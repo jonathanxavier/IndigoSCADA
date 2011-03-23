@@ -1,0 +1,377 @@
+Microsoft Developer Studio Workspace File, Format Version 6.00
+# WARNING: DO NOT EDIT OR DELETE THIS WORKSPACE FILE!
+
+###############################################################################
+
+Project: "Calculated"=..\drivers\Calculated\Calculated.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name fifo
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "Simulator"=..\drivers\Simulator\Simulator.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name scada
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name trace
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "System"=..\drivers\System\System.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name scada
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name trace
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "all"=.\all.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name qtdll
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name install_key
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name io_base
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name gigabase
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name monitor
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name Simulator
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name sqlserver
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name startup
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name System
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name thp94
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name ui
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name psqlodbc
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name opcserver
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name dssodbc
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name realtimesqlserver
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name fastdb
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name dspserver
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name manager
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name archiver
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name Calculated
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name opc_client_com_2_0
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name opc_client_com
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name lightopc_lib
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "archiver"=..\archiver\archiver.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name scada
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name trace
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name utilities
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "dspserver"=..\dispatchserver\dspserver.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name trace
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name utilities
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "fastdb"=..\fastdb\fastdb.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name trace
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "fifo"=..\fifo\fifo.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "gigabase"=..\gigabase\gigabase.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name trace
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "manager"=..\manager\manager.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name trace
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "monitor"=..\monitor\monitor.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name scada
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name trace
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name utilities
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "opc_client_com"=..\drivers\opc_client_com\opc_client_com.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name fifo
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "realtimesqlserver"=..\realtimesqlserver\realtimesqlserver.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name fastdb
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name trace
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name utilities
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "scada"=..\scada\scada.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name trace
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name utilities
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name qtdll
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name fastdb
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "sqlserver"=..\sqlserver\sqlserver.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name gigabase
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name trace
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name utilities
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "ui"=..\UI\ui.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name trace
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name utilities
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "utilities"=..\utilities\utilities.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Global:
+
+Package=<5>
+{{{
+}}}
+
+Package=<3>
+{{{
+}}}
+
+###############################################################################
+

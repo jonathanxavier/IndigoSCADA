@@ -1,0 +1,23 @@
+IndigoSCADA list of TO DO on 21-03-2011
+
+- Reimplement the GUI interface in general and in particular the HMI interface
+
+- Implement dinamic alarm and event lists, now alarm list is static
+
+- Softlogic: improve Calculated.dll
+
+- Porting of GUI of IndigoSCADA to QT version 4.x.x
+
+- Porting to current Linux distributions
+
+- Porting to Symbian
+
+- Upgrade the realtime and historical databases to current versions
+
+- Update documentation 
+
+- Translate user interface
+
+- Remove dependecy on STL std::map
+
+- Use CMake build system - http://www.cmake.org/ or qmake

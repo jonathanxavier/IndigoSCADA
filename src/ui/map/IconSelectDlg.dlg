@@ -1,0 +1,101 @@
+DlgEdit:v1.2:Dialog:
+Dialog {
+	ClassHeader {IconSelectDlg.h}
+	ClassSource {IconSelectDlg.cpp}
+	ClassName {IconSelectDlg}
+	DataHeader {IconSelectDlgData.h}
+	DataSource {IconSelectDlgData.cpp}
+	DataName {IconSelectDlgData}
+	WindowBaseClass {QDialog}
+	IsModal {TRUE}
+	WindowCaption {Select Icon}
+	WindowFlags {208}
+}
+WidgetLayout {
+InitialPos {-1 -1}
+Size {490 330}
+MinSize {0 0}
+MaxSize {32767 32767}
+Grid {10}
+TextTranslated {TRUE}
+
+ListBox {
+		DragSelect {TRUE}
+		AutoScroll {TRUE}
+		ScrollBar {TRUE}
+		AutoScrollBar {TRUE}
+		BottomScrollBar {TRUE}
+		AutoBottomScrollBar {TRUE}
+		SmoothScrolling {FALSE}
+		MultiSelection {FALSE}
+		AutoUpdate {TRUE}
+		Style {34}
+		LineWidth {2}
+		MidLineWidth {0}
+		FrameMargin {0}
+		Rect {10 20 470 250}
+		Name {ListBox_2}
+		Variable {List}
+		MinimumSize {0 0}
+		MaximumSize {32767 32767}
+		BackgroundPixmap {}
+		UseBackgroundPixmap {FALSE}
+		AdjustSize {FALSE}
+		ReadPixmapFromData {FALSE}
+		DataVarName {}
+		DataLenName {}
+		FocusPolicy {TabFocus}
+		BackgroundMode {PaletteBackground}
+		FontPropagation {SameFont}
+		PalettePropagation {SameFont}
+}
+PushButton {
+		ToggleButton {FALSE}
+		Default {FALSE}
+		AutoDefault {TRUE}
+		IsMenuButton {FALSE}
+		Text {Ok}
+		AutoRepeat {FALSE}
+		AutoResize {FALSE}
+		Rect {10 290 100 30}
+		Name {PushButton_3}
+		Signal {[Protected]  clicked --> accept  ()}
+		MinimumSize {0 0}
+		MaximumSize {32767 32767}
+		BackgroundPixmap {}
+		UseBackgroundPixmap {FALSE}
+		AdjustSize {FALSE}
+		ReadPixmapFromData {FALSE}
+		DataVarName {}
+		DataLenName {}
+		FocusPolicy {TabFocus}
+		BackgroundMode {PaletteButton}
+		FontPropagation {SameFont}
+		PalettePropagation {SameFont}
+}
+PushButton {
+		ToggleButton {FALSE}
+		Default {FALSE}
+		AutoDefault {TRUE}
+		IsMenuButton {FALSE}
+		Text {Cancel}
+		AutoRepeat {FALSE}
+		AutoResize {FALSE}
+		Rect {380 290 100 30}
+		Name {PushButton_4}
+		Signal {[Protected]  clicked --> reject  ()}
+		MinimumSize {0 0}
+		MaximumSize {32767 32767}
+		BackgroundPixmap {}
+		UseBackgroundPixmap {FALSE}
+		AdjustSize {FALSE}
+		ReadPixmapFromData {FALSE}
+		DataVarName {}
+		DataLenName {}
+		FocusPolicy {TabFocus}
+		BackgroundMode {PaletteButton}
+		FontPropagation {SameFont}
+		PalettePropagation {SameFont}
+}
+
+}
