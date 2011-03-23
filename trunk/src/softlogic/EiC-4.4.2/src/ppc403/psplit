@@ -1,0 +1,4 @@
+powerpc-eabi-objcopy -v --strip-unneeded --strip-debug -O srec --remove-section=.bss --remove-section=.data seic rom.sr
+powerpc-eabi-objcopy -v --strip-unneeded --strip-debug -O srec --remove-section=.text seic ram.sr
+striplf rom.sr
+striplf ram.sr
