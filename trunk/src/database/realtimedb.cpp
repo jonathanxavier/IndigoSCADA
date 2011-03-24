@@ -49,24 +49,6 @@ QSDatabase *GetConfigureDb ()
 	return NULL;
 
 	#else
-
-	char* dbn = "configdb";
-
-	struct ilist                          ii;
-	struct sglib_hashed_ilist_iterator    it;
-
-	ii.i = 0;
-	for(int i = 0; i < strlen(dbn); i++, dbn++)
-	{
-		ii.i += *dbn;
-	}
-
-	if(sglib_hashed_ilist_find_member(databases, &ii) != NULL)
-	{
-		return ii.db;
-	}
-	
-	return NULL;
 	#endif
 	
 };
@@ -83,23 +65,6 @@ QSDatabase *GetCurrentDb ()
 	return NULL;
 
 	#else
-	char* dbn = "currentdb";
-
-	struct ilist                          ii;
-	struct sglib_hashed_ilist_iterator    it;
-
-	ii.i = 0;
-	for(int i = 0; i < strlen(dbn); i++, dbn++)
-	{
-		ii.i += *dbn;
-	}
-
-	if(sglib_hashed_ilist_find_member(databases, &ii) != NULL)
-	{
-		return ii.db;
-	}
-	
-	return NULL;
 	#endif
 };
 
@@ -115,23 +80,6 @@ QSDatabase *GetResultDb ()
 	return NULL;
 
 	#else
-	char* dbn = "resultsdb";
-
-	struct ilist                          ii;
-	struct sglib_hashed_ilist_iterator    it;
-
-	ii.i = 0;
-	for(int i = 0; i < strlen(dbn); i++, dbn++)
-	{
-		ii.i += *dbn;
-	}
-
-	if(sglib_hashed_ilist_find_member(databases, &ii) != NULL)
-	{
-		return ii.db;
-	}
-	
-	return NULL;
 	#endif
 
 };
@@ -143,11 +91,6 @@ RealTimeDbDict& GetRealTimeDbDict()
 };
 
 #else
-
-RealTimeDbDict GetRealTimeDbDict()
-{
-	return (void*)databases;
-};
 #endif
 //
 //
@@ -182,13 +125,6 @@ bool OpenRealTimeConnections()	// open the connections with the servers
 
 	bool is_low_freq = true;
 
-	#ifndef USE_STD_MAP
-	struct ilist                          ii, *nn;
-	struct sglib_hashed_ilist_iterator    it;
-	
-	sglib_hashed_ilist_init(databases);
-	#endif
-
 	//open connection with databases
 	if(iniFile.find("online","databases"))
 	{
@@ -210,24 +146,6 @@ bool OpenRealTimeConnections()	// open the connections with the servers
 				RealTimeDbDict::value_type pr(dbname,new REALTIME_DB());
 				databases.insert(pr); // put in the dictionary
 				#else
-
-				char *p = (char*)((const char*) dbname);
-				ii.i = 0;
-				for(int i = 0; i < strlen(dbname); i++, p++)
-				{
-					ii.i += *p;
-				}
-				
-				ii.db = new REALTIME_DB();
-
-				if(sglib_hashed_ilist_find_member(databases, &ii) == NULL) 
-				{
-				  nn = (struct ilist*)malloc(sizeof(struct ilist));
-				  nn->i = ii.i;
-				  nn->db = ii.db;
-				  sglib_hashed_ilist_add(databases, nn);
-				}
-								
 				#endif
 
 				if(!strcmp("1",iniFile.find("is_low_freq",token)))
@@ -395,15 +313,6 @@ void CloseRealTimeConnections ()
 		databases.erase(it);
 	}
 	#else
-
-	struct ilist                          *ll;
-	struct sglib_hashed_ilist_iterator    it;
-
-	for(ll=sglib_hashed_ilist_it_init(&it,databases); ll!=NULL; ll=sglib_hashed_ilist_it_next(&it)) 
-	{
-		free(ll);
-	}
-
 	#endif
 
 };
@@ -443,7 +352,6 @@ QSDatabase *GetSpareConfigureDb ()
 
 	return NULL;
 	#else
-return NULL;
 	#endif
 
 };
@@ -459,7 +367,6 @@ QSDatabase *GetSpareCurrentDb ()
 	}
 	return NULL;
 	#else
-return NULL;
 	#endif
 
 };
@@ -475,7 +382,6 @@ QSDatabase *GetSpareResultDb ()
 	}
 	return NULL;
 	#else
-return NULL;
 	#endif
 
 };
