@@ -56,13 +56,12 @@ void Opc_client_com_DriverThread::run()
 	//AsyncRead(false); //Asincronous read from opc server (Read from Device)
 	//AsyncUpdate();
 	/////////////////////////////////////////General interrogation//////////////////////////////////////////////////////////////////////////////////////////////////////
-	//OPC DA 2.0 funziona con il server Prosys.OPC.Simulation. Questa chiede sempre tutti gli items (i.e IEC 101 General Interrogation)
-	//Questa viene chiamata SOLO SE l'operatore scada vuole una general interrogation
+	//OPC DA 2.0 This function sends all items (i.e IEC 101 General Interrogation)
+	//This function is called IF AND ONLY IF operator ask general interrogation
 	//Async2Read(false); 
 	/////////////////////////////////////////Variazioni come spontanee//////////////////////////////////////////////////////////////////////////////////////////////////////
-	//OPC DA 2.0 funziona con il server Prosys.OPC.Simulation. Questa alla prima transaction arrivano tutti gli items, 
-	//poi arrivano solo gli item variati. (i.e. IEC 101 Spontaneaous variations)
-	//Questa viene usata sempre in questo thread
+	//OPC DA 2.0 This function on the first transaction send all items 
+	//the arrives spontaneous variations (i.e. IEC 101 Spontaneaous variations)
 	Async2Update();
 
 	OpcStop();
@@ -884,54 +883,3 @@ signed __int64 Opc_client_com_DriverThread::Epoch_from_FILETIME(const FILETIME *
 	return epoch_in_millisec;
 }
 
-//============================================================================
-// GetUtcTime
-// 
-// These functions were provided by the because they preserve the milliseconds 
-// in the conversion between FILETIME and DATE and they are more efficient.
-
-inline DATE FileTimeToDate(FILETIME *pft)
-{
-	return (double)((double)(*(__int64 *)pft) / 8.64e11) - (double)(363 + (1899 - 1601) * 365 + (24 + 24 + 24));
-}
-
-inline void FileTimeToDate(FILETIME *pft, DATE *pdate)
-{
-	*pdate = FileTimeToDate(pft);
-}
-
-inline FILETIME DateToFileTime(DATE *pdate)
-{
-	__int64 temp = (__int64)((*pdate + (double)(363 + (1899 - 1601) * 365 + (24 + 24 + 24))) * 8.64e11);
-	return *(FILETIME *)&temp;
-}
-
-inline void DateToFileTime(DATE *pdate, FILETIME *pft)
-{
-	*pft = DateToFileTime(pdate);
-}
-
-//==============================================================================
-/*
-//Capire cosa contiene DATE
-QString Opc_client_com_DriverThread::Epoc_from_FILETIME_fast(const FILETIME *fileTime)
-{
-	IT_IT("Epoc_from_FILETIME_fast");
-	
-	DATE d;
-	QString str;
-	signed __int64 epoch_in_millisec;
-
-	FileTimeToDate((FILETIME *)fileTime, &d);
-
-	epoch_in_millisec = (__int64)d;
-
-	char buffer[20];
-	_i64toa(epoch_in_millisec, buffer, 10);
-	str = QString(buffer);
-
-	IT_COMMENT((const char *)str);
-
-	return str;
-}
-*/
