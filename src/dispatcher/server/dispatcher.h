@@ -1,3 +1,15 @@
+/*
+ *                         IndigoSCADA
+ *
+ *   This software and documentation are Copyright 2002 to 2009 Enscada 
+ *   Limited and its licensees. All rights reserved. See file:
+ *
+ *                     $HOME/LICENSE 
+ *
+ *   for full copyright notice and license terms. 
+ *
+ */
+
 #ifndef __DISPATCHER_H__
 #define __DISPATCHER_H__
 

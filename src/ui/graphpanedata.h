@@ -11,7 +11,7 @@
  */
 
 /*
-*Header For: graph window
+*graph window
 *Purpose: to plot a graph on the screen
 */
 

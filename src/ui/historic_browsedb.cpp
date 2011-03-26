@@ -11,8 +11,8 @@
  */
 
 /*
-*Header For: Browser database
-*Purpose: Broeser interface for database
+*Browser database
+*Purpose: Historic browser interface for database
 */
 #include "historic_browsedb.h"
 #include "IndentedTrace.h"

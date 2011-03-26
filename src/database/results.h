@@ -363,7 +363,7 @@ struct SpValue // a measured result
 {
 	QString tag; // the tag name eg value, 0.5
 	unsigned char type; //the type of measurement
-	//dal singolo bit con qualita al valore a 64 bit
+	//from single bit with quality to value at 64 bits
 	union {
 		iec_type1 v1_q;
 		iec_type3 v3_q;
@@ -400,6 +400,7 @@ struct SpValue // a measured result
 
 	SpValue(const QString &s= "", void* v = NULL, unsigned char tp = 0) : tag(s), type(tp)
 	{
+		/*
 		memset(&v1_q, 0x00, sizeof(v1_q));
 		memset(&v3_q, 0x00, sizeof(v3_q));
 		memset(&v7_q, 0x00, sizeof(v7_q));
@@ -417,7 +418,8 @@ struct SpValue // a measured result
 		memset(&v153_q, 0x00, sizeof(v153_q));
 		memset(&v154_q, 0x00, sizeof(v154_q));
 		memset(&v155_q, 0x00, sizeof(v155_q));
-		memset(&v156_q, 0x00, sizeof(v156_q));
+		*/
+		memset(&v150_q, 0x00, sizeof(v150_q));
 
 		if(v == NULL)
 		{

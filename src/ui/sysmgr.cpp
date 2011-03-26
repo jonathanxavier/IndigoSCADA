@@ -1,4 +1,16 @@
 /*
+ *                         IndigoSCADA
+ *
+ *   This software and documentation are Copyright 2002 to 2009 Enscada 
+ *   Limited and its licensees. All rights reserved. See file:
+ *
+ *                     $HOME/LICENSE 
+ *
+ *   for full copyright notice and license terms. 
+ *
+ */
+
+/*
 *Header For: System Manager's window
 *Purpose: The system manager application window allows configuration of the system 
 *- only one system manager can be active at any one time

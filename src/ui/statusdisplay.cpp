@@ -1,4 +1,16 @@
 /*
+ *                         IndigoSCADA
+ *
+ *   This software and documentation are Copyright 2002 to 2009 Enscada 
+ *   Limited and its licensees. All rights reserved. See file:
+ *
+ *                     $HOME/LICENSE 
+ *
+ *   for full copyright notice and license terms. 
+ *
+ */
+
+/*
 *Header For: Sample Status Display
 *Purpose: this window is a vertically split window. On the left are the sample points (colour coded status) 
 *on the right is the status of the currently selected sample point

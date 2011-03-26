@@ -1,4 +1,16 @@
 /*
+ *                         IndigoSCADA
+ *
+ *   This software and documentation are Copyright 2002 to 2009 Enscada 
+ *   Limited and its licensees. All rights reserved. See file:
+ *
+ *                     $HOME/LICENSE 
+ *
+ *   for full copyright notice and license terms. 
+ *
+ */
+
+/*
 *Header For:System
 *
 *Purpose: this is the header for the System device - this monitors disk space and memory. 
