@@ -10,7 +10,6 @@
  *
  */
 /*
-*Header For: user.cpp
 *Purpose: this is the user frame work. Most of the menu handling is done here
 *This must be the top level widget
 */

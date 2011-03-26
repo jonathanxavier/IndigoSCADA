@@ -47,7 +47,7 @@ RIntro::paintEvent(QPaintEvent* _ev)
   paint.setPen(black);
   paint.drawText(0, 0, width(), height()-2,
                  AlignLeft|AlignBottom,
-                 "www.enscada.com");
+                 "you name");
                  
   paint.drawText(0, 0, width(), height()-2,
                  AlignRight|AlignBottom,

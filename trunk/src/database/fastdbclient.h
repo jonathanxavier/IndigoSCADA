@@ -422,14 +422,14 @@ class Fastdb_Thread : QThread
 	bool SetQuery(const QString &s);
 	
 	private:
-    int     pos;
-    int     tknPos;
-    char_t* buf;
+	int     pos;
+	int     tknPos;
+	char_t* buf;
 	char_t* name;
 	char_t* numbuf;
-    int     buflen;
-    int8    ival;
-    real8   fval;
+	int     buflen;
+	int8    ival;
+	real8   fval;
     
 	cli_oid_t oid;
 	cli_field_descriptor* fields;
@@ -445,12 +445,12 @@ class Fastdb_Thread : QThread
 	cli_int8_t *value_int8;
 	cli_oid_t *value_oid;
 
-    void error(char_t const* msg);
-    int  get();
-    void unget(int ch);
-    int  scan();
-    bool expect(char_t const* expected, int token);
-    bool readCondition();
+	void error(char_t const* msg);
+	int  get();
+	void unget(int ch);
+	int  scan();
+	bool expect(char_t const* expected, int token);
+	bool readCondition();
 	QString nested_select(const QString &table_name);
 	int allocate_bindings();
 	void deallocate_bindings();

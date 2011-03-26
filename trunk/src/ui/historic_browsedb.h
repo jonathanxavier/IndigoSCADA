@@ -11,8 +11,7 @@
  */
 
 /*
-*Header For: Browsing the historic online databases
-*Purpose: browser interface for db
+*Purpose: Browsing the historic online databases
 */
 #ifndef include_historic_browsedb_hpp 
 #define include_historic_browsedb_hpp

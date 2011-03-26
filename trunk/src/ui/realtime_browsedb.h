@@ -11,8 +11,7 @@
  */
 
 /*
-*Header For: Browsing the real time online databases
-*Purpose: browser interface for db
+*Purpose: Browsing the real time online databases
 */
 #ifndef include_realtime_browsedb_hpp 
 #define include_realtime_browsedb_hpp

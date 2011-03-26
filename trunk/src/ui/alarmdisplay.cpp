@@ -1,4 +1,15 @@
-/*h
+/*
+ *                         IndigoSCADA
+ *
+ *   This software and documentation are Copyright 2002 to 2009 Enscada 
+ *   Limited and its licensees. All rights reserved. See file:
+ *
+ *                     $HOME/LICENSE 
+ *
+ *   for full copyright notice and license terms. 
+ *
+ */
+/*
 *Header For: Alarm Display Window
 *Purpose: this displays current alarm groups and alarm states
 The alarm display shows on the left the alarm groups. On the right the alarm status of points

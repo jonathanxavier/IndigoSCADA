@@ -11,7 +11,7 @@
  */
 
 /*
-*Header For: Browser realtime database
+*Browser realtime database
 *Purpose: Browser interface for real time database
 */
 #include "realtime_browsedb.h"

@@ -11,7 +11,7 @@
  */
 
 /*
-*Header For: Graph Pane
+*Graph Pane
 *Purpose:to display a graph as NOT a time related graph
 */
 
