@@ -26,7 +26,6 @@
 #include "sptypes.h"
 #include "smplstat.h"
 #include "common.h"
-#include "drivernames.h"
 
 #ifdef OPC_CLIENT_COM_EXPORTS
 #define OPC_CLIENT_COMDRV __declspec(dllexport)
