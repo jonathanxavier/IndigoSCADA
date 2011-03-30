@@ -171,10 +171,7 @@ MaxRetryReconnectToSpareRealTimeDb(0)
 	LastFetchNo = "0";
 	//
 	iscadaAddress = SUPPLIER_NAME_LONG;
-	firmAddress = CUSTOMER_NAME_LONG + QString("\nCodice:")
-	+ QString::number(ENSCADA_MACHINE_CODE)
-	+ QString("/")
-	+ QString::number(ENSCADA_YEAR_CODE);
+	firmAddress = CUSTOMER_NAME_LONG + QString("\n");
 
 };
 /*-Function:~UserFrameWork
@@ -1788,11 +1785,7 @@ void UserFrameWork::About()
 		QDateTime dt = QDateTime::currentDateTime();
 
 		QMessageBox::about(this,tr(SYSTEM_NAME),
-								#ifdef DEMONSTRATION_VERSION
-								tr("Demo version: ") + QString(GetScadaDateBuild()) + " " + QString(GetScadaTimeBuild())
-								#else
 								tr("Version: ") + QString(GetScadaDateBuild()) + " " + QString(GetScadaTimeBuild())
-								#endif
 								+ QString("\n")
 								+ tr("Compiler version: ") + comp
 								+ QString("\n")

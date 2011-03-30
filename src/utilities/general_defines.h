@@ -19,8 +19,7 @@
 #define MONITOR_CAN_RUN_AS_ROOT
 #define USE_DB_MANAGEMENT_WINDOW
 
-#define USE_STD_MAP //if we use the STL std::map 
-#define DEMONSTRATION_VERSION
+//#define USE_STD_MAP //if we use the STL std::map 
 //#define NO_LOGIN //uncomment for development
 
 ///////////HMI appearence//////////////
@@ -45,7 +44,7 @@
 ////////////////////general system names/////////////
 //Suppliers company names
 
-//Enscada
+//Supplier
 #define SUPPLIER_NAME_SHORT "Your name"
 #define SUPPLIER_NAME_LONG "Your long name"
 #define LOGO_SUPPLIER QPixmap((const char **)logo_blank_30)
@@ -64,18 +63,13 @@
 #define SYSTEM_NAME_STARTING "IndigoSCADA Starting"
 
 //IndigoSCADA software demo
-#define CUSTOMER_ID 5
 #define CUSTOMER_NAME_SHORT ""
 #define CUSTOMER_NAME_LONG "logo e nome del cliente"
 #define LOGO_CUSTOMER QPixmap((const char **)logo_blank_30)
-#define ENSCADA_MACHINE_CODE 1005 
-#define ENSCADA_YEAR_CODE 2009
 
 //////////////////////////////////////////////////////////////////
 //start tests section 
 //////////////////////////////////////////////////////////////////
-
-//oppure in IndentedTrace.h per attivare le trace
 
 #endif//GENERAL_DEFINES
 

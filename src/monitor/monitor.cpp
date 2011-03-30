@@ -10,10 +10,7 @@
  *
  */
 /*
-*Header For: Monitoring engine 
 *Purpose: this manages the data acquisition side of things
-*Requires an X server to be running, so Qt can run. Although no window is needed - except for debugging 
-*in which a trace window would be helpful.
 */
 
 #include "common.h"

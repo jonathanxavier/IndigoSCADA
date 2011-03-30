@@ -30,7 +30,8 @@
 #ifdef USE_STD_MAP
 typedef std::map<QString, REALTIME_DB*, std::less<QString> > RealTimeDbDict; // the database dictionary
 #else
-
+#include "ds.h"
+typedef SET RealTimeDbDict;
 #endif
 
 /////////////////////primary host real time databases/////////////////////////////
