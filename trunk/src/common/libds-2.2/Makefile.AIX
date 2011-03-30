@@ -1,0 +1,81 @@
+#-------------------------------------------------------------
+#       
+# SLT: 28.12.2001, Adapt Makefile.x for AIX xlc 3.6 compilers
+#                  Frank Schulte, fschulte\@hightek.com
+#
+#-------------------------------------------------------------
+
+LIB_PATH	= lib
+
+CC              =  xlc
+
+CCOPTFLAGS      = 
+CCDEBUGFLAGS    = -g -qdbxextra -qfullpath -qinfo
+CCWARNFLAGS     = 
+
+CCEXTRAFLAGS	= -DStandAlone
+
+OUTPUTDIR       = .
+INCLUDEDIR      = . 
+
+INCLUDEFLAGS    = -I $(INCLUDEDIR) -I . -I ..
+
+# Default compile is release
+CCFLAGS         = $(CCOPTFLAGS) $(CCWARNFLAGS) $(CCEXTRAFLAGS)
+#CCFLAGS        = $(CCOPTFLAGS) $(CCWARNFLAGS) $(CCEXTRAFLAGS)
+
+.SUFFIXES:	.e .o
+
+LIBTARGET = libds
+LIBHEADER = ds.h
+HEADERS = 
+OBJ = avltree.o hashtbl.o heap.o parray.o queue.o stack.o set.o
+
+LINC	= -I ../include -I ../../include
+ARLIB	= $(LIB_PATH)/$(LIBTARGET).a
+SOLIB   = $(LIB_PATH)/$(LIBTARGET).so
+TARGET	= $(ARLIB) $(SOLIB)
+
+all: 
+	$(MAKE) -f Makefile.AIX release
+
+release:
+	@-$(MAKE) -f Makefile.AIX CCFLAGS="$(CCOPTFLAGS) $(CCWARNFLAGS) $(CCEXTRAFLAGS)" \
+	$(TARGET)
+debug:
+	@-$(MAKE) -f Makefile.AIX CCFLAGS="$(CCDEBUGFLAGS) $(CCWARNFLAGS) $(CCEXTRAFLAGS)" \
+	$(TARGET)
+
+$(ARLIB):   $(OBJ)
+	@mkdir -p $(LIB_PATH)
+	@-ar r $(ARLIB) $(OBJ); ranlib $(ARLIB);\
+	makeC++SharedLib -bnoquiet -o $(SOLIB) -p 0 $(OBJ)
+
+.c.o:
+	$(CC) $(INCLUDEFLAGS) $(LINC) $(CPPFLAGS) $(CCFLAGS) -c $*.c
+
+.c.e:
+	$(CC) -E $(INCLUDEFLAGS) $(LINC) $(CPPFLAGS) $(CCFLAGS) $*.c > $@
+
+.PHONY: clean
+
+clean:
+	@-echo "Cleaning directory $$W"
+	@-rm -f core *.e *.o *.obj *.ilk *.ncb *.pdb *.pch
+	@-rm -f *~ $(SOLIB) $(ARLIB)
+	@-rm -rf $(LIB_PATH) $(BUILD_PATH)
+	@cd tests; $(MAKE) -f Makefile.AIX clean
+
+avltree.o: ./ds.h ./local.h
+
+heap.o: ./ds.h ./local.h
+
+parray.o: ./ds.h ./local.h
+
+queue.o: ./ds.h ./local.h
+
+stack.o: ./ds.h ./local.h
+
+hashtbl.o: ./ds.h ./local.h
+
+set.o:	./ds.h ./local.h

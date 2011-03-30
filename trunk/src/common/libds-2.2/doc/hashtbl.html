@@ -1,0 +1,171 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.72 [en] (Win98; U) [Netscape]">
+   <title>LibDS: Heap </title>
+<!--
+/*
+ * /home/teddykgb/dev/root/ds/doc/hashtbl.html
+ * teddykgb Sat Dec 15 15:58:15 EST 2001
+ */
+-->
+</head>
+<body>
+
+<hr WIDTH="100%"><a href="#intro">Introduction</a> |
+<a href="#init">Initialization</a>
+|
+<a href="#close">Closing</a> |
+<a href="#adding">Adding</a> |
+<a href="#deleting">Deleting</a>
+|
+<a href="#fetching">Fetching</a> |
+<a href="#parameters">Parameters</a>
+|
+<a href="#advanced">Advanced</a> |
+<a href="#obscure">Obscure</a>
+<br>
+<hr WIDTH="100%">
+<h2>
+HASH TABLE</h2>
+
+<h3>
+<a NAME="intro"></a><font color="#3366FF">Introduction</font></h3>
+Using a heap or a balanced binary tree to store and retrieve data is a
+very fast and efficient way to deal with data that needs to be sorted in
+one way or another. We know that construction of a heap or binary tree
+is of the order of O(<i>n </i>lg <i>n</i>), while data access can happen
+in O(lg <i>n</i>), <i>n</i> being the number of data items stored in the
+data structure. These limits are lower limits, and as long as key comparisons
+are required in order to access the data, we know that they cannot be made
+lower (I won't go about giving the proof here, check out a book on this
+if you need the exact proof).
+<p>But, strictly speaking, we don't always <i>need</i> to store data in
+any particular order, nor do we need to sort it. If we don't need to sort
+the data, then we can dispense with the need for key comparisons, and can
+in fact make data access much faster. This is the principle behind using
+a table: you can access any element of the table in O(1), which is <b>independent</b>
+of the number of data elements contained in it. With a lot of elements
+and frequent data access, we can achieve some noticeable speed differences
+this way.
+<p>Mapping a data element with a key to a location in the table is achieved
+by using a hash function. A hash function will always map a given key to
+a particular location in the table. Accessing the element simply means
+run its key through the hash function and read the table index that the
+function returned. From here stems the advantage in speed over a balance
+binary tree.
+<p>LibDS refers to a hashtable as a <tt>HASHTABLE</tt>. In the current
+implementation, a hash table is represented by a fixed size array, while collisions
+are resolved through chaining. Keys are as usual of type <tt>DSKEY</tt>.
+You need to define your own hash function, and hash key comparison function
+(by now this should sound familiar). However, since strings are quite often
+used as keys, LibDS provides a default hash and hash comparison function
+that work on C-strings.
+<p>As usual, items stored in the hash table are <tt>void</tt> pointers
+to actual user data.
+<p>All data is stored in virtual memory.
+<h3>
+<a NAME="init"></a><font color="#3366FF">Initialization</font></h3>
+<tt><font color="#000000">HASHTABLE <b>htMake</b>(int <i>size</i>)</font></tt>
+<p>Creates a default hash table of size <i>size</i>. Passing a value for
+<i>size</i>
+smaller than 1 lets LibDS choose a default value, normally something in
+the order of less than a 1000 elements. There is some debate whether the
+size should be a primary number or not, which can supposedly reflect on
+the amount of collisions that will occur. Experiment with this to find
+out.
+<br>The default hash table assumes C-strings as keys, and uses a predefined
+hash function. If you got a better function, see the next function on how
+to tell LibDS to use that instead.
+<p><tt>HASHTABLE <b>htMakeHashTable</b>(int <i>size</i>,HASHFUNC <i>hashfun</i>,HASHCMPFUNC
+<i>cmpfun</i>)</tt>
+<br><tt>typedef unsigned int (*HASHFUNC)(DSKEY);</tt>
+<br><tt>typedef int (*HASHCMPFUNC)(DSKEY,DSKEY);</tt>
+<p><font color="#000000">Creates a new hash table. It has a size of <i>size</i>,
+and uses the given functions for hashing and comparing the keys. LibDS
+assumes a key of 32 bits, so <i>hashfun</i> must return a 32-bit unsigned
+value. Comparing the keys is necessary only when LibDS is resolving collisions,
+and <i>cmpfun</i> is expected to return -1 when the first key is smaller
+than the second, 0 when the two keys are equal, and 1 whenever the second
+key is larger than the first.</font>
+<p><font color="#000000">Upon success, the above functions return a valid
+<tt>HASHTABLE</tt>
+pointer. If they fail, <tt>NULL</tt> is returned.</font>
+<h3>
+<a NAME="close"></a><font color="#3366FF">Closing</font></h3>
+<tt><font color="#000000">void <b>htClose</b>(HASHTABLE <i>hashtable</i>)</font></tt>
+<p><font color="#000000">Closes the hash table, effectively releasing all
+memory used by it. User data remains untouched.</font>
+<p><tt><font color="#000000">void <b>htCloseWithFunction</b>(HASHTABLE
+<i>hashtable</i>,void
+(*<i>fun</i>)(void*))</font></tt>
+<p><font color="#000000">Closes the hashtable, only this time call the
+function
+<i>fun</i> on each data element in the table as it is being closed.</font>
+<h3>
+<a NAME="adding"></a><font color="#3366FF">Adding</font></h3>
+<tt>int <b>htAdd</b>(HASHTABLE <i>table</i>,DSKEY <i>key</i>,void *<i>data</i>)</tt>
+<p>Adds a new element with key <i>key</i> to the hashtable. The function
+returns 0 on success, -1 on failure. Failure is signalled whenever a duplicate
+key is detected, or there is a memory allocation problem.
+<h3>
+<a NAME="deleting"></a><font color="#3366FF">Deleting</font></h3>
+<tt>void* <b>htRemove</b>(HASHTABLE <i>table</i>,DSKEY <i>key</i>)</tt>
+<p>Delete the element with the given <i>key</i> from the hash table.
+<h3>
+<a NAME="fetching"></a><font color="#3366FF">Fetching</font></h3>
+<font color="#000000">As usual, whenever a <tt>void*</tt> is returned,
+it contains user data, or <tt>NULL</tt> if something went wrong. Therefore,
+storing <tt>NULL</tt> as a value will not be distinguished from an error.</font>
+<p><tt>void * <b>htFind</b>(HASHTABLE <i>table</i>,DSKEY <i>key</i>)</tt>
+<p><font color="#000000">Return the element with the given <i>key</i>.
+Fails if the key is not in the table.</font>
+<br>&nbsp;
+<h3>
+<a NAME="parameters"></a><font color="#3366FF">Parameters</font></h3>
+<tt>int <b>htSize</b>(HASHTABLE <i>table</i>)</tt>
+<p>Return the size of the table. This is equal to the argument passed to
+the <tt>htMake*()</tt> functions, unless that argument was -1, in which
+case this function returns the actual size LibDS selected for the table.
+Does not fail.
+<p><tt>int <b>htItems</b>(HASHTABLE <i>table</i>)</tt>
+<p>Returns the actual number of items currently stored in the table. Never
+fails.
+<p><tt>int <b>htConflicts</b>(HASHTABLE <i>table</i>)</tt>
+<p>Returns the number of conflicts (items that are mapped to the same location
+in the table). Never failes.
+<p><tt>int <b>htEmpty</b>(HASHTABLE <i>table</i>)</tt>
+<p>Returns true (value not equal to zero) if the table has no (more) elements.
+Else, false (value equal to zero) is returned. (Equivalent to <tt>htItems()
+== 0</tt>).
+<h3>
+<a NAME="advanced"></a><font color="#3366FF">Advanced funtionality</font></h3>
+
+<h4>
+Visiting the elements of a HASHTABLE</h4>
+You can visit all elements in the hash table and call a function to be
+performed on each data item found in each element.
+<p><tt>void <b>htWalk</b>(HASHTABLE <i>table</i>,int <i>all</i>,void (*<i>fun</i>)(DSKEY
+<i>key</i>,void * <i>data</i>,int <i>is_conflict</i>))</tt>
+<p>Visits all the elements in the table (in <b>no predefined</b> order),
+and calls <i>fun</i> on each element found. The function receives as first
+argument the key of the element. As second argument the user data that
+was stored with the element is passed. The third argument is non-zero if
+the current element is a <i>conflict of the previous one</i>. The third
+argument is zero if the current element is not conflicting with any other
+elements. If <i>all</i> is true (not equal to zero), all elements are visited.
+If <i>all</i> is equal to zero, only the conflicting elements are visited.
+<p><b>NOTE</b>: <tt>htWalk()</tt> will happily visit all slots in the hashtable,
+<i>including those that are empty</i>. Therefore, it is not ideal for sequential
+access to your data.
+<h3>
+<a NAME="obscure"></a><font color="#3366FF">Obscure functionality</font></h3>
+Nothing.
+<p>
+<hr WIDTH="100%">
+<br><font size=-1>Thu Dec 27 15:37:04 EST 2001</font>
+<br>
+<hr WIDTH="100%">
+</body>
+</html>

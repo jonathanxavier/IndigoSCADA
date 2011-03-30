@@ -1,0 +1,200 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.79 [en] (X11; U; Linux 2.4.2 i386) [Netscape]">
+   <title>LibDS: Stack</title>
+<!--
+/*
+ * /home/teddykgb/dev/root/ds/doc/stack.html
+ * teddykgb Thu Dec 13 11:45:57 CET 2001
+ */
+-->
+</head>
+<body>
+
+<hr WIDTH="100%"><a href="#intro">Introduction</a> |
+<a href="#init">Initialization</a>
+|
+<a href="#close">Closing</a> |
+<a href="#adding">Adding</a> |
+<a href="#deleting">Deleting</a>
+|
+<a href="#fetching">Fetching</a> |
+<a href="#parameters">Parameters</a>
+|
+<a href="#advanced">Advanced</a> |
+<a href="#obscure">Obscure</a>
+<br>
+<hr WIDTH="100%">
+<h2>
+SET and BAG</h2>
+Sets and bags is data structures that hold an unlimited number of elements.
+The only difference between them is that the elements in a set are unique,
+while a bag might hold a multiple copy of the same element. Each has its
+uses. I shall refer to the set only in this discussion, highlighting any
+differences with a bag if applicable.
+<p>A&nbsp;set is a collection of elements. Operations that are of interest
+with sets are <tt>UNION</tt> of two sets which computes the union of the
+two sets (it combines them) to produce a new set that contains the elements
+of the original two sets; <tt>CONTAINS</tt>, which check if a set contains
+a particular element; <tt>INTERSECT</tt>, which computes the intersection
+of the two sets (those elements that are contained in both sets); <tt>XINTERSECT</tt>,
+which computes the inverse intersection of the two sets&nbsp;(those elements
+that are <b>not</b> contained in both sets); and <tt>DIFFERENCE</tt>, which
+computes the difference betweeen two sets, defined as those elements of
+the first set that are <b>not</b> contained in the second set.
+<h3>
+<a NAME="intro"></a><font color="#3366FF">Introduction</font></h3>
+LibDS has a single data type to represent both a set and a bag: the
+<tt>SET</tt>,
+although you can use <tt>BAG</tt>&nbsp;as an alias (beware though, LibDS
+does not actually check if a <tt>BAG</tt>&nbsp;is really a <tt>BAG</tt>,
+this is just a semantic convenience). Since a set needs to keep track of
+whether the elements it contains are unique, a LibDS <tt>SET</tt> needs
+as comparison function to be passed to it at init time. This function is
+type <tt>SETCMPFUN</tt>, which is declared as <tt>int(*)(void*,void*)</tt>.&nbsp;&nbsp;
+The convention in this case is that the comparison function returns 1 if
+the compared elements are equal, and 0 otherwise (i.e. we <b>do not</b>
+require that elements in a set can be ordered). In addition a <tt>SET</tt>
+must be told to ensure disjointness (force that elements that are added
+to the <tt>SET</tt> are not in it yet). NOTE: the elements are not compared
+by LibDS! You need to define an own comparison function, and the LibDS
+<tt>SET</tt> itself has no notion of keys, as does the <tt>AVLTREE</tt>
+or the <tt>HEAP</tt>. This is left entirely to the caller's discretion.
+<p>Note on efficiency:&nbsp;if the elements of the set <b>can</b> be ordered,
+then you can make LibDS use a more efficient representation, by providing
+a flag at set creation time (see below), and using a comparison function
+that returns -1 if the first parameter is smaller than the second, 0 if
+both parameters are equal, and 1 if the first parameter is larger than
+the second. Beware of some special cases, as explained below.
+<p>The difference between a <tt>SET</tt> and a <tt>BAG</tt> is determined
+by a single parameter, <i>ensure_disjoint</i> in the creation routine given
+below.
+<h3>
+<a NAME="init"></a><font color="#3366FF">Initialization</font></h3>
+<tt><font color="#000000">SET <b>setMake</b>(void)</font></tt>
+<p>Create a new set. The set will not check for disjointness so it is in
+fact a <tt>BAG</tt>. Furthermore, no comparison function is assigned to
+the new set.
+<p><tt>SET <b>setNew</b>(SETCMPFUN <i>f</i>,int <i>ensure_disjoint</i>,int
+<i>ord</i>)</tt>
+<p>Creates a new set. The comparison function is <i>f</i>, and if you want
+to ensure disjointness (i.e. use this as a <tt>SET</tt> rather than a <tt>BAG</tt>),
+set <i><tt>ensure_disjoint</tt></i> to true. If this is the case, then
+you can also set <i><tt>ord</tt></i> to anything else but 0, to let LibDS
+know that the elements can be ordered (like numbers or strings).&nbsp;In
+this case, LibDS expects <i>f</i> to behave as the C function <tt>strcmp()</tt>:
+that is, return -1 if the first element is smaller than the second, 1 if
+the first element is larger than the second, and zero otherwise. If <i><tt>ensure_disjoint</tt></i>
+is 0, then the <i><tt>ord</tt></i> flag is ignored, and f should behave
+as the set comparison function mentioned in the Introduction to this page.
+<p><a NAME="close"></a><font color="#3366FF">Closing</font><font color="#3366FF"></font>
+<p><tt><font color="#000000">void <b>setClose</b>(SET <i>set</i>)</font></tt>
+<p><font color="#000000">Close the set, releasing all memory it was using.
+User data is left untouched.</font>
+<p><tt><font color="#000000">void <b>setCloseWithFunction</b>(SET <i>set</i>,void
+(*<i>fun</i>)(void*))</font></tt>
+<p><font color="#000000">Close the set and call <i>fun</i> on each data
+in the set.</font>
+<h3>
+<a NAME="adding"></a><font color="#3366FF">Adding</font></h3>
+<tt><font color="#000000">int <b>setAdd</b>(SET <i>set</i>,void *<i>data</i>)</font></tt>
+<p>Adds this element to the set. If the set was created with <i>ensure_disjoint</i>
+set to true (i.e. a true <tt>SET</tt>), then the element will not be added
+if it is already in the set. If <i>ensure_disjoint</i> is false, then the
+element is blindly added to the set (this is the <tt>BAG</tt> behavior).
+Returns 0 on success, -1 on failure.
+<h3>
+<a NAME="deleting"></a><font color="#3366FF">Deleting</font></h3>
+<tt><font color="#000000">void* <b>setRemove</b>(SET <i>set</i>,void *
+<i>key</i>)</font></tt>
+<p><font color="#000000">Removes the element that matches the given <i><tt>key</tt></i>.
+Returns the given element, or <tt>NULL</tt> on error (if element was not
+found in the given <i><tt>set</tt></i>).</font>
+<h3>
+<a NAME="fetching"></a><font color="#3366FF">Fetching</font></h3>
+<tt><font color="#000000">int <b>setContains</b>(SET <i>set</i>,void *<i>elt</i>)</font></tt>
+<p><font color="#000000">Returns true if this <i>set</i> contains the element
+<i>elt</i>.
+This will only work if a comparison function has been given.</font>
+<p><tt><font color="#000000">void * <b>setFind</b>(SET <i>set</i>,void
+*<i>elt</i>)</font></tt>
+<p><font color="#000000">Find the element in this <i>set</i> that is equal
+to the <i>elt</i> passed. If nothing is found, <tt>NULL</tt> is returned.
+This will only work if a comparison function has been passed to the <tt>SET</tt>.</font>
+<p><tt><font color="#000000">void * <b>setFirst</b>(SET <i>set</i>)</font></tt>
+<p><font color="#000000">Returns the first element in this set. "First"
+in this case can be arbitrary. Returns <tt>NULL</tt> if nothing is in the
+set.</font>
+<p><tt><font color="#000000">void * <b>setNext</b>(SET <i>set</i>)</font></tt>
+<p><font color="#000000">Returns the arbitrary next element in the set.
+If <tt>setFirst()</tt> has not been called prior to this function, then
+its effect is identical to <tt>setFirst()</tt>.</font>
+<h3>
+<a NAME="parameters"></a><font color="#3366FF">Parameters</font></h3>
+<tt><font color="#000000">int <b>setSize</b>(SET <i>set</i>)</font></tt>
+<p><font color="#000000">Returns the number of items currently in the set.</font>
+<p><tt><font color="#000000">int <b>setEmpty</b>(SET <i>set</i>)</font></tt>
+<p><font color="#000000">Returns 0 if the set still has items in it, 1
+if it is empty.</font>
+<h3>
+<a NAME="advanced"></a><font color="#3366FF">Advanced functionality</font></h3>
+<font color="#000000">These are the most <tt>SET</tt>-ish operations of
+all the ones described on this page.&nbsp; The presuppose that the two
+sets are compatible: this means, they contain the same kind of elements.
+The restriction is not that big, however: all this means is that the comparison
+functions of the sets are capable on operating on all types of elements
+present in either set.</font><font color="#000000"></font>
+<p><font color="#000000">In all cases, a new set is created and returned.
+Upon failure, these functions return <tt>NULL</tt>.</font>
+<p><tt><font color="#000000">SET <b>setAppend</b>(SET <i>s1</i>,SET <i>s2</i>)</font></tt>
+<br><tt><font color="#000000">SET <b>setUnion</b>(SET <i>s1</i>,SET <i>s2</i>)</font></tt>
+<p><font color="#000000">NOTE: <tt>setAppend()</tt> is just an alias for
+<tt>setUnion()</tt>.</font>
+<br><font color="#000000">This function makes a new set that is the union
+of the two sets given. The second set is left untouched, while the first
+set now contains the elements of both <i>s1</i> and <i>s2</i>. If any elements
+is <i>s2</i> were already in <i>s1</i> and <i>s1</i> was created with <i>ensure_disjoint
+</i>set
+to true, no duplicates will result, else elements of <i>s2</i> are added
+blindly to <i>s1</i>, which might lead to duplicates. The representative
+of the new set is the representative of <i>s1</i> prior to this operation.
+NOTE: </font>This is in fact equivalent to simpy adding all the elements
+of <i>s2</i> into <i>s1</i> and then getting rid of <i>s2</i>.
+<p><tt><font color="#000000">SET <b>setUnion1</b>(SET <i>s1</i>,SET <i>s2</i>)</font></tt>
+<p><font color="#000000">Same as <tt>setUnion()</tt> only now <i>s1</i>
+and <i>s2</i> are left untouched, and a completely new set is created and
+returned. The new set inherits the parameters of <i>s1</i>.</font>
+<p><tt><font color="#000000">SET <b>setIntersect</b>(SET <i>s1</i>,SET
+<i>s2</i>)</font></tt>
+<p><font color="#000000">Computes the intersection of the two sets. This
+will only work if <b>at least<i> </i></b><i><tt>s2</tt> </i>has a comparison
+function. This is so because this function checks to see if an element
+in <i><tt>s1</tt></i> is contained within <i><tt>s2</tt></i>, and only
+then assigns it to the resulting set. Consequently, <i><tt>s2</tt></i>
+must be able to compare elements. As usual, <tt>NULL</tt> is returned upon
+failure.</font>
+<p><tt><font color="#000000">SET <b>setXIntersect</b>(SET <i>s1</i>,SET
+<i>s2</i>)</font></tt>
+<p>Computes the exclusive intersection of the two sets. This means, the
+resulting set contains all the elements of the two sets that are not contained
+in both sets.&nbsp; I.e. if <i>A</i> contains 1,2,3,4 and <i>B</i> containes
+3,4,5,6,7, after <tt>setXIntersect()</tt> the resulting set will contain
+1,3,5,6,7. In contrast <tt>setIntersect()</tt> will produce a set that
+contains 3,4.
+<p><tt><font color="#000000">SET <b>setDifference</b>(SET <i>s1</i>,SET
+<i>s2</i>)</font></tt>
+<p>Compute the difference between <i><tt>s1</tt></i> and <i><tt>s2</tt></i>.
+This is defined as those elements of <i><tt>s1</tt></i> that are not part
+of <i><tt>s2</tt></i>.
+<h3>
+<a NAME="obscure"></a><font color="#3366FF">Obscure functionality</font></h3>
+<font color="#000000">None whatsoever.</font>
+<br>
+<hr WIDTH="100%"><font size=-1>Mon Jan&nbsp; 7 12:12:53 EST 2002</font>
+<br><font size=-1>Sat Jun 22 14:14:15 CEST 2002</font>
+<br>
+<hr WIDTH="100%">
+</body>
+</html>

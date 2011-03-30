@@ -1,0 +1,198 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.72 [en] (Win98; U) [Netscape]">
+   <title>LibDS: Queue </title>
+<!--
+/*
+ * /home/teddykgb/dev/root/ds/doc/queue.html
+ * teddykgb Thu Dec 13 11:45:51 CET 2001
+ */
+-->
+</head>
+<body>
+
+<hr WIDTH="100%"><a href="#intro">Introduction</a> |
+<a href="#init">Initialization</a>
+|
+<a href="#close">Closing</a> |
+<a href="#adding">Adding</a> |
+<a href="#deleting">Deleting</a>
+|
+<a href="#fetching">Fetching</a> |
+<a href="#parameters">Parameters</a>
+|
+<a href="#advanced">Advanced</a> |
+<a href="#obscure">Obscure</a>
+<br>
+<hr WIDTH="100%">
+<h2>
+QUEUE</h2>
+
+<h3>
+<a NAME="intro"></a><font color="#3366FF">Introduction</font></h3>
+A queue is a data structure that supports manipulation of data sequentially.
+Items that need to be processed sequentially are put in the queue. The
+head of the queue contais the item that is next in line for processing,
+while the tail contains the item that will come last. This is all a basic
+queue can do: get the item that is next in line, and add a new item to
+the end of the queue.
+<p>LibDS's imlemetation of a queue is more advanced than this: it is more
+of a linked-list. (Maybe it should be called a linked list, but it can
+play both roles without any problems.) LibDS refers to a queue as a <tt>QUEUE</tt>.
+In this LibDS implementation, the queue consists of nodes (called <tt>QELEM</tt>s),
+which contain all the administrative details required for the queue to
+operate properly, as well as the user data. You don't need necessarily
+need the <tt>QELEM</tt>s to be able to use a <tt>QUEUE.</tt>
+<p>As usual, items stored in the queue are void pointers to actual user
+data.
+<p>All data is stored in virtual memory.
+<h3>
+<a NAME="init"></a><font color="#3366FF">Initialization</font></h3>
+<tt><font color="#000000">QUEUE <b>qMake</b>(void)</font></tt>
+<p><font color="#000000">Creates a new queue. The value returned is <tt>NULL</tt>
+if creation failed.</font>
+<br>&nbsp;
+<h3>
+<a NAME="close"></a><font color="#3366FF">Closing</font></h3>
+<tt><font color="#000000">void <b>qClose</b>(QUEUE <i>q</i>)</font></tt>
+<p><font color="#000000">Closes the queue, effectively releasing all memory
+used by the queue. User data remains untouched, as usual (you <i>will</i>
+lose the pointer to it that the <tt>QUEUE</tt> was using to refer to it).</font>
+<p><tt><font color="#000000">void <b>qCloseWithFunction</b>(QUEUE <i>q</i>,void
+(*<i>fun</i>)(void*))</font></tt>
+<p><font color="#000000">Closes the queue, only this time call the function
+<i>fun</i>
+on each data element in the queue.</font>
+<h3>
+<a NAME="adding"></a><font color="#3366FF">Adding</font></h3>
+<tt>QELEM <b>qAdd</b>(QUEUE <i>q</i>,void *<i>data</i>)</tt>
+<br><tt>QLLEM <b>qEnque</b>(QUEUE <i>q</i>,void *<i>data</i>)</tt>
+<p>Adds an element to the tail of the queue. Returns a valid <tt>QELEM</tt>,
+or <tt>NULL</tt> if there was a problem (normally only if the implementation
+runs out of virtual memory). You can ignore the <tt>QELEM</tt> returned
+if you don't need the advanced functionality.
+<br>The currency of the queue points to this newly added element.
+<h3>
+<a NAME="deleting"></a><font color="#3366FF">Deleting</font></h3>
+<tt>void* <b>qRemove</b>(QUEUE <i>q</i>)</tt>
+<br><tt>void* <b>qDeque</b>(QUEUE <i>q</i>)</tt>
+<p>Removes the element that is next in line, and returns the data stored
+with it, or <tt>NULL</tt> on failure. Currency is not changed unless the
+current element is removed. In that case, the currency is lost.
+<h3>
+<a NAME="fetching"></a><font color="#3366FF">Fetching</font></h3>
+<font color="#000000">The functions below do not actually remove, add or
+change the order of the queue elements. As usual, whenever a <tt>void*</tt>
+is returned, it contains user data, or <tt>NULL</tt> if something went
+wrong. Therefore, storing <tt>NULL</tt> as a value in the queue will not
+be distinguished from an error.</font>
+<p><tt><font color="#000000">void* <b>qFirst</b>(QUEUE <i>q</i>)</font></tt>
+<p><font color="#000000">Return the first element in the queue. Fails if
+the queue is empty. The currency is set to the first element in the queue.</font>
+<p><tt><font color="#000000">void* <b>qLast</b>(QUEUE <i>q</i>)</font></tt>
+<p><font color="#000000">Returns the last element in the queue. Fails if
+the queue is empty. The currencty is set to the last element in the queue.</font>
+<p><tt><font color="#000000">void* <b>qNext</b>(QUEUE <i>q</i>)</font></tt>
+<p>Returns the next element in the queue. "Next" is defined as the element
+<i>behind</i>
+the current element in the queue. By convention, if there is no current
+item, the first item is returned. This effectively means that calling <tt>qNext()</tt>
+twice at the end of the queue will return the first element in the queue.
+<p><tt>void* <b>qPrev</b>(QUEUE <i>q</i>)</tt>
+<p>Returns the previous element in the queue. "Previous" is defined as
+the element <i>in front</i> of the current element. By convention, if there
+is no current item, the last item is returned. This effectively means that
+calling <tt>qPrev()</tt> twice at the head of the queue will return the
+last element in the queue.
+<p><tt>void* <b>qCurrent</b>(QUEUE <i>q</i>)</tt>
+<p>Returns the current item in the queue, or <tt>NULL</tt> if there's no
+current item.
+<p><tt>void <b>qClearCurrent</b>(QUEUE <i>q</i>)</tt>
+<p>Clears the value of the current element. When this function returns
+the queue has no current element. This function always succeeds.
+<h3>
+<a NAME="parameters"></a><font color="#3366FF">Parameters</font></h3>
+<tt>int <b>qLength</b>(QUEUE <i>q</i>)</tt>
+<br><tt>int <b>qSize</b>(QUEUE <i>q</i>)</tt>
+<p>Return the number of elements in the queue.
+<p><tt>int <b>qEmpty</b>(QUEUE <i>q</i>)</tt>
+<p>Returns 0 if the queue still has elements. Else a value not equal to
+zero is returned.
+<h3>
+<a NAME="advanced"></a><font color="#3366FF">Advanced functionality</font></h3>
+
+<h4>
+Visiting the elements of the <tt>QUEUE</tt></h4>
+You can visit all elements in the queue and call a function to be performed
+on each data item found in each element.
+<p><tt>void <b>qWalk</b>(QUEUE <i>q</i>,void (*<i>fun</i>)(void*))</tt>
+<p>Visit all elements in the queue front-to-back, applying <i>fun</i> on
+each data item. Note that the same effect can be achieved through
+<p><tt>for (data = qFirst(q); data; data = qNext(q))</tt>
+<br><tt>&nbsp;&nbsp;&nbsp; process(data);</tt>
+<p>However, when this code finishes, the currency of the queue will be
+lost. <tt>qWalk()</tt>, on the other hand, will preserve the currency.
+<p><tt>void <b>qWalkAscending</b>(QUEUE <i>q</i>,void (*<i>fun</i>)(void*))</tt>
+<p>Same as <tt>qWalk()</tt>.
+<p><tt>void <b>qWalkDescending</b>(QUEUE <i>q</i>,void (*<i>fun</i>)(void*))</tt>
+<p>Same as <tt>qWalk()</tt>, but the order of the visit is back-to-front.
+Note that this the same as
+<p><tt>for (data = qLast(); data; data = qPrev())</tt>
+<br><tt>&nbsp;&nbsp;&nbsp; process(data);</tt>
+<p>Here also the currency will be lost. <tt>qWalkDescending()</tt> will
+<i>not</i>
+change the currencty.
+<br>&nbsp;
+<h4>
+Using the <tt>QUEUE</tt> as a Linked List</h4>
+LibDS's implementation of the queue data structure can also be used as
+a linked list. The linked list functions have no effect on the currency
+of the queue.
+<p>The queue consists of <tt>QELEM</tt> nodes. These nodes can be taken
+out of the queue, and inserted into it, without resorting to the rules
+imposed by the original queue: that only the front element is next in line
+to be processed, and all new elements are added at the end of the queue.
+<p>A new <tt>QELEM</tt> is created when a new data item is added to the
+queue, through <tt>qAdd()</tt> or <tt>qEnque()</tt>. All functions that
+return and integer, return -1 on failure and 0 on success.
+<p><tt>int <b>qElemAttach</b>(QUEUE <i>q</i>,QELEM <i>qElem</i>)</tt>
+<p>Attach the given QELEM to the end of the queue.
+<p><tt>int <b>qElemInsert</b>(QUEUE <i>q</i>,QELEM <i>in_front_of</i>,QELEM
+<i>qElem</i>)</tt>
+<p>Insert the given <tt>QELEM</tt> into the queue, at the position in front
+of the given qelem <i>in_front_of</i>. If that is NULL, then the element
+is appended to the queue.
+<p><tt>int <b>qElemDetach</b>(QUEUE <i>q</i>,QELEM <i>qElem</i>)</tt>
+<p>Detach the given qElem from the queue.
+<p><tt>void <b>qElemFree</b>(QELEM <i>qElem</i>)</tt>
+<p>Frees the memory associated with the given qElem.
+<p><tt>void* <b>qElemData</b>(QELEM <i>qElem</i>)</tt>
+<p>Returns the user data pointer stored with this qElem. Returns <tt>NULL</tt>
+on failure.
+<p><tt>QELEM <b>qElemFirst</b>(QUEUE <i>q</i>)</tt>
+<p>Returns the first qElem in the queue, <tt>NULL</tt> if it's not there.
+<p><tt>QELEM <b>qElemLast</b>(QUEUE <i>q</i>)</tt>
+<p>Returns the last qElem in the queue, <tt>NULL</tt> if it's not there.
+<p><tt>QELEM <b>qElemNext</b>(QELEM <i>qElem</i>)</tt>
+<p>Return the next qelem after this one. The funtion returns <tt>NULL</tt>
+if the current element is the last one.
+<p><tt>QELEM <b>qElemPrev</b>(QELEM <i>qElem</i>)</tt>
+<p>Returns the qelem in front of this one. The funtion returns <tt>NULL</tt>
+if the current element is the first one.
+<p><tt>void* <b>qElemRemove</b>(QUEUE <i>q</i>,QELEM <i>qElem</i>)</tt>
+<p>This one detaches the qElem from the queue, frees any memory associated
+with it, and returns the user data pointer that was stored with this qElem.
+<tt>NULL</tt>
+is returned on failure.
+<h3>
+<a NAME="obscure"></a><font color="#3366FF">Obscure functionality</font></h3>
+Currently none.
+<br>
+<hr WIDTH="100%">
+<br><font size=-1>Sat Dec 15 15:52:13 EST 2001</font>
+<br>
+<hr WIDTH="100%">
+</body>
+</html>

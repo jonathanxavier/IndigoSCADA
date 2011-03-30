@@ -1,0 +1,27 @@
+# This works with NMAKE.EXE
+
+CC		=  cl /DStandAlone
+CCGFLAGS	= /nologo /DWIN32 /W3
+CCOPTFLAGS	= /Ob2tig /GX /ML $(CCGFLAGS)
+CCDEBUGFLAGS	= /Zi /Od /MLd /D "_DEBUG" $(CCGFLAGS) /D "DO_DEBUG"
+
+INCLUDEDIR      = ../
+LIBDIR		= ..
+
+INCLUDEFLAGS	= $(CCOPTFLAGS) $(CCWARNFLAGS) -I $(INCLUDEDIR)
+LLIBS		= $(LIBDIR)/libds.lib
+
+OBJ 	= avltree.obj heap.obj queue.obj stack.obj parray.obj set.obj
+PROGS	= avltree hashtbl heap parray queue stack set
+
+all:
+	$(MAKE) $(PROGS)
+
+$(PROGS):  $$@.c ../ds.h $(LLIBS)
+	@-$(CC) $(INCLUDEFLAGS) $@.c nullstr.c $(LLIBS) -o $@
+
+.PHONY: clean
+
+clean:
+	del *.obj
+	del *.exe
