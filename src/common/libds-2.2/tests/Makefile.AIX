@@ -1,0 +1,66 @@
+#-------------------------------------------------------------
+#       
+# SLT: 28.12.2001, Adapt Makefile.x for AIX xlc 3.6 compilers
+#                  Frank Schulte, fschulte\@hightek.com
+#
+#-------------------------------------------------------------
+
+LIB_PATH	= ../lib
+
+CC              =  xlc
+
+CCOPTFLAGS      = 
+CCDEBUGFLAGS    = -g -qdbxextra -qfullpath -qinfo
+CCWARNFLAGS     = 
+
+CCEXTRAFLAGS	= -DStandAlone
+
+OUTPUTDIR       = .
+INCLUDEDIR      = ../. 
+
+INCLUDEFLAGS    = -I $(INCLUDEDIR) -I . -I ..
+
+# Default compile is release
+CCFLAGS		= $(CCOPTFLAGS) $(CCWARNFLAGS) $(CCEXTRAFLAGS)
+
+LINC		= -I ../include -I ../../include
+
+LLIBS		= $(LIB_PATH)/libds.a
+
+OBJ		= avltree.o hashtbl.o heap.o parray.o queue.o stack.o set.o
+PROGS		= avltree hashtbl heap queue stack parray set
+
+.SUFFIXES:	.o
+
+all:
+	$(MAKE) -f Makefile.AIX avltree
+	$(MAKE) -f Makefile.AIX queue
+	$(MAKE) -f Makefile.AIX hashtbl
+	$(MAKE) -f Makefile.AIX heap
+	$(MAKE) -f Makefile.AIX stack
+	$(MAKE) -f Makefile.AIX parray
+
+avltree: avltree.o nullstr.o ../ds.h $(LLIBS)
+	$(CC) $(INCLUDEFLAGS) $@.o nullstr.o $(LLIBS) -o $@
+hashtbl: hashtbl.o nullstr.o ../ds.h $(LLIBS)
+	$(CC) $(INCLUDEFLAGS) $@.o nullstr.o $(LLIBS) -o $@
+heap:	heap.o nullstr.o ../ds.h $(LLIBS)
+	$(CC) $(INCLUDEFLAGS) $@.o nullstr.o $(LLIBS) -o $@
+queue:	queue.o nullstr.o ../ds.h $(LLIBS)
+	$(CC) $(INCLUDEFLAGS) $@.o nullstr.o $(LLIBS) -o $@
+stack:	stack.o nullstr.o ../ds.h $(LLIBS)
+	$(CC) $(INCLUDEFLAGS) $@.o nullstr.o $(LLIBS) -o $@
+parray:	parray.o nullstr.o ../ds.h $(LLIBS)
+	$(CC) $(INCLUDEFLAGS) $@.o nullstr.o $(LLIBS) -o $@
+set:	set.o nullstr.o ../ds.h $(LLIBS)
+	$(CC) $(INCLUDEFLAGS) $@.o nullstr.o $(LLIBS) -o $@
+
+.c.o:
+	$(CC) $(INCLUDEFLAGS) $(LINC) $(CPPFLAGS) $(CCFLAGS) -c $*.c
+
+.PHONY: clean
+
+clean:
+	@-echo "Cleaning directory $$W"
+	@-rm -f core *.e *.o *.obj *.ilk *.ncb *.pdb *.pch
+	@-rm -f *~ $(PROGS) $(OBJ)
