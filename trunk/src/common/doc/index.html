@@ -1,0 +1,199 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.72 [en] (Win98; U) [Netscape]">
+   <title>LibDS: a portable data structures library in ANSI C
+</title>
+<!--
+ /*
+ * /home/teddykgb/dev/root/ds/doc/index.html
+ * teddykgb Thu Dec 13 11:46:02 CET 2001
+ */
+ -->
+</head>
+<body>
+
+<h2>
+LibDS: A Portable Data Structures Library</h2>
+<a href="index.html#intro">Introduction</a>
+<br><a href="index.html#history">History</a>
+<br><a href="index.html#overview">Overview</a>
+<br><a href="index.html#ds">The data structures currently present in LibDS</a>
+<br><a href="#usage">Conditions for use</a>
+<br><a href="#copyright">Copyright and contact</a>
+<p>This page contains the documentation for LibDS, a data structures library
+written in ANSI C. LibDS was written by Peter Bozarov.
+<h3>
+<a NAME="intro"></a>Introduction</h3>
+LibDS is a data structures library. It is a collection of useful data structures
+and functions to manipulate them. LibDS has been designed to be as generic
+as possible, which basically means that all the details about the implementation
+have been hidden, and that the interface has been made as consistent as
+possible between all the different data structures.
+<h3>
+<a NAME="history"></a>History</h3>
+I started working on LibDS in 1999. I was reading a book on data structures
+and came across the topic on binary trees, which described how useful they
+were. The book gave a description of a binary tree implementation that
+guarantees that the tree will remain almost balance at all times, even
+after multiple insertion/deletion operations. Those of use versed in binary
+tree theory know that the efficiency of the operations that a binary tree
+supports depends directly on the depth of the tree. Keeping the depth to
+a minimum (which amounts to keeping the tree as balanced as possible) ensures
+fast tree operations. The tree implemetation in question was called an
+AVL tree, and its maximum depth could be proven to be 1.44log(<i>n</i>),
+with <i>n</i> being the number of nodes in the tree. This inspired me.
+(Well, if you're reading this then you're into computers so you realize
+that such things <i>can</i> actually inspire people). There was a data
+structure which supported addition, deletion, and searching of data in
+O(log <i>n</i>) time, with <i>n</i> being the number of data items in the
+tree. I sensed that such a data structure can be a very powerful thing,
+and decided to write my own implementation. (Yes, reinventing the wheel
+and all, but, hey, I was learning to program anyway.) Well, to make a long
+story short, LibDS grew out of this original AVL tree implementation. At
+various times afterwards I came accross the need for a queue, a stack and
+a variable array, and I just added them to the original avl tree, to produce
+a collection of data structures.
+<p>So, here it is then.
+<h3>
+<a NAME="overview"></a>Overview</h3>
+The way LibDS works is designed to be very simple and intuitive. (Whether
+that <i>is</i> the case will remain to be seen.) Here is a short overview.
+<h4>
+Storing data</h4>
+All the data structures that are found in the library store void pointers
+to some user provided data. Those data structures that need to perform
+key comparisons have to also be passed a key that uniquely identifies the
+data item stored. The key can be anything, from a variable length string,
+to binary keys of any size and type. There's a catch, however, to using
+anything else than a string as key: you need to define the comparison operators
+yourself. LibDS has support for this: you simply need to pass your own
+function that performs the comparisons at initialization time. The function
+must have the type
+<tt>int compare(DSKEY k1,DSKEY k2)</tt>, and it must
+return a value less than 0 if k1 is smaller than k2, a value exactly equal
+to 0 if k1 is equal to k2, and a value larger than 0 if k1 is larger than
+k2. You can cast the DSKEY to the appropriate data type that your keys
+have. Should you choose to use strings as keys, then LibDS will simply
+use the C function <tt>strcmp()</tt>, so make sure the keys are NULL terminated.
+If they are not, for whatever reason, use an own function.
+<h4>
+Accessing data</h4>
+LibDS has a generic interface for each data structure type that allows
+access to the user data stored with the data structure in question. Here,
+we will refer to them in their generic names, see the doc page for the
+particular data type to see the exact function name and signature. (As
+we said, the function signatures have been made as similar as possible,
+to simplify the use of the library.) Also, not all data structures support
+all of the operations defined below, again refer to the particular doc
+page for more details
+<p>LibDS supports the following operations on some user data D, a user
+data key K, and a data structure S (for structures that do not need a key,
+the function is the same, but without the key argument, except for items
+with *):
+<table>
+<tr>
+<td>ADD(S,K,D)</td>
+
+<td>Adds and item with key K to S.</td>
+</tr>
+
+<tr>
+<td>REMOVE(S,K)&nbsp;</td>
+
+<td>Remove the item in S that has key K</td>
+</tr>
+
+<tr>
+<td>FIND(S,K,D)*</td>
+
+<td>Find the item in S that has the key K</td>
+</tr>
+
+<tr>
+<td>FIRST(S)</td>
+
+<td>Get the first item in S</td>
+</tr>
+
+<tr>
+<td>LAST(S)</td>
+
+<td>Get the last item in S</td>
+</tr>
+
+<tr>
+<td>NEXT(S)</td>
+
+<td>Get the next item in S</td>
+</tr>
+
+<tr>
+<td>PREV(S)</td>
+
+<td>Get the previous item in S</td>
+</tr>
+
+<tr>
+<td>CURR(S)</td>
+
+<td>Get the current item in S</td>
+</tr>
+
+<tr>
+<td>CLEARCURR(S)</td>
+
+<td>Clears the current item in S</td>
+</tr>
+</table>
+
+<p>There are more functions, but most of them are specific to the data
+structure used, so check with the appropriate pages below.
+<p>LibDS supports the notion of currency. This basically means that it
+keeps track the position in the data structure upon which the last operation
+was performed. Currently, the currency is updated by the ADD(), FIND(),
+FIRST(), LAST(), NEXT(), PREV() and CURR() functions. REMOVE() won't change
+the currency. This is not a design flaw or feature, it's just how it is.
+Consequently, depending on experience this might change in the near future.&nbsp;<a NAME="ds"></a>
+<h3>
+The data structures</h3>
+There are currently five data structures present in LibDS. Check with the
+appropriate pages here for more extensive documentation on how to use them
+exactly.
+<p><b>NOTE</b>: All the <b>Obscure Functionality</b> sections in these
+pages document functionality which is exactly what the name says: obscure.
+This type of functionality can be changed without prior notice, or any
+form of backwards compatibility. Its there for the show...
+<ul>
+<li>
+<a href="avltree.html">an AVL Tree</a></li>
+
+<li>
+<a href="queue.html">a queue</a></li>
+
+<li>
+<a href="heap.html">a heap</a></li>
+
+<li>
+<a href="hashtbl.html">a hash table</a></li>
+
+<li>
+<a href="set.html"> a set and bag</a></li>
+
+<li>
+<a href="stack.html">a stack</a></li>
+
+<li>
+<a href="parray.html">a variable length array</a></li>
+</ul>
+<a NAME="usage"></a>
+<h3>
+Conditions for use</h3>
+They ain't none. Have fun with this one. Free software for all.&nbsp;<a NAME="copyright"></a>
+<h3>
+Copyright and contact</h3>
+LibDS is Copyright (C) 1999, 2000, 2001, 2002 Peter Bozarov
+<p>The official site for LibDS can be found at <a href="http://libds.sourceforge.net">SourceFORGE</a>.
+</body>
+</html>

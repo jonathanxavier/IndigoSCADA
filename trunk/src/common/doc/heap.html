@@ -1,0 +1,189 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.72 [en] (Win98; U) [Netscape]">
+   <title>LibDS: Heap </title>
+<!--
+/*
+ * /home/teddykgb/dev/root/ds/doc/heap.html
+ * teddykgb Sat Dec 15 15:58:15 EST 2001
+ */
+-->
+</head>
+<body>
+
+<hr WIDTH="100%"><a href="#intro">Introduction</a> |
+<a href="#init">Initialization</a>
+|
+<a href="#close">Closing</a> |
+<a href="#adding">Adding</a> |
+<a href="#deleting">Deleting</a>
+|
+<a href="#fetching">Fetching</a> |
+<a href="#parameters">Parameters</a>
+|
+<a href="#advanced">Advanced</a> |
+<a href="#obscure">Obscure</a>
+<br>
+<hr WIDTH="100%">
+<h2>
+HEAP</h2>
+
+<h3>
+<a NAME="intro"></a><font color="#3366FF">Introduction</font></h3>
+In a nutshell, a heap is a data structure that keeps its data ordered according
+to their keys. The difference between a heap and a binary tree is in the
+fact that the heap supports multiple elements with the same key. Technically,
+a binary tree can be made to do this as well, in which case it will be
+able to do exactly the same as a heap. I guess this means that you can
+use a binary tree that supports duplicate keys to do the work of a heap.
+But anyway, LibDS has its own heap implementation, and it is a true heap
+(i.e. it's not a binary tree). LibDS refers to a heap as <tt>HEAP</tt>.
+<p>A heap will always return the next best element (depending on your cost
+function) in the collection. Inserting elements will automatically place
+them in the correct sorted order according to their cost.
+<p>Since a heap can hold multiple elements with the same key, you can no
+longer refer to a specific element by its key. LibDS uses a unique integer
+index to identify each element in the heap. This is the only way you can
+refer to a specific element in the heap. The index has to do with the absolute
+position of the element in the heap. As operations are performed on the
+heap, elements will be moved around and consequently their indices have
+to be updated. If you are interested in keeping track of individual elements,
+then you will somehow have to keep track of each element's index as it
+changes. This HEAP implementation will let you pass it a pointer to a function
+of the type <tt>void (*HEAPCHGFUNC)(void*,int)</tt> which will be called
+every time that the index of the given data element has been changed. The
+<tt>int</tt>
+argument will hold the new index value of the element. Keeping track of
+the index of an element is only necessary if you need to explicitly refer
+to it, for example, if you want to delete a specific element. If you don't
+need an element's index, then you don't need to pass a change function
+pointer. This will spare the overhead of additional function calls.
+<p>As with the <a href="avltree.html">AVLTree</a> implementation, a <tt>HEAP</tt>
+needs a function to perform comparisons on the keys. The default is to
+use C-strings of variable length, and <tt>strcmp()</tt> from the standard
+C library. Given a comparison function, a heap can be made to keeps the
+data in minimized or maximized order. See the section on <a href="#init">initialization</a>
+on how to set this behavior.
+<p>As usual, items stored in the heap are void pointers to actual user
+data.
+<p>All data is stored in virtual memory.
+<h3>
+<a NAME="init"></a><font color="#3366FF">Initialization</font></h3>
+<tt><font color="#000000">HEAP <b>heapMake</b>(void)</font></tt>
+<p><font color="#000000">Creates a new default heap. The value returned
+is <tt>NULL</tt> if creation failed. The heap uses <tt>strcmp()</tt> as
+comparison function and C-strings as keys. Data stored is minimized, that
+is, the cheapest elements come first.</font>
+<p><tt><font color="#000000">HEAP <b>heapNew</b>(int (*<i>cmpfun</i>)(DSKEY,DSKEY),int
+<i>size</i>,int
+<i>grow_by</i>,int
+<i>mode</i>)</font></tt>
+<p><font color="#000000">Creates a new heap. The heap has an original size
+of <i>size</i>, and once that size is reached, the heap will automatically
+grow by <i>grow_by</i> elements, to speed subsequent addition operations.
+The parameter <tt>mode</tt> can be either <tt>HEAP_MINIMIZE</tt> or <tt>HEAP_MAXIMIZE</tt>.
+This tells the heap whether to keep the data in ascending or descending
+order.</font>
+<p><tt>HEAP <b>heapMakeIntKeys</b>(int <i>size</i>,int <i>grow_by</i>,int
+<i>mode</i>)</tt>
+<p>Make a new heap that uses integers as keys. The parameters are the same
+as <tt>heapNew()</tt>.
+<p><tt>HEAP <b>heapMakeDoubleKeys</b>(int <i>size</i>,int <i>grow_by</i>,int
+<i>mode</i>)</tt>
+<p>Make a new heap that uses doubles as keys. The parameters are the same
+as <tt>heapNew()</tt>.
+<p><tt>HEAP <b>heapMakeStringKeys</b>(int <i>size</i>,int <i>grow_by</i>,int
+<i>mode</i>)</tt>
+<p>Make a new heap that uses strings as keys. The parameters are the same
+as <tt>heapNew()</tt>.
+<p><tt>int <b>heapSetChgFunc</b>(HEAP <i>heap</i>, HEAPCHGFUNC <i>fun</i>)</tt>
+<p>Sets the change function for this heap. For the definition of the <tt>HEAPCHGFUNC</tt>
+type and the need for this function, see the
+<br>section <a href="#intro">Introduction</a>. Returns 0 on success, -1
+on failure.
+<h3>
+<a NAME="close"></a><font color="#3366FF">Closing</font></h3>
+<tt><font color="#000000">void <b>heapClose</b>(HEAP <i>heap</i>)</font></tt>
+<p><font color="#000000">Closes the heap, effectively releasing all memory
+used by it. User data remains untouched.</font>
+<p><tt><font color="#000000">void <b>heapCloseWithFunction</b>(HEAP <i>heap</i>,void
+(*<i>fun</i>)(void*))</font></tt>
+<p><font color="#000000">Closes the heap, only this time call the function
+<i>fun</i>
+on each data element in the heap.</font>
+<h3>
+<a NAME="adding"></a><font color="#3366FF">Adding</font></h3>
+<tt>int heapAdd(HEAP <i>q</i>,const DSKEY key,void *<i>data</i>)</tt>
+<br><tt>int heapInsert(HEAP <i>q</i>,const DSKEY key,void *<i>data</i>)</tt>
+<p>Adds a new element with key <i>key</i> to the heap. The function returns
+the index into the heap array of the new element. On failure, -1 is returned.
+<h3>
+<a NAME="deleting"></a><font color="#3366FF">Deleting</font></h3>
+<tt>void* <b>heapDelete</b>(HEAP <i>heap</i>,int <i>idx</i>)</tt>
+<p>Delete the element with index <i>idx</i> from the heap.
+<p><tt>void* <b>heapFirst</b>(HEAP <i>heap)</i></tt>
+<p>Delete the first element in the heap and returns its data. <tt>NULL</tt>
+is returned on failure.
+<h3>
+<a NAME="fetching"></a><font color="#3366FF">Fetching</font></h3>
+<font color="#000000">As usual, whenever a <tt>void*</tt> is returned,
+it contains user data, or <tt>NULL</tt> if something went wrong. Therefore,
+storing <tt>NULL</tt> as a value will not be distinguished from an error.</font>
+<p><tt><font color="#000000">void* <b>heapFirst</b>(HEAP <i>heap</i>)</font></tt>
+<p><font color="#000000">Delete and return the first element in the heap.
+Fails if the heap is empty.</font>
+<p><tt><font color="#000000">void* <b>heapPeekFirst</b>(HEAP <i>heap</i>)</font></tt>
+<p><font color="#000000">Returns the first element in the heap, but does
+not remove it. Fails if the heap is empty.</font>
+<p><tt>void* <b>heapElementAt</b>(HEAP <i>heap</i>,int <i>idx</i>)</tt>
+<p>Returns, but <i>does not</i> remove the element at in dex <i>idx</i>
+in the heap. Fails if <i>idx</i> has a value smaller than zero, or larger
+than the value returned by <tt>heapSize()</tt> (see <a href="#parameters">Parameters</a>).
+<h3>
+<a NAME="parameters"></a><font color="#3366FF">Parameters</font></h3>
+<tt>int <b>heapSize</b>(HEAP <i>heap</i>)</tt>
+<p>Return the number of elements in the heap.
+<p><tt>int <b>heapEmpty</b>(HEAP <i>heap</i>)</tt>
+<p>Returns true (value not equal to zero) if the heap has no more elements.
+Else, false (value equal to zero) is returned.
+<h3>
+<a NAME="advanced"></a><font color="#3366FF">Advanced funtionality</font></h3>
+
+<h4>
+Visiting the elements of the HEAP</h4>
+You can visit all elements in the heap and call a function to be performed
+on each data item found in each element.
+<p><tt>void <b>heapWalk</b>(HEAP <i>heap</i>,HEAPWALKFUN <i>fun</i>)</tt>
+<p>Visit all elements in the heap, and call <i>fun</i> on each one. The
+elements are visited in binary tree fashion, using a pre-order walk.
+<br><tt>HEAPWALKFUN</tt> is defined as <tt>void (*)(int,const DSKEY,void*)</tt>.
+When called, the first argument will hold the depth of the element in the
+binary tree view of the heap, the second will hold the element's key, and
+the last holds the actual user data stored at this element.
+<h3>
+<a NAME="obscure"></a><font color="#3366FF">Obscure functionality</font></h3>
+<tt>void <b>heapPrintTree</b>(HEAP <i>heap</i>,HEAPPRINTFUNC <i>pfun</i>)</tt>
+<br><tt>void <b>heapPrintArray</b>(HEAP <i>heap</i>,HEAPPRINTFUNC <i>pfun</i>)</tt>
+<p>Visit each element in the heap and call the print function. <tt>HEAPPRINTFUNC
+</tt>has the signature <tt>void (*)(int,const DSKEY,void*)</tt> and when
+called, the first argument will contain the depth of the item in the binary
+tree representation, the second the item's key and the last one the item's
+data. <tt>heapPrintTree()</tt> visits each node as they are seen in the
+heap's binary tree representation, while <tt>heapPrintArray()</tt> visits
+the nodes as they are seen in the heap's array representation.
+<p><tt>int <b>heapCheck</b>(HEAP <i>heap</i>)</tt>
+<p>Performs some checks on the heap, to see if it conforms to the heap
+properties. Returns -1 if the checks fail, and 0 if all's OK.
+<p>True to this section's title, this is indeed obscure functionality.
+As with all <b>Obscure</b> sections of LibDS's documentation this functionality
+can be subjected to change without prior notice and should not be used
+in a real implementation.
+<br>
+<hr WIDTH="100%">
+<br><font size=-1>Sat Dec 15 18:12:34 EST 2001</font>
+<br>
+<hr WIDTH="100%">
+</body>
+</html>
