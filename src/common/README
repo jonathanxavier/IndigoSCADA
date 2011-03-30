@@ -1,0 +1,225 @@
+
+        LibDS, Version 1.0, Released Dec 2001
+        LibDS, Version 2.0, Released Jan 2002
+	LibDS, Version 2.1, Released Oct 2002
+	LibDS, Version 2.2, Released Feb 2002
+
+LibDS is Copyright (C) 1999-2001, 2002 Peter Bozarov
+
+Contact: kingofgib <at> users.sourceforge.net
+
+Contents
+========
+ 1. Introduction
+ 2. Usage
+ 3. Compiling
+
+ 1. Introduction
+ ===============
+
+    This directory contains the source code to a small library of 
+data structures. We got a balance binary tree, avltree.c, a binary
+heap, heap.c, a queue, queue.c, a stack, stack.c, a hash table, hashtbl.c,
+and a variable pointer array, parray.c. Check the documentation in
+the "doc" directory for examples and more extensive description of the
+library and its usage.
+
+ 2. Platforms
+ ============
+
+I've ported and tested this on Linux, FreeBSD Windows and Sun 5.8.
+In addition, LibDS has also been ported to AIX, but not by me. 
+
+Since I don't have access to all different kinds of UNIX machines, I can't
+test it on other platforms, however, an ANSI-C compiler should find these
+files OK. The only problem on unsupported platforms is that the shared
+library won't be built and the tests will fail to compile. If you figure out
+how to make shared libraries on other platforms than the ones listed above,
+let me know through the address listed above. Alternatively, link the test
+programs agains the static version of LibDS.
+
+ 3. Usage
+ ========
+
+It might pay off to check the main download page for libds for the latest
+version of the documentation files.
+
+Check the directory "doc" for extensive documentation.
+Check the directory "tests" for some tests.
+
+Add to your source files:
+
+    # include <ds.h>
+    
+You can use tests/Makfile.AIX as example for your own Makefile to compile
+your sources using libds.
+
+Or, add the source path to LibDS to the include seach path of the C compiler
+and link against LibDS in your own Makefile:
+
+LIBDS_LIB = /path/to/libds/lib/libds.a
+LIBDS_INC = /path/to/libds
+
+all:
+    $(CC) -I $(LIBDS_INC) -c yoursource.c
+    $(CC) -I $(LIBDS_INC) yoursource.o $(LIBDS_LIB) -o yourprog
+
+ 4. Compiling LibDS under Unix
+ =============================
+
+If you're using GCC (Linux, FreeBSD, OpenBSD, etc), type 
+  > make gcc
+
+Under Unix, running anything else but GCC, you can simply type
+  > make unix	(NOT SUPPORTED!)
+
+Should work, but the shared library might fail. If you know how to
+build a shared library on some unsupported UNix flavor, send me the
+instructions so I can added to the Makefile.
+
+Under Solaris, the following should work:
+  > make sun
+
+(I've only tested it with Sun 5.8)
+
+That's about it. It should produce two files, libds.a and libds.so,
+respectively the static and shared library version of libds.
+
+   Compiling the examples/tests
+   ============================
+
+   The tests/examples are linked agains the dynamic library of LibDS.
+In order for them to work, you need to have the libds shared library in your
+LD_LIBRARY_PATH. Alternatively, link agains the static library libds.a.
+
+Go to the tests directory:
+  > make
+or
+  > make gcc 
+if you're using GCC.
+or 
+  > make sun
+if you're on Solaris.
+
+This should produce a few executables, which illustrate the basic use of
+the library, and even try to "test" it.
+
+Compiling LibDS on AIX
+======================
+
+To compile the lib and the tests on AIX with the AIX xlc 3.6.x compilers
+you can do: 
+
+    tar -xzf libds-<version>.tar.gz 
+    cd libds-<version>
+    make -f Makefile.AIX 
+
+    cd tests 
+    make -f Makefile.AIX 
+
+
+You can cleanup the package: 
+
+    cd libds-<version>
+    make -f Makefile.AIX clean 
+
+
+Compiling under Windows
+=======================
+
+    Use the file Makefile.w32. It assumes a properly configured MSVC
+compiler, and cl, link, lib, and nmake in your path.
+
+    > copy Makefile.w32 Makefile
+    > nmake
+    
+(Don't worry about clobbering the already existing Makefile, it's a Unix
+Makefile anyway.)
+
+This should produce the libds.lib file. No dlls are present yet.
+
+Compiling the examples/tests under Windows
+==========================================
+
+Go to the tests directory:
+
+  > cp Makefile.w32 Makefile
+  > nmake
+
+This should produce a few executables, which illustrate the basic
+use of the library, and even try to "test" it.
+
+A point on Makefiles
+====================
+
+I'm not a makefile guru, I hate writing makefiles. The makefiles provided
+here are not how one should write makefiles, it's just that I can't be
+bothered right now. I am working on some more efficient way of generating
+makefiles automagically from some set of parameters.
+
+
+Development and patches
+=======================
+
+If you have enhancements developed for libds and want to share it
+you can produce a patch against the latest version and enter this into
+patch manager at sourceforge.net. 
+
+    Patch Manager for libds:
+        http://sourceforge.net/tracker/?group_id=42325&atid=432763
+
+    Add a new Patch for libds:
+        http://sourceforge.net/tracker/?func=add&group_id=42325&atid=432763
+
+
+You can produce a suitable patch by doing
+
+    1. Download latest libds version, unpack it into a folder say libds and 
+       incorporate your changes there.
+
+    2. Unpack the above latest libds version a second time into a folder
+       libds.old. This now contains now the original version.
+
+    3. Create a diff file
+
+       $ cd /path-under-libds-folder
+       $ ls -1
+       libds
+       libds.old
+       $ diff -aburN libds.old libds > /path/to/patch.diff
+ 
+    4. Create tar.gz archive of this file and submit it as patch
+       to the above mentioned Patch Manager at sourceforge.net by
+       attaching this file to the patch formular.
+
+       $ tar -czf /path/to/patch.diff.tar.gz /path/to/patch.diff
+
+    5. We will get this patch and review it
+
+       We do it this way so that we can (regardless of where our source 
+       tree is) apply them with "patch -p1" from our top directory.
+
+       Then we can just do the things below to get your changes incorporated
+       into our sources for testing and approval.
+
+       $ cd /path-under-libds-folder-we-use-for-development
+       $ ls -1
+       libds
+       $ cd libds
+       $ patch -p1 < /path/to/patch.diff
+
+    6. If we approve the patch a next release of libds will have your patch
+       added to the libds source tree.
+
+    7. Many thanks for helping libds development.
+
+
+Anyway...
+=========
+
+Have fun with this one.
+
+
+Mon Dec 24 11:07:56 EST 2001
+Mon May  6 14:22:34 EST 2002
+Sun Jun 23 12:51:59 EST 2002

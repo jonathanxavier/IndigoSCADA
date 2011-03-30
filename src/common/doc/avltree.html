@@ -1,0 +1,226 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.75 [en] (X11; U; Linux 2.2.16-22 i686) [Netscape]">
+   <title>LibDS: AVL TREE</title>
+<!--
+/*
+ * /home/teddykgb/dev/root/ds/doc/avltree.html
+ * teddykgb Thu Dec 13 11:45:46 CET 2001
+ */
+-->
+</head>
+<body>
+
+<hr WIDTH="100%"><a href="#intro">Introduction</a> |
+<a href="#init">Initialization</a>
+|
+<a href="#close">Closing</a> |
+<a href="#adding">Adding</a> |
+<a href="#deleting">Deleting</a>
+|
+<a href="#fetching">Fetching</a> |
+<a href="#parameters">Parameters</a>
+|
+<a href="#advanced">Advanced</a> |
+<a href="#obscure">Obscure</a>
+<br>
+<hr WIDTH="100%">
+<h2>
+AVL TREE</h2>
+Here's the most authoritative documentation on the AVL Tree implementation
+used in LibDS. Ignore any other files that might claim the same.
+<h3>
+<a NAME="intro"></a><font color="#3366FF">Introduction</font></h3>
+An AVL tree is a data structure that is very well suited to storing data
+that supports ordering, such as names, or other miscellaneous things. Due
+to the fact that it is a balanced tree, very fast access to the data is
+supported, including inserting, deleting, finding, determining the next,
+previous, smallest and largest value, etc... Should you wish to learn more,
+a host of books on data structures discuss these and other sundry features
+of binary trees, as well as provide some rigorous proofs of the properties.
+<p>The AVLTREE implementation of LibDS is a true type AVL Tree (i.e. it
+supports all operations in 1.44*log <i>n</i> time). It currently supports
+storage of void pointers and no duplicate values. You can store duplicates
+by managing that yourself. It supports any type of key on which the comparison
+operators "greater than", "smaller than" and "equal to" can be applied.
+Key versatility is achieved by using a user-supplied comparison function.
+The tree uses string keys of variable length, and <tt>strcmp()</tt> per
+default. The tree can store pointers to keys, or make own copies, which
+can be useful in certain cases, such as when filling with data from the
+same dynamic pool.
+<p>This implementation keeps all data in virtual memory.
+<h3>
+<a NAME="init"></a><font color="#3366FF">Initialization</font></h3>
+<tt>AVLTREE <b>avlMake</b>(void)</tt>
+<p>Makes a default AVL tree. Uses variable length C-strings as keys and
+<tt>strcmp()</tt>
+as compare function. This one is likely to be used the most.
+<p><tt>AVLTREE <b>avlNewTree</b>(AVLKEYCOMPFUN <i>f</i>,int <i>copy_keys</i>,int
+<i>key_size</i>)</tt>
+<p>Makes an AVLTREE with <i>f</i> as comparison function. It has the type
+<tt>AVLKEYCOMPFUN</tt>,
+which is defined as <tt>int (*AVLKEYCOMPFUN)(DSKEY,DSKEY)</tt>. The argument
+<i>copy_keys</i>
+instruct LibDS to make copies of the keys and use those instead of the
+pointers to the keys you pass it. It is useful in case where the pointer
+you pass is always the same but the values it contains are different. If
+LibDS needs to copy the keys and unless the keys are simple C-strings (i.e.
+NULL-terminated strings) (in which case LibDS can determine the size of
+the key itself), then <i>key_size</i> must be set to the actual size of
+the keys. Copying keys is not necessary if the key pointers are never the
+same.
+<br>&nbsp;
+<h3>
+<a NAME="close"></a><font color="#3366FF">Closing</font></h3>
+<tt>void <b>avlClose</b>(AVLTREE <i>tr</i>)</tt>
+<p>Closes the given tree. This effectively means that all the nodes and
+the memory associated with them is released. If keys have been copied,
+then they are freed here as well. The data stored with each node is not
+touched.
+<p><tt>void <b>avlCloseWithFunction</b>(AVLTREE <i>tr</i>, void (*fun)(void*))</tt>
+<p>Closes the tree. The effect is the same as <tt>avlClose()</tt>, only
+this time as each node is visited to be freed, the function <i>fun</i>
+will be applied to the data stored in the node. By passing your own version
+of <i>fun</i> you can do things with the data before the tree is closed.
+<p><b>NOTE</b>: the order in which the nodes are visited is undefined (i.e.
+it might be pre-,post- or in-order). The idea is to use avlCloseWithFunction()
+only for cleaning up purposes where the exact order in which the nodes
+are visited is not important.
+<h3>
+<a NAME="adding"></a><font color="#3366FF">Adding</font></h3>
+<tt>int <b>avlAdd</b>(AVLTREE <i>tr</i>,const DSKEY <i>key</i>,void *<i>data</i>)</tt>
+<br><tt>int <b>avlInsert</b>(AVLTREE <i>tr</i>,const DSKEY <i>key</i>,void
+*<i>data</i>)</tt>
+<p>Adds the <i>data</i> to the tree <i>tr</i>. The data has the key <i>key</i>.
+Both functions return -1 on failure, which only happens when a duplicate
+key has been found. If the <i>key</i> was not found in the tree, then a
+new node holding the data is added to the tree. On success 0 is returned.
+<br>Adding an item sets the currency of the tree to the position in the
+tree where the newly created item has been inserted.
+<br>&nbsp;
+<h3>
+<a NAME="deleting"></a><font color="#3366FF">Deleting</font></h3>
+<tt>void* <b>avlRemove</b>(AVLTREE <i>tr</i>,const DSKEY <i>key</i>)</tt>
+<p>Removes the data with the given key. If the key is found, then the actual
+data is returned. If the key is not found (i.e. no such item is present
+in the tree), <tt>NULL</tt> is returned.
+<br>Removing does not change the currency of the tree, <i>unless</i> the
+item that was removed was the current item. In this case the currency is
+lost.
+<p><tt>void&nbsp;* <b>avlCut</b>(AVLTREE <i>tr</i>)</tt>
+<p>Removes the current element from the tree. Returns the data stored with
+that element. If no current element is present, this function fails. Upon
+failure, <tt>NULL</tt>&nbsp;is returned. The currency in the tree is lost,
+just as with <tt>avlRemove()</tt> above.
+<h3>
+<a NAME="fetching"></a><font color="#3366FF">Fetching</font></h3>
+The functionality to retrieve data from the tree is quite extensive. Whenever
+<tt>void*</tt>
+is returned, it will contain the data requested, or <tt>NULL</tt> if the
+data was not found (i.e. the tree did not contain that item).
+<p><b>NOTE</b>: storing <tt>NULL</tt> in the tree will return <tt>NULL</tt>
+whenever that item is requested. Whether or not that is an error will not
+be immediately obvious.
+<p><tt>void* <b>avlFind</b>(AVLTREE <i>tr</i>,const DSKEY <i>key</i>)</tt>
+<p>Find the data with the given key and returns it. The currency of the
+tree is set to this data item.
+<p><tt>void* <b>avlFirst</b>(AVLTREE <i>tr</i>)</tt>
+<br><tt>void* <b>avlMinimum</b>(AVLTREE <i>tr</i>)</tt>
+<p>Returns the first item in the tree. The currency is set to the first
+item in the tree if present.
+<p><tt>void* <b>avlLast</b>(AVLTREE <i>tr</i>)</tt>
+<br><tt>void* <b>avlMaximum</b>(AVLTREE <i>tr</i>)</tt>
+<p>Returns the last item in the tree. The currency is set to the last item
+in the tree if present.
+<p><tt>void* <b>avlNext</b>(AVLTREE <i>tr</i>)</tt>
+<p>Returns the next item in the tree. "Next" is defined as the item <i>after</i>
+the current item in alphabetical order. By convention, if there's no current
+item, the first item in the tree is returned.
+<p><tt>void* <b>avlPrev</b>(AVLTREE <i>tr</i>)</tt>
+<p>Returns the previous item in the tree. "Previous" is defined as the
+item
+<i>before</i> the current item in alphabetical order. By convention,
+if there's no current item, the last item in the tree is returned.
+<p><tt>void* <b>avlCurrent</b>(AVLTREE <i>tr</i>)</tt>
+<p>Returns the current item in the tree. If no item is current, NULL is
+returned.
+<p><tt>int <b>avlSetCurrent</b>(AVLTREE <i>tr</i>,const DSKEY <i>key</i>)</tt>
+<p>Sets the item that matches the given key as the current item in the
+tree. If no such item was found the currency remains unchanged and -1 is
+returned to indicate failure, otherwise 0 is returned to indicate success.
+<p><tt>void <b>avlClearCurrent</b>(AVLTREE <i>tr</i>)</tt>
+<p>Clears the current item in the tree. When this function returns the
+tree has no current item. This function always succeeds.
+<br>&nbsp;
+<h3>
+<a NAME="parameters"></a><font color="#3366FF">Tree Parameters</font></h3>
+<tt><font color="#000000">int <b>avlHeight</b>(AVLTREE <i>tr</i>)</font></tt>
+<p><font color="#000000">This function returns the height of the tree (its
+depth in fact). Since the tree is an AVL tree the depth should be no larger
+than</font>
+<br><font color="#000000">1.44 log <i>n</i> (<i>n</i> being the total number
+of nodes in the tree).</font>
+<p><tt><font color="#000000">int <b>avlTotalNodes</b>(AVLTREE <i>tr</i>)</font></tt>
+<p><tt><font color="#000000">int <b>avlSize</b>(AVLTREE <i>tr</i>)</font></tt>
+<p><font color="#000000">Returns the total number of nodes currently in
+the tree.</font>
+<p><tt><font color="#000000">int <b>avlCheck</b>(AVLTREE <i>tr</i>)</font></tt>
+<p><font color="#000000">This one performs a basic check to see if the
+tree still conforms to the AVL properties, which are that given a node
+in the tree, the heights of its left and right children should not differ
+by more that one, and both children are themselves also AVL trees. The
+function exits the program with some statistics about the errors found.
+I can't see why you would want to run this function, unless you want to
+double-check that this implementation does actually conform to the AVL
+properties.</font>
+<h3>
+<a NAME="advanced"></a><font color="#3366FF">Advanced functionality</font></h3>
+<font color="#000000">There's a few functions that allow sequential access
+to all the nodes in the tree.</font>
+<p><tt><font color="#000000">void <b>avlWalk</b>(AVLTREE <i>tr</i>,void
+(*<i>fun</i>)(void *),int <i>type</i>)</font></tt>
+<p><font color="#000000">This function performs a walk on the tree, calling
+the function <i>fun</i> at each node with that node's data as argument.
+If <tt>type</tt> </font>is
+<br><tt>AVLInWalk</tt>, then the walk is an in-order walk of the tree.
+If <tt>type</tt> is <tt>AVLPreWalk</tt>, the walk is a pre-order walk,
+and if <tt>type</tt> is <tt>AVLPostWalk</tt>, then the walk is a post-order
+walk.
+<p><tt><font color="#000000">void <b>avlWalkAscending</b>(AVLTREE <i>tr</i>,void
+(*<i>fun</i>)(void *))</font></tt>
+<p><font color="#000000">This function visits all the nodes in the tree
+according to their lexicographical order, starting at the lowest key. The
+function</font>
+<br><font color="#000000"><i>fun</i> is called at each node with the node's
+data as argument. Note that you can do the same as follows:</font>
+<p><tt><font color="#000000">for (data = avlFirst(tr); data; data = avlNext(tr))</font></tt>
+<br><tt><font color="#000000">&nbsp;&nbsp;&nbsp; process(data);</font></tt>
+<p><tt><font color="#000000">void <b>avlWalkDescending</b>(AVLTREE <i>tr</i>,void
+(*<i>fun</i>)(void *))</font></tt>
+<p><font color="#000000">This function does the same as <tt>avlWalkAscending</tt>(),
+but starts at the highest key and works its way down to the lowest. The
+same effect can be achieved through:</font>
+<p><tt><font color="#000000">for (data = avlLast(tr); data; data = avlPrev(tr))</font></tt>
+<br><tt><font color="#000000">&nbsp;&nbsp;&nbsp; process(data);</font></tt>
+<p><tt><font color="#000000">void* <b>avlUpdateData</b>(AVLTREE <i>tr</i>,DSKEY
+<i>key</i>,void
+*<i>new_data</i>)</font></tt>
+<p><font color="#000000">This function finds the data item identified by
+the key argument and replaces it with the new data given. The old data
+is returned, unless the key was not found in the tree, in which case NULL
+is returned.</font>
+<br>&nbsp;
+<h3>
+<a NAME="obscure"></a><font color="#3366FF">Obscure functionality</font></h3>
+There's a whole family of functions that work on <tt>AVLNODE</tt>s instead
+of the data in the tree, but I advise you not to use them even though they
+do the same things as the functions given above. I can't think of a reason
+why they should be exported at all. In any case, I won't document them
+here.
+<br>
+<hr WIDTH="100%"><font size=-1>Fri Dec 14 15:50:22 EST 2001</font>
+<hr WIDTH="100%">
+</body>
+</html>

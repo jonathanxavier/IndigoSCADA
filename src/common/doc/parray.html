@@ -1,0 +1,120 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.75 [en] (X11; U; Linux 2.2.16-22 i686) [Netscape]">
+   <title>LibDS: Stack</title>
+<!--
+/*
+ * /home/teddykgb/dev/root/ds/doc/stack.html
+ * teddykgb Thu Dec 13 11:45:57 CET 2001
+ */
+-->
+</head>
+<body>
+
+<hr WIDTH="100%"><a href="#intro">Introduction</a> |
+<a href="#init">Initialization</a>
+|
+<a href="#close">Closing</a> |
+<a href="#adding">Adding</a> |
+<a href="#deleting">Deleting</a>
+|
+<a href="#fetching">Fetching</a> |
+<a href="#parameters">Parameters</a>
+|
+<a href="#advanced">Advanced</a> |
+<a href="#obscure">Obscure</a>
+<br>
+<hr WIDTH="100%">
+<h2>
+PARRAY</h2>
+This data structure is an abstraction of the simple C array data type,
+only the array is dynamic, i.e. it grows and shrinks as the data is added
+or removed. Growing and shrinking happens in user-defined steps, to minimize
+memory management.
+<p>Always useful.
+<h3>
+<a NAME="intro"></a><font color="#3366FF">Introduction</font></h3>
+<font color="#000000">A <tt>PARRAY</tt> is LibDS's name for a variable
+length array. It is nothing more than that, only, in keeping with the design
+of LibDS, it also supports different fetching operations, and currency.
+(<tt>PARRAY</tt> is a rather contrived name, but it stands for <i>Pointer
+Array</i>, since it actually stores void pointers).</font>
+<h3>
+<a NAME="init"></a><font color="#3366FF">Initialization</font></h3>
+<tt><font color="#000000">PARRAY <b>paMake</b>(int <i>size</i>,int <i>grow_by</i>)</font></tt>
+<p><font color="#000000">Make a new <tt>PARRAY</tt> of initial size <i>size</i>.
+The array will grow and shrink as necessary, each time by the number of
+elements given by <i>grow_by</i>.</font>
+<h3>
+<a NAME="close"></a><font color="#3366FF">Closing</font></h3>
+<tt><font color="#000000">void <b>paClose</b>(PARRAY <i>pa</i>)</font></tt>
+<br><tt><font color="#000000">void <b>paCloseWithFunction</b>(PARRAY <i>pa</i>,void
+(*<i>fun</i>)(void*))</font></tt>
+<p><font color="#000000">Close the parray, releasing any memory it was
+using. The second function applies the provided <i>fun</i> to each element
+in the array prior to closing it.</font>
+<h3>
+<a NAME="adding"></a><font color="#3366FF">Adding</font></h3>
+<tt><font color="#000000">int <b>paAdd</b>(PARRAY <i>pa</i>,void *<i>data</i>)</font></tt>
+<p><font color="#000000">Adds the given data to the array. Returns the
+number of items in the array afterwards, -1 if something went wrong.</font>
+<h3>
+<a NAME="deleting"></a><font color="#3366FF">Deleting</font></h3>
+<tt><font color="#000000">void* <b>paRemove</b>(PARRAY <i>pa</i>,int <i>idx</i>)</font></tt>
+<p><font color="#000000">Remove the element at index <i>idx</i>. The data
+stored at <i>idx</i> is returned on success, <tt>NULL</tt> otherwise (most
+likely because the index was smaller than 0, or larger than the number
+of items in the array).</font>
+<h3>
+<a NAME="fetching"></a><font color="#3366FF">Fetching</font></h3>
+<tt><font color="#000000">void* <b>paFirst</b>(PARRAY <i>pa</i>)</font></tt>
+<p><font color="#000000">Returns the first element found in the array.
+If the array contains no elements, <tt>NULL</tt> is returned. Upon success
+the currency is set to the first element.</font>
+<p><tt><font color="#000000">void* <b>paLast</b>(PARRAY <i>pa</i>)</font></tt>
+<p><font color="#000000">Returns the last element found in the array. If
+the array is empty, <tt>NULL</tt> is returned. Upon success, the currency
+is set to the last element.</font>
+<p><tt><font color="#000000">void* <b>paNext</b>(PARRAY <i>pa</i>)</font></tt>
+<p><font color="#000000">Returns the next element in the array. Next is
+defined as the element after the current element. If there's no current
+element, this function is equivalent to <tt>paFirst()</tt>.</font>
+<p><tt><font color="#000000">void* <b>paPrev</b>(PARRAY <i>pa</i>)</font></tt>
+<p><font color="#000000">Returns the previous element in the array. Previous
+is the element before the current one. If there's no current element, the
+function is equivalent to <tt>paLast()</tt>.</font>
+<p><tt><font color="#000000">void* <b>paCurrent</b>(PARRAY <i>pa</i>)</font></tt>
+<p><font color="#000000">Returns the current element in the array, or <tt>NULL</tt>
+if there's no current element.</font>
+<p><tt><font color="#000000">void* <b>paElementAt</b>(PARRAY <i>pa</i>,int
+<i>idx</i>)</font></tt>
+<p><font color="#000000">Returns the element at index <i>idx</i> in the
+array. If <i>idx</i> is out of the array's bounds, <tt>NULL</tt> is returned.
+This is the most arrayish of all functions here.</font>
+<h3>
+<a NAME="parameters"></a><font color="#3366FF">Parameters</font></h3>
+<tt>int <b>paSize</b>(PARRAY <i>pa</i>)</tt>
+<p>Returns the number of elements currently in the array.
+<h3>
+<a NAME="advanced"></a><font color="#3366FF">Advanced functionality</font></h3>
+<tt>void* <b>paContains</b>(PARRAY <i>pa</i>,int (*<i>cmpfun</i>)(void*,void*),void
+*<i>elem</i>)</tt>
+<p>Returns 1 if the array contains the given element <i>elem</i>. The function
+<i>cmpfun</i>()
+that performs element comparisons must be defined by the caller. If the
+given element is not found, the return value is <tt>NULL</tt>.
+<p><tt>void <b>paSetCurrent</b>(PARRAY <i>pa</i>,int <i>idx</i>)</tt>
+<p>Sets the currency to the element found at index <i>idx</i> in the array.
+If <i>idx</i> is out of bounds, the currency is left unchanged.
+<h3>
+<a NAME="obscure"></a><font color="#3366FF">Obscure functionality</font></h3>
+<font color="#000000">None for now.</font>
+<br>
+<hr WIDTH="100%">
+<br><font size=-1>Tue Apr&nbsp; 2 15:00:33 CEST 2002</font>
+<br>
+<hr WIDTH="100%">
+</body>
+</html>

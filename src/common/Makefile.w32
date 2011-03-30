@@ -1,0 +1,37 @@
+CL		=  cl /DStandAlone
+CCGFLAGS	= /nologo /DWIN32 /W3
+CCOPTFLAGS	= /Ob2tig /GX /ML $(CCGFLAGS)
+CCDEBUGFLAGS	= /Zi /Od /MLd /D "_DEBUG" $(CCGFLAGS) /D "DO_DEBUG"
+
+INCLUDEFLAGS	= -I .
+LLIBDIR		= .
+
+LIBOBJ		= avltree.obj heap.obj parray.obj queue.obj stack.obj \
+		  hashtbl.obj set.obj
+LIBOUT		= libds
+# Make.targets
+
+$(LIBOUT):      $(LIBOBJ)
+	lib /out:$(LLIBDIR)/$(LIBOUT).lib $(LIBOBJ)
+
+CC = $(CL) $(INCLUDEFLAGS) $(CCOPTFLAGS) $(EXTRAFLAGS)
+
+all:
+	$(MAKE) release
+debug:
+	$(MAKE) CC="$(CL) $(INCLUDEFLAGS) $(CCDEBUGFLAGS)"
+
+release:
+	$(MAKE) CC="$(CL) $(INCLUDEFLAGS) $(CCOPTFLAGS)"
+
+.PHONY: clean
+
+clean:
+	del *.obj
+	del $(LIBOUT).lib
+realclean:
+	del *.obj
+	del $(LIBOUT).lib
+	del *.ilk
+	del *.pdb
+	del *.pch

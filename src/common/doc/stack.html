@@ -1,0 +1,91 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.72 [en] (Win98; U) [Netscape]">
+   <title>LibDS: Stack</title>
+<!--
+/*
+ * /home/teddykgb/dev/root/ds/doc/stack.html
+ * teddykgb Thu Dec 13 11:45:57 CET 2001
+ */
+-->
+</head>
+<body>
+
+<hr WIDTH="100%"><a href="#intro">Introduction</a> |
+<a href="#init">Initialization</a>
+|
+<a href="#close">Closing</a> |
+<a href="#adding">Adding</a> |
+<a href="#deleting">Deleting</a>
+|
+<a href="#fetching">Fetching</a> |
+<a href="#parameters">Parameters</a>
+|
+<a href="#advanced">Advanced</a> |
+<a href="#obscure">Obscure</a>
+<br>
+<hr WIDTH="100%">
+<h2>
+STACK</h2>
+Yes, LibDS has a stack implementation as well. This is in keeping with
+the name and purpose of the library.
+<h3>
+<a NAME="intro"></a><font color="#3366FF">Introduction</font></h3>
+<font color="#000000">A stack is a data structure that supports the last-in
+first-out processing of data. Data are pushed onto the stack in a particular
+order. To retrieve data, it is popped off the stack. The invariant here
+is that the order in which the items come off the stack is exactly the
+reverse order in which they were pushed onto the stack.</font>
+<br><br>
+LibDS refers to a stack as <tt>STACK</tt>.
+<h3>
+<a NAME="init"></a><font color="#3366FF">Initialization</font></h3>
+<tt><font color="#000000">STACK <b>stkMake</b>(void)</font></tt><font color="#000000"></font>
+<p><font color="#000000">Create a new <tt>STACK</tt>. Returns <tt>NULL</tt>
+on failure.</font>
+<h3>
+<a NAME="close"></a><font color="#3366FF">Closing</font></h3>
+<tt><font color="#000000">void <b>stkClose</b>(STACK <i>stack</i>)</font></tt><font color="#000000"></font>
+<p><font color="#000000">Close the stack, releasing all memory it was using.
+User data is left untouched.</font><font color="#000000"></font>
+<p><tt><font color="#000000">void <b>stkCloseWithFunction</b>(STACK <i>stack</i>,void
+(*<i>fun</i>)(void*))</font></tt><font color="#000000"></font>
+<p><font color="#000000">Close the stack and call <i>fun</i> on each data
+in the stack.</font>
+<h3>
+<a NAME="adding"></a><font color="#3366FF">Adding</font></h3>
+<tt><font color="#000000">int <b>stkPush</b>(STACK <i>stack</i>,void *<i>data</i>)</font></tt><font color="#000000"></font>
+<p><font color="#000000">Pushes this <i>data</i> onto the stack. Returns
+0 on success, -1 on failure.</font>
+<h3>
+<a NAME="deleting"></a><font color="#3366FF">Deleting</font></h3>
+<tt><font color="#000000">void* <b>stkPop</b>(STACK <i>stack</i>)</font></tt><font color="#000000"></font>
+<p><font color="#000000">Pops the top item from the stack and return it.
+Returns <tt>NULL</tt> if <i>stack</i> is empty.</font>
+<h3>
+<a NAME="fetching"></a><font color="#3366FF">Fetching</font></h3>
+<tt><font color="#000000">void* <b>stkPeek</b>(STACK <i>stack</i>)</font></tt><font color="#000000"></font>
+<p><font color="#000000">Returns, without removing it, the top item on
+the stack. Returns <tt>NULL</tt> if the stack is empty.</font>
+<h3>
+<a NAME="parameters"></a><font color="#3366FF">Parameters</font></h3>
+<tt><font color="#000000">int <b>stkSize</b>(STACK <i>stack</i>)</font></tt><font color="#000000"></font>
+<p><font color="#000000">Returns the number of items currently on the stack.</font><font color="#000000"></font>
+<p><tt><font color="#000000">int <b>stkEmpty</b>(STACK <i>stack</i>)</font></tt><font color="#000000"></font>
+<p><font color="#000000">Returns 0 if the stack still has items on it,
+1 if it is empty.</font>
+<h3>
+<a NAME="advanced"></a><font color="#3366FF">Advanced functionality</font></h3>
+<font color="#000000">What exactly did you have in mind?</font>
+<h3>
+<a NAME="obscure"></a><font color="#3366FF">Obscure functionality</font></h3>
+<font color="#000000">None whatsoever.</font>
+<br>
+<hr WIDTH="100%">
+<br>Sat Dec 15 18:31:13 EST 2001
+<br>
+<hr WIDTH="100%">
+</body>
+</html>
