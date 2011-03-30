@@ -21,6 +21,7 @@
 #include "dispatch.h"
 #include "inifile.h"
 #include "IndentedTrace.h"
+
 //
 //
 // We define here the database interfaces 
@@ -31,6 +32,30 @@
 static RealTimeDbDict databases;
 
 #else
+
+#include "ds.h"
+
+static SET databases = NULL;
+
+static const char* nullstr(const char *s)
+{
+    if(!s)
+	{
+		return "(null)";
+	}
+
+    return s;
+}
+
+/* Use this to compare set elements, in this case strings */
+static int setcmp(void *s1,void *s2)
+{
+    return(!strcmp((const char*)s1,(const char*)s2));
+}
+
+//# define PR_SET(s,set)	\
+//    for (s = (char*)setFirst(set); s; s = setNext(set))	\
+//	printf("s = %s\n",nullstr(s));
 
 #endif
 
@@ -49,6 +74,8 @@ QSDatabase *GetConfigureDb ()
 	return NULL;
 
 	#else
+
+	return NULL;
 	#endif
 	
 };
@@ -65,6 +92,8 @@ QSDatabase *GetCurrentDb ()
 	return NULL;
 
 	#else
+
+	return NULL;
 	#endif
 };
 
@@ -80,6 +109,8 @@ QSDatabase *GetResultDb ()
 	return NULL;
 
 	#else
+
+	return NULL;
 	#endif
 
 };
@@ -91,6 +122,10 @@ RealTimeDbDict& GetRealTimeDbDict()
 };
 
 #else
+SET GetRealTimeDbDict()
+{
+	return databases;
+};
 #endif
 //
 //
@@ -146,6 +181,10 @@ bool OpenRealTimeConnections()	// open the connections with the servers
 				RealTimeDbDict::value_type pr(dbname,new REALTIME_DB());
 				databases.insert(pr); // put in the dictionary
 				#else
+
+				databases  = setNew((SETCMPFUN)strcmp, 1, 1);
+				setAdd(databases, strdup(dbname));
+
 				#endif
 
 				if(!strcmp("1",iniFile.find("is_low_freq",token)))
@@ -352,6 +391,8 @@ QSDatabase *GetSpareConfigureDb ()
 
 	return NULL;
 	#else
+
+	return NULL;
 	#endif
 
 };
@@ -367,6 +408,8 @@ QSDatabase *GetSpareCurrentDb ()
 	}
 	return NULL;
 	#else
+
+	return NULL;
 	#endif
 
 };
@@ -382,6 +425,8 @@ QSDatabase *GetSpareResultDb ()
 	}
 	return NULL;
 	#else
+
+	return NULL;
 	#endif
 
 };
