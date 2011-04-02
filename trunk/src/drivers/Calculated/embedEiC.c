@@ -133,9 +133,9 @@ void scada_interpreter(char *argv[])
 
 
 #ifdef WIN32
-// i file .h e .c degli script da eseguire da EiC
-//vengono cercati da EiC nelle directory dichiarate con -I
-//Le #define degli script vengono impostati con -D
+//script .h e .c files  to be interpreted by EiC
+//are looked for by EiC in the directory declared with -I
+//#define of the  script are setted with -D
 #define CLINE "-Ic:\\scada\\scripts\\include -IC:\\scada\\scripts -D_EiC"
 
 #else

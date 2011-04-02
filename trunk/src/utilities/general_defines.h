@@ -19,7 +19,7 @@
 #define MONITOR_CAN_RUN_AS_ROOT
 #define USE_DB_MANAGEMENT_WINDOW
 
-//#define USE_STD_MAP //if we use the STL std::map 
+#define USE_STD_MAP //if we use the STL std::map 
 //#define NO_LOGIN //uncomment for development
 
 ///////////HMI appearence//////////////

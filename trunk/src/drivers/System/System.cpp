@@ -347,20 +347,6 @@ void SystemInstance::Tick()
 	
 	//globab disk usage
 	double disk_used = get_used_disk_space_percentage("c:\\");
-
-	/*
-	typedef struct _MEMORYSTATUS { // mst 
-		DWORD dwLength;        // sizeof(MEMORYSTATUS) 
-		DWORD dwMemoryLoad;    // percent of memory in use 
-		DWORD dwTotalPhys;     // bytes of physical memory 
-		DWORD dwAvailPhys;     // free physical memory bytes 
-		DWORD dwTotalPageFile; // bytes of paging file 
-		DWORD dwAvailPageFile; // free bytes of paging file 
-		DWORD dwTotalVirtual;  // user bytes of address space 
-		DWORD dwAvailVirtual;  // free user bytes 
-	} MEMORYSTATUS, *LPMEMORYSTATUS; 
-
-	*/
 	
 	//global and calling process memory
 	MEMORYSTATUS lpBuffer;
@@ -394,35 +380,6 @@ void SystemInstance::Tick()
 		ftElapsedTime = (ftCurrentTime - ftCreationTime)/10000;
 		ftKernelTime = ftKernelTime/10000;
 		ftUserTime = ftUserTime/10000;
-/*	
-	 char        tmpbuf[1024];
-	sprintf(tmpbuf,
-     "ElapsedTime:   %d Day(s)\n"
-     "               %d Hr\n"
-     "               %d Min\n"
-     "               %d Sec\n"
-     "               %d mSec\n" 
-     "KernelTime:    %d Min\n"
-     "               %d Sec\n"
-     "               %d mSec\n" 
-     "UserTime:      %d Min\n"
-     "               %d Sec\n"
-     "               %d mSec\n"
-     "\n",
-     (DWORD) (ftElapsedTime/86400000),
-     (DWORD) (ftElapsedTime%86400000/3600000),
-     (DWORD) (ftElapsedTime%86400000%3600000/60000),
-     (DWORD) (ftElapsedTime%86400000%3600000%60000/1000),
-     (DWORD) (ftElapsedTime%86400000%3600000%60000%1000),
-     (DWORD) (ftKernelTime/60000),
-     (DWORD) (ftKernelTime%60000/1000),
-     (DWORD) (ftKernelTime%60000%1000),
-     (DWORD) (ftUserTime/60000),
-     (DWORD) (ftUserTime%60000/1000),
-     (DWORD) (ftUserTime%60000%1000));
-
-	  QSLogEvent("Monitor",tmpbuf);
-*/
 	}
 
 	#endif //WIN32

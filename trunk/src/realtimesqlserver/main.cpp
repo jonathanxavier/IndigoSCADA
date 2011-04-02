@@ -10,20 +10,12 @@
  *
  */
 
-//#include "..\fastdb\inc\stdtp.h"
-//#include "..\fastdb\inc\sync.h"
 #include <qt.h>
 #include "IndentedTrace.h"
 #include "general_defines.h"
 #include "realtimesqlserver.h"
 #include "database.xpm"
 #include "utilities.h"
-
-//#ifdef WIN32
-//#include <windows.h>
-//#endif
-
-//USE_FASTDB_NAMESPACE
 
 int main(int argc, char **argv)
 {

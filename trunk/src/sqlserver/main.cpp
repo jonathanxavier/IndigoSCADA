@@ -10,20 +10,12 @@
  *
  */
 
-//#include "stdtp.h"
-//#include "sync.h"
 #include <qt.h>
 #include "IndentedTrace.h"
 #include "general_defines.h"
 #include "sqlserver.h"
 #include "database.xpm"
 #include "utilities.h"
-
-//#ifdef WIN32
-//#include <windows.h>
-//#endif
-
-//USE_GIGABASE_NAMESPACE;
 
 int main(int argc, char **argv)
 {
@@ -45,42 +37,42 @@ int main(int argc, char **argv)
 		IT_COMMENT("Another instance of the Real time sql server is already running!");//error message
 		return stat;
 	}
-		// 
-		// if the DISPLAY variable is empty or not set then we go into none-GUI mode
-		// this application can run GUI mode or non-GUI mode
-		// it is expected that the GUI mode is started when we want to do debugging
-		//   
-		#ifdef UNIX
-		bool useGUI = (getenv( "DISPLAY" ) != 0) && (strlen(getenv( "DISPLAY" )) > 0);
-		//
-		//
-		if(!useGUI)
-		{
-			setenv("DISPLAY","localhost:0",1); 
-		};
-		//
-		QApplication a(argc, argv,useGUI);
-		#else
-		QApplication a(argc, argv);
-		#endif
-		//
-		// connect to the databases uid = 0 for root 
-		//if(getuid() > QS_MIN_UID)
-		{
-				//signal(SIGTERM,SigTermHandler);
+	// 
+	// if the DISPLAY variable is empty or not set then we go into none-GUI mode
+	// this application can run GUI mode or non-GUI mode
+	// it is expected that the GUI mode is started when we want to do debugging
+	//   
+	#ifdef UNIX
+	bool useGUI = (getenv( "DISPLAY" ) != 0) && (strlen(getenv( "DISPLAY" )) > 0);
+	//
+	//
+	if(!useGUI)
+	{
+		setenv("DISPLAY","localhost:0",1); 
+	};
+	//
+	QApplication a(argc, argv,useGUI);
+	#else
+	QApplication a(argc, argv);
+	#endif
+	//
+	// connect to the databases uid = 0 for root 
+	//if(getuid() > QS_MIN_UID)
+	{
+			//signal(SIGTERM,SigTermHandler);
 
-				SqlServer sqlsrv;
-				sqlsrv.run(argc, argv);
+			SqlServer sqlsrv;
+			sqlsrv.run(argc, argv);
 
-				stat = a.exec();
+			stat = a.exec();
 
-				///////////////////wait termination stuff///////////////////
-				//dbMutex mutex;
-				//dbCriticalSection cs(mutex);
-				//sqlsrv.TerminationEvent.open();
-				//sqlsrv.TerminationEvent.wait(mutex);
-				//sqlsrv.TerminationEvent.close();
-		}
+			///////////////////wait termination stuff///////////////////
+			//dbMutex mutex;
+			//dbCriticalSection cs(mutex);
+			//sqlsrv.TerminationEvent.open();
+			//sqlsrv.TerminationEvent.wait(mutex);
+			//sqlsrv.TerminationEvent.close();
+	}
 
 	return stat;
 }

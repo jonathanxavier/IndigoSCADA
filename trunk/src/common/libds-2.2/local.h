@@ -32,6 +32,8 @@
 # ifndef LIBDS_LOCAL_INCLUDE	/**  { **/
 # define LIBDS_LOCAL_INCLUDE
 
+#define StandAlone //apa+++ 02-04-2011  
+
 # ifndef StandAlone 		/* { */
 # 	include <stdinc.h>
 #	define debug		printf

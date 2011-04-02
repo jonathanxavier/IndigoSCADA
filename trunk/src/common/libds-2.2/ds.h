@@ -44,6 +44,10 @@
 # define const
 # endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef void*	DSKEY;
 typedef int 	(*DSKEYCMPFUN)(const DSKEY,const DSKEY);
 
@@ -277,5 +281,10 @@ extern void * stkPop(STACK);
 extern void * stkPeek(STACK);
 extern int stkSize(STACK);
 extern int stkEmpty(STACK);
+
+#ifdef __cplusplus
+}
+#endif
+
 
 # endif /* ! _LIBDS_H_ */
