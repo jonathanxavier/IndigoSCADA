@@ -9,20 +9,13 @@
  *   for full copyright notice and license terms. 
  *
  */
-//#include "stdtp.h"
-//#include "sync.h"
+
 #include <qt.h>
 #include "IndentedTrace.h"
 #include "general_defines.h"
 #include "dispatcher.h"
 #include "link.xpm"
 #include "utilities.h"
-
-//#ifdef WIN32
-//#include <windows.h>
-//#endif
-
-//USE_GIGABASE_NAMESPACE;
 
 int main(int argc, char **argv)
 {

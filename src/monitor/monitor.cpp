@@ -1315,136 +1315,136 @@ int main(int argc, char **argv)
 		return stat;
 	}
 		
-		SetScadaHomeDirectory(argv[0]);
-		
-		// 
-		// if the DISPLAY variable is empty or not set then we go into none-GUI mode
-		// this application can run GUI mode or non-GUI mode
-		// it is expected that the GUI mode is started when we want to do debugging
-		//   
+	SetScadaHomeDirectory(argv[0]);
+	
+	// 
+	// if the DISPLAY variable is empty or not set then we go into none-GUI mode
+	// this application can run GUI mode or non-GUI mode
+	// it is expected that the GUI mode is started when we want to do debugging
+	//   
+	#ifdef UNIX
+	bool useGUI = (getenv( "DISPLAY" ) != 0) && (strlen(getenv( "DISPLAY" )) > 0);
+	//
+	//
+	if(!useGUI)
+	{
+		setenv("DISPLAY","localhost:0",1); 
+	};
+	//
+	QApplication a(argc, argv,useGUI);
+	#else
+	QApplication a(argc, argv);
+	#endif
+	//
+	//
+	//
+	if(!chdir(QSFilename(""))) // change directory   
+	{
+	#ifndef MONITOR_CAN_RUN_AS_ROOT
 		#ifdef UNIX
-		bool useGUI = (getenv( "DISPLAY" ) != 0) && (strlen(getenv( "DISPLAY" )) > 0);
-		//
-		//
-		if(!useGUI)
-		{
-			setenv("DISPLAY","localhost:0",1); 
-		};
-		//
-		QApplication a(argc, argv,useGUI);
+		// uid = 0 for root 
+		if(getuid() > QS_MIN_UID)
 		#else
-		QApplication a(argc, argv);
+		if(!RunningAsAdministrator())
 		#endif
-		//
-		//
-		//
-		if(!chdir(QSFilename(""))) // change directory   
+	#endif
 		{
-		#ifndef MONITOR_CAN_RUN_AS_ROOT
-			#ifdef UNIX
-			// uid = 0 for root 
-			if(getuid() > QS_MIN_UID)
-			#else
-			if(!RunningAsAdministrator())
-			#endif
-		#endif
+			if(OpenRealTimeConnections() && 
+			   OpenDispatcherConnection() )
 			{
-				if(OpenRealTimeConnections() && 
-				   OpenDispatcherConnection() )
+				RealTimeDbDict realtime_databases = GetRealTimeDbDict();
+				RealTimeDbDict spare_realtime_databases;
+				
+				Monitor *pMonitor = NULL;
+				Monitor *pSpareMonitor = NULL;
+
+				pMonitor = new Monitor(NULL, &realtime_databases, GetDispatcher());  // create the monitoring engine interface
+
+				if(OpenSpareDispatcherConnection() && OpenSpareRealTimeConnections())
 				{
-					RealTimeDbDict realtime_databases = GetRealTimeDbDict();
-					RealTimeDbDict spare_realtime_databases;
+					//Se esiste un server Spare, allora si crea un nuovo oggetto monitor
+					//con lo spare dispatcher e con lo spare database realtime
 					
-					Monitor *pMonitor = NULL;
-					Monitor *pSpareMonitor = NULL;
-
-					pMonitor = new Monitor(NULL, &realtime_databases, GetDispatcher());  // create the monitoring engine interface
-
-					if(OpenSpareDispatcherConnection() && OpenSpareRealTimeConnections())
-					{
-						//Se esiste un server Spare, allora si crea un nuovo oggetto monitor
-						//con lo spare dispatcher e con lo spare database realtime
-						
-						spare_realtime_databases = GetSpareRealTimeDbDict();
-						pSpareMonitor = new Monitor(NULL, &spare_realtime_databases, GetSpareDispatcher());  // create the monitoring engine interface
-					}
-
-					OpenHistoricConnections();
-
-					#ifdef UNIX
-					signal(SIGTERM,SigTermHandler);						
-					#endif
-					
-					stat = a.exec();
-
-					if(pMonitor)
-						delete pMonitor;
-
-					if(pSpareMonitor)
-						delete pSpareMonitor;
-
-					//
-					//
-
-					#ifdef STL_BUG_FIXED
-					CloseRealTimeConnections();
-					#endif
-
-					#ifdef STL_BUG_FIXED
-					CloseDispatcherConnection();
-					#endif
-
-					if(GetHistoricResultDb() != NULL)
-					{
-						#ifdef STL_BUG_FIXED
-						CloseHistoricConnections();
-						#endif
-					}
-
-					if(GetSpareDispatcher() != NULL)
-					{
-						#ifdef STL_BUG_FIXED
-						CloseSpareDispatcherConnection();
-						#endif
-					}
-
-					if((GetSpareConfigureDb() != NULL) && (GetSpareCurrentDb() != NULL)&&(GetSpareResultDb() != NULL))
-					{
-						#ifdef STL_BUG_FIXED
-						CloseSpareRealTimeConnections();
-						#endif
-					}
-
-					UnloadAllDlls();
-					//
-					return stat;
-					//
+					spare_realtime_databases = GetSpareRealTimeDbDict();
+					pSpareMonitor = new Monitor(NULL, &spare_realtime_databases, GetSpareDispatcher());  // create the monitoring engine interface
 				}
-				else
+
+				OpenHistoricConnections();
+
+				#ifdef UNIX
+				signal(SIGTERM,SigTermHandler);						
+				#endif
+				
+				stat = a.exec();
+
+				if(pMonitor)
+					delete pMonitor;
+
+				if(pSpareMonitor)
+					delete pSpareMonitor;
+
+				//
+				//
+
+				#ifdef STL_BUG_FIXED
+				CloseRealTimeConnections();
+				#endif
+
+				#ifdef STL_BUG_FIXED
+				CloseDispatcherConnection();
+				#endif
+
+				if(GetHistoricResultDb() != NULL)
 				{
-					//cerr << "Failed to connect to database(s) and (or) dispatcher" << endl;
-					IT_COMMENT("Failed to connect to database(s) and (or) dispatcher");//error messag
-					MessageBox(NULL,"Failed to connect to database(s) and (or) dispatcher","Monitor", MB_OK|MB_ICONSTOP);
+					#ifdef STL_BUG_FIXED
+					CloseHistoricConnections();
+					#endif
 				}
+
+				if(GetSpareDispatcher() != NULL)
+				{
+					#ifdef STL_BUG_FIXED
+					CloseSpareDispatcherConnection();
+					#endif
+				}
+
+				if((GetSpareConfigureDb() != NULL) && (GetSpareCurrentDb() != NULL)&&(GetSpareResultDb() != NULL))
+				{
+					#ifdef STL_BUG_FIXED
+					CloseSpareRealTimeConnections();
+					#endif
+				}
+
+				UnloadAllDlls();
+				//
+				return stat;
+				//
 			}
-		#ifndef MONITOR_CAN_RUN_AS_ROOT
 			else
 			{
-				//cerr << "Must Not Run As Root" << endl;
-				IT_COMMENT("Must Not Run As Root");//error messag
-				MessageBox(NULL,"Must Not Run As Root","Monitor", MB_OK|MB_ICONSTOP);
+				//cerr << "Failed to connect to database(s) and (or) dispatcher" << endl;
+				IT_COMMENT("Failed to connect to database(s) and (or) dispatcher");//error messag
+				MessageBox(NULL,"Failed to connect to database(s) and (or) dispatcher","Monitor", MB_OK|MB_ICONSTOP);
 			}
-		#endif
-			
 		}
+	#ifndef MONITOR_CAN_RUN_AS_ROOT
 		else
 		{
-			//cerr << "User Directory Not Accessible:" << (const char *) QSFilename("") << endl;
-			
-			QString err_msg;
-			err_msg = "User Directory Not Accessible:" + QSFilename("")+ "\n";
-			IT_COMMENT((const char *)err_msg);
+			//cerr << "Must Not Run As Root" << endl;
+			IT_COMMENT("Must Not Run As Root");//error messag
+			MessageBox(NULL,"Must Not Run As Root","Monitor", MB_OK|MB_ICONSTOP);
 		}
+	#endif
+		
+	}
+	else
+	{
+		//cerr << "User Directory Not Accessible:" << (const char *) QSFilename("") << endl;
+		
+		QString err_msg;
+		err_msg = "User Directory Not Accessible:" + QSFilename("")+ "\n";
+		IT_COMMENT((const char *)err_msg);
+	}
 
 	return stat;
 }
