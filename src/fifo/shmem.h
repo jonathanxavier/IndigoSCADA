@@ -84,7 +84,7 @@ class shared_memory {
     // Find storaghe containing specified object and free it
     static void deallocate(void* obj) { 
 		shared_memory* shmem = find_storage(obj);
-		assert(shmem != NULL); //va in assert il 22-03-10 se opc_client.exe ha stack size 6M e iec104slave.exe ha stack size 1 M
+		assert(shmem != NULL);
 		if(shmem)
 		{
 			shmem->free(obj);
