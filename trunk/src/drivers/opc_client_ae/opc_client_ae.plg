@@ -1,0 +1,52 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: opc_client_ae - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\WINNT\TEMP\RSPFF.tmp" with contents
+[
+/nologo /MD /W3 /GX /O2 /I "." /I "C:\Qt\3.1.2\include" /I "C:\Qt\3.1.2\mkspecs\win32-msvc" /I "..\..\gigabase" /I "..\..\common" /I ".." /I "..\..\database" /I "..\..\ui\widgets" /I "..\..\trace" /I "..\..\utilities" /I "..\..\fifo" /I "..\..\common\libds-2.2" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_USRDLL" /D "OPC_CLIENT_COM_EXPORTS" /D "USING_GARRET" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_H_CPP" /D "_WIN32_DCOM" /Fo"Release/" /Fd"Release/" /FD /c 
+"E:\scada\src\drivers\opc_client_ae\opcclient_ae.cpp"
+]
+Creating command line "cl.exe @C:\WINNT\TEMP\RSPFF.tmp" 
+Creating temporary file "C:\WINNT\TEMP\RSP100.tmp" with contents
+[
+scada.lib utilities.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib shell32.lib uuid.lib WSOCK32.LIB snmpapi.lib qt-mt312.lib fifo.lib /nologo /dll /incremental:no /pdb:"Debug/opc_client_ae.pdb" /debug /machine:I386 /out:"c:\scada\Drivers/opc_client_ae.dll" /implib:"c:\scada\Drivers/opc_client_ae.lib" /pdbtype:sept /libpath:"C:\Qt\3.1.2\lib" /libpath:"c:\scada\lib" 
+.\Release\moc_opc_client_ae.obj
+.\Release\moc_opc_client_ae_instance.obj
+.\Release\moc_opc_client_aeCommand.obj
+.\Release\moc_opc_client_aeCommandData.obj
+.\Release\moc_opc_client_aeConfiguration.obj
+.\Release\moc_opc_client_aeConfigurationData.obj
+.\Release\moc_opc_client_aeInput.obj
+.\Release\moc_opc_client_aeInputData.obj
+.\Release\opc_client_ae.obj
+.\Release\opc_client_ae_instance.obj
+.\Release\opc_client_aeCommand.obj
+.\Release\opc_client_aeCommandData.obj
+.\Release\opc_client_aeConfiguration.obj
+.\Release\opc_client_aeConfigurationData.obj
+.\Release\opc_client_aedriverthread.obj
+.\Release\opc_client_aeInput.obj
+.\Release\opc_client_aeInputData.obj
+.\Release\opccomn_i.obj
+.\Release\opcclient_ae.obj
+]
+Creating command line "link.exe @C:\WINNT\TEMP\RSP100.tmp"
+<h3>Output Window</h3>
+Compiling...
+opcclient_ae.cpp
+Linking...
+LINK : fatal error LNK1181: cannot open input file "scada.lib"
+Error executing link.exe.
+
+
+
+<h3>Results</h3>
+opc_client_ae.dll - 1 error(s), 0 warning(s)
+</pre>
+</body>
+</html>
