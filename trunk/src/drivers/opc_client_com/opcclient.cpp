@@ -1895,8 +1895,7 @@ int Opc_client_com_DriverThread::OpcStart()
 	char show_msg[150];
 
 	TCHAR  ServerIPAddress[80];
-	//128.1.1.2 ---> ENLABSERVOPC
-	//128.1.1.25 ---> HMI2
+
 	strcpy(ServerIPAddress, ((Opc_client_com_Instance*)Parent)->Cfg.OpcServerIPAddress);
 
 	if((strlen(ServerIPAddress) == 0))

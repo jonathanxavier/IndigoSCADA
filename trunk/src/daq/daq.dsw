@@ -252,6 +252,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "opc_client_ae"=..\drivers\opc_client_ae\opc_client_ae.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "opc_client_com"=..\drivers\opc_client_com\opc_client_com.dsp - Package Owner=<4>
 
 Package=<5>

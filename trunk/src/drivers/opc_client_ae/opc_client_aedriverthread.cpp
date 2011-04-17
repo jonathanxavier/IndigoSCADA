@@ -48,8 +48,8 @@ void Opc_client_ae_DriverThread::run()
 	int nRet = OpcStart(); // connect to an OPC server
 	if(nRet) return;
 
-	nRet = AddItems(); // add some items
-	if(nRet) return;
+	//nRet = AddItems(); // add some items
+	//if(nRet) return;
 
 	//OPC DA 1.0
 	//SyncRead(false);//Sincronous read from opc server (Read from Device)
@@ -62,7 +62,7 @@ void Opc_client_ae_DriverThread::run()
 	/////////////////////////////////////////Variazioni come spontanee//////////////////////////////////////////////////////////////////////////////////////////////////////
 	//OPC DA 2.0 This function on the first transaction send all items 
 	//the arrives spontaneous variations (i.e. IEC 101 Spontaneaous variations)
-	Async2Update();
+	//Async2Update();
 
 	OpcStop();
 
@@ -787,13 +787,6 @@ signed __int64 Opc_client_ae_DriverThread::Epoch_from_FILETIME(const FILETIME *f
 	epoch_in_millisec =  (signed __int64)sec;
 
 	epoch_in_millisec =  epoch_in_millisec*1000 + sysTime.wMilliseconds;
-
-	//char buffer[20];
-	//_i64toa(epoch_in_millisec, buffer, 10);
-	//str = QString(buffer);
-
-	//IT_COMMENT((const char *)str);
-	//return str;
 
 	return epoch_in_millisec;
 }
