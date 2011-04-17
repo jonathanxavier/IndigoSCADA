@@ -138,10 +138,7 @@ class OPC_CLIENT_AEDRV Opc_client_ae_DriverThread : public DriverThread
 	int OpcStart();
 	int OpcStop();
 	int GetStatus(WORD *pwMav, WORD *pwMiv, WORD *pwB, LPWSTR *pswzV);
-	int AddItems();
-	void SyncRead(bool bFlag);
-	int AsyncRead(bool bFlag);
-	int AsyncUpdate();
+//	int AsyncUpdate();
 	static void ShowError(HRESULT hr, LPCSTR pszError);
 	static void ShowMessage(HRESULT hr, LPCSTR pszError, const char* name);
 //	void StartErrorLog();
