@@ -69,40 +69,10 @@ class CLock
 
 #define READ_LOCK CLock gl(&g_Readcs);
 #define WRITE_LOCK CLock gl(&g_Writecs);
-//#define SINCRONISMO_LOCK CLock gl(&sincronismo);
-
-class ATL_NO_VTABLE CTestAdviseSink;
-class ATL_NO_VTABLE COPCCallback; 
-typedef CComObject<CTestAdviseSink> CComCTestAdviseSink;
-typedef CComObject<COPCCallback> CComCOPCCallback;
 
 UINT g_nOpcFormatData = ::RegisterClipboardFormat("OPCSTMFORMATDATA");
 UINT g_nOpcFormatDatatime = ::RegisterClipboardFormat("OPCSTMFORMATDATATIME");
 UINT g_nOpcFormatWrite = ::RegisterClipboardFormat("OPCSTMFORMATWRITECOMPLETE");
-
-
-// CTestAdviseSink class derived from IAdviseSink
-// used with async updates
-class ATL_NO_VTABLE CTestAdviseSink : 
-	public CComObjectRoot,
-	public IAdviseSink
-{
-public:
-
-BEGIN_COM_MAP(CTestAdviseSink)
-	COM_INTERFACE_ENTRY(IAdviseSink)
-END_COM_MAP()
-
-   STDMETHODIMP_(void) OnViewChange(DWORD, LONG) {IT_IT("CTestAdviseSink::OnViewChange"); };
-   STDMETHODIMP_(void) OnRename(LPMONIKER) {IT_IT("CTestAdviseSink::OnRename"); };
-   STDMETHODIMP_(void) OnSave(void) {IT_IT("CTestAdviseSink::OnSave"); };
-   STDMETHODIMP_(void) OnClose(void) {IT_IT("CTestAdviseSink::OnClose"); };
-
-   STDMETHODIMP_(void) OnDataChange(LPFORMATETC pFE, LPSTGMEDIUM pSTM)
-   {
-	    IT_IT("CTestAdviseSink::OnDataChange");
-   }
-};
 
 int Opc_client_ae_DriverThread::AsyncUpdate()
 {
@@ -118,314 +88,92 @@ int Opc_client_ae_DriverThread::AsyncRead(bool bFlag)
 	return 0;
 }
 
-// COPCCallback class derived from IOPCEventSink
-// used with async updates
-class ATL_NO_VTABLE COPCCallback : 
+//
+// Smart pointer typedef declarations
+//
+
+//_COM_SMARTPTR_TYPEDEF(OPCEventServerCATID, __uuidof(OPCEventServerCATID));
+//_COM_SMARTPTR_TYPEDEF(IOPCEventServer, __uuidof(IOPCEventServer));
+//_COM_SMARTPTR_TYPEDEF(IOPCEventSubscriptionMgt, __uuidof(IOPCEventSubscriptionMgt));
+//_COM_SMARTPTR_TYPEDEF(IOPCEventAreaBrowser, __uuidof(IOPCEventAreaBrowser));
+//_COM_SMARTPTR_TYPEDEF(IOPCEventSink, __uuidof(IOPCEventSink));
+//_COM_SMARTPTR_TYPEDEF(IOPCEventServer2, __uuidof(IOPCEventServer2));
+//_COM_SMARTPTR_TYPEDEF(IOPCEventSubscriptionMgt2, __uuidof(IOPCEventSubscriptionMgt2));
+
+
+
+//typedef _COM_SMARTPTR<IOPCEventSubscriptionMgt, &IID> IOPCEventSubscriptionMgtPtr;
+//typedef _COM_SMARTPTR<IOPCEventServer, &IID> IOPCEventServerPtr;
+
+//typedef _COM_SMARTPTR<_COM_SMARTPTR_LEVEL2<IOPCEventSubscriptionMgt, &IID> > IOPCEventSubscriptionMgtPtr;
+//typedef _COM_SMARTPTR<_COM_SMARTPTR_LEVEL2<IOPCEventServer, &IID> > IOPCEventServerPtr;
+
+#if _MSC_VER > 1100  // VC 6.0 and higher
+	#define GUID_CAST( a )		(const_cast<_GUID*>(a))
+#else				// VC 5.0
+	#define GUID_CAST( a )		((struct GUID *)a)
+#endif
+
+class ATL_NO_VTABLE COPCEventSink : 
 	public CComObjectRoot,
 	public IOPCEventSink
 {
 public:
+	COPCEventSink(){}
 
-BEGIN_COM_MAP(COPCCallback)
+BEGIN_COM_MAP(COPCEventSink)
+	//COM_INTERFACE_ENTRY_IID( __uuidof(IOPCEventSink), IOPCEventSink)
 	COM_INTERFACE_ENTRY(IOPCEventSink)
 END_COM_MAP()
 
-	STDMETHODIMP OnDataChange( 
-    /* [in] */ DWORD dwTransid,
-    /* [in] */ OPCHANDLE hGroup,
-    /* [in] */ HRESULT hrMasterquality,
-    /* [in] */ HRESULT hrMastererror,
-    /* [in] */ DWORD dwCount,
-    /* [size_is][in] */ OPCHANDLE __RPC_FAR *phClientItems,
-    /* [size_is][in] */ VARIANT __RPC_FAR *pvValues,
-    /* [size_is][in] */ WORD __RPC_FAR *pwQualities,
-    /* [size_is][in] */ FILETIME __RPC_FAR *pftTimeStamps,
-    /* [size_is][in] */ HRESULT __RPC_FAR *pErrors)
+    HRESULT __stdcall OnEvent( 
+            /* [in] */ OPCHANDLE hClientSubscription,
+            /* [in] */ BOOL bRefresh,
+            /* [in] */ BOOL bLastRefresh,
+            /* [in] */ DWORD dwCount,
+            /* [size_is][in] */ ONEVENTSTRUCT *pEvents) 
 	{
-
-		IT_IT("COPCCallback::OnDataChange");
-
-		//if(Opc_client_ae_DriverThread::mandare_eventi)
-		{
-			if(FAILED(hrMastererror))
-			{
-				Opc_client_ae_DriverThread::ShowError(hrMastererror,"General ConnectionPoint Update");
-			}
-
-			for(DWORD dw = 0; dw < dwCount; dw++)
-			{
-				IT_COMMENT2("phClientItems[%d] = %d", dw, phClientItems[dw]);
-				IT_COMMENT2("pwQualities[%d] = %d", dw, pwQualities[dw]);
-
-				//printf("phClientItems[%d] = %d\t", dw, phClientItems[dw]);
-				//printf("pwQualities[%d] = %d\t", dw, pwQualities[dw]);
-
-				if((pwQualities[dw] == OPC_QUALITY_GOOD) && SUCCEEDED(pErrors[dw]))
-				{
-					VARIANT *pValue = &pvValues[dw];
-
-					//SINCRONISMO_LOCK
-
-					const FILETIME* ft = reinterpret_cast<const FILETIME *>(&pftTimeStamps[dw]);
-
-					Opc_client_ae_DriverThread::SendEvent2(pValue, ft, pwQualities[dw], phClientItems[dw]);
-				}
-				else if((pwQualities[dw] != OPC_QUALITY_GOOD) && SUCCEEDED(pErrors[dw]))
-				{
-					VARIANT *pValue = &pvValues[dw];
-
-					//SINCRONISMO_LOCK
-
-					const FILETIME* ft = reinterpret_cast<const FILETIME *>(&pftTimeStamps[dw]);
-																										
-					Opc_client_ae_DriverThread::SendEvent2(pValue, ft, pwQualities[dw], phClientItems[dw]);
-
-					QString name;
-					name = QString(Opc_client_ae_DriverThread::Item[phClientItems[dw] - 1].spname);
-
-					switch(pwQualities[dw])
-					{
-						case OPC_QUALITY_GOOD:
-							//ShowError(S_OK, "Quality Good");
-							Opc_client_ae_DriverThread::ShowMessage(S_OK, "Quality Good",(const char*)name);
-							break;
-						case OPC_QUALITY_BAD:
-						default:
-							//ShowError(S_OK, "Quality Bad");
-							Opc_client_ae_DriverThread::ShowMessage(S_OK, "Quality Bad",(const char*)name);
-							break;
-						case OPC_QUALITY_UNCERTAIN:
-							//ShowError(S_OK, "Quality UNCERTAIN");
-							Opc_client_ae_DriverThread::ShowMessage(S_OK, "Quality UNCERTAIN",(const char*)name);
-							break;
-						case OPC_QUALITY_CONFIG_ERROR:
-							//ShowError(S_OK, "CONFIG ERROR");
-							Opc_client_ae_DriverThread::ShowMessage(S_OK, "CONFIG ERROR",(const char*)name);
-							break;
-						case OPC_QUALITY_NOT_CONNECTED:
-							//ShowError(S_OK, "NOT CONNECTED");
-							Opc_client_ae_DriverThread::ShowMessage(S_OK, "NOT CONNECTED",(const char*)name);
-							break;
-						case OPC_QUALITY_DEVICE_FAILURE:
-							//ShowError(S_OK, "DEVICE FAILURE");
-							Opc_client_ae_DriverThread::ShowMessage(S_OK, "DEVICE FAILURE",(const char*)name);
-							break;
-						case OPC_QUALITY_OUT_OF_SERVICE:
-							//ShowError(S_OK, "OUT OF SERVICE");
-							Opc_client_ae_DriverThread::ShowMessage(S_OK, "OUT OF SERVICE",(const char*)name);
-							break;
-					}
-				}
-				else // else if
-				{
-					//SINCRONISMO_LOCK   //lock the other threads to enter in this critical section
-					Opc_client_ae_DriverThread::SendEvent2(0, 0, pwQualities[dw], phClientItems[dw]);
-					
-					//const FILETIME* ft = reinterpret_cast<const FILETIME *>(&pftTimeStamps[dw]);
-
-					QString name;
-					name = QString(Opc_client_ae_DriverThread::Item[phClientItems[dw] - 1].spname);
-
-					switch(pwQualities[dw])
-					{
-						case OPC_QUALITY_GOOD:
-							//ShowError(S_OK, "Quality Good");
-							Opc_client_ae_DriverThread::ShowMessage(S_OK, "Quality Good",(const char*)name);
-							break;
-						case OPC_QUALITY_BAD:
-						default:
-							//ShowError(S_OK, "Quality Bad");
-							Opc_client_ae_DriverThread::ShowMessage(S_OK, "Quality Bad",(const char*)name);
-							break;
-						case OPC_QUALITY_UNCERTAIN:
-							//ShowError(S_OK, "Quality UNCERTAIN");
-							Opc_client_ae_DriverThread::ShowMessage(S_OK, "Quality UNCERTAIN",(const char*)name);
-							break;
-						case OPC_QUALITY_CONFIG_ERROR:
-							//ShowError(S_OK, "CONFIG ERROR");
-							Opc_client_ae_DriverThread::ShowMessage(S_OK, "CONFIG ERROR",(const char*)name);
-							break;
-						case OPC_QUALITY_NOT_CONNECTED:
-							//ShowError(S_OK, "NOT CONNECTED");
-							Opc_client_ae_DriverThread::ShowMessage(S_OK, "NOT CONNECTED",(const char*)name);
-							break;
-						case OPC_QUALITY_DEVICE_FAILURE:
-							//ShowError(S_OK, "DEVICE FAILURE");
-							Opc_client_ae_DriverThread::ShowMessage(S_OK, "DEVICE FAILURE",(const char*)name);
-							break;
-						case OPC_QUALITY_OUT_OF_SERVICE:
-							//ShowError(S_OK, "OUT OF SERVICE");
-							Opc_client_ae_DriverThread::ShowMessage(S_OK, "OUT OF SERVICE",(const char*)name);
-							break;
-					}
-				} // endif
-				//printf("\n");
-			} // end for
-
-			//printf("\n");
-		}
-
+		IT_IT("COPCEventSink::OnEvent");
+		
 		return S_OK;
-	}
+	};
 
-	STDMETHODIMP OnReadComplete( 
-    /* [in] */ DWORD dwTransid,
-    /* [in] */ OPCHANDLE hGroup,
-    /* [in] */ HRESULT hrMasterquality,
-    /* [in] */ HRESULT hrMastererror,
-    /* [in] */ DWORD dwCount,
-    /* [size_is][in] */ OPCHANDLE __RPC_FAR *phClientItems,
-    /* [size_is][in] */ VARIANT __RPC_FAR *pvValues,
-    /* [size_is][in] */ WORD __RPC_FAR *pwQualities,
-    /* [size_is][in] */ FILETIME __RPC_FAR *pftTimeStamps,
-    /* [size_is][in] */ HRESULT __RPC_FAR *pErrors)
-	{
-		IT_IT("COPCCallback::OnReadComplete");
 
-		//if(Opc_client_ae_DriverThread::mandare_eventi)
-		{
-			if(FAILED(hrMastererror))
-			{
-				Opc_client_ae_DriverThread::ShowError(hrMastererror,"General Async2 Read");
-			}
+    virtual HRESULT __stdcall raw_OnEvent (
+        unsigned long hClientSubscription,
+        long bRefresh,
+        long bLastRefresh,
+        unsigned long dwCount,
+        ONEVENTSTRUCT * pEvents );
 
-			if(dwTransid != Opc_client_ae_DriverThread::g_dwReadTransID)
-			{
-				Opc_client_ae_DriverThread::ShowError(S_OK,"Async2 Read callback, TransactionID's do not match");
-				return S_FALSE;
-			}
-
-			for(DWORD dw=0; dw < dwCount; dw++)
-			{
-				IT_COMMENT2("phClientItems[%d] = %d", dw, phClientItems[dw]);
-				IT_COMMENT2("pwQualities[%d] = %d", dw, pwQualities[dw]);
-
-				//printf("phClientItems[%d] = %d\t", dw, phClientItems[dw]);
-				//printf("pwQualities[%d] = %d\t", dw, pwQualities[dw]);
-
-				if((pwQualities[dw] == OPC_QUALITY_GOOD) && SUCCEEDED(pErrors[dw]))
-				{
-					VARIANT *pValue = &pvValues[dw];
-
-					//SINCRONISMO_LOCK
-
-					const FILETIME* ft = reinterpret_cast<const FILETIME *>(&pftTimeStamps[dw]);
-
-					Opc_client_ae_DriverThread::SendEvent2(pValue, ft, pwQualities[dw], phClientItems[dw]);
-				}
-				else if((pwQualities[dw] != OPC_QUALITY_GOOD) && SUCCEEDED(pErrors[dw]))
-				{
-					VARIANT *pValue = &pvValues[dw];
-
-					//SINCRONISMO_LOCK
-
-					const FILETIME* ft = reinterpret_cast<const FILETIME *>(&pftTimeStamps[dw]);
-																										
-					Opc_client_ae_DriverThread::SendEvent2(pValue, ft, pwQualities[dw], phClientItems[dw]);
-
-					QString name;
-					name = QString(Opc_client_ae_DriverThread::Item[phClientItems[dw] - 1].spname);
-
-					switch(pwQualities[dw])
-					{
-						case OPC_QUALITY_GOOD:
-							//ShowError(S_OK, "Quality Good");
-							Opc_client_ae_DriverThread::ShowMessage(S_OK, "Quality Good",(const char*)name);
-							break;
-						case OPC_QUALITY_BAD:
-						default:
-							//ShowError(S_OK, "Quality Bad");
-							Opc_client_ae_DriverThread::ShowMessage(S_OK, "Quality Bad",(const char*)name);
-							break;
-						case OPC_QUALITY_UNCERTAIN:
-							//ShowError(S_OK, "Quality UNCERTAIN");
-							Opc_client_ae_DriverThread::ShowMessage(S_OK, "Quality UNCERTAIN",(const char*)name);
-							break;
-						case OPC_QUALITY_CONFIG_ERROR:
-							//ShowError(S_OK, "CONFIG ERROR");
-							Opc_client_ae_DriverThread::ShowMessage(S_OK, "CONFIG ERROR",(const char*)name);
-							break;
-						case OPC_QUALITY_NOT_CONNECTED:
-							//ShowError(S_OK, "NOT CONNECTED");
-							Opc_client_ae_DriverThread::ShowMessage(S_OK, "NOT CONNECTED",(const char*)name);
-							break;
-						case OPC_QUALITY_DEVICE_FAILURE:
-							//ShowError(S_OK, "DEVICE FAILURE");
-							Opc_client_ae_DriverThread::ShowMessage(S_OK, "DEVICE FAILURE",(const char*)name);
-							break;
-						case OPC_QUALITY_OUT_OF_SERVICE:
-							//ShowError(S_OK, "OUT OF SERVICE");
-							Opc_client_ae_DriverThread::ShowMessage(S_OK, "OUT OF SERVICE",(const char*)name);
-							break;
-					}
-				}
-				else // else if
-				{
-					//SINCRONISMO_LOCK   //lock the other threads to enter in this critical section
-					Opc_client_ae_DriverThread::SendEvent2(0, 0, pwQualities[dw], phClientItems[dw]);
-					
-					//const FILETIME* ft = reinterpret_cast<const FILETIME *>(&pftTimeStamps[dw]);
-
-					QString name;
-					name = QString(Opc_client_ae_DriverThread::Item[phClientItems[dw] - 1].spname);
-
-					switch(pwQualities[dw])
-					{
-						case OPC_QUALITY_GOOD:
-							//ShowError(S_OK, "Quality Good");
-							Opc_client_ae_DriverThread::ShowMessage(S_OK, "Quality Good",(const char*)name);
-							break;
-						case OPC_QUALITY_BAD:
-						default:
-							//ShowError(S_OK, "Quality Bad");
-							Opc_client_ae_DriverThread::ShowMessage(S_OK, "Quality Bad",(const char*)name);
-							break;
-						case OPC_QUALITY_UNCERTAIN:
-							//ShowError(S_OK, "Quality UNCERTAIN");
-							Opc_client_ae_DriverThread::ShowMessage(S_OK, "Quality UNCERTAIN",(const char*)name);
-							break;
-						case OPC_QUALITY_CONFIG_ERROR:
-							//ShowError(S_OK, "CONFIG ERROR");
-							Opc_client_ae_DriverThread::ShowMessage(S_OK, "CONFIG ERROR",(const char*)name);
-							break;
-						case OPC_QUALITY_NOT_CONNECTED:
-							//ShowError(S_OK, "NOT CONNECTED");
-							Opc_client_ae_DriverThread::ShowMessage(S_OK, "NOT CONNECTED",(const char*)name);
-							break;
-						case OPC_QUALITY_DEVICE_FAILURE:
-							//ShowError(S_OK, "DEVICE FAILURE");
-							Opc_client_ae_DriverThread::ShowMessage(S_OK, "DEVICE FAILURE",(const char*)name);
-							break;
-						case OPC_QUALITY_OUT_OF_SERVICE:
-							//ShowError(S_OK, "OUT OF SERVICE");
-							Opc_client_ae_DriverThread::ShowMessage(S_OK, "OUT OF SERVICE",(const char*)name);
-							break;
-					}
-				} // endif
-
-				//printf("\n");
-
-			} // end for
-
-			Opc_client_ae_DriverThread::g_bReadComplete = true;
-
-			SetEvent(cb_complete_c_ic_na_1);
-
-			//printf("\n");
-		}
-
-		return S_OK;
-	}
-
-	STDMETHODIMP OnCancelComplete( 
-    /* [in] */ DWORD dwTransid,
-    /* [in] */ OPCHANDLE hGroup)
-	{
-		IT_IT("COPCCallback::OnCancelComplete");
-		return S_OK;
-	}
 };
 
+//EventStruct curEvent;
+
+HRESULT COPCEventSink::raw_OnEvent (
+        unsigned long hClientSubscription,
+        long bRefresh,
+        long bLastRefresh,
+        unsigned long dwCount,
+        ONEVENTSTRUCT * pEvents )
+{
+/*
+	MoveEvent MvEvent;
+
+	for( DWORD i = 0; i < dwCount; i++ )
+	{
+		TRACE( "%ls  %ls   %ls   %ls\n", pEvents[i].szSource, 
+								pEvents[i].szMessage,
+								pEvents[i].szConditionName, 
+								pEvents[i].szSubconditionName );
+		curEvent = pEvents[i];
+		MvEvent.PushEvent(curEvent);
+	}
+*/
+	return S_OK;
+}
+
+typedef CComObject<COPCEventSink> CComCOPCEventSink;
 
 int Opc_client_ae_DriverThread::OpcStart()
 {
@@ -433,9 +181,11 @@ int Opc_client_ae_DriverThread::OpcStart()
 
 	char show_msg[150];
 
-	TCHAR  ServerIPAddress[80];
 	//128.1.1.2 ---> ENLABSERVOPC
 	//128.1.1.25 ---> HMI2
+
+	TCHAR  ServerIPAddress[80];
+
 	strcpy(ServerIPAddress, ((Opc_client_ae_Instance*)Parent)->Cfg.OpcServerIPAddress);
 
 	if((strlen(ServerIPAddress) == 0))
@@ -445,8 +195,9 @@ int Opc_client_ae_DriverThread::OpcStart()
 	
 	if(local_server)
 	{
+		//TODO: finisch to implement the local connection apa+++ 14-04-2011
 		//COM connection
-
+		
 		// browse registry for OPC Servers
 		HKEY hk = HKEY_CLASSES_ROOT;
 		TCHAR szKey[MAX_KEYLEN];
@@ -494,7 +245,6 @@ int Opc_client_ae_DriverThread::OpcStart()
 
 		printf("Server ID found.\n");
 		IT_COMMENT("Server ID found.\n");
-
 		
 		hr = ::CoInitializeEx(NULL,COINIT_MULTITHREADED); // setup COM lib
 
@@ -504,10 +254,99 @@ int Opc_client_ae_DriverThread::OpcStart()
 			return(1);
 		}
 
+		//////////////////////start here OPC example/////////////////////////////////
+//		USES_CONVERSION;
+		
+		ICatInformation* pcr = NULL;
+//		HRESULT hr=S_OK;
+
+		hr = CoCreateInstance(CLSID_StdComponentCategoriesMgr, NULL, CLSCTX_ALL, IID_ICatInformation, (void**)&pcr);
+
+		IEnumCLSID* pEnumCLSID;
+
+		CLSID catid =  __uuidof(OPCEventServerCATID);
+		pcr->EnumClassesOfCategories(1, &catid, 1, &catid, &pEnumCLSID);
+
+		//get 10 at a time for efficiency
+		unsigned long c;
+		CLSID clsids[10];
+
+		char  strText[100];
+		WCHAR* lpszProgID = NULL;
+		//int item;
+
+		while(SUCCEEDED(hr=pEnumCLSID->Next(10,clsids, &c)) && c)
+		{
+			for(unsigned long i =0;i<c;i++)
+			{
+				clsids[i];
+				hr=ProgIDFromCLSID(clsids[i],&lpszProgID);
+
+				strcpy(strText, W2T(lpszProgID));
+
+				CoTaskMemFree( lpszProgID );
+
+				//item = m_AlarmServerList.AddString(strText);
+
+				//if(item==LB_ERR)
+				//	return(1);
+
+				printf("%s\n", strText);
+
+				CLSID* pData;
+
+				pData = new CLSID;
+
+				*pData = clsids[i];
+
+				//item = m_AlarmServerList.SetItemDataPtr(item,pData);
+
+				//if(item==LB_ERR)
+				//	return(1);
+			}
+		}
+
+		pcr->Release();
+
+		/*
+		int item = m_AlarmServerList.GetCurSel();
+
+		if(item == LB_ERR)
+			return(1);
+
+		CLSID* pData=NULL;
+
+		pData = (CLSID *)m_AlarmServerList.GetItemDataPtr(item);
+
+		IOPCEventServerPtr			m_IEventServer;
+
+		hr = m_IEventServer.CreateInstance(*pData);
+
+		if(hr==S_OK)
+		{
+			UINT count = m_AlarmServerList.GetCount();
+
+			if(item == LB_ERR)
+				return(1);
+
+
+			for(UINT i=0;i<count;i++)
+			{
+				pData = (CLSID *)m_AlarmServerList.GetItemDataPtr(i);
+				delete pData;
+			}
+		}
+
+		*/
+
+		/////////////////////////end here OPC example////////////////////////////////
+
 		// Create a running object from that class ID
 		// (CLSCTX_ALL will allow in-proc, local and remote)
 
-		hr = ::CoCreateInstance(clsid, NULL, CLSCTX_ALL, IID_ICatInformation, (void**)&g_pIOPCServer);
+		hr = ::CoCreateInstance(CLSID_StdComponentCategoriesMgr, NULL, CLSCTX_ALL, IID_ICatInformation, (void**)&g_pIOPCServer);
+
+		//hr = ::CoCreateInstance(clsid, NULL, CLSCTX_ALL, IID_ICatInformation, (void**)&g_pIOPCServer);
 
 		if(FAILED(hr) || (g_pIOPCServer == NULL))
 		{
@@ -527,7 +366,7 @@ int Opc_client_ae_DriverThread::OpcStart()
 		WORD wMajor, wMinor, wBuild;
 
 		LPWSTR pwsz = NULL;
-
+		
 		if(!GetStatus(&wMajor, &wMinor, &wBuild, &pwsz))
 		{
 			char ver[150];
@@ -538,7 +377,7 @@ int Opc_client_ae_DriverThread::OpcStart()
 			Opc_client_ae_DriverThread::ShowMessage(S_OK, "",ver);
 			::CoTaskMemFree(pwsz);
 		}
-
+/*
 		g_bVer2 = Version2();
 
 		if(g_bVer2)
@@ -561,7 +400,7 @@ int Opc_client_ae_DriverThread::OpcStart()
 		// create an in-active group
 		// NOTE: 1st param must not be a NULL or the proxy will puke
 		
-		/*
+		
 		hr = g_pIOPCServer->AddGroup(L"",					// [in] Server name, if NULL OPC Server will generate a unique name
 									 TRUE		,			// [in] State of group to add
 									 g_dwUpdateRate,		// [in] Requested update rate for group (ms)
@@ -580,13 +419,12 @@ int Opc_client_ae_DriverThread::OpcStart()
 			g_pIOPCServer->Release();
 			return(1);
 		}
-		*/
 
 		printf("Group added, update rate = %ld.\n", dwRevisedUpdateRate);
 		IT_COMMENT1("Group added, update rate = %ld.", dwRevisedUpdateRate);
 		
 		// Get pointer to OPC Server interfaces required for this program.
-		/*
+
 		hr = g_pIGroupUnknown->QueryInterface(IID_IDataObject, (void**)&g_pIDataObject);
 
 		if(FAILED(hr))
@@ -663,8 +501,8 @@ int Opc_client_ae_DriverThread::OpcStart()
 	{
 		//DCOM connection
 
-		printf("Try to connect to remote server: %s.\n", ServerIPAddress);
-		sprintf(show_msg, "Try to connect to remote server: %s.\n", ServerIPAddress);
+		printf("Trying to connect to remote A&E server on machine with IP: %s\n", ServerIPAddress);
+		sprintf(show_msg, "Trying to connect to remote A&E server on machine with IP: %s\n", ServerIPAddress);
 
 		ShowMessage(S_OK, "", show_msg);
 		
@@ -738,7 +576,7 @@ int Opc_client_ae_DriverThread::OpcStart()
 
 		ULONG actual;
 
-		printf("Available DA servers on remote server.\n");
+		printf("Available A&E server(s) on remote machine:\n");
 
 		while((hr = iEnum->Next(1, &glist, &actual)) == S_OK)
 		{
@@ -766,8 +604,7 @@ int Opc_client_ae_DriverThread::OpcStart()
 		////////////////////////end getListOfDAServers
 
 		TCHAR serverName[100];
-		
-		//Prosys.OPC.Simulation
+				
 		strcpy(serverName, ((Opc_client_ae_Instance*)Parent)->Cfg.OpcServerProgID);
 				
 		if((strlen(serverName) == 0))
@@ -839,8 +676,8 @@ int Opc_client_ae_DriverThread::OpcStart()
 			ShowError(hr,"RegConnectRegistry failed");
 		}
 
-       RegCloseKey(remoteRegHandle);
-	   RegCloseKey(keyHandle);
+        RegCloseKey(remoteRegHandle);
+	    RegCloseKey(keyHandle);
 
 		////////////////////end Get CLSID From Remote Registry
 
@@ -885,23 +722,22 @@ int Opc_client_ae_DriverThread::OpcStart()
 
 		if (FAILED(hr))
 		{
-			printf("OPC error:Failed obtain IID_IOPCEventServer interface from server, %x\n", hr);
-			ShowError(hr,"Failed obtain IID_IOPCEventServer interface from server");
+			printf("OPC error:Failed to obtain IID_IOPCEventServer interface from server, %x\n", hr);
+			ShowError(hr,"Failed to obtain IID_IOPCEventServer interface from server");
 			return 1;
 		}
 
 		printf("Connected to server %s.\n", ServerIPAddress);
 
-		sprintf(show_msg, "Connected to server %s.\n", ServerIPAddress);
+		sprintf(show_msg, "Connected to A&E server on machine with IP: %s\n", ServerIPAddress);
 		Opc_client_ae_DriverThread::ShowMessage(S_OK, "", show_msg);
-
 
 		WORD wMajor, wMinor, wBuild;
 		LPWSTR pwsz = NULL;
 
 		if(!GetStatus(&wMajor, &wMinor, &wBuild, &pwsz))
 		{
-			char ver[150];
+			char ver[250];
 			//printf("Version: %d.%d.%d\n", wMajor, wMinor, wBuild);
 			//printf("%ls\n\n",pwsz);
 			sprintf(ver,"Server version: %d.%d.%d, %s", wMajor, wMinor, wBuild, W2T(pwsz));
@@ -911,14 +747,15 @@ int Opc_client_ae_DriverThread::OpcStart()
 			Opc_client_ae_DriverThread::ShowMessage(S_OK, "",ver);
 			::CoTaskMemFree(pwsz);
 		}
-
+	
+		/*
 		g_bVer2 = Version2();
 
 		if(g_bVer2)
 		{
 			printf("Server supports OPC 2.0 interfaces\n\n");
 		}
-		
+				
 		hr = g_pIOPCServer->QueryInterface(IID_IOPCEventSubscriptionMgt, (void**)&g_pIOPCSubscriptionMgt);
 
 		if (FAILED(hr))
@@ -937,7 +774,6 @@ int Opc_client_ae_DriverThread::OpcStart()
 			return 1;
 		}
 
-		/*
 		float fTemp = 0.0f;
 
 		long lTimeBias = 0;
@@ -966,9 +802,7 @@ int Opc_client_ae_DriverThread::OpcStart()
 		}
 
 		printf("Group added, update rate = %ld.\n", dwRevisedUpdateRate);
-		*/
-		
-		/*
+
 		// Get pointer to OPC Server interfaces required for this program.
 		hr = g_pIGroupUnknown->QueryInterface(IID_IDataObject, (void**)&g_pIDataObject);
 
@@ -1041,6 +875,126 @@ int Opc_client_ae_DriverThread::OpcStart()
 
 		printf("Active Group interface added.\n");
 		*/
+
+		int bActive;
+		DWORD dwBufferTime;
+		DWORD dwMaxSize;
+		DWORD hClientSubscription;
+		DWORD dwRevisedBufferTime;
+		DWORD dwRevisedMaxSize;
+		//IOPCEventSubscriptionMgtPtr m_ISubMgt;
+		IOPCEventSubscriptionMgt* m_ISubMgt = NULL;
+		//IOPCEventServerPtr		m_IEventServer;
+		IOPCEventServer*		m_IEventServer = g_pIOPCServer;
+		DWORD m_dwCookie;
+		CComCOPCEventSink   *m_pSink = NULL;
+
+		//ATLTRY(m_pSink = new CComCOPCEventSink);
+
+		//if(m_pSink == NULL)
+		//{
+		//	ShowError(E_OUTOFMEMORY,"new CComCOPCEventSink");
+		//	return 1;
+		//}
+
+		//bActive=m_ActiveCheck.GetCheck();
+		//dwBufferTime = TexttoDWORD(m_BufferTime);
+		//dwMaxSize = TexttoDWORD(m_MaxSize);  
+
+		dwMaxSize = 1000; //this is parameter
+		bActive = 1; //this is parameter
+
+	    //server should check for maxsize of 0 however client should never pass it
+		if(!dwMaxSize)
+		{
+			dwMaxSize=1;
+			//DWORDtoText(m_MaxSize,dwMaxSize);
+		}
+
+		//hClientSubscription = TexttoDWORD(m_ClientSub);
+		hClientSubscription = 1243272; //this is parameter ?
+		dwBufferTime = 10000; //this is parameter
+
+		bool  m_bNewSubscription = 1; //this is parameter
+
+		if(m_bNewSubscription)
+		{
+			hr = m_IEventServer->CreateEventSubscription( bActive,
+								dwBufferTime,
+								dwMaxSize,
+								hClientSubscription,
+								//GUID_CAST(&__uuidof(m_ISubMgt)), //apa--- 17-04-2011
+								IID_IOPCEventSubscriptionMgt, //apa+++ 17-04-2011
+							   (IUnknown **)&m_ISubMgt,
+							   &dwRevisedBufferTime,
+							   &dwRevisedMaxSize );
+
+			if(hr != S_OK)
+			{
+				//MessageBox("Fialed to Create Subscription");
+				return 1;
+			}
+			
+			// create advise
+			CComObject<COPCEventSink>::CreateInstance(&m_pSink);
+			m_dwCookie = 99;
+
+			//IUnknownPtr pUnk;
+			IUnknown* pUnk;
+
+			m_pSink->_InternalQueryInterface( __uuidof(IUnknown), (void**)&pUnk );
+
+			hr = AtlAdvise(m_ISubMgt, pUnk, __uuidof(IOPCEventSink), &m_dwCookie );
+			
+		}
+		else
+		{
+			/*
+			if(m_NullCheck.GetCheck())  //for testing purposes
+			{
+				long *pbActive;
+				DWORD *pdwBufferTime;
+				DWORD *pdwMaxSize;
+				pbActive=NULL;	
+				pdwBufferTime = NULL;
+				pdwMaxSize = NULL;
+
+				hr=m_ISubMgt->SetState(pbActive,pdwBufferTime,pdwMaxSize,
+					hClientSubscription,&dwRevisedBufferTime,&dwRevisedMaxSize);
+			}
+			else
+			*/
+			{
+				hr = m_ISubMgt->SetState(&bActive,&dwBufferTime,&dwMaxSize,
+					hClientSubscription,&dwRevisedBufferTime,&dwRevisedMaxSize);
+			}
+
+			if(hr != S_OK)
+			{
+				//MessageBox("Fialed to Set State");
+				return 1;
+			}
+		}
+
+		//if(dwRevisedBufferTime != dwBufferTime)
+		//{
+			//DWORDtoText(m_BufferTime,dwRevisedBufferTime);
+		//}
+
+		//if(dwRevisedMaxSize != dwMaxSize)
+		//{
+			//DWORDtoText(m_MaxSize,dwRevisedMaxSize);
+		//}
+
+		//IOPCEventSubscriptionMgt2Ptr ISubMgt2 = m_ISubMgt;
+		IOPCEventSubscriptionMgt2* ISubMgt2 = (struct IOPCEventSubscriptionMgt2*)m_ISubMgt;
+
+		if(ISubMgt2 != NULL)
+		{
+			DWORD dwRevisedKeepAliveTime = 0;
+			// set the keep-alive to 3X the dwRevisedBufferTime
+			hr = ISubMgt2->SetKeepAlive( 3 * dwRevisedBufferTime, &dwRevisedKeepAliveTime );
+		}
 	}
 
     return(0);
@@ -1077,21 +1031,27 @@ int Opc_client_ae_DriverThread::GetStatus(WORD *pwMav, WORD *pwMiv, WORD *pwB, L
 	OPCEVENTSERVERSTATUS *pStatus = NULL;
 	if(g_pIOPCServer == NULL) return E_POINTER;
 	HRESULT hr = g_pIOPCServer->GetStatus(&pStatus);
-	if(FAILED(hr) || (pStatus == NULL) || (pStatus->dwServerState != OPCAE_STATUS_RUNNING))
+	if(FAILED(hr) || 
+		(pStatus == NULL) 
+		//|| (pStatus->dwServerState != OPCAE_STATUS_RUNNING) ||
+		//(pStatus->dwServerState != OPCAE_STATUS_TEST)
+		)
 	{
 		if(FAILED(hr))	ShowError(hr,"GetStatus()");
 		if(pStatus != NULL) ::CoTaskMemFree(pStatus);
 		return E_FAIL;
 	}
+
 	*pwMav = pStatus->wMajorVersion;
 	*pwMiv = pStatus->wMinorVersion;
 	*pwB = pStatus->wBuildNumber;
 	*pszV = pStatus->szVendorInfo;
 	::CoTaskMemFree(pStatus);
+
 	return 0;
 }
 
-// simple check for version OPC 2.0 type connection point containers
+/*
 bool Opc_client_ae_DriverThread::Version2()
 {
 	IT_IT("Opc_client_ae_DriverThread::Version2");
@@ -1105,6 +1065,7 @@ bool Opc_client_ae_DriverThread::Version2()
 	pCPC->Release();
 	return true;
 }
+*/
 
 
 int Opc_client_ae_DriverThread::AddItems()

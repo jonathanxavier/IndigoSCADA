@@ -147,9 +147,8 @@ class OPC_CLIENT_AEDRV Opc_client_ae_DriverThread : public DriverThread
 //	void StartErrorLog();
 //	void EndErrorLog();
 	static LPCSTR GetDateTime();
-	bool Version2();
+//	bool Version2();
 	int Async2Read(bool bFlag);
-	int Async2Update();
 	static void SendEvent2(VARIANT *pValue, const FILETIME* ft, DWORD pwQualities, OPCHANDLE phClientItem);
 	static DriverInstance *StaticParent;
 	static DriverThread *StaticThis;

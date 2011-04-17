@@ -43,6 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 LIB32=link.exe -lib
+F90=df.exe
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "OPC_CLIENT_AE_EXPORTS" /YX /FD /GZ /c
 # ADD CPP /nologo /MDd /W3 /GX /Zi /Od /I "." /I "$(QTDIR)\include" /I "$(QTDIR)\mkspecs\win32-msvc" /I "..\..\gigabase" /I "..\..\common" /I ".." /I "..\..\database" /I "..\..\ui\widgets" /I "..\..\trace" /I "..\..\utilities" /I "..\..\fifo" /I "..\..\common\libds-2.2" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_USRDLL" /D "OPC_CLIENT_AE_EXPORTS" /D "USING_GARRET" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_H_CPP" /D "_WIN32_DCOM" /FD /GZ /c
 # SUBTRACT CPP /YX
@@ -73,6 +74,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 LIB32=link.exe -lib
+F90=df.exe
 # ADD BASE CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "." /I "$(QTDIR)\include" /I "..\..\gigabase" /I "..\..\common" /I ".." /I "..\..\database" /I "..\..\ui\widgets" /I "..\..\STL" /I "..\..\trace" /I "..\..\utilities" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_USRDLL" /D "OPC_CLIENT_AE_EXPORTS" /D "USING_GARRET" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /FD /GZ /c
 # SUBTRACT BASE CPP /YX
 # ADD CPP /nologo /MD /W3 /GX /O2 /I "." /I "$(QTDIR)\include" /I "$(QTDIR)\mkspecs\win32-msvc" /I "..\..\gigabase" /I "..\..\common" /I ".." /I "..\..\database" /I "..\..\ui\widgets" /I "..\..\trace" /I "..\..\utilities" /I "..\..\fifo" /I "..\..\common\libds-2.2" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_USRDLL" /D "OPC_CLIENT_AE_EXPORTS" /D "USING_GARRET" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_H_CPP" /D "_WIN32_DCOM" /FD /c
@@ -129,6 +131,10 @@ SOURCE=.\moc_opc_client_aeInput.cpp
 # Begin Source File
 
 SOURCE=.\moc_opc_client_aeInputData.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\opc_ae_i.c
 # End Source File
 # Begin Source File
 
@@ -445,6 +451,10 @@ SOURCE=.\opccomn.h
 # Begin Source File
 
 SOURCE=.\opccomn_i.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\OpcEnum_i.c
 # End Source File
 # End Group
 # End Target
