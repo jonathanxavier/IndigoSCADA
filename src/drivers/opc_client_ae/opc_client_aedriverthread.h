@@ -74,7 +74,7 @@ class OPC_CLIENT_AEDRV Opc_client_ae_DriverThread : public DriverThread
 		//g_pIOPCSyncIO = NULL;
 		//g_pIOPCItemMgt = NULL;
 		//g_pIOPCAsyncIO2 = NULL;
-		//g_pIOPCCommon = NULL;
+		g_pIOPCCommon = NULL;
 		g_pIGroupUnknown = NULL;
 		g_pIOPCSubscriptionMgt = NULL;
 		g_iCatInfo = NULL;
@@ -125,7 +125,7 @@ class OPC_CLIENT_AEDRV Opc_client_ae_DriverThread : public DriverThread
 	//IOPCSyncIO *g_pIOPCSyncIO;
 	//IOPCItemMgt *g_pIOPCItemMgt;
 	//IOPCAsyncIO2 *g_pIOPCAsyncIO2;
-	//IOPCCommon *g_pIOPCCommon;
+	IOPCCommon *g_pIOPCCommon;
 	IUnknown *g_pIGroupUnknown;
 	IOPCEventSubscriptionMgt *g_pIOPCSubscriptionMgt;
 	IOPCServerList *g_iCatInfo;
@@ -138,7 +138,7 @@ class OPC_CLIENT_AEDRV Opc_client_ae_DriverThread : public DriverThread
 	int OpcStart();
 	int OpcStop();
 	int GetStatus(WORD *pwMav, WORD *pwMiv, WORD *pwB, LPWSTR *pswzV);
-//	int AsyncUpdate();
+	int Update();
 	static void ShowError(HRESULT hr, LPCSTR pszError);
 	static void ShowMessage(HRESULT hr, LPCSTR pszError, const char* name);
 //	void StartErrorLog();

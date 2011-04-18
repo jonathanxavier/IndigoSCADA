@@ -2094,7 +2094,7 @@ int Opc_client_com_DriverThread::OpcStart()
 			}
 			else
 			{
-				g_pIOPCCommon->SetClientName(L"IndigoSCADA OPC Client");
+				g_pIOPCCommon->SetClientName(L"IndigoSCADA OPC DA Client");
 			}
 		}
 		
@@ -2120,7 +2120,7 @@ int Opc_client_com_DriverThread::OpcStart()
 		//DCOM connection
 
 		printf("Try to connect to remote server: %s.\n", ServerIPAddress);
-		sprintf(show_msg, "Try to connect to remote server: %s.\n", ServerIPAddress);
+		sprintf(show_msg, "Try to connect to remote server: %s", ServerIPAddress);
 
 		ShowMessage(S_OK, "", show_msg);
 		
@@ -2346,7 +2346,7 @@ int Opc_client_com_DriverThread::OpcStart()
 
 		printf("Connected to server %s.\n", ServerIPAddress);
 
-		sprintf(show_msg, "Connected to server %s.\n", ServerIPAddress);
+		sprintf(show_msg, "Connected to server %s", ServerIPAddress);
 		Opc_client_com_DriverThread::ShowMessage(S_OK, "", show_msg);
 
 
@@ -2473,7 +2473,7 @@ int Opc_client_com_DriverThread::OpcStart()
 			}
 			else
 			{
-				g_pIOPCCommon->SetClientName(L"IndigoSCADA OPC Client");
+				g_pIOPCCommon->SetClientName(L"IndigoSCADA OPC DA Client");
 			}
 		}
 		//
