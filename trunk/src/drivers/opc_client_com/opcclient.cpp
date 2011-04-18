@@ -25,7 +25,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 //apa - Updated opcda.h to 3.0 DA support
-//TODO: AddItems: add support of arrays
+//TODO: AddItems: add support for arrays
 
 
 #define STRICT
@@ -64,7 +64,7 @@ CComModule _Module;
 #include "opc_client_comdriverthread.h"
 
 #define MAX_KEYLEN 256
-#define MAX_ITEMS 5000  //<--PARAMETRO
+#define MAX_ITEMS 5000  //<--should be parameter
 
 // critical section stuff
 CComAutoCriticalSection sincronismo; 
@@ -1664,9 +1664,9 @@ int Opc_client_com_DriverThread::Async2Update()
 					}
 					else
 					{
-						//general interrogation persa
+						//lost general interrogation
 						//assert(0);
-						printf("General interrogation persa!");
+						printf("Lost general interrogation!");
 					}
 
 					/////////end General interrogation command

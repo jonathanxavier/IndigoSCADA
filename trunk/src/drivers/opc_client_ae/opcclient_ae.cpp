@@ -44,7 +44,6 @@ CComModule _Module;
 #include "opcae_er.h"
 #include "general_defines.h"
 #include "IndentedTrace.h"
-
 #include "opc_client_ae_instance.h"
 #include "opc_client_aedriverthread.h"
 
@@ -61,12 +60,35 @@ CComModule _Module;
 //_COM_SMARTPTR_TYPEDEF(IOPCEventSink, __uuidof(IOPCEventSink));
 //_COM_SMARTPTR_TYPEDEF(IOPCEventServer2, __uuidof(IOPCEventServer2));
 //_COM_SMARTPTR_TYPEDEF(IOPCEventSubscriptionMgt2, __uuidof(IOPCEventSubscriptionMgt2));
-
 //typedef _COM_SMARTPTR<IOPCEventSubscriptionMgt, &IID> IOPCEventSubscriptionMgtPtr;
 //typedef _COM_SMARTPTR<IOPCEventServer, &IID> IOPCEventServerPtr;
-
 //typedef _COM_SMARTPTR<_COM_SMARTPTR_LEVEL2<IOPCEventSubscriptionMgt, &IID> > IOPCEventSubscriptionMgtPtr;
 //typedef _COM_SMARTPTR<_COM_SMARTPTR_LEVEL2<IOPCEventServer, &IID> > IOPCEventServerPtr;
+
+/*
+typedef  struct __MIDL___MIDL_itf_opc_ae_0257_0004
+    {
+    WORD wChangeMask;
+    WORD wNewState;
+    LPWSTR szSource;
+    FILETIME ftTime;
+    LPWSTR szMessage;
+    DWORD dwEventType;
+    DWORD dwEventCategory;
+    DWORD dwSeverity;
+    LPWSTR szConditionName;
+    LPWSTR szSubconditionName;
+    WORD wQuality;
+    WORD wReserved;
+    BOOL bAckRequired;
+    FILETIME ftActiveTime;
+    DWORD dwCookie;
+    DWORD dwNumEventAttrs;
+    [size_is] VARIANT *pEventAttributes;
+    LPWSTR szActorID;
+    } 	ONEVENTSTRUCT;
+
+*/
 
 #if _MSC_VER > 1100  // VC 6.0 and higher
 	#define GUID_CAST( a )		(const_cast<_GUID*>(a))
@@ -86,7 +108,7 @@ BEGIN_COM_MAP(COPCEventSink)
 	COM_INTERFACE_ENTRY(IOPCEventSink)
 END_COM_MAP()
 
-    HRESULT __stdcall OnEvent( 
+	HRESULT STDMETHODCALLTYPE OnEvent( 
             /* [in] */ OPCHANDLE hClientSubscription,
             /* [in] */ BOOL bRefresh,
             /* [in] */ BOOL bLastRefresh,
@@ -100,41 +122,12 @@ END_COM_MAP()
 			printf("%ls  %ls   %ls   %ls\n", pEvents[i].szSource, 
 									pEvents[i].szMessage,
 									pEvents[i].szConditionName, 
-									pEvents[i].szSubconditionName );
+									pEvents[i].szSubconditionName);
 		}
 		
 		return S_OK;
 	};
-
-
-    virtual HRESULT __stdcall raw_OnEvent (
-        unsigned long hClientSubscription,
-        long bRefresh,
-        long bLastRefresh,
-        unsigned long dwCount,
-        ONEVENTSTRUCT * pEvents );
-
 };
-
-
-HRESULT COPCEventSink::raw_OnEvent (
-        unsigned long hClientSubscription,
-        long bRefresh,
-        long bLastRefresh,
-        unsigned long dwCount,
-        ONEVENTSTRUCT * pEvents )
-{
-
-	for( DWORD i = 0; i < dwCount; i++ )
-	{
-		printf("%ls  %ls   %ls   %ls\n", pEvents[i].szSource, 
-								pEvents[i].szMessage,
-								pEvents[i].szConditionName, 
-								pEvents[i].szSubconditionName );
-	}
-
-	return S_OK;
-}
 
 typedef CComObject<COPCEventSink> CComCOPCEventSink;
 
@@ -147,7 +140,7 @@ int Opc_client_ae_DriverThread::Update()
 		if(fExit)
 		{
 			mandare_eventi = false;
-			IT_COMMENT("Opc_client_com_DriverThread exiting....");
+			IT_COMMENT("Opc_client_ae_DriverThread exiting....");
 			m_hevtEnd.signal();
 			break; //terminate the thread
 		}
@@ -965,7 +958,7 @@ int Opc_client_ae_DriverThread::OpcStart()
 
 		//IOPCEventSubscriptionMgt2Ptr ISubMgt2 = m_ISubMgt;
 
-#if 0 //Remove ASAP #if 0, here only because the following lines chashes
+#if 0 //Remove ASAP #if 0, this is ere only because the following lines chashes
 
 		IOPCEventSubscriptionMgt2* ISubMgt2 = (struct IOPCEventSubscriptionMgt2*)m_ISubMgt;
 
@@ -1011,8 +1004,11 @@ int Opc_client_ae_DriverThread::GetStatus(WORD *pwMav, WORD *pwMiv, WORD *pwB, L
 	*pwB = 0;
 	*pszV = NULL;
 	OPCEVENTSERVERSTATUS *pStatus = NULL;
+
 	if(g_pIOPCServer == NULL) return E_POINTER;
+
 	HRESULT hr = g_pIOPCServer->GetStatus(&pStatus);
+
 	if(FAILED(hr) || (pStatus == NULL) )
 	{
 		if(FAILED(hr))	ShowError(hr,"GetStatus()");

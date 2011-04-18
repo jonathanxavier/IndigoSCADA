@@ -62,7 +62,6 @@ class OPC_CLIENT_AEDRV Opc_client_ae_DriverThread : public DriverThread
 		g_dwNumItems = 0;
 		g_bWriteEnable = false;
 //		g_bWriteEnable_flag = false;
-		g_bVer2 = false; // version 2.0 flag
 		g_hClientGroup = 0;
 		g_dwUpdateTransID = 1;
 		g_dwCancelID = 1;
@@ -102,8 +101,7 @@ class OPC_CLIENT_AEDRV Opc_client_ae_DriverThread : public DriverThread
 //	bool  g_bWriteEnable_flag;
 	static bool  g_bWriteComplete;
 	static bool  g_bReadComplete;
-	static bool  g_bPoll; // poll for values or async updates
-	bool  g_bVer2; // version 2.0 flag
+	//static bool  g_bPoll; // poll for values or async updates
 	DWORD g_dwUpdateTransID;
 	DWORD g_dwCancelID;
 	static DWORD g_dwReadTransID;
