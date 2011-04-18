@@ -62,8 +62,6 @@ CComModule _Module;
 //_COM_SMARTPTR_TYPEDEF(IOPCEventServer2, __uuidof(IOPCEventServer2));
 //_COM_SMARTPTR_TYPEDEF(IOPCEventSubscriptionMgt2, __uuidof(IOPCEventSubscriptionMgt2));
 
-
-
 //typedef _COM_SMARTPTR<IOPCEventSubscriptionMgt, &IID> IOPCEventSubscriptionMgtPtr;
 //typedef _COM_SMARTPTR<IOPCEventServer, &IID> IOPCEventServerPtr;
 
@@ -96,6 +94,14 @@ END_COM_MAP()
             /* [size_is][in] */ ONEVENTSTRUCT *pEvents) 
 	{
 		IT_IT("COPCEventSink::OnEvent");
+
+		for( DWORD i = 0; i < dwCount; i++ )
+		{
+			printf("%ls  %ls   %ls   %ls\n", pEvents[i].szSource, 
+									pEvents[i].szMessage,
+									pEvents[i].szConditionName, 
+									pEvents[i].szSubconditionName );
+		}
 		
 		return S_OK;
 	};
@@ -118,32 +124,45 @@ HRESULT COPCEventSink::raw_OnEvent (
         unsigned long dwCount,
         ONEVENTSTRUCT * pEvents )
 {
-/*
-	MoveEvent MvEvent;
 
 	for( DWORD i = 0; i < dwCount; i++ )
 	{
-		TRACE( "%ls  %ls   %ls   %ls\n", pEvents[i].szSource, 
+		printf("%ls  %ls   %ls   %ls\n", pEvents[i].szSource, 
 								pEvents[i].szMessage,
 								pEvents[i].szConditionName, 
 								pEvents[i].szSubconditionName );
-		curEvent = pEvents[i];
-		MvEvent.PushEvent(curEvent);
 	}
-*/
+
 	return S_OK;
 }
 
 typedef CComObject<COPCEventSink> CComCOPCEventSink;
+
+int Opc_client_ae_DriverThread::Update()
+{
+	IT_IT("Opc_client_ae_DriverThread::Update");
+
+	while(true)
+	{
+		if(fExit)
+		{
+			mandare_eventi = false;
+			IT_COMMENT("Opc_client_com_DriverThread exiting....");
+			m_hevtEnd.signal();
+			break; //terminate the thread
+		}
+
+		::Sleep(g_dwUpdateRate);
+	}
+
+	return 0;
+}
 
 int Opc_client_ae_DriverThread::OpcStart()
 {
 	IT_IT("Opc_client_ae_DriverThread::OpcStart");
 
 	char show_msg[150];
-
-	//128.1.1.2 ---> ENLABSERVOPC
-	//128.1.1.25 ---> HMI2
 
 	TCHAR  ServerIPAddress[80];
 
@@ -156,7 +175,7 @@ int Opc_client_ae_DriverThread::OpcStart()
 	
 	if(local_server)
 	{
-		//TODO: finisch to implement the local connection apa+++ 14-04-2011
+		//TODO: finish to implement the local connection apa+++ 14-04-2011
 		//COM connection
 		
 		// browse registry for OPC Servers
@@ -463,7 +482,7 @@ int Opc_client_ae_DriverThread::OpcStart()
 		//DCOM connection
 
 		printf("Trying to connect to remote A&E server on machine with IP: %s\n", ServerIPAddress);
-		sprintf(show_msg, "Trying to connect to remote A&E server on machine with IP: %s\n", ServerIPAddress);
+		sprintf(show_msg, "Trying to connect to remote A&E server on machine with IP: %s", ServerIPAddress);
 
 		ShowMessage(S_OK, "", show_msg);
 		
@@ -562,7 +581,7 @@ int Opc_client_ae_DriverThread::OpcStart()
 			}
 		}
 		
-		////////////////////////end getListOfDAServers
+		////////////////////////end getListOfAEServers
 
 		TCHAR serverName[100];
 				
@@ -690,7 +709,7 @@ int Opc_client_ae_DriverThread::OpcStart()
 
 		printf("Connected to server %s.\n", ServerIPAddress);
 
-		sprintf(show_msg, "Connected to A&E server on machine with IP: %s\n", ServerIPAddress);
+		sprintf(show_msg, "Connected to A&E server on machine with IP: %s", ServerIPAddress);
 		Opc_client_ae_DriverThread::ShowMessage(S_OK, "", show_msg);
 
 		WORD wMajor, wMinor, wBuild;
@@ -837,6 +856,17 @@ int Opc_client_ae_DriverThread::OpcStart()
 		printf("Active Group interface added.\n");
 		*/
 
+		hr = g_pIOPCServer->QueryInterface(IID_IOPCCommon, (void**)&g_pIOPCCommon);
+
+		if(FAILED(hr))
+		{
+			ShowError(hr,"QueryInterface(IID_IOPCCommon)");
+		}
+		else
+		{
+			g_pIOPCCommon->SetClientName(L"IndigoSCADA OPC AE Client");
+		}
+
 		int bActive;
 		DWORD dwBufferTime;
 		DWORD dwMaxSize;
@@ -858,10 +888,6 @@ int Opc_client_ae_DriverThread::OpcStart()
 		//	return 1;
 		//}
 
-		//bActive=m_ActiveCheck.GetCheck();
-		//dwBufferTime = TexttoDWORD(m_BufferTime);
-		//dwMaxSize = TexttoDWORD(m_MaxSize);  
-
 		dwMaxSize = 1000; //this is parameter
 		bActive = 1; //this is parameter
 
@@ -869,12 +895,11 @@ int Opc_client_ae_DriverThread::OpcStart()
 		if(!dwMaxSize)
 		{
 			dwMaxSize=1;
-			//DWORDtoText(m_MaxSize,dwMaxSize);
 		}
 
 		//hClientSubscription = TexttoDWORD(m_ClientSub);
-		hClientSubscription = 1243272; //this is parameter ?
-		dwBufferTime = 10000; //this is parameter
+		hClientSubscription = 1243272; //is this a parameter ?
+		dwBufferTime = 10000; //this is a parameter
 
 		bool  m_bNewSubscription = 1; //this is parameter
 
@@ -892,9 +917,11 @@ int Opc_client_ae_DriverThread::OpcStart()
 
 			if(hr != S_OK)
 			{
-				//MessageBox("Fialed to Create Subscription");
+				printf("Fialed to Create Subscription\n");
 				return 1;
 			}
+
+			printf("CreateEventSubscription Done\n");
 			
 			// create advise
 			CComObject<COPCEventSink>::CreateInstance(&m_pSink);
@@ -906,7 +933,6 @@ int Opc_client_ae_DriverThread::OpcStart()
 			m_pSink->_InternalQueryInterface( __uuidof(IUnknown), (void**)&pUnk );
 
 			hr = AtlAdvise(m_ISubMgt, pUnk, __uuidof(IOPCEventSink), &m_dwCookie );
-			
 		}
 		else
 		{
@@ -932,30 +958,25 @@ int Opc_client_ae_DriverThread::OpcStart()
 
 			if(hr != S_OK)
 			{
-				//MessageBox("Fialed to Set State");
+				printf("Failed to Set State\n");
 				return 1;
 			}
 		}
 
-		//if(dwRevisedBufferTime != dwBufferTime)
-		//{
-			//DWORDtoText(m_BufferTime,dwRevisedBufferTime);
-		//}
-
-		//if(dwRevisedMaxSize != dwMaxSize)
-		//{
-			//DWORDtoText(m_MaxSize,dwRevisedMaxSize);
-		//}
-
 		//IOPCEventSubscriptionMgt2Ptr ISubMgt2 = m_ISubMgt;
+
+#if 0 //Remove ASAP #if 0, here only because the following lines chashes
+
 		IOPCEventSubscriptionMgt2* ISubMgt2 = (struct IOPCEventSubscriptionMgt2*)m_ISubMgt;
 
+		
 		if(ISubMgt2 != NULL)
 		{
 			DWORD dwRevisedKeepAliveTime = 0;
 			// set the keep-alive to 3X the dwRevisedBufferTime
 			hr = ISubMgt2->SetKeepAlive( 3 * dwRevisedBufferTime, &dwRevisedKeepAliveTime );
 		}
+#endif
 	}
 
     return(0);
@@ -992,11 +1013,7 @@ int Opc_client_ae_DriverThread::GetStatus(WORD *pwMav, WORD *pwMiv, WORD *pwB, L
 	OPCEVENTSERVERSTATUS *pStatus = NULL;
 	if(g_pIOPCServer == NULL) return E_POINTER;
 	HRESULT hr = g_pIOPCServer->GetStatus(&pStatus);
-	if(FAILED(hr) || 
-		(pStatus == NULL) 
-		//|| (pStatus->dwServerState != OPCAE_STATUS_RUNNING) ||
-		//(pStatus->dwServerState != OPCAE_STATUS_TEST)
-		)
+	if(FAILED(hr) || (pStatus == NULL) )
 	{
 		if(FAILED(hr))	ShowError(hr,"GetStatus()");
 		if(pStatus != NULL) ::CoTaskMemFree(pStatus);
@@ -1027,6 +1044,31 @@ bool Opc_client_ae_DriverThread::Version2()
 	return true;
 }
 */
+
+void Opc_client_ae_DriverThread::ShowError(HRESULT hr, LPCSTR pszError)
+{
+	/*
+	LPWSTR pwszError = NULL;
+
+	if((g_pIOPCServer != NULL) && SUCCEEDED(g_pIOPCServer->GetErrorString(hr, 0, &pwszError)))
+	{
+		QString err;
+		USES_CONVERSION;
+		err.sprintf("Error: %s, %s", pszError, W2T(pwszError));
+
+		postEvent(StaticParent,new DriverEvent(StaticThis, DriverEvent::OpSendAlarmString,0,err));
+		
+		::CoTaskMemFree(pwszError);
+	}
+	else
+	*/
+	{
+		QString err;
+		err.sprintf("Error: %s, %lX", pszError, hr);
+
+		postEvent(StaticParent,new DriverEvent(StaticThis, DriverEvent::OpSendAlarmString,0,err));
+	}
+}
 
 void Opc_client_ae_DriverThread::ShowMessage(HRESULT hr, LPCSTR pszError, const char* name)
 {

@@ -47,22 +47,8 @@ void Opc_client_ae_DriverThread::run()
 
 	int nRet = OpcStart(); // connect to an OPC server
 	if(nRet) return;
-
-	//nRet = AddItems(); // add some items
-	//if(nRet) return;
-
-	//OPC DA 1.0
-	//SyncRead(false);//Sincronous read from opc server (Read from Device)
-	//AsyncRead(false); //Asincronous read from opc server (Read from Device)
-	//AsyncUpdate();
-	/////////////////////////////////////////General interrogation//////////////////////////////////////////////////////////////////////////////////////////////////////
-	//OPC DA 2.0 This function sends all items (i.e IEC 101 General Interrogation)
-	//This function is called IF AND ONLY IF operator ask general interrogation
-	//Async2Read(false); 
-	/////////////////////////////////////////Variazioni come spontanee//////////////////////////////////////////////////////////////////////////////////////////////////////
-	//OPC DA 2.0 This function on the first transaction send all items 
-	//the arrives spontaneous variations (i.e. IEC 101 Spontaneaous variations)
-	//Async2Update();
+	
+	Update();
 
 	OpcStop();
 
