@@ -37,6 +37,7 @@
 #include "IndentedTrace.h"
 #include "fifo.h"
 #include "fifoc.h"
+//#include "opcaeclasses.h"
 
 struct structItem
 {
@@ -84,6 +85,8 @@ class OPC_CLIENT_AEDRV Opc_client_ae_DriverThread : public DriverThread
 		StaticThis = this;
 
 		fifo_control_direction = ((Opc_client_ae_Instance*)Parent)->fifo_control_direction;
+
+		m_ISubMgt = NULL;
 	};
 
 		//Questo destructor viene chimato solo sulla Disconnect e non quando
@@ -132,6 +135,11 @@ class OPC_CLIENT_AEDRV Opc_client_ae_DriverThread : public DriverThread
 	static struct structItem* Item;
 
 	int local_server;
+
+	////////begin A&E specific variables///////////////////////////////////////////////////
+	DWORD m_dwCookie, m_dwShutdownCookie;
+	IOPCEventSubscriptionMgt* m_ISubMgt;
+	////////end A&E specific variables///////////////////////////////////////////////////
 
 	int OpcStart();
 	int OpcStop();
