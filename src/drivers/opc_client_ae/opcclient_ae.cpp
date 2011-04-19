@@ -49,87 +49,7 @@ CComModule _Module;
 
 #define MAX_KEYLEN 256
 
-//
-// Smart pointer typedef declarations
-//
-
-//_COM_SMARTPTR_TYPEDEF(OPCEventServerCATID, __uuidof(OPCEventServerCATID));
-//_COM_SMARTPTR_TYPEDEF(IOPCEventServer, __uuidof(IOPCEventServer));
-//_COM_SMARTPTR_TYPEDEF(IOPCEventSubscriptionMgt, __uuidof(IOPCEventSubscriptionMgt));
-//_COM_SMARTPTR_TYPEDEF(IOPCEventAreaBrowser, __uuidof(IOPCEventAreaBrowser));
-//_COM_SMARTPTR_TYPEDEF(IOPCEventSink, __uuidof(IOPCEventSink));
-//_COM_SMARTPTR_TYPEDEF(IOPCEventServer2, __uuidof(IOPCEventServer2));
-//_COM_SMARTPTR_TYPEDEF(IOPCEventSubscriptionMgt2, __uuidof(IOPCEventSubscriptionMgt2));
-//typedef _COM_SMARTPTR<IOPCEventSubscriptionMgt, &IID> IOPCEventSubscriptionMgtPtr;
-//typedef _COM_SMARTPTR<IOPCEventServer, &IID> IOPCEventServerPtr;
-//typedef _COM_SMARTPTR<_COM_SMARTPTR_LEVEL2<IOPCEventSubscriptionMgt, &IID> > IOPCEventSubscriptionMgtPtr;
-//typedef _COM_SMARTPTR<_COM_SMARTPTR_LEVEL2<IOPCEventServer, &IID> > IOPCEventServerPtr;
-
-/*
-typedef  struct __MIDL___MIDL_itf_opc_ae_0257_0004
-    {
-    WORD wChangeMask;
-    WORD wNewState;
-    LPWSTR szSource;
-    FILETIME ftTime;
-    LPWSTR szMessage;
-    DWORD dwEventType;
-    DWORD dwEventCategory;
-    DWORD dwSeverity;
-    LPWSTR szConditionName;
-    LPWSTR szSubconditionName;
-    WORD wQuality;
-    WORD wReserved;
-    BOOL bAckRequired;
-    FILETIME ftActiveTime;
-    DWORD dwCookie;
-    DWORD dwNumEventAttrs;
-    [size_is] VARIANT *pEventAttributes;
-    LPWSTR szActorID;
-    } 	ONEVENTSTRUCT;
-
-*/
-
-#if _MSC_VER > 1100  // VC 6.0 and higher
-	#define GUID_CAST( a )		(const_cast<_GUID*>(a))
-#else				// VC 5.0
-	#define GUID_CAST( a )		((struct GUID *)a)
-#endif
-
-class ATL_NO_VTABLE COPCEventSink : 
-	public CComObjectRoot,
-	public IOPCEventSink
-{
-public:
-	COPCEventSink(){}
-
-BEGIN_COM_MAP(COPCEventSink)
-	//COM_INTERFACE_ENTRY_IID( __uuidof(IOPCEventSink), IOPCEventSink)
-	COM_INTERFACE_ENTRY(IOPCEventSink)
-END_COM_MAP()
-
-	HRESULT STDMETHODCALLTYPE OnEvent( 
-            /* [in] */ OPCHANDLE hClientSubscription,
-            /* [in] */ BOOL bRefresh,
-            /* [in] */ BOOL bLastRefresh,
-            /* [in] */ DWORD dwCount,
-            /* [size_is][in] */ ONEVENTSTRUCT *pEvents) 
-	{
-		IT_IT("COPCEventSink::OnEvent");
-
-		for( DWORD i = 0; i < dwCount; i++ )
-		{
-			printf("%ls  %ls   %ls   %ls\n", pEvents[i].szSource, 
-									pEvents[i].szMessage,
-									pEvents[i].szConditionName, 
-									pEvents[i].szSubconditionName);
-		}
-		
-		return S_OK;
-	};
-};
-
-typedef CComObject<COPCEventSink> CComCOPCEventSink;
+#include "opcaeclasses.h"
 
 int Opc_client_ae_DriverThread::Update()
 {
@@ -291,9 +211,9 @@ int Opc_client_ae_DriverThread::OpcStart()
 
 		pData = (CLSID *)m_AlarmServerList.GetItemDataPtr(item);
 
-		IOPCEventServerPtr			m_IEventServer;
+		IOPCEventServerPtr			g_pIOPCServer;
 
-		hr = m_IEventServer.CreateInstance(*pData);
+		hr = g_pIOPCServer.CreateInstance(*pData);
 
 		if(hr==S_OK)
 		{
@@ -334,6 +254,7 @@ int Opc_client_ae_DriverThread::OpcStart()
 		IT_COMMENT("Connected to local server");
 
 		sprintf(show_msg, "Connected to local server");
+
 		Opc_client_ae_DriverThread::ShowMessage(S_OK, "", show_msg);
 
 		WORD wMajor, wMinor, wBuild;
@@ -350,125 +271,6 @@ int Opc_client_ae_DriverThread::OpcStart()
 			Opc_client_ae_DriverThread::ShowMessage(S_OK, "",ver);
 			::CoTaskMemFree(pwsz);
 		}
-/*
-		g_bVer2 = Version2();
-
-		if(g_bVer2)
-		{
-			printf("Server supports OPC 2.0 interfaces\n\n");
-			IT_COMMENT("Server supports OPC 2.0 interfaces");
-		}
-
-		hr = g_pIOPCServer->QueryInterface(IID_IOPCEventSubscriptionMgt, (void**)&g_pIOPCSubscriptionMgt);
-
-		if(FAILED(hr))
-		{
-			ShowError(hr,"QueryInterface(IID_IOPCEventSubscriptionMgt");
-		}
-
-		float fTemp = 0.0f;
-		long lTimeBias = 0;
-		DWORD dwRevisedUpdateRate = 0;
-
-		// create an in-active group
-		// NOTE: 1st param must not be a NULL or the proxy will puke
-		
-		
-		hr = g_pIOPCServer->AddGroup(L"",					// [in] Server name, if NULL OPC Server will generate a unique name
-									 TRUE		,			// [in] State of group to add
-									 g_dwUpdateRate,		// [in] Requested update rate for group (ms)
-									 1234,					// [in] Client handle to OPC Group
-									 &lTimeBias,			// [in] Time 
-									 &fTemp,				// [in] Percent Deadband
-									 0,						// [in] Localization ID
-									 &g_hClientGroup,		// [out] Server Handle to group
-									 &dwRevisedUpdateRate,	// [out] Revised update rate
-									 IID_IUnknown,			// [in] Type of interface desired
-									 &g_pIGroupUnknown);	// [out] where to store the interface pointer
-			
-		if(FAILED(hr))
-		{
-			ShowError(hr,"AddGroup()");
-			g_pIOPCServer->Release();
-			return(1);
-		}
-
-		printf("Group added, update rate = %ld.\n", dwRevisedUpdateRate);
-		IT_COMMENT1("Group added, update rate = %ld.", dwRevisedUpdateRate);
-		
-		// Get pointer to OPC Server interfaces required for this program.
-
-		hr = g_pIGroupUnknown->QueryInterface(IID_IDataObject, (void**)&g_pIDataObject);
-
-		if(FAILED(hr))
-		{
-			ShowError(hr,"QueryInterface(IID_IDataObject)");
-		}
-
-		hr = g_pIGroupUnknown->QueryInterface(IID_IOPCGroupStateMgt, (void**)&g_pIOPCGroupStateMgt);
-
-		if(FAILED(hr))
-		{
-			ShowError(hr,"QueryInterface(IID_IOPCGroupStateMgt)");
-		}
-
-		hr = g_pIGroupUnknown->QueryInterface(IID_IOPCAsyncIO, (void**)&g_pIOPCAsyncIO);
-
-		if(FAILED(hr))
-		{
-			ShowError(hr,"QueryInterface(IID_IOPCAsyncIO)");
-		}
-
-		hr = g_pIGroupUnknown->QueryInterface(IID_IOPCItemMgt, (void**)&g_pIOPCItemMgt);
-
-		if(FAILED(hr))
-		{
-			ShowError(hr,"QueryInterface(IID_IOPCItemMgt)");
-		}
-
-		hr = g_pIGroupUnknown->QueryInterface(IID_IOPCSyncIO, (void**)&g_pIOPCSyncIO);
-
-		if(FAILED(hr))
-		{
-			ShowError(hr,"QueryInterface(IID_IOPCSyncIO)");
-		}
-
-		if(g_bVer2)
-		{
-			hr = g_pIGroupUnknown->QueryInterface(IID_IOPCAsyncIO2, (void**)&g_pIOPCAsyncIO2);
-			if(FAILED(hr))
-			{
-				ShowError(hr,"QueryInterface(IID_IOPCAsyncIO2)");
-			}
-
-			hr = g_pIOPCServer->QueryInterface(IID_IOPCCommon, (void**)&g_pIOPCCommon);
-			if(FAILED(hr))
-			{
-				ShowError(hr,"QueryInterface(IID_IOPCCommon)");
-			}
-			else
-			{
-				g_pIOPCCommon->SetClientName(L"IndigoSCADA OPC Client");
-			}
-		}
-		
-		if(FAILED(hr))
-		{
-			g_pIOPCServer->Release();
-			printf("OPC error: secondary QI failed\n");
-			IT_COMMENT("OPC error: secondary QI failed");
-			ShowError(hr,"secondary QI failed");
-			return(1);
-		}
-
-		if(dwRevisedUpdateRate != g_dwUpdateRate)
-		{
-			g_dwUpdateRate = dwRevisedUpdateRate;
-		}
-
-		printf("Active Group interface added.\n");
-		IT_COMMENT("Active Group interface added.");
-	*/
 	}
 	else
 	{
@@ -720,134 +522,6 @@ int Opc_client_ae_DriverThread::OpcStart()
 			Opc_client_ae_DriverThread::ShowMessage(S_OK, "",ver);
 			::CoTaskMemFree(pwsz);
 		}
-	
-		/*
-		g_bVer2 = Version2();
-
-		if(g_bVer2)
-		{
-			printf("Server supports OPC 2.0 interfaces\n\n");
-		}
-				
-		hr = g_pIOPCServer->QueryInterface(IID_IOPCEventSubscriptionMgt, (void**)&g_pIOPCSubscriptionMgt);
-
-		if (FAILED(hr))
-		{
-			printf("OPC error:Failed to obtain IID_IOPCEventSubscriptionMgt interface %x\n",hr);
-			ShowError(hr,"Failed to obtain IID_IOPCEventSubscriptionMgt interface");
-			return 1;
-		}
-		
-		hr = g_pIOPCServer->QueryInterface(IID_IOPCEventAreaBrowser, (void**)&g_iOpcAreaBrowser);
-
-		if (FAILED(hr))
-		{
-			printf("OPC error:Failed to obtain IID_IOPCEventAreaBrowser interface, %x\n",hr);
-			ShowError(hr,"Failed to obtain IID_IOPCEventAreaBrowser interface");
-			return 1;
-		}
-
-		float fTemp = 0.0f;
-
-		long lTimeBias = 0;
-
-		DWORD dwRevisedUpdateRate = 0;
-
-		// create an in-active group
-		// NOTE: 1st param must not be a NULL or the proxy will puke
-		hr = g_pIOPCServer->AddGroup(L"",					// [in] Server name, if NULL OPC Server will generate a unique name
-									 TRUE		,			// [in] State of group to add
-									 g_dwUpdateRate,		// [in] Requested update rate for group (ms)
-									 1234,					// [in] Client handle to OPC Group
-									 &lTimeBias,			// [in] Time 
-									 &fTemp,				// [in] Percent Deadband
-									 0,						// [in] Localization ID
-									 &g_hClientGroup,		// [out] Server Handle to group
-									 &dwRevisedUpdateRate,	// [out] Revised update rate
-									 IID_IUnknown,			// [in] Type of interface desired
-									 &g_pIGroupUnknown);	// [out] where to store the interface pointer
-
-		if(FAILED(hr))
-		{
-			ShowError(hr,"AddGroup()");
-			g_pIOPCServer->Release();
-			return 1;
-		}
-
-		printf("Group added, update rate = %ld.\n", dwRevisedUpdateRate);
-
-		// Get pointer to OPC Server interfaces required for this program.
-		hr = g_pIGroupUnknown->QueryInterface(IID_IDataObject, (void**)&g_pIDataObject);
-
-		if(FAILED(hr))
-		{
-			ShowError(hr,"QueryInterface(IID_IDataObject)");
-		}
-
-		hr = g_pIGroupUnknown->QueryInterface(IID_IOPCGroupStateMgt, (void**)&g_pIOPCGroupStateMgt);
-
-		if(FAILED(hr))
-		{
-			ShowError(hr,"QueryInterface(IID_IOPCGroupStateMgt)");
-		}
-
-		hr = g_pIGroupUnknown->QueryInterface(IID_IOPCAsyncIO, (void**)&g_pIOPCAsyncIO);
-
-		if(FAILED(hr))
-		{
-			ShowError(hr,"QueryInterface(IID_IOPCAsyncIO)");
-		}
-
-		hr = g_pIGroupUnknown->QueryInterface(IID_IOPCItemMgt, (void**)&g_pIOPCItemMgt);
-
-		if(FAILED(hr))
-		{
-			ShowError(hr,"QueryInterface(IID_IOPCItemMgt)");
-		}
-
-		hr = g_pIGroupUnknown->QueryInterface(IID_IOPCSyncIO, (void**)&g_pIOPCSyncIO);
-
-		if(FAILED(hr))
-		{
-			ShowError(hr,"QueryInterface(IID_IOPCSyncIO)");
-		}
-
-		if(g_bVer2)
-		{
-			hr = g_pIGroupUnknown->QueryInterface(IID_IOPCAsyncIO2, (void**)&g_pIOPCAsyncIO2);
-
-			if(FAILED(hr))
-			{
-				ShowError(hr,"QueryInterface(IID_IOPCAsyncIO2)");
-			}
-
-			hr = g_pIOPCServer->QueryInterface(IID_IOPCCommon, (void**)&g_pIOPCCommon);
-
-			if(FAILED(hr))
-			{
-				ShowError(hr,"QueryInterface(IID_IOPCCommon)");
-			}
-			else
-			{
-				g_pIOPCCommon->SetClientName(L"IndigoSCADA OPC Client");
-			}
-		}
-		//
-		if(FAILED(hr))
-		{
-			g_pIOPCServer->Release();
-			printf("OPC error: secondary QI failed\n");
-			ShowError(hr,"secondary QI failed");
-			return 1;
-		}
-
-		if(dwRevisedUpdateRate != g_dwUpdateRate)
-		{
-			g_dwUpdateRate = dwRevisedUpdateRate;
-		}
-
-		printf("Active Group interface added.\n");
-		*/
 
 		hr = g_pIOPCServer->QueryInterface(IID_IOPCCommon, (void**)&g_pIOPCCommon);
 
@@ -860,18 +534,15 @@ int Opc_client_ae_DriverThread::OpcStart()
 			g_pIOPCCommon->SetClientName(L"IndigoSCADA OPC AE Client");
 		}
 
-		int bActive;
+		BOOL bActive;
 		DWORD dwBufferTime;
 		DWORD dwMaxSize;
 		DWORD hClientSubscription;
 		DWORD dwRevisedBufferTime;
 		DWORD dwRevisedMaxSize;
-		//IOPCEventSubscriptionMgtPtr m_ISubMgt;
-		IOPCEventSubscriptionMgt* m_ISubMgt = NULL;
-		//IOPCEventServerPtr		m_IEventServer;
-		IOPCEventServer*		m_IEventServer = g_pIOPCServer;
-		DWORD m_dwCookie;
+
 		CComCOPCEventSink   *m_pSink = NULL;
+		CComCOPCShutdownRequest  *m_pShutdown = NULL;
 
 		//ATLTRY(m_pSink = new CComCOPCEventSink);
 
@@ -881,95 +552,161 @@ int Opc_client_ae_DriverThread::OpcStart()
 		//	return 1;
 		//}
 
-		dwMaxSize = 1000; //this is parameter
-		bActive = 1; //this is parameter
+		dwMaxSize = 1000; //The server can send upto 1000 events for each OnEvent call
+
+		bActive = 1;
 
 	    //server should check for maxsize of 0 however client should never pass it
+
 		if(!dwMaxSize)
 		{
 			dwMaxSize=1;
 		}
 
-		//hClientSubscription = TexttoDWORD(m_ClientSub);
-		hClientSubscription = 1243272; //is this a parameter ?
-		dwBufferTime = 10000; //this is a parameter
+		hClientSubscription = 1243272;
+		//dwBufferTime = 10000; //this is a parameter
+		dwBufferTime = 0; //this is a parameter
 
-		bool  m_bNewSubscription = 1; //this is parameter
+		//sixth parametere is:
+		/* Type of function called by rules to load a provider */
+		//typedef LPUNKNOWN (CALLBACK * LPFNEXCHANGERULEEXTENTRY)(VOID);
 
-		if(m_bNewSubscription)
+		hr = g_pIOPCServer->CreateEventSubscription(bActive,
+							dwBufferTime,
+							dwMaxSize,
+							hClientSubscription,
+							//GUID_CAST(&__uuidof(m_ISubMgt)), //apa--- 17-04-2011
+							IID_IOPCEventSubscriptionMgt, //apa+++ 17-04-2011
+						   (IUnknown **)&m_ISubMgt,
+						   &dwRevisedBufferTime,
+						   &dwRevisedMaxSize);
+
+		if(hr != S_OK)
 		{
-			hr = m_IEventServer->CreateEventSubscription( bActive,
-								dwBufferTime,
-								dwMaxSize,
-								hClientSubscription,
-								//GUID_CAST(&__uuidof(m_ISubMgt)), //apa--- 17-04-2011
-								IID_IOPCEventSubscriptionMgt, //apa+++ 17-04-2011
-							   (IUnknown **)&m_ISubMgt,
-							   &dwRevisedBufferTime,
-							   &dwRevisedMaxSize );
-
-			if(hr != S_OK)
-			{
-				printf("Fialed to Create Subscription\n");
-				return 1;
-			}
-
-			printf("CreateEventSubscription Done\n");
-			
-			// create advise
-			CComObject<COPCEventSink>::CreateInstance(&m_pSink);
-			m_dwCookie = 99;
-
-			//IUnknownPtr pUnk;
-			IUnknown* pUnk;
-
-			m_pSink->_InternalQueryInterface( __uuidof(IUnknown), (void**)&pUnk );
-
-			hr = AtlAdvise(m_ISubMgt, pUnk, __uuidof(IOPCEventSink), &m_dwCookie );
-		}
-		else
-		{
-			/*
-			if(m_NullCheck.GetCheck())  //for testing purposes
-			{
-				long *pbActive;
-				DWORD *pdwBufferTime;
-				DWORD *pdwMaxSize;
-				pbActive=NULL;	
-				pdwBufferTime = NULL;
-				pdwMaxSize = NULL;
-
-				hr=m_ISubMgt->SetState(pbActive,pdwBufferTime,pdwMaxSize,
-					hClientSubscription,&dwRevisedBufferTime,&dwRevisedMaxSize);
-			}
-			else
-			*/
-			{
-				hr = m_ISubMgt->SetState(&bActive,&dwBufferTime,&dwMaxSize,
-					hClientSubscription,&dwRevisedBufferTime,&dwRevisedMaxSize);
-			}
-
-			if(hr != S_OK)
-			{
-				printf("Failed to Set State\n");
-				return 1;
-			}
+			printf("Failed to Create Subscription\n");
+			return 1;
 		}
 
+		printf("A&E server dwRevisedBufferTime = %d, dwRevisedMaxSize = %d\n", dwRevisedBufferTime, dwRevisedMaxSize);
+
+		if(m_ISubMgt == NULL)
+		{
+			printf("CreateEventSubscription returned m_ISubMgt NULL\n");
+			return 1;
+		}
+
+		printf("CreateEventSubscription Done\n");
+		
+		// create advise
+		CComObject<COPCEventSink>::CreateInstance(&m_pSink);
+		m_dwCookie = 0xCDCDCDCD;
+
+		IUnknown* pUnk;
+
+		hr = m_pSink->_InternalQueryInterface( __uuidof(IUnknown), (void**)&pUnk );
+
+		if(hr != S_OK)
+		{
+			printf("Failed m_pSink->_InternalQueryInterface\n");
+			return 1;
+		}
+
+		hr = AtlAdvise(m_ISubMgt, pUnk, __uuidof(IOPCEventSink), &m_dwCookie );
+
+		if(hr != S_OK)
+		{
+			printf("Failed AtlAdvise m_dwCookie\n");
+			return 1;
+		}
+
+		//shutdown advise 
+		///////////////////////////////////////////////Shutdown/////////////////////////////
+/*
+//NOT WORKING...
+		CComObject<COPCShutdownRequest>::CreateInstance(&m_pShutdown);
+		m_dwShutdownCookie = 0xCDCDCDCD;
+
+		//IUnknown* pUnk;
+
+		hr = m_pShutdown->_InternalQueryInterface( __uuidof(IUnknown), (void**)&pUnk );
+
+		if(hr != S_OK)
+		{
+			printf("Failed m_pShutdown->_InternalQueryInterface\n");
+			return 1;
+		}
+
+		//hr = AtlAdvise(m_ISubMgt, m_pShutdown->GetUnknown(),__uuidof(IOPCShutdown), &m_dwShutdownCookie);
+
+		hr = AtlAdvise(m_ISubMgt, pUnk, __uuidof(IOPCShutdown), &m_dwShutdownCookie);
+		
+		if(hr != S_OK)
+		{
+			printf("Failed shutdown advise\n");
+			return 1;
+		}
+*/
+		////////////////////////GetStae and SetState/////////////////////////////////////////////////////////////
+
+		hr = m_ISubMgt->GetState(&bActive,&dwBufferTime,&dwMaxSize,&hClientSubscription);
+
+		if(hr != S_OK)
+		{
+			printf("Failed m_ISubMgt->GetState\n");
+			return 1;
+		}
+
+		printf("Server state: bActive = %d, dwBufferTime = %d, dwMaxSize = %d, hClientSubscription = %d\n", bActive, dwBufferTime, dwMaxSize, hClientSubscription);
+/*
+		hr = m_ISubMgt->SetState(&bActive, &dwBufferTime, &dwMaxSize, hClientSubscription, &dwRevisedBufferTime, &dwRevisedMaxSize);
+
+		if(hr != S_OK)
+		{
+			printf("Failed m_ISubMgt->SetState\n");
+			return 1;
+		}
+*/
+		///////////////////////Refresh//////////////////////////////////////////////////////////////
+
+		hr = m_ISubMgt->Refresh(m_dwCookie);
+
+		if(hr != S_OK)
+		{
+			printf("Failed Refresh\n");
+			return 1;
+		}
+
+		///////////////////////SetKeepAlive//////////////////////////////////////////////////////////////
+		
 		//IOPCEventSubscriptionMgt2Ptr ISubMgt2 = m_ISubMgt;
 
-#if 0 //Remove ASAP #if 0, this is ere only because the following lines chashes
+/*
+NOT WORKING...
 
 		IOPCEventSubscriptionMgt2* ISubMgt2 = (struct IOPCEventSubscriptionMgt2*)m_ISubMgt;
-
 		
 		if(ISubMgt2 != NULL)
 		{
 			DWORD dwRevisedKeepAliveTime = 0;
 			// set the keep-alive to 3X the dwRevisedBufferTime
-			hr = ISubMgt2->SetKeepAlive( 3 * dwRevisedBufferTime, &dwRevisedKeepAliveTime );
+			hr = ISubMgt2->SetKeepAlive(3 * dwRevisedBufferTime, &dwRevisedKeepAliveTime);
+
+			printf("dwRevisedKeepAliveTime = %d\n", dwRevisedKeepAliveTime);
 		}
-#endif
+*/
+
+/*
+		IOPCEventSubscriptionMgt2* ISubMgt2;
+
+		hr = g_pIOPCServer->QueryInterface(IID_IOPCEventSubscriptionMgt2, (void**)&ISubMgt2);
+
+		if(FAILED(hr))
+		{
+			printf("OPC error:Failed to obtain IID_IOPCEventSubscriptionMgt2 interface %x\n",hr);
+			ShowError(hr,"Failed to obtain IID_IOPCEventSubscriptionMgt2 interface");
+			return 1;
+		}
+*/
 	}
 
     return(0);
@@ -979,10 +716,21 @@ int Opc_client_ae_DriverThread::OpcStop()
 {
 	IT_IT("Opc_client_ae_DriverThread::OpcStop");
 
-	if(Item)
+	HRESULT hr;
+
+	if(m_ISubMgt != NULL)
 	{
-		free(Item);
-		Item = NULL;
+		if(m_dwCookie != 0xCDCDCDCD)
+		{
+			hr = AtlUnadvise(m_ISubMgt, __uuidof(IOPCEventSink), m_dwCookie);
+			m_dwCookie = 0xCDCDCDCD;
+		}
+
+		if(m_dwShutdownCookie != 0xCDCDCDCD)
+		{
+			hr = AtlUnadvise(m_ISubMgt, __uuidof(IOPCShutdown), m_dwShutdownCookie);
+			m_dwShutdownCookie = 0xCDCDCDCD;
+		}
 	}
 
 	// terminate server and it will clean up itself
@@ -994,6 +742,31 @@ int Opc_client_ae_DriverThread::OpcStop()
 	ShowMessage(S_OK,"","Server and all group interfaces terminated");
 	return 1;
 }
+
+/*
+void ::OnOpcDisconnect() 
+{
+	CWaitCursor	cWait;		//show wait cursor. 
+	HRESULT hr;
+
+	m_bConnected = FALSE;
+	m_bSubscription = FALSE;
+	
+	if(m_ISub != NULL)
+	{
+		OLE_TRY(hr = AtlUnadvise( m_ISub,__uuidof(IOPCEventSink), m_dwCookie ));
+		OLE_TRY(hr = AtlUnadvise( m_ISub,__uuidof(IOPCShutdown), m_dwShutdownCookie ));
+		m_ISub.Attach(NULL);
+	}
+
+	m_IEventServer2.Attach(NULL);
+	m_IEventServer.Attach(NULL);  //detach server
+	m_ICommon.Attach(NULL);
+	
+	OnViewClearAll();
+	
+}
+*/
 
 int Opc_client_ae_DriverThread::GetStatus(WORD *pwMav, WORD *pwMiv, WORD *pwB, LPWSTR *pszV)
 {
