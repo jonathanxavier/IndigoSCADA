@@ -271,8 +271,6 @@ class QSEXPORT DriverInstance : public QObject // the actual driver bits
 	virtual void Tick();
 };
 
-//#include "..\..\STL\queue" //use the SGI stl NOT Microsoft stl!	//APA
-
 class SerialConnect;
 
 #define INT_BUF_SEND_RECE 25
