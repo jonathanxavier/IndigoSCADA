@@ -658,6 +658,8 @@ int Opc_client_ae_DriverThread::OpcStart()
 
 		printf("Server state: bActive = %d, dwBufferTime = %d, dwMaxSize = %d, hClientSubscription = %d\n", bActive, dwBufferTime, dwMaxSize, hClientSubscription);
 /*
+Here on for test, is working.
+
 		hr = m_ISubMgt->SetState(&bActive, &dwBufferTime, &dwMaxSize, hClientSubscription, &dwRevisedBufferTime, &dwRevisedMaxSize);
 
 		if(hr != S_OK)

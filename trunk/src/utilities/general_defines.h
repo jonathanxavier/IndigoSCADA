@@ -17,10 +17,9 @@
 
 ///////////////////////////////////////////////////////////
 #define MONITOR_CAN_RUN_AS_ROOT
-#define USE_DB_MANAGEMENT_WINDOW
 
 #define USE_STD_MAP //if we use the STL std::map 
-//#define NO_LOGIN //uncomment for development
+#define NO_LOGIN //uncomment for development
 
 ///////////HMI appearence//////////////
 
@@ -45,8 +44,8 @@
 //Suppliers company names
 
 //Supplier
-#define SUPPLIER_NAME_SHORT "Your name"
-#define SUPPLIER_NAME_LONG "Your long name"
+#define SUPPLIER_NAME_SHORT ""
+#define SUPPLIER_NAME_LONG ""
 #define LOGO_SUPPLIER QPixmap((const char **)logo_blank_30)
 
 //IndigoSCADA
@@ -64,7 +63,7 @@
 
 //IndigoSCADA software demo
 #define CUSTOMER_NAME_SHORT ""
-#define CUSTOMER_NAME_LONG "logo e nome del cliente"
+#define CUSTOMER_NAME_LONG ""
 #define LOGO_CUSTOMER QPixmap((const char **)logo_blank_30)
 
 //////////////////////////////////////////////////////////////////

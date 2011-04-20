@@ -490,7 +490,6 @@ void UserFrameWork::Login()
 				control->insertItem(QPixmap((const char **)open_xpm),tr("&Load Receipe..."),this,SLOT(loadReceipe()));
 				control->insertSeparator();
 				//Database management...
-				#ifdef USE_DB_MANAGEMENT_WINDOW
 
 				if(GetConfigureDb()->Ok() && GetResultDb()->Ok() && GetCurrentDb()->Ok())
 				{
@@ -514,7 +513,7 @@ void UserFrameWork::Login()
 				}
 
 				control->insertSeparator();
-				#endif
+
 				control->insertItem(QPixmap((const char **)unlock_xpm),tr("&Clear System Manager Lock..."),this,SLOT(ClearSystemMgrLock()));
 				menuBar()->insertItem(tr("System C&ontrol"),control);
 			}
