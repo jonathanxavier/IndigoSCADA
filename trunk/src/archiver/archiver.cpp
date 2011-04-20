@@ -1016,6 +1016,8 @@ void SigTermHandler(int)
 #endif
 
 #define ARCHIVER_CAN_RUN_AS_ROOT
+
+//apa NOTE: 20-04-2011 Archiver is in pre-alpha development level 
 //
 int main(int argc, char **argv)
 {
