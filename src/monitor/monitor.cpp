@@ -806,7 +806,7 @@ void Monitor::ConfigQueryResponse (QObject *p,const QString &c, int id, QObject*
 		break;
 		case tSamples:
 		{
-			//vengono caricati i sample points abilitati
+			//loading the enabled sample points
 			
 			//Results::GetEnabledPoints().clear();  //<------crash on exit of Monitor applivation 17-05-2005 APA With STLPort no more crash; 13-10-09 commentato
 
@@ -855,7 +855,7 @@ void Monitor::ConfigQueryResponse (QObject *p,const QString &c, int id, QObject*
 		break;
 		case tTags:
 		{
-			//vengono caricati i tags abilitati
+			//loading the enabled tags
 						
 			if(CfgDb->GetNumberResults() > 0)
 			{
