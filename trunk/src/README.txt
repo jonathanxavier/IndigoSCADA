@@ -1,4 +1,4 @@
-Wellcome to the source code repository of IndigoSCADA
+Welcome to the source code repository of IndigoSCADA
 
 Included dependencies:
 
@@ -14,7 +14,7 @@ To compile under WIN32 go to .\src\daq directory
 and run daq.dsw with Visual Studio C++ 6.0 or later
 
 You need:
-Qt Development Frameworks version 3.1.2 for Windows
+Qt Development Frameworks version 3.1.2 or 2.3.2 for Windows
 STLPort 6.4.6 or later
 
 Linux
@@ -24,7 +24,7 @@ compilation under Linux. You need to create your own makefiles.
 
 You need to download IndigoSCADA dependencies:
 
-Qt Development Frameworks version 3.1.2 for Linux
+Qt Development Frameworks version 3.1.2 or 2.3.2 for Linux
 STLPort 6.4.6 or later
 
 Enjoy!
