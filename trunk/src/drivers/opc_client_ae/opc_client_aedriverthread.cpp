@@ -19,10 +19,8 @@
 *Returns:none
 */
 
-//Opc_client_ae_DriverThread Opc_client_ae_DriverThread::OpcClients[3];
 bool  Opc_client_ae_DriverThread::g_bWriteComplete = true;
 bool  Opc_client_ae_DriverThread::g_bReadComplete = true;
-//bool  Opc_client_ae_DriverThread::g_bPoll = false; // poll for values or async updates
 DWORD Opc_client_ae_DriverThread::g_dwReadTransID = 1;
 DWORD Opc_client_ae_DriverThread::g_dwWriteTransID = 2;
 //FILE *Opc_client_ae_DriverThread::g_stream = NULL; // file log handle

@@ -62,24 +62,15 @@ class OPC_CLIENT_AEDRV Opc_client_ae_DriverThread : public DriverThread
 		g_dwClientHandle = 1;
 		g_dwNumItems = 0;
 		g_bWriteEnable = false;
-//		g_bWriteEnable_flag = false;
 		g_hClientGroup = 0;
 		g_dwUpdateTransID = 1;
 		g_dwCancelID = 1;
 
-		// group interfaces
-		//g_pIDataObject = NULL;
-		//g_pIOPCGroupStateMgt = NULL;
-		//g_pIOPCAsyncIO = NULL;
-		//g_pIOPCSyncIO = NULL;
-		//g_pIOPCItemMgt = NULL;
-		//g_pIOPCAsyncIO2 = NULL;
 		g_pIOPCCommon = NULL;
 		g_pIGroupUnknown = NULL;
 		g_pIOPCSubscriptionMgt = NULL;
 		g_iCatInfo = NULL;
 		g_iOpcAreaBrowser = NULL;
-		local_server = 0;
 
 		StaticParent = Parent;
 		StaticThis = this;
@@ -89,22 +80,17 @@ class OPC_CLIENT_AEDRV Opc_client_ae_DriverThread : public DriverThread
 		m_ISubMgt = NULL;
 	};
 
-		//Questo destructor viene chimato solo sulla Disconnect e non quando
-		//spento il programma, si potrebbe usare la static Opc_client_ae_DriverThread OpcClients[3];
 	~Opc_client_ae_DriverThread()
 	{
 		IT_IT("Opc_client_ae_DriverThread::~Opc_client_ae_DriverThread");
-		//int nRet = OpcStop(); // done with server
 	}
 
 	DWORD g_dwUpdateRate;
 	DWORD g_dwClientHandle;
 	DWORD g_dwNumItems;
 	bool  g_bWriteEnable;
-//	bool  g_bWriteEnable_flag;
 	static bool  g_bWriteComplete;
 	static bool  g_bReadComplete;
-	//static bool  g_bPoll; // poll for values or async updates
 	DWORD g_dwUpdateTransID;
 	DWORD g_dwCancelID;
 	static DWORD g_dwReadTransID;
@@ -119,13 +105,6 @@ class OPC_CLIENT_AEDRV Opc_client_ae_DriverThread : public DriverThread
 
 	static bool mandare_eventi;
 
-	// group interfaces
-	//IDataObject *g_pIDataObject;
-	//IOPCGroupStateMgt *g_pIOPCGroupStateMgt;
-	//IOPCAsyncIO *g_pIOPCAsyncIO;
-	//IOPCSyncIO *g_pIOPCSyncIO;
-	//IOPCItemMgt *g_pIOPCItemMgt;
-	//IOPCAsyncIO2 *g_pIOPCAsyncIO2;
 	IOPCCommon *g_pIOPCCommon;
 	IUnknown *g_pIGroupUnknown;
 	IOPCEventSubscriptionMgt *g_pIOPCSubscriptionMgt;
@@ -133,8 +112,6 @@ class OPC_CLIENT_AEDRV Opc_client_ae_DriverThread : public DriverThread
 	IOPCEventAreaBrowser *g_iOpcAreaBrowser;
 
 	static struct structItem* Item;
-
-	int local_server;
 
 	////////begin A&E specific variables///////////////////////////////////////////////////
 	DWORD m_dwCookie, m_dwShutdownCookie;
@@ -157,8 +134,6 @@ class OPC_CLIENT_AEDRV Opc_client_ae_DriverThread : public DriverThread
 	static DriverThread *StaticThis;
 	static signed __int64 Epoch_from_FILETIME(const FILETIME *fileTime);
 	//static QString Epoc_from_FILETIME_fast(const FILETIME *fileTime);
-	
-	//static Opc_client_ae_DriverThread OpcClients[3];
 
 	static void post_val(SpValue &v, QString &name);
 
