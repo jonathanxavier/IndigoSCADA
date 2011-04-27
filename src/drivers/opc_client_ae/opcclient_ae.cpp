@@ -1,7 +1,7 @@
 /*
  *                         IndigoSCADA
  *
- *   This software and documentation are Copyright 2002 to 2009 Enscada 
+ *   This software and documentation are Copyright 2002 to 2011 Enscada 
  *   Limited and its licensees. All rights reserved. See file:
  *
  *                     $HOME/LICENSE 
@@ -83,633 +83,440 @@ int Opc_client_ae_DriverThread::OpcStart()
 
 	if((strlen(ServerIPAddress) == 0))
 	{
-		local_server = 1;
+		strcpy(ServerIPAddress, "127.0.0.1");
+	}
+		
+	//DCOM connection (and local connection)
+
+	printf("Trying to connect to remote (or local) A&E server on machine with IP: %s\n", ServerIPAddress);
+	sprintf(show_msg, "Trying to connect to remote (or local) A&E server on machine with IP: %s", ServerIPAddress);
+
+	ShowMessage(S_OK, "", show_msg);
+	
+	HRESULT	hr = ::CoInitializeEx(NULL,COINIT_MULTITHREADED); // setup COM lib
+
+	if(FAILED(hr))
+	{
+		printf("CoInitializeEx failed\n");
+		ShowError(hr,"CoInitializeEx failed");
+		return 1;
+	}
+
+	CoInitializeSecurity(NULL, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_NONE, RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE, NULL);
+	
+	COAUTHINFO athn;
+	ZeroMemory(&athn, sizeof(COAUTHINFO));
+	// Set up the NULL security information
+	athn.dwAuthnLevel = RPC_C_AUTHN_LEVEL_CONNECT;
+	//athn.dwAuthnLevel = RPC_C_AUTHN_LEVEL_NONE;
+	athn.dwAuthnSvc = RPC_C_AUTHN_WINNT;
+	athn.dwAuthzSvc = RPC_C_AUTHZ_NONE;
+	athn.dwCapabilities = EOAC_NONE;
+	athn.dwImpersonationLevel = RPC_C_IMP_LEVEL_IMPERSONATE;
+	athn.pAuthIdentityData = NULL;
+	athn.pwszServerPrincName = NULL;
+
+	USES_CONVERSION;
+
+	COSERVERINFO remoteServerInfo;
+	ZeroMemory(&remoteServerInfo, sizeof(COSERVERINFO));
+	remoteServerInfo.pAuthInfo = &athn;
+	remoteServerInfo.pwszName = T2OLE(ServerIPAddress);
+	//printf("Remote host: %s\n", OLE2T(remoteServerInfo.pwszName));
+
+	MULTI_QI reqInterface;
+	reqInterface.pIID = &IID_IOPCServerList; //requested interface
+	reqInterface.pItf = NULL;
+	reqInterface.hr = S_OK;
+							//requested class
+	hr = CoCreateInstanceEx(CLSID_OpcServerList,NULL, CLSCTX_REMOTE_SERVER, &remoteServerInfo, 1, &reqInterface);
+	
+	if (FAILED(hr))
+	{
+		printf("OPC error:Failed to get remote interface, %x\n", hr);
+		ShowError(hr,"Failed to get remote interface");
+		return 1;
 	}
 	
-	if(local_server)
+	g_iCatInfo = (IOPCServerList *)reqInterface.pItf;
+
+	///////////////////////////////////////
+
+	CATID Implist[1];
+
+	Implist[0] = __uuidof(OPCEventServerCATID);
+
+	//CLSID catid =  __uuidof(OPCEventServerCATID);
+
+	IEnumCLSID *iEnum = NULL;
+
+	hr = g_iCatInfo->EnumClassesOfCategories(1, Implist,0, NULL,&iEnum);
+
+	if (FAILED(hr))
 	{
-		//TODO: finish to implement the local connection apa+++ 14-04-2011
-		//COM connection
-		
-		// browse registry for OPC Servers
-		HKEY hk = HKEY_CLASSES_ROOT;
-		TCHAR szKey[MAX_KEYLEN];
+		printf("OPC error:Failed to get enum for categeories, %x\n", hr);
+		ShowError(hr,"Failed to get enum for categeories");
+		return 1;
+	}
 
-		for(int nIndex = 0; ::RegEnumKey(hk, nIndex, szKey, MAX_KEYLEN) == ERROR_SUCCESS; nIndex++)
+	GUID glist;
+
+	ULONG actual;
+
+	printf("Available A&E server(s) on remote machine:\n");
+
+	while((hr = iEnum->Next(1, &glist, &actual)) == S_OK)
+	{
+		WCHAR *progID;
+		WCHAR *userType;
+		HRESULT res = g_iCatInfo->GetClassDetails(glist, &progID, &userType);/*ProgIDFromCLSID(glist, &progID)*/;
+
+		if(FAILED(res))
 		{
-			HKEY hProgID;
-			TCHAR szDummy[MAX_KEYLEN];
-
-			if(::RegOpenKey(hk, szKey, &hProgID) == ERROR_SUCCESS)
-			{
-				LONG lSize = MAX_KEYLEN;
-
-				if(::RegQueryValue(hProgID, "OPC", szDummy, &lSize) == ERROR_SUCCESS)
-				{
-					printf("%s\n",szKey);
-					IT_COMMENT1("%s",szKey);
-				}
-
-				::RegCloseKey(hProgID);
-			}
+			printf("OPC error:Failed to get ProgId from ClassId, %x\n",res);
+			ShowError(res,"Failed to get ProgId from ClassId");
+			return 1;
 		}
-
-		WCHAR wszServerName[100];
-		
-		HRESULT hr;
-
-		USES_CONVERSION;
-
-		TCHAR serv[100];
-		
-		strcpy(serv, ((Opc_client_ae_Instance*)Parent)->Cfg.OpcServerProgID);
-
-		wcscpy(wszServerName, T2W(serv));
-
-		CLSID clsid;
-			
-		hr = ::CLSIDFromProgID(wszServerName, &clsid );
-
-		if(FAILED(hr))
+		else 
 		{
-			ShowError(hr,"CLSIDFromProgID()");
-			return(1);
-		}
-
-		printf("Server ID found.\n");
-		IT_COMMENT("Server ID found.\n");
-		
-		hr = ::CoInitializeEx(NULL,COINIT_MULTITHREADED); // setup COM lib
-
-		if(FAILED(hr))
-		{
-			ShowError(hr,"CoInitializeEx()");
-			return(1);
-		}
-
-		//////////////////////start here OPC example/////////////////////////////////
-//		USES_CONVERSION;
-		
-		ICatInformation* pcr = NULL;
-//		HRESULT hr=S_OK;
-
-		hr = CoCreateInstance(CLSID_StdComponentCategoriesMgr, NULL, CLSCTX_ALL, IID_ICatInformation, (void**)&pcr);
-
-		IEnumCLSID* pEnumCLSID;
-
-		CLSID catid =  __uuidof(OPCEventServerCATID);
-		pcr->EnumClassesOfCategories(1, &catid, 1, &catid, &pEnumCLSID);
-
-		//get 10 at a time for efficiency
-		unsigned long c;
-		CLSID clsids[10];
-
-		char  strText[100];
-		WCHAR* lpszProgID = NULL;
-		//int item;
-
-		while(SUCCEEDED(hr=pEnumCLSID->Next(10,clsids, &c)) && c)
-		{
-			for(unsigned long i =0;i<c;i++)
-			{
-				clsids[i];
-				hr=ProgIDFromCLSID(clsids[i],&lpszProgID);
-
-				strcpy(strText, W2T(lpszProgID));
-
-				CoTaskMemFree( lpszProgID );
-
-				//item = m_AlarmServerList.AddString(strText);
-
-				//if(item==LB_ERR)
-				//	return(1);
-
-				printf("%s\n", strText);
-
-				CLSID* pData;
-
-				pData = new CLSID;
-
-				*pData = clsids[i];
-
-				//item = m_AlarmServerList.SetItemDataPtr(item,pData);
-
-				//if(item==LB_ERR)
-				//	return(1);
-			}
-		}
-
-		pcr->Release();
-
-		/*
-		int item = m_AlarmServerList.GetCurSel();
-
-		if(item == LB_ERR)
-			return(1);
-
-		CLSID* pData=NULL;
-
-		pData = (CLSID *)m_AlarmServerList.GetItemDataPtr(item);
-
-		IOPCEventServerPtr			g_pIOPCServer;
-
-		hr = g_pIOPCServer.CreateInstance(*pData);
-
-		if(hr==S_OK)
-		{
-			UINT count = m_AlarmServerList.GetCount();
-
-			if(item == LB_ERR)
-				return(1);
-
-
-			for(UINT i=0;i<count;i++)
-			{
-				pData = (CLSID *)m_AlarmServerList.GetItemDataPtr(i);
-				delete pData;
-			}
-		}
-
-		*/
-
-		/////////////////////////end here OPC example////////////////////////////////
-
-		// Create a running object from that class ID
-		// (CLSCTX_ALL will allow in-proc, local and remote)
-
-		hr = ::CoCreateInstance(CLSID_StdComponentCategoriesMgr, NULL, CLSCTX_ALL, IID_ICatInformation, (void**)&g_pIOPCServer);
-
-		//hr = ::CoCreateInstance(clsid, NULL, CLSCTX_ALL, IID_ICatInformation, (void**)&g_pIOPCServer);
-
-		if(FAILED(hr) || (g_pIOPCServer == NULL))
-		{
-			if(FAILED(hr)){ ShowError(hr,"CoCreateInstance()");}
-			printf("You may not have registered the OPC Proxy dll!\n");
-			IT_COMMENT("You may not have registered the OPC Proxy dll!");
-
-			return(1);
-		}
-			
-		printf("Connected to local server.\n");
-		IT_COMMENT("Connected to local server");
-
-		sprintf(show_msg, "Connected to local server");
-
-		Opc_client_ae_DriverThread::ShowMessage(S_OK, "", show_msg);
-
-		WORD wMajor, wMinor, wBuild;
-
-		LPWSTR pwsz = NULL;
-		
-		if(!GetStatus(&wMajor, &wMinor, &wBuild, &pwsz))
-		{
-			char ver[150];
-			sprintf(ver,"Server version: %d.%d.%d, %s", wMajor, wMinor, wBuild, W2T(pwsz));
-			printf("%s\n\n",ver);
-			IT_COMMENT4("Version: %d.%d.%d, %s", wMajor, wMinor, wBuild,W2T(pwsz));
-			
-			Opc_client_ae_DriverThread::ShowMessage(S_OK, "",ver);
-			::CoTaskMemFree(pwsz);
+			USES_CONVERSION;
+			char * str = OLE2T(progID);
+			char * str1 = OLE2T(userType);
+			printf("%s\n", str);
+			::CoTaskMemFree(progID);
+			::CoTaskMemFree(userType);
 		}
 	}
-	else
+	
+	////////////////////////end getListOfAEServers
+
+	TCHAR serverName[100];
+			
+	strcpy(serverName, ((Opc_client_ae_Instance*)Parent)->Cfg.OpcServerProgID);
+			
+	if((strlen(serverName) == 0))
 	{
-		//DCOM connection
+		printf("OPC error: Please supply ProgID\n");
+		ShowError(S_FALSE,"Please supply ProgID");
+		return 1;
+	}
+	
+	//Get CLSID From RemoteRegistry
+			
+	char _progID[100];
+	strcpy(_progID, serverName);
 
-		printf("Trying to connect to remote A&E server on machine with IP: %s\n", ServerIPAddress);
-		sprintf(show_msg, "Trying to connect to remote A&E server on machine with IP: %s", ServerIPAddress);
+	char keyName[100];
+	
+	strcpy(keyName,"SOFTWARE\\Classes\\");
+	strcat(keyName, _progID);
+	strcat(keyName, "\\Clsid");
 
-		ShowMessage(S_OK, "", show_msg);
-		
-		HRESULT	hr = ::CoInitializeEx(NULL,COINIT_MULTITHREADED); // setup COM lib
+	HKEY remoteRegHandle;
+	HKEY keyHandle;
+	char classIdString[100];
+	CLSID classId;
 
-		if(FAILED(hr))
-		{
-			printf("CoInitializeEx failed\n");
-			ShowError(hr,"CoInitializeEx failed");
-			return 1;
-		}
+	hr = RegConnectRegistry(ServerIPAddress, HKEY_LOCAL_MACHINE, &remoteRegHandle);
 
-		CoInitializeSecurity(NULL, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_NONE, RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE, NULL);
-		
-		COAUTHINFO athn;
-		ZeroMemory(&athn, sizeof(COAUTHINFO));
-		// Set up the NULL security information
-		athn.dwAuthnLevel = RPC_C_AUTHN_LEVEL_CONNECT;
-		//athn.dwAuthnLevel = RPC_C_AUTHN_LEVEL_NONE;
-		athn.dwAuthnSvc = RPC_C_AUTHN_WINNT;
-		athn.dwAuthzSvc = RPC_C_AUTHZ_NONE;
-		athn.dwCapabilities = EOAC_NONE;
-		athn.dwImpersonationLevel = RPC_C_IMP_LEVEL_IMPERSONATE;
-		athn.pAuthIdentityData = NULL;
-		athn.pwszServerPrincName = NULL;
+	if(SUCCEEDED(hr))
+	{
+	   hr = RegOpenKeyEx(remoteRegHandle, keyName, 0, KEY_READ, &keyHandle);
 
-		USES_CONVERSION;
+	   if(SUCCEEDED(hr))
+	   {
+		   DWORD entryType;
 
-		COSERVERINFO remoteServerInfo;
-		ZeroMemory(&remoteServerInfo, sizeof(COSERVERINFO));
-		remoteServerInfo.pAuthInfo = &athn;
-		remoteServerInfo.pwszName = T2OLE(ServerIPAddress);
-		//printf("Remote host: %s\n", OLE2T(remoteServerInfo.pwszName));
+		   unsigned bufferSize = 100;
 
-		MULTI_QI reqInterface;
-		reqInterface.pIID = &IID_IOPCServerList; //requested interface
-		reqInterface.pItf = NULL;
-		reqInterface.hr = S_OK;
-								//requested class
-		hr = CoCreateInstanceEx(CLSID_OpcServerList,NULL, CLSCTX_REMOTE_SERVER, &remoteServerInfo, 1, &reqInterface);
-		
-		if (FAILED(hr))
-		{
-			printf("OPC error:Failed to get remote interface, %x\n", hr);
-			ShowError(hr,"Failed to get remote interface");
-			return 1;
-		}
-		
-		g_iCatInfo = (IOPCServerList *)reqInterface.pItf;
+		   hr = RegQueryValueEx(keyHandle, NULL, 0, &entryType, (LPBYTE)&classIdString, (LPDWORD)&bufferSize);
 
-		///////////////////////////////////////
-
-		CATID Implist[1];
-
-		Implist[0] = __uuidof(OPCEventServerCATID);
-
-		//CLSID catid =  __uuidof(OPCEventServerCATID);
-
-		IEnumCLSID *iEnum = NULL;
-
-		hr = g_iCatInfo->EnumClassesOfCategories(1, Implist,0, NULL,&iEnum);
-
-		if (FAILED(hr))
-		{
-			printf("OPC error:Failed to get enum for categeories, %x\n", hr);
-			ShowError(hr,"Failed to get enum for categeories");
-			return 1;
-		}
-
-		GUID glist;
-
-		ULONG actual;
-
-		printf("Available A&E server(s) on remote machine:\n");
-
-		while((hr = iEnum->Next(1, &glist, &actual)) == S_OK)
-		{
-			WCHAR *progID;
-			WCHAR *userType;
-			HRESULT res = g_iCatInfo->GetClassDetails(glist, &progID, &userType);/*ProgIDFromCLSID(glist, &progID)*/;
-
-			if(FAILED(res))
-			{
-				printf("OPC error:Failed to get ProgId from ClassId, %x\n",res);
-				ShowError(res,"Failed to get ProgId from ClassId");
-				return 1;
-			}
-			else 
-			{
-				USES_CONVERSION;
-				char * str = OLE2T(progID);
-				char * str1 = OLE2T(userType);
-				printf("%s\n", str);
-				::CoTaskMemFree(progID);
-				::CoTaskMemFree(userType);
-			}
-		}
-		
-		////////////////////////end getListOfAEServers
-
-		TCHAR serverName[100];
-				
-		strcpy(serverName, ((Opc_client_ae_Instance*)Parent)->Cfg.OpcServerProgID);
-				
-		if((strlen(serverName) == 0))
-		{
-			printf("OPC error: Please supply ProgID\n");
-			ShowError(S_FALSE,"Please supply ProgID");
-			return 1;
-		}
-		
-		//Get CLSID From RemoteRegistry
-				
-		char _progID[100];
-		strcpy(_progID, serverName);
-
-		char keyName[100];
-		
-		strcpy(keyName,"SOFTWARE\\Classes\\");
-		strcat(keyName, _progID);
-		strcat(keyName, "\\Clsid");
-
-		HKEY remoteRegHandle;
-		HKEY keyHandle;
-		char classIdString[100];
-		CLSID classId;
-
-		hr = RegConnectRegistry(ServerIPAddress, HKEY_LOCAL_MACHINE, &remoteRegHandle);
-
-		if(SUCCEEDED(hr))
-		{
-		   hr = RegOpenKeyEx(remoteRegHandle, keyName, 0, KEY_READ, &keyHandle);
-
-		   if(SUCCEEDED(hr))
+		   if(FAILED(hr))
 		   {
-			   DWORD entryType;
-
-			   unsigned bufferSize = 100;
-
-			   hr = RegQueryValueEx(keyHandle, NULL, 0, &entryType, (LPBYTE)&classIdString, (LPDWORD)&bufferSize);
-
-			   if(FAILED(hr))
-			   {
-					printf("RegQueryValueEx failed");
-					ShowError(hr,"RegQueryValueEx failed");
-					return 1;
-			   }
-			   else
-			   {
-					USES_CONVERSION;
-
-					LPOLESTR sz = A2W(classIdString);
-
-					hr = CLSIDFromString(sz,&classId);
-
-					if(FAILED(hr))
-					{
-						printf("CLSIDFromString failed");
-						ShowError(hr,"CLSIDFromString failed");
-						return 1;
-					}
-			   }
+				printf("RegQueryValueEx failed");
+				ShowError(hr,"RegQueryValueEx failed");
+				return 1;
 		   }
 		   else
 		   {
-				ShowError(hr,"RegOpenKeyEx failed");
+				USES_CONVERSION;
+
+				LPOLESTR sz = A2W(classIdString);
+
+				hr = CLSIDFromString(sz,&classId);
+
+				if(FAILED(hr))
+				{
+					printf("CLSIDFromString failed");
+					ShowError(hr,"CLSIDFromString failed");
+					return 1;
+				}
 		   }
-		}	
-	    else
-		{
-			ShowError(hr,"RegConnectRegistry failed");
-		}
-
-        RegCloseKey(remoteRegHandle);
-	    RegCloseKey(keyHandle);
-
-		////////////////////end Get CLSID From Remote Registry
-
-		ZeroMemory(&athn, sizeof(COAUTHINFO));
-		// Set up the NULL security information
-		athn.dwAuthnLevel = RPC_C_AUTHN_LEVEL_CONNECT;
-		//athn.dwAuthnLevel = RPC_C_AUTHN_LEVEL_NONE;
-		athn.dwAuthnSvc = RPC_C_AUTHN_WINNT;
-		athn.dwAuthzSvc = RPC_C_AUTHZ_NONE;
-		athn.dwCapabilities = EOAC_NONE;
-		athn.dwImpersonationLevel = RPC_C_IMP_LEVEL_IMPERSONATE;
-		athn.pAuthIdentityData = NULL;
-		athn.pwszServerPrincName = NULL;
-		
-		ZeroMemory(&remoteServerInfo, sizeof(COSERVERINFO));
-		remoteServerInfo.pAuthInfo = &athn;
-		
-		remoteServerInfo.pwszName = T2OLE(ServerIPAddress);
-
-		//printf("%s\n", OLE2T(remoteServerInfo.pwszName));
-		
-		reqInterface.pIID = &IID_IUnknown; //requested interface
-		reqInterface.pItf = NULL;
-		reqInterface.hr = S_OK;
-		                          //requsted class
-		hr = CoCreateInstanceEx(classId,NULL, CLSCTX_REMOTE_SERVER, &remoteServerInfo, 1, &reqInterface);	
-		
-		if (FAILED(hr))
-		{
-			printf("OPC error:Failed to get remote interface, %x\n", hr);
-			ShowError(hr,"Failed to get remote interface");
-			return 1;
-		}
-		
-		IUnknown * pIUnknown = NULL;
-
-		pIUnknown = reqInterface.pItf;
-
-		/////end make Remote Object
-
-		hr = pIUnknown->QueryInterface(IID_IOPCEventServer, (void**)&g_pIOPCServer);
-
-		if (FAILED(hr))
-		{
-			printf("OPC error:Failed to obtain IID_IOPCEventServer interface from server, %x\n", hr);
-			ShowError(hr,"Failed to obtain IID_IOPCEventServer interface from server");
-			return 1;
-		}
-
-		printf("Connected to server %s.\n", ServerIPAddress);
-
-		sprintf(show_msg, "Connected to A&E server on machine with IP: %s", ServerIPAddress);
-		Opc_client_ae_DriverThread::ShowMessage(S_OK, "", show_msg);
-
-		WORD wMajor, wMinor, wBuild;
-		LPWSTR pwsz = NULL;
-
-		if(!GetStatus(&wMajor, &wMinor, &wBuild, &pwsz))
-		{
-			char ver[250];
-			//printf("Version: %d.%d.%d\n", wMajor, wMinor, wBuild);
-			//printf("%ls\n\n",pwsz);
-			sprintf(ver,"Server version: %d.%d.%d, %s", wMajor, wMinor, wBuild, W2T(pwsz));
-			printf("%s\n\n",ver);
-
-			IT_COMMENT4("Version: %d.%d.%d, %s", wMajor, wMinor, wBuild,W2T(pwsz));
-			Opc_client_ae_DriverThread::ShowMessage(S_OK, "",ver);
-			::CoTaskMemFree(pwsz);
-		}
-
-		hr = g_pIOPCServer->QueryInterface(IID_IOPCCommon, (void**)&g_pIOPCCommon);
-
-		if(FAILED(hr))
-		{
-			ShowError(hr,"QueryInterface(IID_IOPCCommon)");
-		}
-		else
-		{
-			g_pIOPCCommon->SetClientName(L"IndigoSCADA OPC AE Client");
-		}
-
-		BOOL bActive;
-		DWORD dwBufferTime;
-		DWORD dwMaxSize;
-		DWORD hClientSubscription;
-		DWORD dwRevisedBufferTime;
-		DWORD dwRevisedMaxSize;
-
-		CComCOPCEventSink   *m_pSink = NULL;
-		CComCOPCShutdownRequest  *m_pShutdown = NULL;
-
-		//ATLTRY(m_pSink = new CComCOPCEventSink);
-
-		//if(m_pSink == NULL)
-		//{
-		//	ShowError(E_OUTOFMEMORY,"new CComCOPCEventSink");
-		//	return 1;
-		//}
-
-		dwMaxSize = 1000; //The server can send upto 1000 events for each OnEvent call
-
-		bActive = 1;
-
-	    //server should check for maxsize of 0 however client should never pass it
-
-		if(!dwMaxSize)
-		{
-			dwMaxSize=1;
-		}
-
-		hClientSubscription = 1243272;
-		//dwBufferTime = 10000; //this is a parameter
-		dwBufferTime = 0; //this is a parameter
-
-		//sixth parametere is:
-		/* Type of function called by rules to load a provider */
-		//typedef LPUNKNOWN (CALLBACK * LPFNEXCHANGERULEEXTENTRY)(VOID);
-
-		hr = g_pIOPCServer->CreateEventSubscription(bActive,
-							dwBufferTime,
-							dwMaxSize,
-							hClientSubscription,
-							//GUID_CAST(&__uuidof(m_ISubMgt)), //apa--- 17-04-2011
-							IID_IOPCEventSubscriptionMgt, //apa+++ 17-04-2011
-						   (IUnknown **)&m_ISubMgt,
-						   &dwRevisedBufferTime,
-						   &dwRevisedMaxSize);
-
-		if(hr != S_OK)
-		{
-			printf("Failed to Create Subscription\n");
-			return 1;
-		}
-
-		printf("A&E server dwRevisedBufferTime = %d, dwRevisedMaxSize = %d\n", dwRevisedBufferTime, dwRevisedMaxSize);
-
-		if(m_ISubMgt == NULL)
-		{
-			printf("CreateEventSubscription returned m_ISubMgt NULL\n");
-			return 1;
-		}
-
-		printf("CreateEventSubscription Done\n");
-		
-		// create advise
-		CComObject<COPCEventSink>::CreateInstance(&m_pSink);
-		m_dwCookie = 0xCDCDCDCD;
-
-		IUnknown* pUnk;
-
-		hr = m_pSink->_InternalQueryInterface( __uuidof(IUnknown), (void**)&pUnk );
-
-		if(hr != S_OK)
-		{
-			printf("Failed m_pSink->_InternalQueryInterface\n");
-			return 1;
-		}
-
-		hr = AtlAdvise(m_ISubMgt, pUnk, __uuidof(IOPCEventSink), &m_dwCookie );
-
-		if(hr != S_OK)
-		{
-			printf("Failed AtlAdvise m_dwCookie\n");
-			return 1;
-		}
-
-		//shutdown advise 
-		///////////////////////////////////////////////Shutdown/////////////////////////////
-/*
-//NOT WORKING...
-		CComObject<COPCShutdownRequest>::CreateInstance(&m_pShutdown);
-		m_dwShutdownCookie = 0xCDCDCDCD;
-
-		//IUnknown* pUnk;
-
-		hr = m_pShutdown->_InternalQueryInterface( __uuidof(IUnknown), (void**)&pUnk );
-
-		if(hr != S_OK)
-		{
-			printf("Failed m_pShutdown->_InternalQueryInterface\n");
-			return 1;
-		}
-
-		//hr = AtlAdvise(m_ISubMgt, m_pShutdown->GetUnknown(),__uuidof(IOPCShutdown), &m_dwShutdownCookie);
-
-		hr = AtlAdvise(m_ISubMgt, pUnk, __uuidof(IOPCShutdown), &m_dwShutdownCookie);
-		
-		if(hr != S_OK)
-		{
-			printf("Failed shutdown advise\n");
-			return 1;
-		}
-*/
-		////////////////////////GetStae and SetState/////////////////////////////////////////////////////////////
-
-		hr = m_ISubMgt->GetState(&bActive,&dwBufferTime,&dwMaxSize,&hClientSubscription);
-
-		if(hr != S_OK)
-		{
-			printf("Failed m_ISubMgt->GetState\n");
-			return 1;
-		}
-
-		printf("Server state: bActive = %d, dwBufferTime = %d, dwMaxSize = %d, hClientSubscription = %d\n", bActive, dwBufferTime, dwMaxSize, hClientSubscription);
-/*
-Here on for test, is working.
-
-		hr = m_ISubMgt->SetState(&bActive, &dwBufferTime, &dwMaxSize, hClientSubscription, &dwRevisedBufferTime, &dwRevisedMaxSize);
-
-		if(hr != S_OK)
-		{
-			printf("Failed m_ISubMgt->SetState\n");
-			return 1;
-		}
-*/
-		///////////////////////Refresh//////////////////////////////////////////////////////////////
-
-		hr = m_ISubMgt->Refresh(m_dwCookie);
-
-		if(hr != S_OK)
-		{
-			printf("Failed Refresh\n");
-			return 1;
-		}
-
-		///////////////////////SetKeepAlive//////////////////////////////////////////////////////////////
-		
-		//IOPCEventSubscriptionMgt2Ptr ISubMgt2 = m_ISubMgt;
-
-/*
-NOT WORKING...
-
-		IOPCEventSubscriptionMgt2* ISubMgt2 = (struct IOPCEventSubscriptionMgt2*)m_ISubMgt;
-		
-		if(ISubMgt2 != NULL)
-		{
-			DWORD dwRevisedKeepAliveTime = 0;
-			// set the keep-alive to 3X the dwRevisedBufferTime
-			hr = ISubMgt2->SetKeepAlive(3 * dwRevisedBufferTime, &dwRevisedKeepAliveTime);
-
-			printf("dwRevisedKeepAliveTime = %d\n", dwRevisedKeepAliveTime);
-		}
-*/
-
-/*
-		IOPCEventSubscriptionMgt2* ISubMgt2;
-
-		hr = g_pIOPCServer->QueryInterface(IID_IOPCEventSubscriptionMgt2, (void**)&ISubMgt2);
-
-		if(FAILED(hr))
-		{
-			printf("OPC error:Failed to obtain IID_IOPCEventSubscriptionMgt2 interface %x\n",hr);
-			ShowError(hr,"Failed to obtain IID_IOPCEventSubscriptionMgt2 interface");
-			return 1;
-		}
-*/
+	   }
+	   else
+	   {
+			ShowError(hr,"RegOpenKeyEx failed");
+	   }
+	}	
+	else
+	{
+		ShowError(hr,"RegConnectRegistry failed");
 	}
+
+    RegCloseKey(remoteRegHandle);
+	RegCloseKey(keyHandle);
+
+	////////////////////end Get CLSID From Remote Registry
+
+	ZeroMemory(&athn, sizeof(COAUTHINFO));
+	// Set up the NULL security information
+	athn.dwAuthnLevel = RPC_C_AUTHN_LEVEL_CONNECT;
+	//athn.dwAuthnLevel = RPC_C_AUTHN_LEVEL_NONE;
+	athn.dwAuthnSvc = RPC_C_AUTHN_WINNT;
+	athn.dwAuthzSvc = RPC_C_AUTHZ_NONE;
+	athn.dwCapabilities = EOAC_NONE;
+	athn.dwImpersonationLevel = RPC_C_IMP_LEVEL_IMPERSONATE;
+	athn.pAuthIdentityData = NULL;
+	athn.pwszServerPrincName = NULL;
+	
+	ZeroMemory(&remoteServerInfo, sizeof(COSERVERINFO));
+	remoteServerInfo.pAuthInfo = &athn;
+	
+	remoteServerInfo.pwszName = T2OLE(ServerIPAddress);
+
+	//printf("%s\n", OLE2T(remoteServerInfo.pwszName));
+	
+	reqInterface.pIID = &IID_IUnknown; //requested interface
+	reqInterface.pItf = NULL;
+	reqInterface.hr = S_OK;
+		                      //requsted class
+	hr = CoCreateInstanceEx(classId,NULL, CLSCTX_REMOTE_SERVER, &remoteServerInfo, 1, &reqInterface);	
+	
+	if (FAILED(hr))
+	{
+		printf("OPC error:Failed to get remote interface, %x\n", hr);
+		ShowError(hr,"Failed to get remote interface");
+		return 1;
+	}
+	
+	IUnknown * pIUnknown = NULL;
+
+	pIUnknown = reqInterface.pItf;
+
+	/////end make Remote Object
+
+	hr = pIUnknown->QueryInterface(IID_IOPCEventServer, (void**)&g_pIOPCServer);
+
+	if (FAILED(hr))
+	{
+		printf("OPC error:Failed to obtain IID_IOPCEventServer interface from server, %x\n", hr);
+		ShowError(hr,"Failed to obtain IID_IOPCEventServer interface from server");
+		return 1;
+	}
+
+	printf("Connected to server %s.\n", ServerIPAddress);
+
+	sprintf(show_msg, "Connected to A&E server on machine with IP: %s", ServerIPAddress);
+	Opc_client_ae_DriverThread::ShowMessage(S_OK, "", show_msg);
+
+	WORD wMajor, wMinor, wBuild;
+	LPWSTR pwsz = NULL;
+
+	if(!GetStatus(&wMajor, &wMinor, &wBuild, &pwsz))
+	{
+		char ver[250];
+		//printf("Version: %d.%d.%d\n", wMajor, wMinor, wBuild);
+		//printf("%ls\n\n",pwsz);
+		sprintf(ver,"Server version: %d.%d.%d, %s", wMajor, wMinor, wBuild, W2T(pwsz));
+		printf("%s\n\n",ver);
+
+		IT_COMMENT4("Version: %d.%d.%d, %s", wMajor, wMinor, wBuild,W2T(pwsz));
+		Opc_client_ae_DriverThread::ShowMessage(S_OK, "",ver);
+		::CoTaskMemFree(pwsz);
+	}
+
+	hr = g_pIOPCServer->QueryInterface(IID_IOPCCommon, (void**)&g_pIOPCCommon);
+
+	if(FAILED(hr))
+	{
+		ShowError(hr,"QueryInterface(IID_IOPCCommon)");
+	}
+	else
+	{
+		g_pIOPCCommon->SetClientName(L"IndigoSCADA OPC AE Client");
+	}
+
+	BOOL bActive;
+	DWORD dwBufferTime;
+	DWORD dwMaxSize;
+	DWORD hClientSubscription;
+	DWORD dwRevisedBufferTime;
+	DWORD dwRevisedMaxSize;
+
+	CComCOPCEventSink   *m_pSink = NULL;
+	CComCOPCShutdownRequest  *m_pShutdown = NULL;
+
+	//ATLTRY(m_pSink = new CComCOPCEventSink);
+
+	//if(m_pSink == NULL)
+	//{
+	//	ShowError(E_OUTOFMEMORY,"new CComCOPCEventSink");
+	//	return 1;
+	//}
+
+	dwMaxSize = 1000; //The server can send upto 1000 events for each OnEvent call
+
+	bActive = 1;
+
+	//server should check for maxsize of 0 however client should never pass it
+
+	if(!dwMaxSize)
+	{
+		dwMaxSize=1;
+	}
+
+	hClientSubscription = 1243272;
+	//dwBufferTime = 10000; //this is a parameter
+	dwBufferTime = 0; //this is a parameter
+
+	hr = g_pIOPCServer->CreateEventSubscription(bActive,
+						dwBufferTime,
+						dwMaxSize,
+						hClientSubscription,
+						IID_IOPCEventSubscriptionMgt,
+					   (IUnknown **)&m_ISubMgt,
+					   &dwRevisedBufferTime,
+					   &dwRevisedMaxSize);
+
+	if(hr != S_OK)
+	{
+		printf("Failed to Create Subscription\n");
+		return 1;
+	}
+
+	printf("A&E server dwRevisedBufferTime = %d, dwRevisedMaxSize = %d\n", dwRevisedBufferTime, dwRevisedMaxSize);
+
+	if(m_ISubMgt == NULL)
+	{
+		printf("CreateEventSubscription returned m_ISubMgt NULL\n");
+		return 1;
+	}
+
+	printf("CreateEventSubscription Done\n");
+	
+	// create advise
+	CComObject<COPCEventSink>::CreateInstance(&m_pSink);
+	m_dwCookie = 0xCDCDCDCD;
+
+	IUnknown* pUnk;
+
+	hr = m_pSink->_InternalQueryInterface( __uuidof(IUnknown), (void**)&pUnk );
+
+	if(hr != S_OK)
+	{
+		printf("Failed m_pSink->_InternalQueryInterface\n");
+		return 1;
+	}
+
+	hr = AtlAdvise(m_ISubMgt, pUnk, __uuidof(IOPCEventSink), &m_dwCookie );
+
+	if(hr != S_OK)
+	{
+		printf("Failed AtlAdvise m_dwCookie\n");
+		return 1;
+	}
+
+	//shutdown advise 
+	///////////////////////////////////////////////Shutdown/////////////////////////////
+/*
+//does not work...
+
+	CComObject<COPCShutdownRequest>::CreateInstance(&m_pShutdown);
+	m_dwShutdownCookie = 0xCDCDCDCD;
+
+	//IUnknown* pUnk;
+
+	hr = m_pShutdown->_InternalQueryInterface( __uuidof(IUnknown), (void**)&pUnk );
+
+	if(hr != S_OK)
+	{
+		printf("Failed m_pShutdown->_InternalQueryInterface\n");
+		return 1;
+	}
+
+	//hr = AtlAdvise(m_ISubMgt, m_pShutdown->GetUnknown(),__uuidof(IOPCShutdown), &m_dwShutdownCookie);
+
+	hr = AtlAdvise(m_ISubMgt, pUnk, __uuidof(IOPCShutdown), &m_dwShutdownCookie);
+	
+	if(hr != S_OK)
+	{
+		printf("Failed shutdown advise\n");
+		return 1;
+	}
+*/
+	////////////////////////GetState and SetState/////////////////////////////////////////////////////////////
+
+	hr = m_ISubMgt->GetState(&bActive,&dwBufferTime,&dwMaxSize,&hClientSubscription);
+
+	if(hr != S_OK)
+	{
+		printf("Failed m_ISubMgt->GetState\n");
+		return 1;
+	}
+
+	printf("Server state: bActive = %d, dwBufferTime = %d, dwMaxSize = %d, hClientSubscription = %d\n", bActive, dwBufferTime, dwMaxSize, hClientSubscription);
+/*
+Here only for test, it works.
+
+	hr = m_ISubMgt->SetState(&bActive, &dwBufferTime, &dwMaxSize, hClientSubscription, &dwRevisedBufferTime, &dwRevisedMaxSize);
+
+	if(hr != S_OK)
+	{
+		printf("Failed m_ISubMgt->SetState\n");
+		return 1;
+	}
+*/
+	///////////////////////Refresh//////////////////////////////////////////////////////////////
+
+	hr = m_ISubMgt->Refresh(m_dwCookie);
+
+	if(hr != S_OK)
+	{
+		printf("Failed Refresh\n");
+		return 1;
+	}
+
+	///////////////////////SetKeepAlive//////////////////////////////////////////////////////////////
+	
+	//IOPCEventSubscriptionMgt2Ptr ISubMgt2 = m_ISubMgt;
+
+/*
+//does not work...
+
+	IOPCEventSubscriptionMgt2* ISubMgt2 = (struct IOPCEventSubscriptionMgt2*)m_ISubMgt;
+	
+	if(ISubMgt2 != NULL)
+	{
+		DWORD dwRevisedKeepAliveTime = 0;
+		// set the keep-alive to 3X the dwRevisedBufferTime
+		hr = ISubMgt2->SetKeepAlive(3 * dwRevisedBufferTime, &dwRevisedKeepAliveTime);
+
+		printf("dwRevisedKeepAliveTime = %d\n", dwRevisedKeepAliveTime);
+	}
+*/
+
+/*
+	IOPCEventSubscriptionMgt2* ISubMgt2;
+
+	hr = g_pIOPCServer->QueryInterface(IID_IOPCEventSubscriptionMgt2, (void**)&ISubMgt2);
+
+	if(FAILED(hr))
+	{
+		printf("OPC error:Failed to obtain IID_IOPCEventSubscriptionMgt2 interface %x\n",hr);
+		ShowError(hr,"Failed to obtain IID_IOPCEventSubscriptionMgt2 interface");
+		return 1;
+	}
+*/
 
     return(0);
 }
