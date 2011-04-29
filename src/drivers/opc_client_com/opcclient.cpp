@@ -64,7 +64,7 @@ CComModule _Module;
 #include "opc_client_comdriverthread.h"
 
 #define MAX_KEYLEN 256
-#define MAX_ITEMS 5000  //<--should be parameter
+#define MAX_ITEMS 20000  //<--should be parameter
 
 // critical section stuff
 CComAutoCriticalSection sincronismo; 
@@ -2119,8 +2119,8 @@ int Opc_client_com_DriverThread::OpcStart()
 	{
 		//DCOM connection
 
-		printf("Try to connect to remote server: %s.\n", ServerIPAddress);
-		sprintf(show_msg, "Try to connect to remote server: %s", ServerIPAddress);
+		printf("Trying to connect to remote DA server on machine with IP: %s\n", ServerIPAddress);
+		sprintf(show_msg, "Trying to connect to remote DA server on machine with IP: %s", ServerIPAddress);
 
 		ShowMessage(S_OK, "", show_msg);
 		
@@ -2138,8 +2138,8 @@ int Opc_client_com_DriverThread::OpcStart()
 		COAUTHINFO athn;
 		ZeroMemory(&athn, sizeof(COAUTHINFO));
 		// Set up the NULL security information
-		athn.dwAuthnLevel = RPC_C_AUTHN_LEVEL_CONNECT;
-		//athn.dwAuthnLevel = RPC_C_AUTHN_LEVEL_NONE;
+		//athn.dwAuthnLevel = RPC_C_AUTHN_LEVEL_CONNECT;
+		athn.dwAuthnLevel = RPC_C_AUTHN_LEVEL_NONE;
 		athn.dwAuthnSvc = RPC_C_AUTHN_WINNT;
 		athn.dwAuthzSvc = RPC_C_AUTHZ_NONE;
 		athn.dwCapabilities = EOAC_NONE;
@@ -2192,7 +2192,7 @@ int Opc_client_com_DriverThread::OpcStart()
 
 		ULONG actual;
 
-		printf("Available DA servers on remote server.\n");
+		printf("Available DA servers on remote machine:\n");
 
 		while((hr = iEnum->Next(1, &glist, &actual)) == S_OK)
 		{
@@ -2211,7 +2211,7 @@ int Opc_client_com_DriverThread::OpcStart()
 				USES_CONVERSION;
 				char * str = OLE2T(progID);
 				char * str1 = OLE2T(userType);
-				printf("%s\n", str);
+				printf("DA - %s\n", str);
 				::CoTaskMemFree(progID);
 				::CoTaskMemFree(userType);
 			}
@@ -2221,7 +2221,6 @@ int Opc_client_com_DriverThread::OpcStart()
 
 		TCHAR serverName[100];
 		
-		//Prosys.OPC.Simulation
 		strcpy(serverName, ((Opc_client_com_Instance*)Parent)->Cfg.OpcServerProgID);
 				
 		if((strlen(serverName) == 0))
@@ -2249,7 +2248,33 @@ int Opc_client_com_DriverThread::OpcStart()
 
 		hr = RegConnectRegistry(ServerIPAddress, HKEY_LOCAL_MACHINE, &remoteRegHandle);
 
-		if(SUCCEEDED(hr))
+		if(hr)
+		{
+			char show_msg[150];
+
+			LPVOID lpMsgBuf;
+
+			FormatMessage( 
+			FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+			FORMAT_MESSAGE_FROM_SYSTEM | 
+			FORMAT_MESSAGE_IGNORE_INSERTS,
+			NULL,
+			GetLastError(),
+			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
+			(LPTSTR) &lpMsgBuf,
+			0,
+			NULL 
+			);
+
+			sprintf(show_msg, "RegConnectRegistry failed, with message: %s", lpMsgBuf);
+			printf("RegConnectRegistry failed: %s\n", lpMsgBuf);
+			Opc_client_com_DriverThread::ShowMessage(hr, "", show_msg);			
+
+			LocalFree(lpMsgBuf);
+
+			return 1;
+		}
+		else
 		{
 		   hr = RegOpenKeyEx(remoteRegHandle, keyName, 0, KEY_READ, &keyHandle);
 
@@ -2263,7 +2288,7 @@ int Opc_client_com_DriverThread::OpcStart()
 
 			   if(FAILED(hr))
 			   {
-					printf("RegQueryValueEx failed");
+					printf("RegQueryValueEx failed\n");
 					ShowError(hr,"RegQueryValueEx failed");
 					return 1;
 			   }
@@ -2277,7 +2302,7 @@ int Opc_client_com_DriverThread::OpcStart()
 
 					if(FAILED(hr))
 					{
-						printf("CLSIDFromString failed");
+						printf("CLSIDFromString failed\n");
 						ShowError(hr,"CLSIDFromString failed");
 						return 1;
 					}
@@ -2287,21 +2312,17 @@ int Opc_client_com_DriverThread::OpcStart()
 		   {
 				ShowError(hr,"RegOpenKeyEx failed");
 		   }
+
+		   RegCloseKey(keyHandle);
+		   RegCloseKey(remoteRegHandle);
 		}	
-	    else
-		{
-			ShowError(hr,"RegConnectRegistry failed");
-		}
-
-       RegCloseKey(remoteRegHandle);
-	   RegCloseKey(keyHandle);
-
+	    
 		////////////////////end Get CLSID From Remote Registry
 
 		ZeroMemory(&athn, sizeof(COAUTHINFO));
 		// Set up the NULL security information
-		athn.dwAuthnLevel = RPC_C_AUTHN_LEVEL_CONNECT;
-		//athn.dwAuthnLevel = RPC_C_AUTHN_LEVEL_NONE;
+		//athn.dwAuthnLevel = RPC_C_AUTHN_LEVEL_CONNECT;
+		athn.dwAuthnLevel = RPC_C_AUTHN_LEVEL_NONE;
 		athn.dwAuthnSvc = RPC_C_AUTHN_WINNT;
 		athn.dwAuthzSvc = RPC_C_AUTHZ_NONE;
 		athn.dwCapabilities = EOAC_NONE;
@@ -2506,13 +2527,14 @@ int Opc_client_com_DriverThread::OpcStop()
 		Item = NULL;
 	}
 
+	ShowMessage(S_OK,"","Server and all group interfaces being terminated");
+
 	// terminate server and it will clean up itself
 	if(g_pIOPCServer) while(g_pIOPCServer->Release()) ;
 	::CoUninitialize();
 
 	printf("Server and all group interfaces terminated.\n");
-
-	ShowMessage(S_OK,"","Server and all group interfaces terminated");
+	
 	return 1;
 }
 
