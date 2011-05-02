@@ -31,7 +31,7 @@ BEGIN_COM_MAP(COPCHistoricDASink)
 	COM_INTERFACE_ENTRY(IOPCHDA_DataCallback)
 END_COM_MAP()
 
-	HRESULT STDMETHODCALLTYPE OnDataChangeOnDataChange( 
+	HRESULT STDMETHODCALLTYPE OnDataChange( 
             /* [in] */ DWORD dwTransactionID,
             /* [in] */ HRESULT hrStatus,
             /* [in] */ DWORD dwNumItems,
