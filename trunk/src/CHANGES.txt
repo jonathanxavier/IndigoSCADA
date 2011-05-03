@@ -1,3 +1,11 @@
 
 03-05-2011
 Development of OPC client A&E 1.10 and OPC client HDA 1.20 is under way
+
+OPC DA Client limitations:
+OPC Client OPC DA has limitations in the server browsing feature.
+To fix we propose these steps:
+1) Browsing of server upto 40000 ItemsID
+2) Choosing a subset of the ItemsID
+3) The OPC DA client adds only the subset of items select in fase 2)
+---------------------------------------------------------------------------
