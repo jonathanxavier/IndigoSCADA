@@ -1,0 +1,13 @@
+The codebase origin goes back to 2000, when
+it was developed on Linux OS.
+Then in 2001 it was ported to Window 2000 Pro.
+Since 2001 there was no time and requests
+to port back the codebase to Linux again.
+So the codebase now require al lot of 
+#ifdef WIN32 or #ifdef UNIX to compile again on Linux.
+
+We are looking for volunteers interested in the porting back to Linux.
+
+apa
+
+
