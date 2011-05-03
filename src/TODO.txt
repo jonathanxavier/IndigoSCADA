@@ -1,6 +1,8 @@
-IndigoSCADA list of TO DO on 21-03-2011
+IndigoSCADA list of TO DO on 03-05-2011
 
-- Reimplement the GUI interface in general and in particular the HMI interface
+- Reimplement the GUI interface in general and in particular the HMI interface.
+  Up to now IndigoSCADA does not support drag and drop for HMI widgets,
+  it is time to add support for it.
 
 - Implement dinamic alarm and event lists, now alarm list is static
 
@@ -16,8 +18,8 @@ IndigoSCADA list of TO DO on 21-03-2011
 
 - Update documentation 
 
-- Translate user interface
+- Translate user interface, contribution needed
 
-- Remove dependecy on STL std::map
+- Remove dependecy on STL std::map, so looking for a stable implemention of AVL trees
 
 - Use CMake build system - http://www.cmake.org/ or qmake
