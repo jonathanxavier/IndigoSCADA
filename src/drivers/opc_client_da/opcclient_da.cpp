@@ -24,9 +24,7 @@
 // generates the transaction ID BEFORE the read/write is called.
 //
 ////////////////////////////////////////////////////////////////////////////////
-//apa - Updated opcda.h to 3.0 DA support
 //TODO: AddItems: add support for arrays
-
 
 #define STRICT
 #define VC_EXTRALEAN
@@ -60,8 +58,8 @@ CComModule _Module;
 #include "general_defines.h"
 #include "IndentedTrace.h"
 
-#include "opc_client_com_instance.h"
-#include "opc_client_comdriverthread.h"
+#include "opc_client_da_instance.h"
+#include "opc_client_dadriverthread.h"
 
 #define MAX_KEYLEN 256
 #define MAX_ITEMS 20000  //<--should be parameter
@@ -101,9 +99,9 @@ UINT g_nOpcFormatWrite = ::RegisterClipboardFormat("OPCSTMFORMATWRITECOMPLETE");
 //	printf("Error: %s failed,\t->%lX\t", pszError, hr);
 //}
 
-void Opc_client_com_DriverThread::SyncRead(bool bFlag)
+void Opc_client_da_DriverThread::SyncRead(bool bFlag)
 {
-	IT_IT("Opc_client_com_DriverThread::SyncRead");
+	IT_IT("Opc_client_da_DriverThread::SyncRead");
 	
 	OPCITEMSTATE *pItemState = NULL;
 	HRESULT *pErrors = NULL;
@@ -264,7 +262,7 @@ END_COM_MAP()
    {
 	    IT_IT("CTestAdviseSink::OnDataChange");
 
-		if(Opc_client_com_DriverThread::mandare_eventi)
+		if(Opc_client_da_DriverThread::mandare_eventi)
 		{
 			// Verify the format follows the OPC spec
 			if(TYMED_HGLOBAL != pFE->tymed)
@@ -292,12 +290,12 @@ END_COM_MAP()
 
 				if(FAILED(pHeader->hrStatus))
 				{
-					Opc_client_com_DriverThread::ShowError(pHeader->hrStatus,"General Async Write");
+					Opc_client_da_DriverThread::ShowError(pHeader->hrStatus,"General Async Write");
 				}
 
-				if(Opc_client_com_DriverThread::g_dwWriteTransID != pHeader->dwTransactionID)
+				if(Opc_client_da_DriverThread::g_dwWriteTransID != pHeader->dwTransactionID)
 				{
-					Opc_client_com_DriverThread::ShowError(S_OK,"Async Write callback, TransactionID's do not match");
+					Opc_client_da_DriverThread::ShowError(S_OK,"Async Write callback, TransactionID's do not match");
 				}
 
 				DWORD dwSize = sizeof(OPCGROUPHEADERWRITE);
@@ -308,13 +306,13 @@ END_COM_MAP()
 
 					if(FAILED(pItemHeader->dwError))
 					{
-						Opc_client_com_DriverThread::ShowError(pItemHeader->dwError,"Async Write request");
+						Opc_client_da_DriverThread::ShowError(pItemHeader->dwError,"Async Write request");
 					}
 				}
 				
-				//Opc_client_com_DriverThread::ShowMessage(S_OK,"g_bWriteComplete", "Messaggio");
+				//Opc_client_da_DriverThread::ShowMessage(S_OK,"g_bWriteComplete", "Messaggio");
 				//printf("Write completa");
-				Opc_client_com_DriverThread::g_bWriteComplete = true;
+				Opc_client_da_DriverThread::g_bWriteComplete = true;
 
 				::GlobalUnlock(pSTM->hGlobal);
 
@@ -338,10 +336,10 @@ END_COM_MAP()
 
 			if(FAILED(pHeader->hrStatus))
 			{
-				Opc_client_com_DriverThread::ShowError(pHeader->hrStatus,"General Async Read");
+				Opc_client_da_DriverThread::ShowError(pHeader->hrStatus,"General Async Read");
 			}
 
-			if(Opc_client_com_DriverThread::g_bPoll)
+			if(Opc_client_da_DriverThread::g_bPoll)
 			{
 				// if we are polling, ignore async updates
 				if(pHeader->dwTransactionID == 0)
@@ -351,16 +349,16 @@ END_COM_MAP()
 
 				READ_LOCK; //lock the other threads to enter in this critical section
 
-				if(pHeader->dwTransactionID != Opc_client_com_DriverThread::g_dwReadTransID)
+				if(pHeader->dwTransactionID != Opc_client_da_DriverThread::g_dwReadTransID)
 				{
-					Opc_client_com_DriverThread::ShowError(S_OK,"Async Read callback, TransactionID's do not match");
+					Opc_client_da_DriverThread::ShowError(S_OK,"Async Read callback, TransactionID's do not match");
 					
 					return;
 				}
 
-				if(!(Opc_client_com_DriverThread::g_bReadComplete))
+				if(!(Opc_client_da_DriverThread::g_bReadComplete))
 				{ 
-					Opc_client_com_DriverThread::g_bReadComplete = true;
+					Opc_client_da_DriverThread::g_bReadComplete = true;
 				}
 
 			}	//unlock, so let the other threads to enter in this critical section
@@ -386,7 +384,7 @@ END_COM_MAP()
 
 					const FILETIME* ft = reinterpret_cast<const FILETIME *>(&(pItemHeader->ftTimeStampItem));
 
-					Opc_client_com_DriverThread::SendEvent(pItemHeader, pValue, ft);
+					Opc_client_da_DriverThread::SendEvent(pItemHeader, pValue, ft);
 					
 					switch(V_VT(pValue))
 					{
@@ -437,45 +435,45 @@ END_COM_MAP()
 				else
 				{
 					//SINCRONISMO_LOCK   //lock the other threads to enter in this critical section
-					Opc_client_com_DriverThread::SendEvent(pItemHeader, 0, 0);
+					Opc_client_da_DriverThread::SendEvent(pItemHeader, 0, 0);
 					
 					//const FILETIME* ft = reinterpret_cast<const FILETIME *>(&(pItemHeader->ftTimeStampItem));
 
 					QString name;
-					name = QString(Opc_client_com_DriverThread::Item[pItemHeader->hClient].spname);
-					//name = QString(Opc_client_com_DriverThread::Item[pItemHeader->hClient - 1].spname); mettere il -1 ?
+					name = QString(Opc_client_da_DriverThread::Item[pItemHeader->hClient].spname);
+					//name = QString(Opc_client_da_DriverThread::Item[pItemHeader->hClient - 1].spname); mettere il -1 ?
 					
 					switch(pItemHeader->wQuality)
 					{
 						case OPC_QUALITY_BAD:
 						default:
 						{
-							Opc_client_com_DriverThread::ShowMessage(S_OK, "Quality Bad",(const char*)name);
+							Opc_client_da_DriverThread::ShowMessage(S_OK, "Quality Bad",(const char*)name);
 						}
 						break;
 						case OPC_QUALITY_UNCERTAIN:
 						{
-							Opc_client_com_DriverThread::ShowMessage(S_OK, "Quality UNCERTAIN",(const char*)name);
+							Opc_client_da_DriverThread::ShowMessage(S_OK, "Quality UNCERTAIN",(const char*)name);
 						}
 						break;
 						case OPC_QUALITY_CONFIG_ERROR:
 						{
-							Opc_client_com_DriverThread::ShowMessage(S_OK, "CONFIG ERROR",(const char*)name);
+							Opc_client_da_DriverThread::ShowMessage(S_OK, "CONFIG ERROR",(const char*)name);
 						}
 						break;
 						case OPC_QUALITY_NOT_CONNECTED:
 						{
-							Opc_client_com_DriverThread::ShowMessage(S_OK, "NOT CONNECTED",(const char*)name);
+							Opc_client_da_DriverThread::ShowMessage(S_OK, "NOT CONNECTED",(const char*)name);
 						}
 						break;
 						case OPC_QUALITY_DEVICE_FAILURE:
 						{
-							Opc_client_com_DriverThread::ShowMessage(S_OK, "DEVICE FAILURE",(const char*)name);
+							Opc_client_da_DriverThread::ShowMessage(S_OK, "DEVICE FAILURE",(const char*)name);
 						}
 						break;
 						case OPC_QUALITY_OUT_OF_SERVICE:
 						{
-							Opc_client_com_DriverThread::ShowMessage(S_OK, "OUT OF SERVICE",(const char*)name);
+							Opc_client_da_DriverThread::ShowMessage(S_OK, "OUT OF SERVICE",(const char*)name);
 						}
 						break;
 					}
@@ -489,9 +487,9 @@ END_COM_MAP()
    }
 };
 
-int Opc_client_com_DriverThread::AsyncUpdate()
+int Opc_client_da_DriverThread::AsyncUpdate()
 {
-	IT_IT("Opc_client_com_DriverThread::AsyncUpdate");
+	IT_IT("Opc_client_da_DriverThread::AsyncUpdate");
 
 	HRESULT hr = 0;
 	FORMATETC formatetc;
@@ -552,7 +550,7 @@ int Opc_client_com_DriverThread::AsyncUpdate()
 	while(!_kbhit())
 	{
 		::Sleep(10);
-		if(g_bWriteEnable && Opc_client_com_DriverThread::g_bWriteComplete)
+		if(g_bWriteEnable && Opc_client_da_DriverThread::g_bWriteComplete)
 		{
 			// pump out data async to items
 			for(dw = 0; dw < g_dwNumItems; dw++)
@@ -566,7 +564,7 @@ int Opc_client_com_DriverThread::AsyncUpdate()
 			{
 				V_I2(&vCount) = 0; // allow bool to toggle on/off
 			}
-			Opc_client_com_DriverThread::g_bWriteComplete = false;
+			Opc_client_da_DriverThread::g_bWriteComplete = false;
 			g_Writecs.Lock(); // lock callbacks until we get transid
 			hr = g_pIOPCAsyncIO->Write(dwWriteConnection, g_dwNumItems, hServer, Val, &g_dwWriteTransID, &pErrorsWrite);
 			g_Writecs.Unlock();
@@ -617,9 +615,9 @@ int Opc_client_com_DriverThread::AsyncUpdate()
 	return 0;
 }
 
-int Opc_client_com_DriverThread::AsyncRead(bool bFlag)
+int Opc_client_da_DriverThread::AsyncRead(bool bFlag)
 {
-	IT_IT("Opc_client_com_DriverThread::AsyncRead");
+	IT_IT("Opc_client_da_DriverThread::AsyncRead");
 
 	HRESULT hr = 0;
 	FORMATETC formatetc;
@@ -716,7 +714,7 @@ int Opc_client_com_DriverThread::AsyncRead(bool bFlag)
 
 	while(true)
 	{
-		//IT_COMMENT("Opc_client_com_DriverThread Waiting....");
+		//IT_COMMENT("Opc_client_da_DriverThread Waiting....");
 		
 		//{
 		//	dbCriticalSection cs(mutex); //enter critical section
@@ -727,12 +725,12 @@ int Opc_client_com_DriverThread::AsyncRead(bool bFlag)
 		if(fExit)
 		{
 			mandare_eventi = false;
-			IT_COMMENT("Opc_client_com_DriverThread exiting....");
+			IT_COMMENT("Opc_client_da_DriverThread exiting....");
 			m_hevtEnd.signal();
 			break; //terminate the thread
 		}
 		
-		//IT_COMMENT("Opc_client_com_DriverThread Past Wait Flag");
+		//IT_COMMENT("Opc_client_da_DriverThread Past Wait Flag");
 
 		//if(!SendRece(*pinternal_packet))
 		//{
@@ -741,7 +739,7 @@ int Opc_client_com_DriverThread::AsyncRead(bool bFlag)
 		//}
 
 
-		if(g_bWriteEnable && Opc_client_com_DriverThread::g_bWriteComplete)
+		if(g_bWriteEnable && Opc_client_da_DriverThread::g_bWriteComplete)
 		{
 			//pump out data async to items
 			for(dw = 0; dw < g_dwNumItems; dw++)
@@ -798,7 +796,7 @@ int Opc_client_com_DriverThread::AsyncRead(bool bFlag)
 
 					if(dwAccessRights == OPC_WRITEABLE)
 					{
-						Opc_client_com_DriverThread::g_bWriteComplete = false;
+						Opc_client_da_DriverThread::g_bWriteComplete = false;
 						
 						g_Writecs.Lock(); // lock callbacks until we get transid
 
@@ -916,11 +914,11 @@ END_COM_MAP()
 
 		IT_IT("COPCCallback::OnDataChange");
 
-		//if(Opc_client_com_DriverThread::mandare_eventi)
+		//if(Opc_client_da_DriverThread::mandare_eventi)
 		{
 			if(FAILED(hrMastererror))
 			{
-				Opc_client_com_DriverThread::ShowError(hrMastererror,"General ConnectionPoint Update");
+				Opc_client_da_DriverThread::ShowError(hrMastererror,"General ConnectionPoint Update");
 			}
 
 			for(DWORD dw = 0; dw < dwCount; dw++)
@@ -939,7 +937,7 @@ END_COM_MAP()
 
 					const FILETIME* ft = reinterpret_cast<const FILETIME *>(&pftTimeStamps[dw]);
 
-					Opc_client_com_DriverThread::SendEvent2(pValue, ft, pwQualities[dw], phClientItems[dw]);
+					Opc_client_da_DriverThread::SendEvent2(pValue, ft, pwQualities[dw], phClientItems[dw]);
 				}
 				else if((pwQualities[dw] != OPC_QUALITY_GOOD) && SUCCEEDED(pErrors[dw]))
 				{
@@ -949,84 +947,84 @@ END_COM_MAP()
 
 					const FILETIME* ft = reinterpret_cast<const FILETIME *>(&pftTimeStamps[dw]);
 																										
-					Opc_client_com_DriverThread::SendEvent2(pValue, ft, pwQualities[dw], phClientItems[dw]);
+					Opc_client_da_DriverThread::SendEvent2(pValue, ft, pwQualities[dw], phClientItems[dw]);
 
 					QString name;
-					name = QString(Opc_client_com_DriverThread::Item[phClientItems[dw] - 1].spname);
+					name = QString(Opc_client_da_DriverThread::Item[phClientItems[dw] - 1].spname);
 
 					switch(pwQualities[dw])
 					{
 						case OPC_QUALITY_GOOD:
 							//ShowError(S_OK, "Quality Good");
-							Opc_client_com_DriverThread::ShowMessage(S_OK, "Quality Good",(const char*)name);
+							Opc_client_da_DriverThread::ShowMessage(S_OK, "Quality Good",(const char*)name);
 							break;
 						case OPC_QUALITY_BAD:
 						default:
 							//ShowError(S_OK, "Quality Bad");
-							Opc_client_com_DriverThread::ShowMessage(S_OK, "Quality Bad",(const char*)name);
+							Opc_client_da_DriverThread::ShowMessage(S_OK, "Quality Bad",(const char*)name);
 							break;
 						case OPC_QUALITY_UNCERTAIN:
 							//ShowError(S_OK, "Quality UNCERTAIN");
-							Opc_client_com_DriverThread::ShowMessage(S_OK, "Quality UNCERTAIN",(const char*)name);
+							Opc_client_da_DriverThread::ShowMessage(S_OK, "Quality UNCERTAIN",(const char*)name);
 							break;
 						case OPC_QUALITY_CONFIG_ERROR:
 							//ShowError(S_OK, "CONFIG ERROR");
-							Opc_client_com_DriverThread::ShowMessage(S_OK, "CONFIG ERROR",(const char*)name);
+							Opc_client_da_DriverThread::ShowMessage(S_OK, "CONFIG ERROR",(const char*)name);
 							break;
 						case OPC_QUALITY_NOT_CONNECTED:
 							//ShowError(S_OK, "NOT CONNECTED");
-							Opc_client_com_DriverThread::ShowMessage(S_OK, "NOT CONNECTED",(const char*)name);
+							Opc_client_da_DriverThread::ShowMessage(S_OK, "NOT CONNECTED",(const char*)name);
 							break;
 						case OPC_QUALITY_DEVICE_FAILURE:
 							//ShowError(S_OK, "DEVICE FAILURE");
-							Opc_client_com_DriverThread::ShowMessage(S_OK, "DEVICE FAILURE",(const char*)name);
+							Opc_client_da_DriverThread::ShowMessage(S_OK, "DEVICE FAILURE",(const char*)name);
 							break;
 						case OPC_QUALITY_OUT_OF_SERVICE:
 							//ShowError(S_OK, "OUT OF SERVICE");
-							Opc_client_com_DriverThread::ShowMessage(S_OK, "OUT OF SERVICE",(const char*)name);
+							Opc_client_da_DriverThread::ShowMessage(S_OK, "OUT OF SERVICE",(const char*)name);
 							break;
 					}
 				}
 				else // else if
 				{
 					//SINCRONISMO_LOCK   //lock the other threads to enter in this critical section
-					Opc_client_com_DriverThread::SendEvent2(0, 0, pwQualities[dw], phClientItems[dw]);
+					Opc_client_da_DriverThread::SendEvent2(0, 0, pwQualities[dw], phClientItems[dw]);
 					
 					//const FILETIME* ft = reinterpret_cast<const FILETIME *>(&pftTimeStamps[dw]);
 
 					QString name;
-					name = QString(Opc_client_com_DriverThread::Item[phClientItems[dw] - 1].spname);
+					name = QString(Opc_client_da_DriverThread::Item[phClientItems[dw] - 1].spname);
 
 					switch(pwQualities[dw])
 					{
 						case OPC_QUALITY_GOOD:
 							//ShowError(S_OK, "Quality Good");
-							Opc_client_com_DriverThread::ShowMessage(S_OK, "Quality Good",(const char*)name);
+							Opc_client_da_DriverThread::ShowMessage(S_OK, "Quality Good",(const char*)name);
 							break;
 						case OPC_QUALITY_BAD:
 						default:
 							//ShowError(S_OK, "Quality Bad");
-							Opc_client_com_DriverThread::ShowMessage(S_OK, "Quality Bad",(const char*)name);
+							Opc_client_da_DriverThread::ShowMessage(S_OK, "Quality Bad",(const char*)name);
 							break;
 						case OPC_QUALITY_UNCERTAIN:
 							//ShowError(S_OK, "Quality UNCERTAIN");
-							Opc_client_com_DriverThread::ShowMessage(S_OK, "Quality UNCERTAIN",(const char*)name);
+							Opc_client_da_DriverThread::ShowMessage(S_OK, "Quality UNCERTAIN",(const char*)name);
 							break;
 						case OPC_QUALITY_CONFIG_ERROR:
 							//ShowError(S_OK, "CONFIG ERROR");
-							Opc_client_com_DriverThread::ShowMessage(S_OK, "CONFIG ERROR",(const char*)name);
+							Opc_client_da_DriverThread::ShowMessage(S_OK, "CONFIG ERROR",(const char*)name);
 							break;
 						case OPC_QUALITY_NOT_CONNECTED:
 							//ShowError(S_OK, "NOT CONNECTED");
-							Opc_client_com_DriverThread::ShowMessage(S_OK, "NOT CONNECTED",(const char*)name);
+							Opc_client_da_DriverThread::ShowMessage(S_OK, "NOT CONNECTED",(const char*)name);
 							break;
 						case OPC_QUALITY_DEVICE_FAILURE:
 							//ShowError(S_OK, "DEVICE FAILURE");
-							Opc_client_com_DriverThread::ShowMessage(S_OK, "DEVICE FAILURE",(const char*)name);
+							Opc_client_da_DriverThread::ShowMessage(S_OK, "DEVICE FAILURE",(const char*)name);
 							break;
 						case OPC_QUALITY_OUT_OF_SERVICE:
 							//ShowError(S_OK, "OUT OF SERVICE");
-							Opc_client_com_DriverThread::ShowMessage(S_OK, "OUT OF SERVICE",(const char*)name);
+							Opc_client_da_DriverThread::ShowMessage(S_OK, "OUT OF SERVICE",(const char*)name);
 							break;
 					}
 				} // endif
@@ -1053,16 +1051,16 @@ END_COM_MAP()
 	{
 		IT_IT("COPCCallback::OnReadComplete");
 
-		//if(Opc_client_com_DriverThread::mandare_eventi)
+		//if(Opc_client_da_DriverThread::mandare_eventi)
 		{
 			if(FAILED(hrMastererror))
 			{
-				Opc_client_com_DriverThread::ShowError(hrMastererror,"General Async2 Read");
+				Opc_client_da_DriverThread::ShowError(hrMastererror,"General Async2 Read");
 			}
 
-			if(dwTransid != Opc_client_com_DriverThread::g_dwReadTransID)
+			if(dwTransid != Opc_client_da_DriverThread::g_dwReadTransID)
 			{
-				Opc_client_com_DriverThread::ShowError(S_OK,"Async2 Read callback, TransactionID's do not match");
+				Opc_client_da_DriverThread::ShowError(S_OK,"Async2 Read callback, TransactionID's do not match");
 				return S_FALSE;
 			}
 
@@ -1082,7 +1080,7 @@ END_COM_MAP()
 
 					const FILETIME* ft = reinterpret_cast<const FILETIME *>(&pftTimeStamps[dw]);
 
-					Opc_client_com_DriverThread::SendEvent2(pValue, ft, pwQualities[dw], phClientItems[dw]);
+					Opc_client_da_DriverThread::SendEvent2(pValue, ft, pwQualities[dw], phClientItems[dw]);
 				}
 				else if((pwQualities[dw] != OPC_QUALITY_GOOD) && SUCCEEDED(pErrors[dw]))
 				{
@@ -1092,84 +1090,84 @@ END_COM_MAP()
 
 					const FILETIME* ft = reinterpret_cast<const FILETIME *>(&pftTimeStamps[dw]);
 																										
-					Opc_client_com_DriverThread::SendEvent2(pValue, ft, pwQualities[dw], phClientItems[dw]);
+					Opc_client_da_DriverThread::SendEvent2(pValue, ft, pwQualities[dw], phClientItems[dw]);
 
 					QString name;
-					name = QString(Opc_client_com_DriverThread::Item[phClientItems[dw] - 1].spname);
+					name = QString(Opc_client_da_DriverThread::Item[phClientItems[dw] - 1].spname);
 
 					switch(pwQualities[dw])
 					{
 						case OPC_QUALITY_GOOD:
 							//ShowError(S_OK, "Quality Good");
-							Opc_client_com_DriverThread::ShowMessage(S_OK, "Quality Good",(const char*)name);
+							Opc_client_da_DriverThread::ShowMessage(S_OK, "Quality Good",(const char*)name);
 							break;
 						case OPC_QUALITY_BAD:
 						default:
 							//ShowError(S_OK, "Quality Bad");
-							Opc_client_com_DriverThread::ShowMessage(S_OK, "Quality Bad",(const char*)name);
+							Opc_client_da_DriverThread::ShowMessage(S_OK, "Quality Bad",(const char*)name);
 							break;
 						case OPC_QUALITY_UNCERTAIN:
 							//ShowError(S_OK, "Quality UNCERTAIN");
-							Opc_client_com_DriverThread::ShowMessage(S_OK, "Quality UNCERTAIN",(const char*)name);
+							Opc_client_da_DriverThread::ShowMessage(S_OK, "Quality UNCERTAIN",(const char*)name);
 							break;
 						case OPC_QUALITY_CONFIG_ERROR:
 							//ShowError(S_OK, "CONFIG ERROR");
-							Opc_client_com_DriverThread::ShowMessage(S_OK, "CONFIG ERROR",(const char*)name);
+							Opc_client_da_DriverThread::ShowMessage(S_OK, "CONFIG ERROR",(const char*)name);
 							break;
 						case OPC_QUALITY_NOT_CONNECTED:
 							//ShowError(S_OK, "NOT CONNECTED");
-							Opc_client_com_DriverThread::ShowMessage(S_OK, "NOT CONNECTED",(const char*)name);
+							Opc_client_da_DriverThread::ShowMessage(S_OK, "NOT CONNECTED",(const char*)name);
 							break;
 						case OPC_QUALITY_DEVICE_FAILURE:
 							//ShowError(S_OK, "DEVICE FAILURE");
-							Opc_client_com_DriverThread::ShowMessage(S_OK, "DEVICE FAILURE",(const char*)name);
+							Opc_client_da_DriverThread::ShowMessage(S_OK, "DEVICE FAILURE",(const char*)name);
 							break;
 						case OPC_QUALITY_OUT_OF_SERVICE:
 							//ShowError(S_OK, "OUT OF SERVICE");
-							Opc_client_com_DriverThread::ShowMessage(S_OK, "OUT OF SERVICE",(const char*)name);
+							Opc_client_da_DriverThread::ShowMessage(S_OK, "OUT OF SERVICE",(const char*)name);
 							break;
 					}
 				}
 				else // else if
 				{
 					//SINCRONISMO_LOCK   //lock the other threads to enter in this critical section
-					Opc_client_com_DriverThread::SendEvent2(0, 0, pwQualities[dw], phClientItems[dw]);
+					Opc_client_da_DriverThread::SendEvent2(0, 0, pwQualities[dw], phClientItems[dw]);
 					
 					//const FILETIME* ft = reinterpret_cast<const FILETIME *>(&pftTimeStamps[dw]);
 
 					QString name;
-					name = QString(Opc_client_com_DriverThread::Item[phClientItems[dw] - 1].spname);
+					name = QString(Opc_client_da_DriverThread::Item[phClientItems[dw] - 1].spname);
 
 					switch(pwQualities[dw])
 					{
 						case OPC_QUALITY_GOOD:
 							//ShowError(S_OK, "Quality Good");
-							Opc_client_com_DriverThread::ShowMessage(S_OK, "Quality Good",(const char*)name);
+							Opc_client_da_DriverThread::ShowMessage(S_OK, "Quality Good",(const char*)name);
 							break;
 						case OPC_QUALITY_BAD:
 						default:
 							//ShowError(S_OK, "Quality Bad");
-							Opc_client_com_DriverThread::ShowMessage(S_OK, "Quality Bad",(const char*)name);
+							Opc_client_da_DriverThread::ShowMessage(S_OK, "Quality Bad",(const char*)name);
 							break;
 						case OPC_QUALITY_UNCERTAIN:
 							//ShowError(S_OK, "Quality UNCERTAIN");
-							Opc_client_com_DriverThread::ShowMessage(S_OK, "Quality UNCERTAIN",(const char*)name);
+							Opc_client_da_DriverThread::ShowMessage(S_OK, "Quality UNCERTAIN",(const char*)name);
 							break;
 						case OPC_QUALITY_CONFIG_ERROR:
 							//ShowError(S_OK, "CONFIG ERROR");
-							Opc_client_com_DriverThread::ShowMessage(S_OK, "CONFIG ERROR",(const char*)name);
+							Opc_client_da_DriverThread::ShowMessage(S_OK, "CONFIG ERROR",(const char*)name);
 							break;
 						case OPC_QUALITY_NOT_CONNECTED:
 							//ShowError(S_OK, "NOT CONNECTED");
-							Opc_client_com_DriverThread::ShowMessage(S_OK, "NOT CONNECTED",(const char*)name);
+							Opc_client_da_DriverThread::ShowMessage(S_OK, "NOT CONNECTED",(const char*)name);
 							break;
 						case OPC_QUALITY_DEVICE_FAILURE:
 							//ShowError(S_OK, "DEVICE FAILURE");
-							Opc_client_com_DriverThread::ShowMessage(S_OK, "DEVICE FAILURE",(const char*)name);
+							Opc_client_da_DriverThread::ShowMessage(S_OK, "DEVICE FAILURE",(const char*)name);
 							break;
 						case OPC_QUALITY_OUT_OF_SERVICE:
 							//ShowError(S_OK, "OUT OF SERVICE");
-							Opc_client_com_DriverThread::ShowMessage(S_OK, "OUT OF SERVICE",(const char*)name);
+							Opc_client_da_DriverThread::ShowMessage(S_OK, "OUT OF SERVICE",(const char*)name);
 							break;
 					}
 				} // endif
@@ -1178,7 +1176,7 @@ END_COM_MAP()
 
 			} // end for
 
-			Opc_client_com_DriverThread::g_bReadComplete = true;
+			Opc_client_da_DriverThread::g_bReadComplete = true;
 
 			SetEvent(cb_complete_c_ic_na_1);
 
@@ -1200,24 +1198,24 @@ END_COM_MAP()
 		
 		if(FAILED(hrMastererr))
 		{
-			Opc_client_com_DriverThread::ShowError(hrMastererr,"General Async2 Write");
+			Opc_client_da_DriverThread::ShowError(hrMastererr,"General Async2 Write");
 
 			//Send error detected in execution of command
 		}
 
-		//fprintf(stderr, "g_dwWriteTransID = %d, dwTransid = %d\n", Opc_client_com_DriverThread::g_dwWriteTransID, dwTransid);
+		//fprintf(stderr, "g_dwWriteTransID = %d, dwTransid = %d\n", Opc_client_da_DriverThread::g_dwWriteTransID, dwTransid);
 		//fflush(stderr);
 
-		if(Opc_client_com_DriverThread::g_dwWriteTransID != dwTransid)
+		if(Opc_client_da_DriverThread::g_dwWriteTransID != dwTransid)
 		{
-			Opc_client_com_DriverThread::ShowError(S_OK,"Async2 Write callback, TransactionID's do not match");
+			Opc_client_da_DriverThread::ShowError(S_OK,"Async2 Write callback, TransactionID's do not match");
 		}
 
 		for(DWORD dw=0; dw < dwCount; dw++)
 		{
 			if(FAILED(pErrors[dw]))
 			{
-				Opc_client_com_DriverThread::ShowError(pErrors[dw], "Async2 Write request");
+				Opc_client_da_DriverThread::ShowError(pErrors[dw], "Async2 Write request");
 			}
 
 			switch(pErrors[dw])
@@ -1249,7 +1247,7 @@ END_COM_MAP()
 			}
 		}
 
-		Opc_client_com_DriverThread::g_bWriteComplete = true;
+		Opc_client_da_DriverThread::g_bWriteComplete = true;
 
 		SetEvent(cb_complete_c_sc_na_1);
 
@@ -1266,9 +1264,9 @@ END_COM_MAP()
 	}
 };
 
-int Opc_client_com_DriverThread::Async2Update()
+int Opc_client_da_DriverThread::Async2Update()
 {
-	IT_IT("Opc_client_com_DriverThread::Async2Update");
+	IT_IT("Opc_client_da_DriverThread::Async2Update");
 
 	if(g_pIOPCAsyncIO2 == NULL) return 1; // not supported
 
@@ -1355,12 +1353,12 @@ int Opc_client_com_DriverThread::Async2Update()
 		if(fExit)
 		{
 			mandare_eventi = false;
-			IT_COMMENT("Opc_client_com_DriverThread exiting....");
+			IT_COMMENT("Opc_client_da_DriverThread exiting....");
 			m_hevtEnd.signal();
 			break; //terminate the thread
 		}
 
-		//fprintf(stderr, "Opc_client_com_DriverThread::g_bWriteComplete = %d\n", Opc_client_com_DriverThread::g_bWriteComplete);
+		//fprintf(stderr, "Opc_client_da_DriverThread::g_bWriteComplete = %d\n", Opc_client_da_DriverThread::g_bWriteComplete);
 		//fflush(stderr);
 		
 		
@@ -1373,7 +1371,7 @@ int Opc_client_com_DriverThread::Async2Update()
 			struct iec_item* p_item;
 			u_int message_checksum, msg_checksum;
 			
-			for(n = 0; (len = fifo_get(Opc_client_com_DriverThread::fifo_control_direction, buf, sizeof(struct iec_item), wait_limit_ms)) >= 0; n += 1)
+			for(n = 0; (len = fifo_get(Opc_client_da_DriverThread::fifo_control_direction, buf, sizeof(struct iec_item), wait_limit_ms)) >= 0; n += 1)
 			{ 
 				p_item = (struct iec_item*)buf;
 
@@ -1438,7 +1436,7 @@ int Opc_client_com_DriverThread::Async2Update()
 					ResetEvent(cb_complete_c_sc_na_1);
 
 					//Receive a write command
-					if(g_bWriteEnable && Opc_client_com_DriverThread::g_bWriteComplete)
+					if(g_bWriteEnable && Opc_client_da_DriverThread::g_bWriteComplete)
 					{
 						//printf("Receiving command for hClient %d\n", queued_item.hClient);
 
@@ -1519,12 +1517,12 @@ int Opc_client_com_DriverThread::Async2Update()
 
 							if(dwAccessRights == OPC_WRITEABLE)
 							{
-								Opc_client_com_DriverThread::g_bWriteComplete = false;
+								Opc_client_da_DriverThread::g_bWriteComplete = false;
 
-								//fprintf(stderr, "Opc_client_com_DriverThread::g_bWriteComplete = %d\n", Opc_client_com_DriverThread::g_bWriteComplete);
+								//fprintf(stderr, "Opc_client_da_DriverThread::g_bWriteComplete = %d\n", Opc_client_da_DriverThread::g_bWriteComplete);
 								//fflush(stderr);
 
-								//fprintf(stderr, "g_dwWriteTransID = %d\n", Opc_client_com_DriverThread::g_dwWriteTransID);
+								//fprintf(stderr, "g_dwWriteTransID = %d\n", Opc_client_da_DriverThread::g_dwWriteTransID);
 								//fflush(stderr);
 
 								hr = g_pIOPCAsyncIO2->Write(nWriteItems, hServer, Val, ++g_dwWriteTransID, &g_dwCancelID, &pErrorsWrite);
@@ -1562,7 +1560,7 @@ int Opc_client_com_DriverThread::Async2Update()
 							{
 								IT_COMMENT1("No access write for sample point %s", Item[queued_item.hClient - 1].spname);
 								printf("No access write for sample point %s\n", Item[queued_item.hClient - 1].spname);
-								Opc_client_com_DriverThread::ShowError(0,"No access write for sample point");
+								Opc_client_da_DriverThread::ShowError(0,"No access write for sample point");
 								//send_negative_termination_to_iec_104slave(&queued_item);
 								goto write_error;
 							}
@@ -1702,9 +1700,9 @@ int Opc_client_com_DriverThread::Async2Update()
 	return 0;
 }
 
-int Opc_client_com_DriverThread::Async2Read(bool bFlag)
+int Opc_client_da_DriverThread::Async2Read(bool bFlag)
 {
-	IT_IT("Opc_client_com_DriverThread::Async2Read");
+	IT_IT("Opc_client_da_DriverThread::Async2Read");
 
 	if(g_pIOPCAsyncIO2 == NULL) return 1; // not supported
 
@@ -1785,12 +1783,12 @@ int Opc_client_com_DriverThread::Async2Read(bool bFlag)
 		if(fExit)
 		{
 			mandare_eventi = false;
-			IT_COMMENT("Opc_client_com_DriverThread exiting....");
+			IT_COMMENT("Opc_client_da_DriverThread exiting....");
 			m_hevtEnd.signal();
 			break; //terminate the thread
 		}
 		
-		if(g_bWriteEnable && Opc_client_com_DriverThread::g_bWriteComplete)
+		if(g_bWriteEnable && Opc_client_da_DriverThread::g_bWriteComplete)
 		{
 			// pump out data async to items
 
@@ -1808,7 +1806,7 @@ int Opc_client_com_DriverThread::Async2Read(bool bFlag)
 				V_I2(&vCount) = 0; // allow bool to toggle on/off
 			}
 
-			Opc_client_com_DriverThread::g_bWriteComplete = false;
+			Opc_client_da_DriverThread::g_bWriteComplete = false;
 
 			// write items
 
@@ -1888,15 +1886,15 @@ int Opc_client_com_DriverThread::Async2Read(bool bFlag)
 	return 0;
 }
 
-int Opc_client_com_DriverThread::OpcStart()
+int Opc_client_da_DriverThread::OpcStart()
 {
-	IT_IT("Opc_client_com_DriverThread::OpcStart");
+	IT_IT("Opc_client_da_DriverThread::OpcStart");
 
 	char show_msg[150];
 
 	TCHAR  ServerIPAddress[80];
 
-	strcpy(ServerIPAddress, ((Opc_client_com_Instance*)Parent)->Cfg.OpcServerIPAddress);
+	strcpy(ServerIPAddress, ((Opc_client_da_Instance*)Parent)->Cfg.OpcServerIPAddress);
 
 	if((strlen(ServerIPAddress) == 0))
 	{
@@ -1938,7 +1936,7 @@ int Opc_client_com_DriverThread::OpcStart()
 
 		TCHAR serv[100];
 		
-		strcpy(serv, ((Opc_client_com_Instance*)Parent)->Cfg.OpcServerProgID);
+		strcpy(serv, ((Opc_client_da_Instance*)Parent)->Cfg.OpcServerProgID);
 
 		wcscpy(wszServerName, T2W(serv));
 
@@ -1982,7 +1980,7 @@ int Opc_client_com_DriverThread::OpcStart()
 		IT_COMMENT("Connected to local server");
 
 		sprintf(show_msg, "Connected to local server");
-		Opc_client_com_DriverThread::ShowMessage(S_OK, "", show_msg);
+		Opc_client_da_DriverThread::ShowMessage(S_OK, "", show_msg);
 
 		WORD wMajor, wMinor, wBuild;
 
@@ -1995,7 +1993,7 @@ int Opc_client_com_DriverThread::OpcStart()
 			printf("%s\n\n",ver);
 			IT_COMMENT4("Version: %d.%d.%d, %s", wMajor, wMinor, wBuild,W2T(pwsz));
 			
-			Opc_client_com_DriverThread::ShowMessage(S_OK, "",ver);
+			Opc_client_da_DriverThread::ShowMessage(S_OK, "",ver);
 			::CoTaskMemFree(pwsz);
 		}
 
@@ -2221,7 +2219,7 @@ int Opc_client_com_DriverThread::OpcStart()
 
 		TCHAR serverName[100];
 		
-		strcpy(serverName, ((Opc_client_com_Instance*)Parent)->Cfg.OpcServerProgID);
+		strcpy(serverName, ((Opc_client_da_Instance*)Parent)->Cfg.OpcServerProgID);
 				
 		if((strlen(serverName) == 0))
 		{
@@ -2268,7 +2266,7 @@ int Opc_client_com_DriverThread::OpcStart()
 
 			sprintf(show_msg, "RegConnectRegistry failed, with message: %s", lpMsgBuf);
 			printf("RegConnectRegistry failed: %s\n", lpMsgBuf);
-			Opc_client_com_DriverThread::ShowMessage(hr, "", show_msg);			
+			Opc_client_da_DriverThread::ShowMessage(hr, "", show_msg);			
 
 			LocalFree(lpMsgBuf);
 
@@ -2368,7 +2366,7 @@ int Opc_client_com_DriverThread::OpcStart()
 		printf("Connected to server %s.\n", ServerIPAddress);
 
 		sprintf(show_msg, "Connected to server %s", ServerIPAddress);
-		Opc_client_com_DriverThread::ShowMessage(S_OK, "", show_msg);
+		Opc_client_da_DriverThread::ShowMessage(S_OK, "", show_msg);
 
 
 		WORD wMajor, wMinor, wBuild;
@@ -2383,7 +2381,7 @@ int Opc_client_com_DriverThread::OpcStart()
 			printf("%s\n\n",ver);
 
 			IT_COMMENT4("Version: %d.%d.%d, %s", wMajor, wMinor, wBuild,W2T(pwsz));
-			Opc_client_com_DriverThread::ShowMessage(S_OK, "",ver);
+			Opc_client_da_DriverThread::ShowMessage(S_OK, "",ver);
 			::CoTaskMemFree(pwsz);
 		}
 
@@ -2517,9 +2515,9 @@ int Opc_client_com_DriverThread::OpcStart()
     return(0);
 }
 
-int Opc_client_com_DriverThread::OpcStop()
+int Opc_client_da_DriverThread::OpcStop()
 {
-	IT_IT("Opc_client_com_DriverThread::OpcStop");
+	IT_IT("Opc_client_da_DriverThread::OpcStop");
 
 	if(Item)
 	{
@@ -2538,9 +2536,9 @@ int Opc_client_com_DriverThread::OpcStop()
 	return 1;
 }
 
-int Opc_client_com_DriverThread::GetStatus(WORD *pwMav, WORD *pwMiv, WORD *pwB, LPWSTR *pszV)
+int Opc_client_da_DriverThread::GetStatus(WORD *pwMav, WORD *pwMiv, WORD *pwB, LPWSTR *pszV)
 {
-	IT_IT("Opc_client_com_DriverThread::GetStatus");
+	IT_IT("Opc_client_da_DriverThread::GetStatus");
 
 	*pwMav = 0;
 	*pwMiv = 0;
@@ -2564,9 +2562,9 @@ int Opc_client_com_DriverThread::GetStatus(WORD *pwMav, WORD *pwMiv, WORD *pwB, 
 }
 
 // simple check for version OPC 2.0 type connection point containers
-bool Opc_client_com_DriverThread::Version2()
+bool Opc_client_da_DriverThread::Version2()
 {
-	IT_IT("Opc_client_com_DriverThread::Version2");
+	IT_IT("Opc_client_da_DriverThread::Version2");
 
 	if(g_pIOPCServer == NULL) return false;
 	IConnectionPointContainer *pCPC = NULL;
@@ -2579,9 +2577,9 @@ bool Opc_client_com_DriverThread::Version2()
 }
 
 
-int Opc_client_com_DriverThread::AddItems()
+int Opc_client_da_DriverThread::AddItems()
 {
-	IT_IT("Opc_client_com_DriverThread::AddItems");
+	IT_IT("Opc_client_da_DriverThread::AddItems");
 
 	// loop until all items are added
 	char sz2[128];
@@ -2630,7 +2628,7 @@ int Opc_client_com_DriverThread::AddItems()
 			return 1;
 		}
 
-		QString unit = ((Opc_client_com_Instance*)Parent)->unit_name;
+		QString unit = ((Opc_client_da_Instance*)Parent)->unit_name;
 
 		nTestItem = 0;
 			
@@ -2785,7 +2783,7 @@ int Opc_client_com_DriverThread::AddItems()
 				{
 					//printf(" - Readable");
 					IT_COMMENT(" - Readable");
-					//Opc_client_com_DriverThread::ShowMessage(S_OK, "Readable",(const char*)W2T(pItemAttr[i].szItemID));
+					//Opc_client_da_DriverThread::ShowMessage(S_OK, "Readable",(const char*)W2T(pItemAttr[i].szItemID));
 				}
 
 				ar = pItemAttr[i].dwAccessRights & OPC_WRITEABLE;
@@ -2794,7 +2792,7 @@ int Opc_client_com_DriverThread::AddItems()
 				{
 					//printf(" - Writable");
 					IT_COMMENT(" - Writable");
-					//Opc_client_com_DriverThread::ShowMessage(S_OK, "Writable",(const char*)W2T(pItemAttr[i].szItemID));
+					//Opc_client_da_DriverThread::ShowMessage(S_OK, "Writable",(const char*)W2T(pItemAttr[i].szItemID));
 				}
 				
 				//printf("\n");
@@ -2845,7 +2843,7 @@ int Opc_client_com_DriverThread::AddItems()
 	return(0);
 }
 
-void Opc_client_com_DriverThread::ShowError(HRESULT hr, LPCSTR pszError)
+void Opc_client_da_DriverThread::ShowError(HRESULT hr, LPCSTR pszError)
 {
 	LPWSTR pwszError = NULL;
 
@@ -2868,9 +2866,9 @@ void Opc_client_com_DriverThread::ShowError(HRESULT hr, LPCSTR pszError)
 	}
 }
 
-void Opc_client_com_DriverThread::ShowMessage(HRESULT hr, LPCSTR pszError, const char* name)
+void Opc_client_da_DriverThread::ShowMessage(HRESULT hr, LPCSTR pszError, const char* name)
 {
-	//if(Opc_client_com_DriverThread::mandare_eventi)
+	//if(Opc_client_da_DriverThread::mandare_eventi)
 	{	
 		LPWSTR pwszError = NULL;
 
@@ -2895,7 +2893,7 @@ void Opc_client_com_DriverThread::ShowMessage(HRESULT hr, LPCSTR pszError, const
 
 /*
 
-void Opc_client_com_DriverThread::StartErrorLog()
+void Opc_client_da_DriverThread::StartErrorLog()
 {
 	char opc_log_file[_MAX_PATH];
 		
@@ -2917,7 +2915,7 @@ void Opc_client_com_DriverThread::StartErrorLog()
 	}
 }
 
-void Opc_client_com_DriverThread::EndErrorLog()
+void Opc_client_da_DriverThread::EndErrorLog()
 {
 	if(g_stream)
 	{
@@ -2926,7 +2924,7 @@ void Opc_client_com_DriverThread::EndErrorLog()
 	}
 }
 
-LPCSTR Opc_client_com_DriverThread::GetDateTime()
+LPCSTR Opc_client_da_DriverThread::GetDateTime()
 {
 	static char sz[128];
 	char sz2[128];

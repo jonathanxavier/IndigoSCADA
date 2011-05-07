@@ -27,10 +27,10 @@
 #include "smplstat.h"
 #include "common.h"
 
-#ifdef OPC_CLIENT_AE_EXPORTS
-#define OPC_CLIENT_AEDRV __declspec(dllexport)
+#ifdef OPC_CLIENT_HDA_EXPORTS
+#define OPC_CLIENT_HDADRV __declspec(dllexport)
 #else
-#define OPC_CLIENT_AEDRV //__declspec(dllimport)
+#define OPC_CLIENT_HDADRV //__declspec(dllimport)
 #endif
 
 class Opc_client_hda_Instance;
@@ -55,7 +55,7 @@ struct InstanceCfg // friend to anyone
 };
 
 
-class OPC_CLIENT_AEDRV Opc_client_hda : public Driver // all this is private to this one file
+class OPC_CLIENT_HDADRV Opc_client_hda : public Driver // all this is private to this one file
 {
 	Q_OBJECT
 	public:

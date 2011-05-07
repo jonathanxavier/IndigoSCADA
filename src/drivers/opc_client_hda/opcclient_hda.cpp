@@ -37,7 +37,7 @@ CComModule _Module;
  #error minimum requirements: Visual C++ 5 w/SP3
 #endif
 
-#include "opc_hda.h"	/* The OPC custom interface defintions */
+#include "opchda.h"	/* The OPC custom interface defintions */
 #include "opccomn_i.c"
 #include "opccomn.h"
 #include "OpcEnum.h"
@@ -80,7 +80,7 @@ int Opc_client_hda_DriverThread::OpcStart()
 
 	TCHAR  ServerIPAddress[80];
 
-	strcpy(ServerIPAddress, ((Opc_client_ae_Instance*)Parent)->Cfg.OpcServerIPAddress);
+	strcpy(ServerIPAddress, ((Opc_client_hda_Instance*)Parent)->Cfg.OpcServerIPAddress);
 
 	if((strlen(ServerIPAddress) == 0))
 	{
@@ -145,9 +145,7 @@ int Opc_client_hda_DriverThread::OpcStart()
 
 	CATID Implist[1];
 
-	Implist[0] = __uuidof(CATID_OPCHDAServer10);
-
-	//CLSID catid =  __uuidof(CATID_OPCHDAServer10);
+	Implist[0] = IID_CATID_OPCHDAServer10;
 
 	IEnumCLSID *iEnum = NULL;
 
@@ -193,7 +191,7 @@ int Opc_client_hda_DriverThread::OpcStart()
 
 	TCHAR serverName[100];
 			
-	strcpy(serverName, ((Opc_client_ae_Instance*)Parent)->Cfg.OpcServerProgID);
+	strcpy(serverName, ((Opc_client_hda_Instance*)Parent)->Cfg.OpcServerProgID);
 			
 	if((strlen(serverName) == 0))
 	{
@@ -369,12 +367,12 @@ int Opc_client_hda_DriverThread::OpcStart()
 		g_pIOPCCommon->SetClientName(L"IndigoSCADA OPC HDA Client");
 	}
 
-	BOOL bActive;
-	DWORD dwBufferTime;
-	DWORD dwMaxSize;
-	DWORD hClientSubscription;
-	DWORD dwRevisedBufferTime;
-	DWORD dwRevisedMaxSize;
+//	BOOL bActive;
+//	DWORD dwBufferTime;
+//	DWORD dwMaxSize;
+//	DWORD hClientSubscription;
+//	DWORD dwRevisedBufferTime;
+//	DWORD dwRevisedMaxSize;
 
 	CComCOPCHistoricDASink   *m_pSink = NULL;
 	CComCOPCShutdownRequest  *m_pShutdown = NULL;
@@ -417,37 +415,37 @@ int Opc_client_hda_DriverThread::OpcStart()
 	//	return 1;
 	//}
 
-	printf("HDA server dwRevisedBufferTime = %d, dwRevisedMaxSize = %d\n", dwRevisedBufferTime, dwRevisedMaxSize);
+//	printf("HDA server dwRevisedBufferTime = %d, dwRevisedMaxSize = %d\n", dwRevisedBufferTime, dwRevisedMaxSize);
 
-	if(m_ISubMgt == NULL)
-	{
-		printf("CreateEventSubscription returned m_ISubMgt NULL\n");
-		return 1;
-	}
+//	if(m_ISubMgt == NULL)
+//	{
+//		printf("CreateEventSubscription returned m_ISubMgt NULL\n");
+//		return 1;
+//	}
 
-	printf("CreateEventSubscription Done\n");
+//	printf("CreateEventSubscription Done\n");
 	
 	// create advise
-	CComObject<COPCEventSink>::CreateInstance(&m_pSink);
-	m_dwCookie = 0xCDCDCDCD;
+//	CComObject<CComCOPCHistoricDASink>::CreateInstance(&m_pSink);
+//	m_dwCookie = 0xCDCDCDCD;
 
-	IUnknown* pUnk;
+//	IUnknown* pUnk;
 
-	hr = m_pSink->_InternalQueryInterface( __uuidof(IUnknown), (void**)&pUnk );
+//	hr = m_pSink->_InternalQueryInterface( __uuidof(IUnknown), (void**)&pUnk );
 
-	if(hr != S_OK)
-	{
-		printf("Failed m_pSink->_InternalQueryInterface\n");
-		return 1;
-	}
+//	if(hr != S_OK)
+//	{
+//		printf("Failed m_pSink->_InternalQueryInterface\n");
+//		return 1;
+//	}
 
-	hr = AtlAdvise(m_ISubMgt, pUnk, __uuidof(IOPCHDA_DataCallback), &m_dwCookie );
+	//hr = AtlAdvise(m_ISubMgt, pUnk, __uuidof(IOPCHDA_DataCallback), &m_dwCookie );
 
-	if(hr != S_OK)
-	{
-		printf("Failed AtlAdvise m_dwCookie\n");
-		return 1;
-	}
+	//if(hr != S_OK)
+	//{
+	//	printf("Failed AtlAdvise m_dwCookie\n");
+	//	return 1;
+	//}
 
 	//shutdown advise 
 	///////////////////////////////////////////////Shutdown/////////////////////////////
@@ -479,15 +477,15 @@ int Opc_client_hda_DriverThread::OpcStart()
 */
 	////////////////////////GetState and SetState/////////////////////////////////////////////////////////////
 
-	hr = m_ISubMgt->GetState(&bActive,&dwBufferTime,&dwMaxSize,&hClientSubscription);
+//	hr = m_ISubMgt->GetState(&bActive,&dwBufferTime,&dwMaxSize,&hClientSubscription);
 
-	if(hr != S_OK)
-	{
-		printf("Failed m_ISubMgt->GetState\n");
-		return 1;
-	}
+//	if(hr != S_OK)
+//	{
+//		printf("Failed m_ISubMgt->GetState\n");
+//		return 1;
+//	}
 
-	printf("Server state: bActive = %d, dwBufferTime = %d, dwMaxSize = %d, hClientSubscription = %d\n", bActive, dwBufferTime, dwMaxSize, hClientSubscription);
+//	printf("Server state: bActive = %d, dwBufferTime = %d, dwMaxSize = %d, hClientSubscription = %d\n", bActive, dwBufferTime, dwMaxSize, hClientSubscription);
 /*
 Here only for test, it works.
 
@@ -501,13 +499,13 @@ Here only for test, it works.
 */
 	///////////////////////Refresh//////////////////////////////////////////////////////////////
 
-	hr = m_ISubMgt->Refresh(m_dwCookie);
+//	hr = m_ISubMgt->Refresh(m_dwCookie);
 
-	if(hr != S_OK)
-	{
-		printf("Failed Refresh\n");
-		return 1;
-	}
+//	if(hr != S_OK)
+//	{
+//		printf("Failed Refresh\n");
+//		return 1;
+//	}
 
 	///////////////////////SetKeepAlive//////////////////////////////////////////////////////////////
 	
@@ -548,22 +546,22 @@ int Opc_client_hda_DriverThread::OpcStop()
 {
 	IT_IT("Opc_client_hda_DriverThread::OpcStop");
 
-	HRESULT hr;
+//	HRESULT hr;
 
-	if(m_ISubMgt != NULL)
-	{
-		if(m_dwCookie != 0xCDCDCDCD)
-		{
-			hr = AtlUnadvise(m_ISubMgt, __uuidof(IOPCHDA_DataCallback), m_dwCookie);
-			m_dwCookie = 0xCDCDCDCD;
-		}
-
-		if(m_dwShutdownCookie != 0xCDCDCDCD)
-		{
-			hr = AtlUnadvise(m_ISubMgt, __uuidof(IOPCShutdown), m_dwShutdownCookie);
-			m_dwShutdownCookie = 0xCDCDCDCD;
-		}
-	}
+//	if(m_ISubMgt != NULL)
+//	{
+//		if(m_dwCookie != 0xCDCDCDCD)
+//		{
+//			hr = AtlUnadvise(m_ISubMgt, __uuidof(IOPCHDA_DataCallback), m_dwCookie);
+//			m_dwCookie = 0xCDCDCDCD;
+//		}
+//
+//		if(m_dwShutdownCookie != 0xCDCDCDCD)
+//		{
+//			hr = AtlUnadvise(m_ISubMgt, __uuidof(IOPCShutdown), m_dwShutdownCookie);
+//			m_dwShutdownCookie = 0xCDCDCDCD;
+//		}
+//	}
 
 	// terminate server and it will clean up itself
 	if(g_pIOPCServer) while(g_pIOPCServer->Release()) ;
@@ -608,11 +606,12 @@ int Opc_client_hda_DriverThread::GetStatus(WORD *pwMav, WORD *pwMiv, WORD *pwB, 
 	*pwMiv = 0;
 	*pwB = 0;
 	*pszV = NULL;
-	OPCEVENTSERVERSTATUS *pStatus = NULL;
+	OPCHDA_SERVERSTATUS *pStatus = NULL;
 
 	if(g_pIOPCServer == NULL) return E_POINTER;
 
-	HRESULT hr = g_pIOPCServer->GetStatus(&pStatus);
+	/*
+	HRESULT hr = g_pIOPCServer->GetHistorianStatus(&pStatus);
 
 	if(FAILED(hr) || (pStatus == NULL) )
 	{
@@ -626,6 +625,7 @@ int Opc_client_hda_DriverThread::GetStatus(WORD *pwMav, WORD *pwMiv, WORD *pwB, 
 	*pwB = pStatus->wBuildNumber;
 	*pszV = pStatus->szVendorInfo;
 	::CoTaskMemFree(pStatus);
+	*/
 
 	return 0;
 }
