@@ -1,0 +1,150 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: opc_client_da - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPC2.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe .\opc_client_daInputData.h -o .\moc_opc_client_daInputData.cpp
+]
+Creating command line "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPC2.bat"
+Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPC3.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe .\opc_client_daInput.h -o .\moc_opc_client_daInput.cpp
+]
+Creating command line "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPC3.bat"
+Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPC4.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe .\opc_client_daConfigurationData.h -o .\moc_opc_client_daConfigurationData.cpp
+]
+Creating command line "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPC4.bat"
+Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPC5.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe .\opc_client_daConfiguration.h -o .\moc_opc_client_daConfiguration.cpp
+]
+Creating command line "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPC5.bat"
+Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPC6.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe .\opc_client_daCommandData.h -o .\moc_opc_client_daCommandData.cpp
+]
+Creating command line "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPC6.bat"
+Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPC7.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe .\opc_client_daCommand.h -o .\moc_opc_client_daCommand.cpp
+]
+Creating command line "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPC7.bat"
+Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPC8.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe .\opc_client_da_instance.h -o .\moc_opc_client_da_instance.cpp
+]
+Creating command line "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPC8.bat"
+Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPC9.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe .\opc_client_da.h -o .\moc_opc_client_da.cpp
+]
+Creating command line "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPC9.bat"
+Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPCA.tmp" with contents
+[
+/nologo /MD /W3 /GX /O2 /I "." /I "G:\qt\3.1.2\include" /I "G:\qt\3.1.2\mkspecs\win32-msvc" /I "..\..\gigabase" /I "..\..\common" /I ".." /I "..\..\database" /I "..\..\ui\widgets" /I "..\..\trace" /I "..\..\utilities" /I "..\..\fifo" /I "..\..\common\libds-2.2" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_USRDLL" /D "OPC_CLIENT_DA_EXPORTS" /D "USING_GARRET" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_H_CPP" /D "_WIN32_DCOM" /Fo"Release/" /Fd"Release/" /FD /c 
+"G:\scada\src\drivers\opc_client_da\moc_opc_client_da.cpp"
+"G:\scada\src\drivers\opc_client_da\moc_opc_client_da_instance.cpp"
+"G:\scada\src\drivers\opc_client_da\moc_opc_client_daCommand.cpp"
+"G:\scada\src\drivers\opc_client_da\moc_opc_client_daCommandData.cpp"
+"G:\scada\src\drivers\opc_client_da\moc_opc_client_daConfiguration.cpp"
+"G:\scada\src\drivers\opc_client_da\moc_opc_client_daConfigurationData.cpp"
+"G:\scada\src\drivers\opc_client_da\moc_opc_client_daInput.cpp"
+"G:\scada\src\drivers\opc_client_da\moc_opc_client_daInputData.cpp"
+"G:\scada\src\drivers\opc_client_da\opc_client_da.cpp"
+"G:\scada\src\drivers\opc_client_da\opc_client_da_instance.cpp"
+"G:\scada\src\drivers\opc_client_da\opc_client_daCommand.cpp"
+"G:\scada\src\drivers\opc_client_da\opc_client_daCommandData.cpp"
+"G:\scada\src\drivers\opc_client_da\opc_client_daConfiguration.cpp"
+"G:\scada\src\drivers\opc_client_da\opc_client_daConfigurationData.cpp"
+"G:\scada\src\drivers\opc_client_da\opc_client_dadriverthread.cpp"
+"G:\scada\src\drivers\opc_client_da\opc_client_daInput.cpp"
+"G:\scada\src\drivers\opc_client_da\opc_client_daInputData.cpp"
+"G:\scada\src\drivers\opc_client_da\opccomn_i.c"
+"G:\scada\src\drivers\opc_client_da\Opcda_i.c"
+"G:\scada\src\drivers\opc_client_da\OpcEnum_i.c"
+]
+Creating command line "cl.exe @C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPCA.tmp" 
+MOCing opc_client_daInputData.h...
+MOCing opc_client_daInput.h...
+MOCing opc_client_daConfigurationData.h...
+MOCing opc_client_daConfiguration.h...
+MOCing opc_client_daCommandData.h...
+MOCing opc_client_daCommand.h...
+MOCing opc_client_da_instance.h...
+MOCing opc_client_da.h...
+Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPCB.tmp" with contents
+[
+scada.lib utilities.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib shell32.lib uuid.lib WSOCK32.LIB snmpapi.lib qt-mt312.lib fifo.lib /nologo /dll /incremental:no /pdb:"Debug/opc_client_da.pdb" /debug /machine:I386 /out:"c:\scada\Drivers/opc_client_da.dll" /implib:"c:\scada\Drivers/opc_client_da.lib" /pdbtype:sept /libpath:"G:\qt\3.1.2\lib" /libpath:"c:\scada\lib" 
+.\Release\moc_opc_client_da.obj
+.\Release\moc_opc_client_da_instance.obj
+.\Release\moc_opc_client_daCommand.obj
+.\Release\moc_opc_client_daCommandData.obj
+.\Release\moc_opc_client_daConfiguration.obj
+.\Release\moc_opc_client_daConfigurationData.obj
+.\Release\moc_opc_client_daInput.obj
+.\Release\moc_opc_client_daInputData.obj
+.\Release\opc_client_da.obj
+.\Release\opc_client_da_instance.obj
+.\Release\opc_client_daCommand.obj
+.\Release\opc_client_daCommandData.obj
+.\Release\opc_client_daConfiguration.obj
+.\Release\opc_client_daConfigurationData.obj
+.\Release\opc_client_dadriverthread.obj
+.\Release\opc_client_daInput.obj
+.\Release\opc_client_daInputData.obj
+.\Release\opccomn_i.obj
+.\Release\Opcda_i.obj
+.\Release\OpcEnum_i.obj
+]
+Creating command line "link.exe @C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPCB.tmp"
+<h3>Output Window</h3>
+Compiling...
+moc_opc_client_da.cpp
+moc_opc_client_da_instance.cpp
+moc_opc_client_daCommand.cpp
+moc_opc_client_daCommandData.cpp
+moc_opc_client_daConfiguration.cpp
+moc_opc_client_daConfigurationData.cpp
+moc_opc_client_daInput.cpp
+moc_opc_client_daInputData.cpp
+opc_client_da.cpp
+opc_client_da_instance.cpp
+opc_client_daCommand.cpp
+opc_client_daCommandData.cpp
+opc_client_daConfiguration.cpp
+opc_client_daConfigurationData.cpp
+opc_client_dadriverthread.cpp
+opc_client_daInput.cpp
+opc_client_daInputData.cpp
+Generating Code...
+Compiling...
+opccomn_i.c
+Opcda_i.c
+OpcEnum_i.c
+Generating Code...
+Linking...
+LINK : fatal error LNK1181: cannot open input file "scada.lib"
+Error executing link.exe.
+
+
+
+<h3>Results</h3>
+opc_client_da.dll - 1 error(s), 0 warning(s)
+</pre>
+</body>
+</html>
