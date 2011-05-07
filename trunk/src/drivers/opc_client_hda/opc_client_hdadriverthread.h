@@ -29,7 +29,7 @@
 #include <windows.h>
 #include <conio.h>
 #include <atlbase.h>
-#include "opc_hda.h"	/* The OPC custom interface defintions */
+#include "opchda.h"	/* The OPC custom interface defintions */
 #include "opccomn.h"
 ////////////////////////////////////
 #include "general_defines.h"
@@ -67,16 +67,16 @@ class OPC_CLIENT_HDADRV Opc_client_hda_DriverThread : public DriverThread
 
 		g_pIOPCCommon = NULL;
 		g_pIGroupUnknown = NULL;
-		g_pIOPCSubscriptionMgt = NULL;
+//		g_pIOPCSubscriptionMgt = NULL;
 		g_iCatInfo = NULL;
-		g_iOpcAreaBrowser = NULL;
+//		g_iOpcAreaBrowser = NULL;
 
 		StaticParent = Parent;
 		StaticThis = this;
 
 		fifo_control_direction = ((Opc_client_hda_Instance*)Parent)->fifo_control_direction;
 
-		m_ISubMgt = NULL;
+//		m_ISubMgt = NULL;
 	};
 
 	~Opc_client_hda_DriverThread()
@@ -96,7 +96,7 @@ class OPC_CLIENT_HDADRV Opc_client_hda_DriverThread : public DriverThread
 	static DWORD g_dwWriteTransID;
 	//static FILE *g_stream; // file log handle
 	OPCHANDLE g_hClientGroup;
-	static IOPCEventServer *g_pIOPCServer;
+	static IOPCHDA_Server *g_pIOPCServer;
 
 	/////////////comandi/////////////////////////////////
 	static fifo_h fifo_control_direction; //fifo in control direction: SCADA-------------> RTU
@@ -106,15 +106,15 @@ class OPC_CLIENT_HDADRV Opc_client_hda_DriverThread : public DriverThread
 
 	IOPCCommon *g_pIOPCCommon;
 	IUnknown *g_pIGroupUnknown;
-	IOPCEventSubscriptionMgt *g_pIOPCSubscriptionMgt;
+//	IOPCEventSubscriptionMgt *g_pIOPCSubscriptionMgt;
 	IOPCServerList *g_iCatInfo;
-	IOPCEventAreaBrowser *g_iOpcAreaBrowser;
+//	IOPCEventAreaBrowser *g_iOpcAreaBrowser;
 
 	static struct structItem* Item;
 
 	////////begin HDA specific variables///////////////////////////////////////////////////
 	DWORD m_dwCookie, m_dwShutdownCookie;
-	IOPCEventSubscriptionMgt* m_ISubMgt;
+//	IOPCEventSubscriptionMgt* m_ISubMgt;
 	////////end HDA specific variables///////////////////////////////////////////////////
 
 	int OpcStart();

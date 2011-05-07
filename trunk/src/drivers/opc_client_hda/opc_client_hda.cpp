@@ -286,8 +286,8 @@ void Opc_client_hda::QueryResponse (QObject *p, const QString &, int id, QObject
 extern "C"
 { 
 	#ifdef WIN32
-	OPC_CLIENT_AEDRV Driver *  _cdecl _GetDriverEntry(QObject *parent); 
-	OPC_CLIENT_AEDRV void _cdecl _Unload();
+	OPC_CLIENT_HDADRV Driver *  _cdecl _GetDriverEntry(QObject *parent); 
+	OPC_CLIENT_HDADRV void _cdecl _Unload();
 	#endif
 	Driver *  _cdecl  _GetDriverEntry(QObject *parent) 
 	{

@@ -132,10 +132,10 @@ class OPC_CLIENT_DADRV Opc_client_da_DriverThread : public DriverThread
 
 	int local_server;
 
-	int OpcStart();
-	int OpcStop();
+	int OpcStart(void);
+	int OpcStop(void);
 	int GetStatus(WORD *pwMav, WORD *pwMiv, WORD *pwB, LPWSTR *pswzV);
-	int AddItems();
+	int AddItems(void);
 	void SyncRead(bool bFlag);
 	int AsyncRead(bool bFlag);
 	int AsyncUpdate();
@@ -146,7 +146,7 @@ class OPC_CLIENT_DADRV Opc_client_da_DriverThread : public DriverThread
 	static LPCSTR GetDateTime();
 	bool Version2();
 	int Async2Read(bool bFlag);
-	int Async2Update();
+	int Async2Update(void);
 	static void SendEvent(const OPCITEMHEADER1* h, VARIANT *pValue,const FILETIME*);
 	static void SendEvent2(VARIANT *pValue, const FILETIME* ft, DWORD pwQualities, OPCHANDLE phClientItem);
 	static DriverInstance *StaticParent;
