@@ -1,5 +1,7 @@
 IndigoSCADA contributors
 
 We thank authors of the third party libraries (EiC, fastdb, gigabase)
-who made possible the startup of IndigoSCADA development.
+who made possible the IndigoSCADA development.
 
+Open source contributors:
+We'd like to write your name here

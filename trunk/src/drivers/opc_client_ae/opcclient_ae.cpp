@@ -242,7 +242,7 @@ int Opc_client_ae_DriverThread::OpcStart()
 		Opc_client_ae_DriverThread::ShowMessage(hr, "", show_msg);			
 
 		LocalFree(lpMsgBuf);
-		
+
 		return 1;
 	}
 	else

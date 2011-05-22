@@ -869,6 +869,11 @@ signed __int64 Opc_client_da_DriverThread::Epoch_from_FILETIME(const FILETIME *f
 	
 	sec = mktime(&t);
 
+	if(sec < 0)
+	{
+		return 0;
+	}
+
 	epoch_in_millisec =  (signed __int64)sec;
 
 	epoch_in_millisec =  epoch_in_millisec*1000 + sysTime.wMilliseconds;

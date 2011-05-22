@@ -34,7 +34,7 @@ int main(int argc, char **argv)
 		
 	if(!IsSingleInstance(""SYSTEM_NAME_DISPATCHER""))
 	{
-		IT_COMMENT("Another instance of the sql server is already running!");//error message
+		IT_COMMENT("Another instance of the dispatcher server is already running!");//error message
 		return stat;
 	}
 

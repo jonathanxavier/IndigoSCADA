@@ -1,4 +1,4 @@
-IndigoSCADA list of TO DO on 03-05-2011
+IndigoSCADA list of TO DO on 22-05-2011
 
 - Reimplement the GUI interface in general and in particular the HMI interface.
   Up to now IndigoSCADA does not support drag and drop for HMI widgets,
@@ -12,7 +12,7 @@ IndigoSCADA list of TO DO on 03-05-2011
 
 - Porting to current Linux distributions
 
-- Porting to Symbian
+- Porting to Symbian(?)
 
 - Upgrade the realtime and historical databases to current versions
 
@@ -20,6 +20,9 @@ IndigoSCADA list of TO DO on 03-05-2011
 
 - Translate user interface, contribution needed
 
-- Remove dependecy on STL std::map, so looking for a stable implemention of AVL trees
-
+- Remove dependecy on STL std::map, so looking for a stable implemention of red-black trees
+  (we plan to use kazlib or libds-2.2)
+  kazlib is already used as an efficient alternative to the C++ map template in numerous places in the code base
+  of other projects
+  
 - Use CMake build system - http://www.cmake.org/ or qmake

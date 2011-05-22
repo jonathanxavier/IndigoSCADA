@@ -82,7 +82,6 @@ void epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch_in_millisec)
 
 void Opc_client_ae_DriverThread::post_val(SpValue &v, QString &name)
 {
-
 	#ifndef PROVE_TIPI
 	SpValue v(VALUE_TAG, &value);
 	#endif
@@ -94,32 +93,155 @@ void Opc_client_ae_DriverThread::post_val(SpValue &v, QString &name)
 	if(StaticParent) QThread::postEvent(StaticParent,d); // parent must delete data SpValueList
 }
 
-void Opc_client_ae_DriverThread::SendEvent2(VARIANT *pValue, const FILETIME* ft, DWORD pwQualities, OPCHANDLE phClientItem)
+void Opc_client_ae_DriverThread::SendEvent2(ONEVENTSTRUCT* pEvent)
 {
 	IT_IT("Opc_client_ae_DriverThread::SendEvent2");
 	
 	QString name;
-
+	char event_source[100];
+	FILETIME* ftTime;
+	FILETIME* ftActiveTime;
+	
 	#ifndef PROVE_TIPI
 	double value;
 	#else
 	cp56time2a time;
+	cp56time2a active_time;
 	#endif
 	signed __int64 epoch_in_millisec;
 
+	char show_msg[250];
+
 	USES_CONVERSION;
 
-	IT_COMMENT1("pwQualities = %d", pwQualities);
-	IT_COMMENT1("phClientItem = %d", phClientItem);
+	IT_COMMENT1("pwQualities = %d", pEvent->wQuality);
 
-	epoch_in_millisec = Epoch_from_FILETIME(ft);
+	strcpy(event_source, W2T(pEvent->szSource));
+	//TODO: obtain name from lookup table, using event_source as index
+
+	ftTime = &(pEvent->ftTime);
+	epoch_in_millisec = Epoch_from_FILETIME(ftTime);
+	epoch_to_cp56time2a(&time, epoch_in_millisec);
+
+	ftActiveTime = &(pEvent->ftActiveTime);
+	epoch_in_millisec = Epoch_from_FILETIME(ftActiveTime);
+	epoch_to_cp56time2a(&active_time, epoch_in_millisec);
+
+	printf("%d, %d, %ls, h:%i m:%i s:%i ms:%i %02i-%02i-%02i iv %i su %i,\
+ %ls, %d, %d, %d, %ls, %ls, %d, %d, %d, h:%i m:%i s:%i ms:%i %02i-%02i-%02i iv %i su %i, %d, %d, %ls\n", 
+
+				pEvent->wChangeMask,
+				pEvent->wNewState,
+				pEvent->szSource,
+				//FILETIME pEvent->ftTime,
+				time.hour,
+				time.min,
+				time.msec/1000,
+				time.msec%1000,
+				time.mday,
+				time.month,
+				time.year,
+				time.iv,
+				time.su,
+				pEvent->szMessage,
+				pEvent->dwEventType,
+				pEvent->dwEventCategory,
+				pEvent->dwSeverity,
+				pEvent->szConditionName,
+				pEvent->szSubconditionName,
+				pEvent->wQuality,
+				pEvent->wReserved,
+				pEvent->bAckRequired,
+				//FILETIME pEvent->ftActiveTime,
+				active_time.hour,
+				active_time.min,
+				active_time.msec/1000,
+				active_time.msec%1000,
+				active_time.mday,
+				active_time.month,
+				active_time.year,
+				active_time.iv,
+				active_time.su,
+				pEvent->dwCookie,
+				pEvent->dwNumEventAttrs,
+				//[size_is] VARIANT *pEventAttributes,
+				pEvent->szActorID);
+
+				sprintf(show_msg, "%d, %d, %ls, h:%i m:%i s:%i ms:%i %02i-%02i-%02i iv %i su %i,\
+ %ls, %d, %d, %d, %ls, %ls, %d, %d, %d, h:%i m:%i s:%i ms:%i %02i-%02i-%02i iv %i su %i, %d, %d, %ls", 
+				pEvent->wChangeMask,
+				pEvent->wNewState,
+				pEvent->szSource,
+				//FILETIME pEvent->ftTime,
+				time.hour,
+				time.min,
+				time.msec/1000,
+				time.msec%1000,
+				time.mday,
+				time.month,
+				time.year,
+				time.iv,
+				time.su,
+				pEvent->szMessage,
+				pEvent->dwEventType,
+				pEvent->dwEventCategory,
+				pEvent->dwSeverity,
+				pEvent->szConditionName,
+				pEvent->szSubconditionName,
+				pEvent->wQuality,
+				pEvent->wReserved,
+				pEvent->bAckRequired,
+				//FILETIME pEvent->ftActiveTime,
+				active_time.hour,
+				active_time.min,
+				active_time.msec/1000,
+				active_time.msec%1000,
+				active_time.mday,
+				active_time.month,
+				active_time.year,
+				active_time.iv,
+				active_time.su,
+				pEvent->dwCookie,
+				pEvent->dwNumEventAttrs,
+				//[size_is] VARIANT *pEventAttributes,
+				pEvent->szActorID);
+
+				ShowMessage(S_OK, "", show_msg);
+
+/*
+	fprintf(stderr,"Event time: h:%i m:%i s:%i ms:%i %02i-%02i-%02i, iv %i, su %i\n",
+					time.hour,
+					time.min,
+					time.msec/1000,
+					time.msec%1000,
+					time.mday,
+					time.month,
+					time.year,
+					time.iv,
+					time.su);
+	fflush(stderr);
+	
+	fprintf(stderr,"Event active time: h:%i m:%i s:%i ms:%i %02i-%02i-%02i, iv %i, su %i\n",
+					active_time.hour,
+					active_time.min,
+					active_time.msec/1000,
+					active_time.msec%1000,
+					active_time.mday,
+					active_time.month,
+					active_time.year,
+					active_time.iv,
+					active_time.su);
+	fflush(stderr);
+*/
+
 	
 	//if(Opc_client_ae_DriverThread::mandare_eventi)  //27-10-09
 	{
 		//ItemID = QString((const char*)W2T(Item[phClientItem - 1].wszName));
 
-		name = QString(Item[phClientItem - 1].spname);
+		//name = QString(Item[phClientItem - 1].spname);
 
+		/*
 		switch(V_VT(pValue))
 		{
 			#ifndef PROVE_TIPI
@@ -369,71 +491,12 @@ void Opc_client_ae_DriverThread::SendEvent2(VARIANT *pValue, const FILETIME* ft,
 			{
 				printf("Not supported with CV++ 6.0");
 				IT_COMMENT("Not supported with CV++ 6.0");
-				/*
-				is_type156 var;
-
-				memset(&var, 0x00, sizeof(is_type156));
-
-				var.mv = V_I8(pValue);
-
-				if(pwQualities != OPC_QUALITY_GOOD)
-				{
-					printf("pwQualities = %d\n", pwQualities);
-					var.iv = 1;
-				}
-				else
-				{
-					var.iv = 0;
-				}
-
-				//var.mv = pValue->llVal;
-
-				epoch_to_cp56time2a(&time, epoch_in_millisec);
-
-				var.time = time;
-
-				SpValue v(VALUE_TAG, &var, M_ME_TT_1);
-
-				post_val(v, name);
-				
-				IT_COMMENT1("Value = %ld", pValue->llVal);
-				*/
-				
 			}
 			break;
 			case VT_UI8:
 			{
 				printf("Not supported with CV++ 6.0");
 				IT_COMMENT("Not supported with CV++ 6.0");
-				/*
-				is_type155 var;
-
-				memset(&var, 0x00, sizeof(is_type155));
-
-				var.mv = V_UI8(pValue);
-
-  				if(pwQualities != OPC_QUALITY_GOOD)
-				{
-					printf("pwQualities = %d\n", pwQualities);
-					var.iv = 1;
-				}
-				else
-				{
-					var.iv = 0;
-				}
-
-				//var.mv = pValue->ullVal;
-
-				epoch_to_cp56time2a(&time, epoch_in_millisec);
-
-				var.time = time;
-
-				SpValue v(VALUE_TAG, &var, M_ME_TS_1);
-
-				post_val(v, name);
-				
-				IT_COMMENT1("Value = %d", pValue->ullVal);
-				*/
 			}
 			break;
 			case VT_R4:
@@ -587,88 +650,6 @@ void Opc_client_ae_DriverThread::SendEvent2(VARIANT *pValue, const FILETIME* ft,
 
 			}
 			break;
-			/*
-			case VT_VARIANT:
-			{					
-
-			}
-			break;
-			case VT_ARRAY | VT_I1:
-			{	
-				
-			}
-			break;
-			case VT_ARRAY | VT_UI1:
-			{	
-				
-			}
-			break;
-			case VT_ARRAY | VT_I2:
-			{	
-				
-			}
-			break;
-			case VT_ARRAY | VT_UI2:
-			{
-				
-			}
-			break;
-			case VT_ARRAY | VT_I4:
-			{
-				
-			}
-			break;
-			case VT_ARRAY | VT_UI4:
-			{
-				
-			}
-			break;
-			case VT_ARRAY | VT_I8:
-			{
-				
-			}
-			break;
-			case VT_ARRAY | VT_UI8:
-			{
-				
-			}
-			break;
-			case VT_ARRAY | VT_R4:
-			{
-				
-			}
-			break;
-			case VT_ARRAY | VT_R8:
-			{
-				
-			}
-			break;
-			case VT_ARRAY | VT_CY:
-			{
-				
-			}
-			break;
-			case VT_ARRAY | VT_BOOL:
-			{
-				
-			}
-			break;
-			case VT_ARRAY | VT_DATE:
-			{
-				
-			}
-			break;
-			case VT_ARRAY | VT_BSTR:
-			{
-				
-			}
-			break;
-			case VT_ARRAY | VT_VARIANT:
-			{
-				
-			}
-			break;
-			*/
 			default:
 			{
 				IT_COMMENT1("V_VT(pValue) %d not supported", V_VT(pValue));
@@ -718,6 +699,7 @@ void Opc_client_ae_DriverThread::SendEvent2(VARIANT *pValue, const FILETIME* ft,
 
 			#endif //#ifdef PROVE_TIPI
 		}
+		*/
 	}
 }
 
@@ -767,6 +749,11 @@ signed __int64 Opc_client_ae_DriverThread::Epoch_from_FILETIME(const FILETIME *f
 	t.tm_isdst = -1; //to force mktime to check for dst
 	
 	sec = mktime(&t);
+
+	if(sec < 0)
+	{
+		return 0;
+	}
 
 	epoch_in_millisec =  (signed __int64)sec;
 
