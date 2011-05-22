@@ -34,7 +34,7 @@ int main(int argc, char **argv)
 		
 	if(!IsSingleInstance(""SYSTEM_NAME_HISTOR_SERVER""))
 	{
-		IT_COMMENT("Another instance of the Real time sql server is already running!");//error message
+		IT_COMMENT("Another instance of the Historical sql server is already running!");//error message
 		return stat;
 	}
 	// 

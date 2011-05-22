@@ -51,7 +51,9 @@ END_COM_MAP()
 
 		//IMPORTANT NOTE: no blocking function may be called here
 
-		char show_msg[150];
+		//char show_msg[150];
+
+		printf("hClientSubscription = %d, bRefresh = %d bLastRefresh = %d dwCount = %d\n", hClientSubscription, bRefresh, bLastRefresh, dwCount);
 
 		for(DWORD i = 0; i < dwCount; i++)
 		{
@@ -62,8 +64,7 @@ END_COM_MAP()
 									pEvents[i].szSubconditionName);
 			*/
 
-			printf("hClientSubscription = %d, bRefresh = %d bLastRefresh = %d dwCount = %d\n", hClientSubscription, bRefresh, bLastRefresh, dwCount);
-
+			/*
 			printf("%d, %d, %ls, %ls, %d, %d, %d, %ls, %ls, %d, %d, %d, %d, %d, %ls\n", 
 
 				pEvents[i].wChangeMask,
@@ -107,6 +108,11 @@ END_COM_MAP()
 				pEvents[i].szActorID);
 
 				Opc_client_ae_DriverThread::ShowMessage(S_OK, "", show_msg);
+			*/
+
+				//const FILETIME* ftTime = reinterpret_cast<const FILETIME *>(&(pEvents[i].ftTime));
+
+				Opc_client_ae_DriverThread::SendEvent2(&pEvents[i]);
 		}
 		
 		return S_OK;

@@ -37,7 +37,6 @@
 #include "IndentedTrace.h"
 #include "fifo.h"
 #include "fifoc.h"
-//#include "opcaeclasses.h"
 
 struct structItem
 {
@@ -129,7 +128,7 @@ class OPC_CLIENT_AEDRV Opc_client_ae_DriverThread : public DriverThread
 	static LPCSTR GetDateTime();
 //	bool Version2();
 	int Async2Read(bool bFlag);
-	static void SendEvent2(VARIANT *pValue, const FILETIME* ft, DWORD pwQualities, OPCHANDLE phClientItem);
+	static void SendEvent2(ONEVENTSTRUCT* pEvent);
 	static DriverInstance *StaticParent;
 	static DriverThread *StaticThis;
 	static signed __int64 Epoch_from_FILETIME(const FILETIME *fileTime);
