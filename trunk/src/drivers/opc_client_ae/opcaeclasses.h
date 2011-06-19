@@ -53,7 +53,12 @@ END_COM_MAP()
 
 		//char show_msg[150];
 
-		printf("hClientSubscription = %d, bRefresh = %d bLastRefresh = %d dwCount = %d\n", hClientSubscription, bRefresh, bLastRefresh, dwCount);
+		//printf("hClientSubscription = %d, bRefresh = %d bLastRefresh = %d dwCount = %d\n", hClientSubscription, bRefresh, bLastRefresh, dwCount);
+
+		if(dwCount == 0)
+		{
+			printf("A&E server keep-alive notification\n");
+		}
 
 		for(DWORD i = 0; i < dwCount; i++)
 		{
