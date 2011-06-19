@@ -77,6 +77,7 @@ class OPC_CLIENT_AEDRV Opc_client_ae_DriverThread : public DriverThread
 		fifo_control_direction = ((Opc_client_ae_Instance*)Parent)->fifo_control_direction;
 
 		m_ISubMgt = NULL;
+		m_ISubMgt2 = NULL;
 	};
 
 	~Opc_client_ae_DriverThread()
@@ -115,6 +116,7 @@ class OPC_CLIENT_AEDRV Opc_client_ae_DriverThread : public DriverThread
 	////////begin A&E specific variables///////////////////////////////////////////////////
 	DWORD m_dwCookie, m_dwShutdownCookie;
 	IOPCEventSubscriptionMgt* m_ISubMgt;
+	IOPCEventSubscriptionMgt2* m_ISubMgt2;
 	////////end A&E specific variables///////////////////////////////////////////////////
 
 	int OpcStart();

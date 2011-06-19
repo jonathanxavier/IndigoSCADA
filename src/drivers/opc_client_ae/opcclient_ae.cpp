@@ -399,13 +399,13 @@ int Opc_client_ae_DriverThread::OpcStart()
 
 	hClientSubscription = 1243272;
 	//dwBufferTime = 10000; //this is a parameter
-	dwBufferTime = 0; //this is a parameter
+	dwBufferTime = 100; //this is a parameter
 
 	hr = g_pIOPCServer->CreateEventSubscription(bActive,
 						dwBufferTime,
 						dwMaxSize,
 						hClientSubscription,
-						IID_IOPCEventSubscriptionMgt,
+						IID_IOPCEventSubscriptionMgt2,
 					   (IUnknown **)&m_ISubMgt,
 					   &dwRevisedBufferTime,
 					   &dwRevisedMaxSize);
@@ -418,9 +418,9 @@ int Opc_client_ae_DriverThread::OpcStart()
 
 	printf("A&E server dwRevisedBufferTime = %d, dwRevisedMaxSize = %d\n", dwRevisedBufferTime, dwRevisedMaxSize);
 
-	if(m_ISubMgt == NULL)
+	if(m_ISubMgt2 == NULL)
 	{
-		printf("CreateEventSubscription returned m_ISubMgt NULL\n");
+		printf("CreateEventSubscription returned m_ISubMgt2 NULL\n");
 		return 1;
 	}
 
@@ -440,7 +440,7 @@ int Opc_client_ae_DriverThread::OpcStart()
 		return 1;
 	}
 
-	hr = AtlAdvise(m_ISubMgt, pUnk, __uuidof(IOPCEventSink), &m_dwCookie );
+	hr = AtlAdvise(m_ISubMgt2, pUnk, __uuidof(IOPCEventSink), &m_dwCookie );
 
 	if(hr != S_OK)
 	{
@@ -466,9 +466,9 @@ int Opc_client_ae_DriverThread::OpcStart()
 		return 1;
 	}
 
-	//hr = AtlAdvise(m_ISubMgt, m_pShutdown->GetUnknown(),__uuidof(IOPCShutdown), &m_dwShutdownCookie);
+	//hr = AtlAdvise(m_ISubMgt2, m_pShutdown->GetUnknown(),__uuidof(IOPCShutdown), &m_dwShutdownCookie);
 
-	hr = AtlAdvise(m_ISubMgt, pUnk, __uuidof(IOPCShutdown), &m_dwShutdownCookie);
+	hr = AtlAdvise(m_ISubMgt2, pUnk, __uuidof(IOPCShutdown), &m_dwShutdownCookie);
 	
 	if(hr != S_OK)
 	{
@@ -478,11 +478,11 @@ int Opc_client_ae_DriverThread::OpcStart()
 */
 	////////////////////////GetState and SetState/////////////////////////////////////////////////////////////
 
-	hr = m_ISubMgt->GetState(&bActive,&dwBufferTime,&dwMaxSize,&hClientSubscription);
+	hr = m_ISubMgt2->GetState(&bActive,&dwBufferTime,&dwMaxSize,&hClientSubscription);
 
 	if(hr != S_OK)
 	{
-		printf("Failed m_ISubMgt->GetState\n");
+		printf("Failed m_ISubMgt2->GetState\n");
 		return 1;
 	}
 
@@ -490,17 +490,17 @@ int Opc_client_ae_DriverThread::OpcStart()
 /*
 Here only for test, it works.
 
-	hr = m_ISubMgt->SetState(&bActive, &dwBufferTime, &dwMaxSize, hClientSubscription, &dwRevisedBufferTime, &dwRevisedMaxSize);
+	hr = m_ISubMgt2->SetState(&bActive, &dwBufferTime, &dwMaxSize, hClientSubscription, &dwRevisedBufferTime, &dwRevisedMaxSize);
 
 	if(hr != S_OK)
 	{
-		printf("Failed m_ISubMgt->SetState\n");
+		printf("Failed m_ISubMgt2->SetState\n");
 		return 1;
 	}
 */
 	///////////////////////Refresh//////////////////////////////////////////////////////////////
 
-	hr = m_ISubMgt->Refresh(m_dwCookie);
+	hr = m_ISubMgt2->Refresh(m_dwCookie);
 
 	if(hr != S_OK)
 	{
@@ -510,35 +510,17 @@ Here only for test, it works.
 
 	///////////////////////SetKeepAlive//////////////////////////////////////////////////////////////
 	
-	//IOPCEventSubscriptionMgt2Ptr ISubMgt2 = m_ISubMgt;
+	DWORD dwRevisedKeepAliveTime = 0;
+	// set the keep-alive to 3X the dwRevisedBufferTime
+	hr = m_ISubMgt2->SetKeepAlive(3 * dwRevisedBufferTime, &dwRevisedKeepAliveTime);
 
-/*
-//does not work...
-
-	IOPCEventSubscriptionMgt2* ISubMgt2 = (struct IOPCEventSubscriptionMgt2*)m_ISubMgt;
-	
-	if(ISubMgt2 != NULL)
+	if(FAILDED(hr))
 	{
-		DWORD dwRevisedKeepAliveTime = 0;
-		// set the keep-alive to 3X the dwRevisedBufferTime
-		hr = ISubMgt2->SetKeepAlive(3 * dwRevisedBufferTime, &dwRevisedKeepAliveTime);
-
-		printf("dwRevisedKeepAliveTime = %d\n", dwRevisedKeepAliveTime);
-	}
-*/
-
-/*
-	IOPCEventSubscriptionMgt2* ISubMgt2;
-
-	hr = g_pIOPCServer->QueryInterface(IID_IOPCEventSubscriptionMgt2, (void**)&ISubMgt2);
-
-	if(FAILED(hr))
-	{
-		printf("OPC error:Failed to obtain IID_IOPCEventSubscriptionMgt2 interface %x\n",hr);
-		ShowError(hr,"Failed to obtain IID_IOPCEventSubscriptionMgt2 interface");
+		printf("Failed SetKeepAlive\n");
 		return 1;
 	}
-*/
+
+	printf("dwRevisedKeepAliveTime = %d\n", dwRevisedKeepAliveTime);
 
     return(0);
 }
@@ -549,17 +531,17 @@ int Opc_client_ae_DriverThread::OpcStop()
 
 	HRESULT hr;
 
-	if(m_ISubMgt != NULL)
+	if(m_ISubMgt2 != NULL)
 	{
 		if(m_dwCookie != 0xCDCDCDCD)
 		{
-			hr = AtlUnadvise(m_ISubMgt, __uuidof(IOPCEventSink), m_dwCookie);
+			hr = AtlUnadvise(m_ISubMgt2, __uuidof(IOPCEventSink), m_dwCookie);
 			m_dwCookie = 0xCDCDCDCD;
 		}
 
 		if(m_dwShutdownCookie != 0xCDCDCDCD)
 		{
-			hr = AtlUnadvise(m_ISubMgt, __uuidof(IOPCShutdown), m_dwShutdownCookie);
+			hr = AtlUnadvise(m_ISubMgt2, __uuidof(IOPCShutdown), m_dwShutdownCookie);
 			m_dwShutdownCookie = 0xCDCDCDCD;
 		}
 	}
