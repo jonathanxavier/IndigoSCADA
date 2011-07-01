@@ -1,0 +1,42 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: iec104driver - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\WINNT\TEMP\RSPF.tmp" with contents
+[
+scada.lib utilities.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib shell32.lib uuid.lib WSOCK32.LIB snmpapi.lib qt-mt312.lib fifo.lib /nologo /dll /incremental:no /pdb:"Debug/iec104driver.pdb" /debug /machine:I386 /out:"c:\scada\Drivers/iec104driver.dll" /implib:"c:\scada\Drivers/iec104driver.lib" /pdbtype:sept /libpath:"C:\Qt\3.1.2\lib" /libpath:"c:\scada\lib" 
+.\Release\iec104driver.obj
+.\Release\iec104driver_instance.obj
+.\Release\iec104driverCommand.obj
+.\Release\iec104driverCommandData.obj
+.\Release\iec104driverConfiguration.obj
+.\Release\iec104driverConfigurationData.obj
+.\Release\iec104driverInput.obj
+.\Release\iec104driverInputData.obj
+.\Release\moc_iec104driver.obj
+.\Release\moc_iec104driver_instance.obj
+.\Release\moc_iec104driverCommand.obj
+.\Release\moc_iec104driverCommandData.obj
+.\Release\moc_iec104driverConfiguration.obj
+.\Release\moc_iec104driverConfigurationData.obj
+.\Release\moc_iec104driverInput.obj
+.\Release\moc_iec104driverInputData.obj
+c:\scada\lib\scada.lib
+]
+Creating command line "link.exe @C:\WINNT\TEMP\RSPF.tmp"
+<h3>Output Window</h3>
+Linking...
+LINK : fatal error LNK1181: cannot open input file "scada.lib"
+Error executing link.exe.
+
+
+
+<h3>Results</h3>
+iec104driver.dll - 1 error(s), 0 warning(s)
+</pre>
+</body>
+</html>
