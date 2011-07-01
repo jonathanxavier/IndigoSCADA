@@ -107,6 +107,13 @@ typedef struct cp56time2a {
 	u_char		res4	:1;	
 } cp56time2a;
 
+
+/* CP16time2a timestamp*/
+typedef struct cp16time2a {
+	u_short		msec; /* milliseconds upto seconds */
+}cp16time2a;
+
+
 //////////////////////IEC types////////////////////////////////////////////////
 
 /* M_SP_NA_1 - single point information with quality description */
@@ -145,7 +152,7 @@ typedef struct _iec_type7 {
 
 /* M_ME_NA_1 - normalized measured value */
 typedef struct _iec_type9 {
-	u_short		mv;	/* normalized value */
+	u_short		mv;	/* normalized value: from 32767 to -32768 */
 	u_char		ov	:1; /* overflow/no overflow */
 	u_char		res	:3;
 	u_char		bl	:1; /* blocked/not blocked */
@@ -156,7 +163,7 @@ typedef struct _iec_type9 {
 
 /* M_ME_NB_1 - scaled measured value */
 typedef struct _iec_type11 {
-	u_short		mv;	/* scaled value */
+	u_short		mv;	/* scaled value: from 32767 to -32768 */
 	u_char		ov	:1; /* overflow/no overflow */
 	u_char		res	:3;
 	u_char		bl	:1; /* blocked/not blocked */
@@ -176,6 +183,16 @@ typedef struct _iec_type13 {
 	u_char		iv	:1; /* valid/invalid */
 }iec_type13;
 
+/* M_IT_NA_1 - itegrated totals */
+typedef struct _iec_type15 {
+	int		count_read;	/* counter reading */ /*BCR = Binary counter reading, defined 7.2.6.9*/
+	u_char		sq	:5; /* sequence number */
+	u_char		cy	:1; /* carry: 0 = no counter overflow occurred / 1 = counter overflow occurred*/
+	u_char		ca	:1; /* 0 = counter was not adjusted / 1 = counter was adjusted */
+	u_char		iv	:1; /* 0 = valid/ 1 = invalid */
+}iec_type15;
+
+
 /* M_SP_TB_1 - single point information with quality description and time tag */
 typedef struct _iec_type30 {
 	u_char		sp	:1; /* single point information */
@@ -186,6 +203,17 @@ typedef struct _iec_type30 {
 	u_char		iv	:1; /* valid/invalid */
 	cp56time2a	time;
 }iec_type30;
+
+/* M_DP_TB_1 - double point information with quality description and time tag */
+typedef struct _iec_type31 {
+	u_char		dp	:2; /* double point information */
+	u_char		res	:2;
+	u_char		bl	:1; /* blocked/not blocked */
+	u_char		sb	:1; /* substituted/not substituted */
+	u_char		nt	:1; /* not topical/topical */
+	u_char		iv	:1; /* valid/invalid */
+	cp56time2a	time;
+}iec_type31;
 
 /* M_BO_TB_1 - state and change information bit string and time tag  */
 typedef struct _iec_type33 {
@@ -234,6 +262,150 @@ typedef struct _iec_type36 {
 	u_char		iv	:1; /* valid/invalid */
 	cp56time2a	time;
 }iec_type36;
+
+/* M_IT_TB_1 - Integrated totals with time tag */
+typedef struct _iec_type37 {
+	int		    counter; /*binary counter reading*/
+	u_char		seqn:5; /*sequence number*/
+	u_char		cy	:1; /*carry*/
+	u_char		ca	:1; /*counter was adjusted*/
+	u_char		iv	:1; /* valid/invalid */
+	cp56time2a	time;
+}iec_type37;
+
+/* C_SC_NA_1 - Single command */
+typedef struct _iec_type45 {
+	u_char		scs:1;//See 7.2.6.15 Qualifier of command
+	u_char		res:1;
+	u_char		qu:5; //See 7.2.6.26 Qualifier of command
+	u_char		se:1;//See 7.2.6.26 Qualifier of command
+}iec_type45;
+
+/* C_DC_NA_1 - Double command */
+typedef struct _iec_type46 {
+	u_char		dcs:2;//See 7.2.6.16 Qualifier of command
+	u_char		qu:5;//See 7.2.6.26 Qualifier of command
+	u_char		se:1;//See 7.2.6.26 Qualifier of command
+}iec_type46;
+
+/* C_BO_NA_1 - Bitstring of 32 bit*/
+typedef struct _iec_type51 {
+	struct iec_stcd	stcd;
+}iec_type51;
+
+/* C_SC_TA_1 - Single command with time tag*/
+typedef struct _iec_type58 {
+	u_char		scs:1;//See 7.2.6.15 Qualifier of command
+	u_char		res:1;
+	u_char		qu:5; //See 7.2.6.26 Qualifier of command
+	u_char		se:1; //See 7.2.6.26 Qualifier of command
+	cp56time2a	time; //contains the UTC time
+}iec_type58;
+
+/* C_BO_TA_1 - Bitstring of 32 bit command with time tag*/
+typedef struct _iec_type64 {
+	struct iec_stcd	stcd;
+	u_char chs;
+	cp56time2a	time; //contains the UTC time
+}iec_type64;
+
+/* M_EI_NA_1 - End of initialization*/
+typedef struct _iec_type70 {
+	u_char		coi_ui7:7; /*cause of initialisation*/
+	u_char		coi_bs1:1; /*cause of initialisation*/
+}iec_type70;
+
+/* C_IC_NA_1 - Interrogation command*/
+typedef struct _iec_type100 {
+	u_char		qoi; /*qualifier of interrogation*/
+}iec_type100;
+
+/* C_CS_NA_1 - Clock synchronisation command*/
+typedef struct _iec_type103 {
+	cp56time2a	time;
+}iec_type103;
+
+
+/* C_TS_NA_1 - Test command*/
+typedef struct _iec_type104 {
+	u_short fbp; /*fixed test pattern*/
+}iec_type104;
+
+/* C_TS_TA_1 - Test command with time tag*/
+typedef struct _iec_type107 {
+	u_short fbp; /*fixed test pattern*/
+	cp56time2a	time;
+}iec_type107;
+
+/* C_RP_NA_1 - Reset process command*/
+typedef struct _iec_type105 {
+	u_char		qrp; /*qualifier of reset process command*/
+}iec_type105;
+
+/* C_CD_NA_1 - Delay acquisition command*/
+typedef struct _iec_type106 {
+	cp16time2a	two_oct_time; /*two octect binary time cfr 7.2.6.20*/
+}iec_type106;
+
+/* F_FR_NA_1 - File ready*/
+typedef struct _iec_type120 {
+	u_short		nof; /*name of file cfr.7.2.6.33*/
+	u_int		lof:24; /*length of file cfr.7.2.6.35*/
+	u_int		frq_ui7:7; /*file ready qualifier cfr.7.2.6.28*/
+	u_int		frq_bs1:1; /*file ready qualifier cfr.7.2.6.28*/
+}iec_type120;
+
+/* F_SR_NA_1 - Section ready*/
+typedef struct _iec_type121 {
+	u_short		nof; /*name of file cfr.7.2.6.33*/
+	u_char		nos; /*name of section cfr.7.2.6.34*/
+	u_int		lof:24; /*length of file cfr.7.2.6.35*/
+	u_int		srq_ui7:7; /*section ready qualifier cfr.7.2.6.29*/
+	u_int		srq_bs1:1; /*section ready qualifier cfr.7.2.6.29*/
+}iec_type121;
+
+/* F_SC_NA_1 - Call directory, select file, call file, call section*/
+typedef struct _iec_type122 {
+	u_short		nof; /*name of file cfr.7.2.6.33*/
+	u_char		nos; /*name of section cfr.7.2.6.34*/
+	u_char		scq_ui4low:4; /*select and call qualifier cfr.7.2.6.30*/
+	u_char		scq_ui4high:4; /*select and call qualifier cfr.7.2.6.30*/
+}iec_type122;
+
+/* F_LS_NA_1 - Last section, last segment*/
+typedef struct _iec_type123 {
+	u_short		nof; /*name of file cfr.7.2.6.33*/
+	u_char		nos; /*name of section cfr.7.2.6.34*/
+	u_char		lsq; /*last section or segment qualifier cfr.7.2.6.31*/
+	u_char		chs; /*checksum cfr.7.2.6.37*/
+}iec_type123;
+
+/* F_AF_NA_1 - ACK file, ACK section*/
+typedef struct _iec_type124 {
+	u_short		nof; /*name of file cfr.7.2.6.33*/
+	u_char		nos; /*name of section cfr.7.2.6.34*/
+	u_char		afq_ui4low:4; /*ACK file or section qualifier cfr.7.2.6.32*/
+	u_char		afq_ui4high:4; /*ACK file or section qualifier cfr.7.2.6.32*/
+}iec_type124;
+
+
+/* F_SG_NA_1 - Segment*/
+typedef struct _iec_type125 {
+	u_short		nof; /*name of file cfr.7.2.6.33*/
+	u_char		nos; /*name of section cfr.7.2.6.34*/
+	u_char		los; /*Length of segment cfr.7.2.6.36*/
+}iec_type125;
+
+/* F_DR_TA_1 - Directory. E' paccata ! It is packed !*/
+typedef struct _iec_type126 {
+	u_short		nof; /*name of file or subdirectory cfr.7.2.6.33*/
+	u_int		lof:24; /*length of file cfr.7.2.6.35*/
+	u_int		sof_status:5; /*Status of file cfr.7.2.6.38*/
+	u_int		sof_lfd:1; /*last file of the directory cfr.7.2.6.38*/
+	u_int		sof_for:1; /*Name defines file or directory cfr.7.2.6.38*/
+	u_int		sof_fa:1; /*file active or waits cfr.7.2.6.38*/
+	cp56time2a	time; /*Creation time of the file*/
+}iec_type126;
 
 /////////////////////////IndigoSCADA types/////////////////////////////////////////
 
@@ -336,6 +508,7 @@ enum m_type
 	M_ME_NB_1 =		11,
 	M_ME_NC_1 =		13,
 	M_SP_TB_1 =		30,
+	M_DP_TB_1 =		31,
 	M_BO_TB_1 =		33,
 	M_ME_TD_1 =		34,
 	M_ME_TE_1 =		35,

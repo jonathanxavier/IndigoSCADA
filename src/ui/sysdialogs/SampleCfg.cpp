@@ -116,8 +116,8 @@ void SampleCfg::ShowConfig() // create the specific config
 			connect(this,SIGNAL(LoadConfig(const QString &)),pConfig,SLOT(Load(const QString &))); //
 			connect(this,SIGNAL(SaveConfig(const QString &)),pConfig,SLOT(Save(const QString &))); //
 			//
-			//QString cmd = "select IKEY,DVAL from PROPS where SKEY ='SAMPLEPROPS' and IKEY='"+Name->text()+"';"; //commented out on 02-12-09
-			QString cmd = "select NAME,PARAMS from TAGS where NAME ='"+ Name->text() +"';";
+			QString cmd = "select IKEY,DVAL from PROPS where SKEY ='SAMPLEPROPS' and IKEY='"+Name->text()+"';"; //commented out on 02-12-09
+			//QString cmd = "select NAME,PARAMS from TAGS where NAME ='"+ Name->text() +"';";
 			GetConfigureDb()->DoExec(this,cmd,tConfigLoad);
 			// ask for the configuration
 		}
@@ -466,7 +466,7 @@ void SampleCfg::QueryResponse (QObject *p, const QString &, int State, QObject*c
 		break;
 		case tConfigLoad:
 		{
-			if(Name->text() == GetConfigureDb()->GetString("NAME")) // may be several queued up
+			if(Name->text() == GetConfigureDb()->GetString("IKEY")) // may be several queued up
 			{
 				emit LoadConfig (Name->text()); // ask it to load - we pass in the obejct name
 				// it a given that the current configuration record is the property record
