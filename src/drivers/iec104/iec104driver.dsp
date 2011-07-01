@@ -26,7 +26,6 @@ CFG=iec104driver - Win32 Release
 # PROP Scc_ProjName ""
 # PROP Scc_LocalPath ""
 CPP=cl.exe
-F90=df.exe
 MTL=midl.exe
 RSC=rc.exe
 
