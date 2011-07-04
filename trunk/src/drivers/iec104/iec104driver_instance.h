@@ -1,7 +1,7 @@
 /*
  *                         IndigoSCADA
  *
- *   This software and documentation are Copyright 2002 to 2009 Enscada 
+ *   This software and documentation are Copyright 2002 to 2011 Enscada 
  *   Limited and its licensees. All rights reserved. See file:
  *
  *                     $HOME/LICENSE 
@@ -18,7 +18,7 @@
 #include "fifo.h"
 #include "fifoc.h"
 
-#define MAX_FIFO_SIZE 33554432UL//2^25 since 03-11-2010
+#define MAX_FIFO_SIZE 33554432UL//2^25
 
 /* Information object */
 struct iec_object {
@@ -70,14 +70,14 @@ struct iec_object {
 #define ITEMID_LENGTH 99
 
 //Record format of configuration database inside iec 104 master and slave
-//the collection of all records form a table, wich is the configuration database
+//the collection of all records form a table, which is the configuration database
 
 struct iec_item
 {
-	char opc_server_item_id[ITEMID_LENGTH]; //Item ID of opc server, i.e. Simulated Card.Simulated Node.Random.R8
-    u_char iec_type; //tipo di punto come configurato nell'OPC server
+	char opc_server_item_id[ITEMID_LENGTH]; //Item ID of opc server
+	u_char iec_type;
 	struct iec_object iec_obj;
-	DWORD hClient; //Index inside table che è UGUALE a hClient della tabella struct structItem<--------------INDEX, starting from 1
+	DWORD hClient; 
 	unsigned char cause; //Per distingure tra spontanee e general interrogation
 	u_int   msg_id; //ID of the message
 	u_int	checksum; //Checksum of the message
@@ -94,7 +94,8 @@ class IEC_104_DRIVERDRV Iec104driver_Instance : public DriverInstance
 	//
 	enum
 	{
-		tUnitProperties = 1,tList, tSamplePointProperties, tListUnits, tGetSamplePointName
+		tUnitProperties = 1,tList, tSamplePointProperties, tListUnits, 
+		tGetSamplePointName, tGetIOAfromSamplePointName
 	};
 	//
 	//
