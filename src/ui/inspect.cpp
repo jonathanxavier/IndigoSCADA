@@ -600,6 +600,11 @@ void InspectMenu(QWidget *parent, const QString &name, bool AckState)
 		{
 			m.insertItem(QPixmap((const char **)button),QObject::tr("Send command..."),5); // Send command
 		}
+
+		if(name.contains("IEC104", false) > 0)
+		{
+			m.insertItem(QPixmap((const char **)button),QObject::tr("Send command..."),6); // Send command
+		}
 	}
 	
 	if(GetUserDetails ().privs &  PRIVS_ACK_ALARMS)
@@ -694,16 +699,32 @@ void InspectMenu(QWidget *parent, const QString &name, bool AckState)
 			}
 		};
 		break;
-		case 5: // send command
+		case 5: // send command to OPC driver
+		{
+			//Send command trough dispatcher to monitor.exe
+			//In monitor.exe call the ::Command method of the drive of unit_type
+			//Note: dll drivers should be installed  on the client PC, where ist.exe is running
+			//in C:\scada\Drivers 
+
+			QString unit_type; // the current unit type
+			unit_type = "opc_client_da"; 
+			Driver *dp = FindDriver(unit_type);
+
+			if(dp)
+			{
+				dp->CommandDlg(parent, name);
+			}
+		};
+		break;
+		case 6: // send command to IEC 104 driver
 		{
 			//Send command trough dispatcher to monitor.exe
 			//In monitor. exe call the ::Command method of the drive of unit_type
-			//Vedi come viene fatto il restart monitor
-			//Attenzione: le dll dei driver devono essere installate
-			//anche sui client (dove gira ist.exe) nella C:\scada\Drivers 
+			//Note: dll drivers should be installed  on the client PC, where ist.exe is running
+			//in C:\scada\Drivers
 
 			QString unit_type; // the current unit type
-			unit_type = "opc_client_com"; 
+			unit_type = "iec104driver"; 
 			Driver *dp = FindDriver(unit_type);
 
 			if(dp)

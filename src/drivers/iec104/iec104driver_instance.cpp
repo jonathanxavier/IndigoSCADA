@@ -1,7 +1,7 @@
 /*
  *                         IndigoSCADA
  *
- *   This software and documentation are Copyright 2002 to 2009 Enscada 
+ *   This software and documentation are Copyright 2002 to 2011 Enscada 
  *   Limited and its licensees. All rights reserved. See file:
  *
  *                     $HOME/LICENSE 
@@ -195,11 +195,11 @@ void Iec104driver_Instance::QueryResponse(QObject *p, const QString &c, int id, 
 			if(GetConfigureDb()->GetNumberResults() > 0)
 			{
 				// 
-				QString s = UndoEscapeSQLText(GetConfigureDb()->GetString("IKEY"));
-				QTextIStream is(&s); // extract the values
+				QString SamplePointName = UndoEscapeSQLText(GetConfigureDb()->GetString("IKEY"));
+				//QTextIStream is(&s); // extract the values
 				//
-				QString SamplePointName;
-				is >> SamplePointName;
+				//QString SamplePointName;
+				//is >> SamplePointName;
 
 				double v = 0.0;
 				if(strlen((const char*)t.Data1) > 0)
@@ -209,6 +209,59 @@ void Iec104driver_Instance::QueryResponse(QObject *p, const QString &c, int id, 
 				}
 
 				printf("SamplePointName = %s, IOA = %s, value = %lf\n", (const char*)SamplePointName, (const char*)t.Data2, v);
+			}
+		}
+		break;
+		case tGetIOAfromSamplePointName:
+		{
+			QSTransaction &t = GetConfigureDb()->CurrentTransaction();
+
+			if(GetConfigureDb()->GetNumberResults() > 0)
+			{
+				// 
+				QString IOACommand = UndoEscapeSQLText(GetConfigureDb()->GetString("DVAL"));
+				
+				int command_value = 0;
+				int ioa_command = 0;
+
+				ioa_command = atoi((const char*)IOACommand);
+
+				if(strlen((const char*)t.Data1) > 0)
+				{
+					command_value = atoi((const char*)t.Data1);
+				}
+
+				printf("IOA command = %d, value = %d\n", ioa_command, command_value);
+
+				//Send C_SC_NA_1
+				char buf[sizeof(struct iec_item)];
+				struct iec_item item_to_send;
+				struct iec_item* p_item;
+				u_int message_checksum = 0;
+				int kk;
+
+				memset(&item_to_send,0x00, sizeof(struct iec_item));
+
+				item_to_send.iec_type = C_SC_NA_1;
+				item_to_send.iec_obj.ioa = ioa_command;
+				item_to_send.iec_obj.o.type45.scs = command_value;
+					
+				msg_sent_in_control_direction++;
+
+				item_to_send.msg_id = msg_sent_in_control_direction;
+				
+				memcpy(buf, &item_to_send, sizeof(struct iec_item));
+				//////calculate checksum with checsum byte set to value zero////
+									
+				for(kk = 0;kk < sizeof(struct iec_item); kk++)
+				{
+					message_checksum = message_checksum + buf[kk];
+				}
+				p_item = (struct iec_item*)buf;
+				p_item->checksum = message_checksum%256;
+				////////////////////////////////////////////////////////////////
+				fifo_put(fifo_control_direction, buf, sizeof(struct iec_item));
+				//////////////////////////////////////////////////////////////////////////////
 			}
 		}
 		break;
@@ -333,7 +386,7 @@ void Iec104driver_Instance::Tick()
 	//This code runs inside main monitor.exe thread
 
 	unsigned char buf[sizeof(struct iec_item)];
-    int len, j;
+	int len, j;
 	const unsigned wait_limit_ms = 1;
 	struct iec_item* p_item;
 	u_int message_checksum, msg_checksum;
@@ -604,72 +657,14 @@ void Iec104driver_Instance::Command(const QString & name, BYTE cmd, LPVOID lpPa,
 
 	QString sample_point_name = QString(params->string2);
 
-	IT_COMMENT3("Ricevuto comando per instance %s, sample point: %s, value: %lf: %s", (const char*)name, (const char*)sample_point_name, (params->res[0]).value);
+	IT_COMMENT3("Received command for instance %s, sample point: %s, value: %lf", (const char*)name, (const char*)sample_point_name, (params->res[0]).value);
 
+	//Execute query on table PROPS
 
-	//if(pConnect)
-	{
-//		USES_CONVERSION;
+	QString pc = "select * from PROPS where IKEY='" + sample_point_name + "';"; 
 
-		//Invio C_SC_NA_1
-//		char buf[sizeof(struct iec_item)];
-//		struct iec_item item_to_send;
-//		struct iec_item* p_item;
-//		u_int message_checksum = 0;
-//		int kk;
-
-//		memset(&item_to_send,0x00, sizeof(struct iec_item));
-
-//		item_to_send.iec_type = C_SC_NA_1;
-
-		/*
-		for(unsigned i = 0; i < pConnect->g_dwNumItems; i ++)
-		{
-			if(sample_point_name == pConnect->Item[i].spname)
-			{
-				//DWORD dwAccessRights = pConnect->Item[i].dwAccessRights;
-
-				//dwAccessRights = dwAccessRights & OPC_WRITEABLE;
-
-				//if(dwAccessRights == OPC_WRITEABLE)
-				//{
-					switch(pConnect->Item[i].vt)
-					{
-						case VT_BSTR:
-						{
-							strcpy(item_to_send.command_string, params->string3);
-						}
-						break;
-						default:
-						{
-							item_to_send.commandValue = (params->res[0]).value;
-						}
-						break;
-					}
-					
-					item_to_send.hClient = pConnect->Item[i].hClient;
-
-					msg_sent_in_control_direction++;
-
-					item_to_send.msg_id = msg_sent_in_control_direction;
-					
-					//Send message to ocp_client.exe ///////////////////////////////////////////////////////////////////
-					memcpy(buf, &item_to_send, sizeof(struct iec_item));
-					//////calculate checksum with checsum byte set to value zero////
-										
-					for(kk = 0;kk < sizeof(struct iec_item); kk++)
-					{
-						message_checksum = message_checksum + buf[kk];
-					}
-					p_item = (struct iec_item*)buf;
-					p_item->checksum = message_checksum%256;
-					////////////////////////////////////////////////////////////////
-					fifo_put(fifo_control_direction, buf, sizeof(struct iec_item));
-					//////////////////////////////////////////////////////////////////////////////
-
-				//}
-			}
-		}
-		*/
-	}
+	QString value_for_command;
+	value_for_command.sprintf("%lf", (params->res[0]).value);
+	// 
+	GetConfigureDb()->DoExec(this, pc, tGetIOAfromSamplePointName, value_for_command);
 }
