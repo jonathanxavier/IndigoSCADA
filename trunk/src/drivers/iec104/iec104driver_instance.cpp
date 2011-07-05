@@ -188,7 +188,7 @@ void Iec104driver_Instance::QueryResponse(QObject *p, const QString &c, int id, 
 			}
 		}
 		break;
-		case tGetSamplePointName:
+		case tGetSamplePointNamefromIOA:
 		{
 			QSTransaction &t = GetConfigureDb()->CurrentTransaction();
 
@@ -196,12 +196,9 @@ void Iec104driver_Instance::QueryResponse(QObject *p, const QString &c, int id, 
 			{
 				// 
 				QString SamplePointName = UndoEscapeSQLText(GetConfigureDb()->GetString("IKEY"));
-				//QTextIStream is(&s); // extract the values
-				//
-				//QString SamplePointName;
-				//is >> SamplePointName;
 
 				double v = 0.0;
+
 				if(strlen((const char*)t.Data1) > 0)
 				{
 					v = atof((const char*)t.Data1);
@@ -385,6 +382,9 @@ void Iec104driver_Instance::Tick()
 
 	//This code runs inside main monitor.exe thread
 
+	cp56time2a time;
+	signed __int64 epoch_in_millisec;
+
 	unsigned char buf[sizeof(struct iec_item)];
 	int len, j;
 	const unsigned wait_limit_ms = 1;
@@ -436,42 +436,127 @@ void Iec104driver_Instance::Tick()
 		{
 			case M_SP_NA_1:
 			{
+				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+				iec_type1 var = p_item->iec_obj.o.type1;
+				
+				SpValue v(VALUE_TAG, &var, M_SP_NA_1);
+				TODO:05-07-2011 Get name here
+				post_val(v, name);
+
+				#else
+
 				value.sprintf("%d", p_item->iec_obj.o.type1.sp);
+
+				#endif
+				
 			}
 			break;
 			case M_DP_NA_1:
 			{
+				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+				iec_type3 var = p_item->iec_obj.o.type3;
+				
+				SpValue v(VALUE_TAG, &var, M_DP_NA_1);
+				TODO:05-07-2011 Get name here
+				post_val(v, name);
+
+				#else
+
 				value.sprintf("%d", p_item->iec_obj.o.type3.dp);
+
+				#endif
 			}
 			break;
 			//case M_BO_NA_1:
 			//{
-			//	
 			//}
 			//break;
 			case M_ME_NA_1:
 			{
+				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+				iec_type9 var = p_item->iec_obj.o.type9;
+				
+				SpValue v(VALUE_TAG, &var, M_ME_NA_1);
+				TODO:05-07-2011 Get name here
+				post_val(v, name);
+
+				#else
+
 				value.sprintf("%d", p_item->iec_obj.o.type9.mv);
+
+				#endif
 			}
 			break;
 			case M_ME_NB_1:
 			{
+				
+				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+				iec_type11 var = p_item->iec_obj.o.type11;
+				
+				SpValue v(VALUE_TAG, &var, M_ME_NB_1);
+				TODO:05-07-2011 Get name here
+				post_val(v, name);
+
+				#else
+
 				value.sprintf("%d", p_item->iec_obj.o.type11.mv);
+
+				#endif
 			}
 			break;
 			case M_ME_NC_1:
 			{
+				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+				iec_type13 var = p_item->iec_obj.o.type13;
+				
+				SpValue v(VALUE_TAG, &var, M_ME_NC_1);
+				TODO:05-07-2011 Get name here
+				post_val(v, name);
+
+				#else
+
 				value.sprintf("%d", p_item->iec_obj.o.type13.mv);
+
+				#endif
 			}
 			break;
 			case M_SP_TB_1:
 			{
+				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+				iec_type30 var = p_item->iec_obj.o.type30;
+				
+				SpValue v(VALUE_TAG, &var, M_SP_TB_1);
+				TODO:05-07-2011 Get name here
+				post_val(v, name);
+
+				#else
+
 				value.sprintf("%d", p_item->iec_obj.o.type30.sp);
+
+				#endif
 			}
 			break;
 			case M_DP_TB_1:
 			{
+				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+				iec_type31 var = p_item->iec_obj.o.type31;
+				
+				SpValue v(VALUE_TAG, &var, M_DP_TB_1);
+				TODO:05-07-2011 Get name here
+				post_val(v, name);
+
+				#else
+
 				value.sprintf("%d", p_item->iec_obj.o.type31.dp);
+
+				#endif
 			}
 			break;
 			case M_BO_TB_1:
@@ -481,22 +566,57 @@ void Iec104driver_Instance::Tick()
 			break;
 			case M_ME_TD_1:
 			{
+				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+				iec_type34 var = p_item->iec_obj.o.type34;
+				
+				SpValue v(VALUE_TAG, &var, M_ME_TD_1);
+				TODO:05-07-2011 Get name here
+				post_val(v, name);
+
+				#else
+
 				value.sprintf("%d", p_item->iec_obj.o.type34.mv);
+
+				#endif
 			}
 			break;
 			case M_ME_TE_1:
 			{
+				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+				iec_type35 var = p_item->iec_obj.o.type35;
+				
+				SpValue v(VALUE_TAG, &var, M_ME_TE_1);
+				TODO:05-07-2011 Get name here
+				post_val(v, name);
+
+				#else
+
 				value.sprintf("%d", p_item->iec_obj.o.type35.mv);
+
+				#endif
 			}
 			break;
 			case M_ME_TF_1:
 			{
+				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+				iec_type36 var = p_item->iec_obj.o.type36;
+				
+				SpValue v(VALUE_TAG, &var, M_ME_TF_1);
+				TODO:05-07-2011 Get name here
+				post_val(v, name);
+
+				#else
+
 				value.sprintf("%d", p_item->iec_obj.o.type36.mv);
+
+				#endif
 			}
 			break;
 			//case M_IT_TB_1:
 			//{
-			//	p_item->iec_obj.o.type37.iv = 1;
 			//}
 			//break;
 			default:
