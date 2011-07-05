@@ -95,7 +95,7 @@ class IEC_104_DRIVERDRV Iec104driver_Instance : public DriverInstance
 	enum
 	{
 		tUnitProperties = 1,tList, tSamplePointProperties, tListUnits, 
-		tGetSamplePointName, tGetIOAfromSamplePointName
+		tGetSamplePointNamefromIOA, tGetIOAfromSamplePointName
 	};
 	//
 	//
