@@ -95,7 +95,7 @@ void Iec104driver_Instance::QueryResponse(QObject *p, const QString &c, int id, 
 			// now get the properties for each of the sample points
 			QString nl; // name list for getting properties
 			// 
-			for(int ii = 1; ii <= OpcItems; ii++) // initialise
+			for(int ii = 1; ii <= IecItems; ii++) // initialise
 			{
 				Values[ii].Name = "";
 				Values[ii].clear();
@@ -106,7 +106,7 @@ void Iec104driver_Instance::QueryResponse(QObject *p, const QString &c, int id, 
 			for(int i = 0; i < n; i++,GetConfigureDb()->FetchNext())
 			{
 				int idx = GetConfigureDb()->GetInt("IPINDEX");
-				if (idx > 0 && idx <= OpcItems)
+				if (idx > 0 && idx <= IecItems)
 				{
 					Values[idx].Name = GetConfigureDb()->GetString("NAME"); // save the name
 				};
@@ -129,7 +129,7 @@ void Iec104driver_Instance::QueryResponse(QObject *p, const QString &c, int id, 
 			for(int j = 0; j < n; j++,GetConfigureDb()->FetchNext()) // may get a boat load of properties back
 			{  
 				// look for the entry in the table
-				for(int k = 1; k <= OpcItems;k++)
+				for(int k = 1; k <= IecItems;k++)
 				{
 					if(Values[k].Name == GetConfigureDb()->GetString("IKEY"))
 					{
@@ -159,9 +159,8 @@ void Iec104driver_Instance::QueryResponse(QObject *p, const QString &c, int id, 
 				QString s = UndoEscapeSQLText(GetConfigureDb()->GetString("DVAL")); // the top one is either the receipe or (default)
 				QTextIStream is(&s); // extract the values
 				//
-				is >> OpcItems;	  // how many OPC items there are in the TRU or PLC
+				is >> IecItems;	  // how many IEC items there are in the RTU or PLC
 				is >> Cfg.SampleTime; // how long we sample for in milliseconds
-				is >> Cfg.OpcServerProgID;    // Opc Server ProgID
 				is >> Cfg.IEC104ServerIPAddress; // IEC 104 server IP Address
 
 				Countdown = 1;
@@ -172,7 +171,7 @@ void Iec104driver_Instance::QueryResponse(QObject *p, const QString &c, int id, 
 					Values = NULL;
 				}
 
-				Values = new Track[OpcItems+1];
+				Values = new Track[IecItems+1];
 				//
 				if(InTest())
 				{
@@ -180,10 +179,10 @@ void Iec104driver_Instance::QueryResponse(QObject *p, const QString &c, int id, 
 				};
 				//
 
-				//Start opc client driver
+				//Start IEC 104 client driver
 				if(!Connect())
 				{
-					QSLogAlarm(Name,tr("Failed to start OPC client driver"));
+					QSLogAlarm(Name,tr("Failed to start IEC 104 client driver"));
 				}
 			}
 		}
@@ -632,7 +631,7 @@ void Iec104driver_Instance::Tick()
 
 		QString cmd = "select IKEY from PROPS where DVAL='"+ ioa + "' and SKEY='SAMPLEPROPS';";
 
-		GetConfigureDb()->DoExec(this, cmd, tGetSamplePointName, value, ioa);
+		GetConfigureDb()->DoExec(this, cmd, tGetSamplePointNamefromIOA, value, ioa);
 
 		//printf("ioa %s, value %s\n", (const char*)ioa, (const char*)value);
 
@@ -742,24 +741,7 @@ bool  Iec104driver_Instance::DoExec(SendRecePacket *t)
 	IT_IT("Iec104driver_Instance::DoExec");
 	
 	bool res = false;
-/*
-	if(pConnect)
-	{
-		IT_COMMENT3("OPC TRANSACTION de %d, cmd %d, lpPa %s", t->Dest, t->CommandType, (char*)(t->lpParams));
 
-		if(!InQueue.count()) 
-		{
-			// we have a zero count so must trigger the send receive loop
-			pConnect->SetCommand(t);
-		}
-		
-		pending_transactions++;
-
-		IT_COMMENT1("PENDING COMMANDS %d", pending_transactions);
-
-		InQueue.enqueue(t); 
-	}
-*/
 	return res;
 };
 

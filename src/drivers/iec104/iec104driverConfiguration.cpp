@@ -115,8 +115,6 @@ void Iec104driverConfiguration::QueryResponse (QObject *p, const QString &c, int
 				GetConfigureDb()->DoExec(0,cmd,0);
 				NItems->setValue(8);
 				PollInterval->setValue(1000);
-				//SetComboItem(OpcServerProgID,"COM2");
-//				OpcServerProgIDText->setText("");
 				IEC104ServerIPAddressText->setText("");
 			}
 		} 
