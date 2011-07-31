@@ -26,3 +26,5 @@ IndigoSCADA list of TO DO on 22-05-2011
   of other projects
   
 - Use CMake build system - http://www.cmake.org/ or qmake
+
+- Make reports in xml format
