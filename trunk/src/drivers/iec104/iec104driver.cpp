@@ -27,7 +27,7 @@
 *Outputs:none
 *Returns:none
 */
-Iec104driver::Iec104driver(QObject *parent,const QString &name) : Driver(parent,name),n_opc_items(0)
+Iec104driver::Iec104driver(QObject *parent,const QString &name) : Driver(parent,name),n_iec_items(0)
 {
 	connect (GetConfigureDb (),
 	SIGNAL (TransactionDone (QObject *, const QString &, int, QObject*)), this,
@@ -174,7 +174,7 @@ void Iec104driver::Command(const QString & instance,BYTE cmd, LPVOID lpPa, DWORD
 */
 void Iec104driver::CreateNewUnit(QWidget *parent, const QString &name, int n_inputs) // create a new unit - quick configure
 {
-	n_opc_items = n_inputs;
+	n_iec_items = n_inputs;
 	iec_unit_name = name;
 	
 	QString n;
@@ -258,7 +258,7 @@ void Iec104driver::QueryResponse (QObject *p, const QString &, int id, QObject*c
 		{
 			if(GetConfigureDb()->GetNumberResults() == 0)
 			{
-				for(int i = 1 ; i <= n_opc_items; i++)
+				for(int i = 1 ; i <= n_iec_items; i++)
 				{
 					QString n;
 					n.sprintf("%02d",i);

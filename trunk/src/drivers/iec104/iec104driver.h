@@ -37,19 +37,18 @@ class Iec104driver_Instance;
 
 struct InstanceCfg // friend to anyone
 {
-	QString OpcServerProgID;  // opc server ProgID
 	QString IEC104ServerIPAddress;  // IEC 104 server IP address (slave)
 
 	unsigned SampleTime; // sampleing time 
 
 	InstanceCfg() : 
-	OpcServerProgID(""),SampleTime(1000),IEC104ServerIPAddress("")
+	SampleTime(1000),IEC104ServerIPAddress("")
 	{
 	};
 
 	InstanceCfg(const InstanceCfg &m) : 
 
-	OpcServerProgID(m.OpcServerProgID),SampleTime(m.SampleTime),IEC104ServerIPAddress(m.IEC104ServerIPAddress)
+	SampleTime(m.SampleTime),IEC104ServerIPAddress(m.IEC104ServerIPAddress)
 	{
 	};
 };
@@ -84,7 +83,7 @@ class IEC_104_DRIVERDRV Iec104driver : public Driver // all this is private to t
 	// 
 	static Iec104driver *pDriver; // only one instance should be created
 
-	int n_opc_items;
+	int n_iec_items;
 	QString iec_unit_name;
 	//
 	// Actual driver stuff

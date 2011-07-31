@@ -44,39 +44,6 @@ Iec104driverConfigurationData::Iec104driverConfigurationData(QWidget *parent, co
 	Name->setText( "" );
 	Name->setAlignment( AlignLeft|AlignVCenter|ExpandTabs );
 	Name->setMargin( 0 );
-	/////////////////////////////////////////////////////////////////////////
-//	OpcServerProgIDText = new QLineEdit(this, "LineEdit_7");
-//	OpcServerProgIDText->setGeometry(200, 40, 250, 30);
-//	OpcServerProgIDText->setMinimumSize(0, 0);
-//	OpcServerProgIDText->setMaximumSize(32767, 32767);
-//	OpcServerProgIDText->setFocusPolicy(QWidget::StrongFocus);
-//	OpcServerProgIDText->setBackgroundMode(QWidget::PaletteBase);
-#if QT_VERSION < 300
-//	OpcServerProgIDText->setFontPropagation(QWidget::SameFont);
-//	OpcServerProgIDText->setPalettePropagation(QWidget::SameFont);
-	#endif
-//	OpcServerProgIDText->setText( tr( "" ) );
-//	OpcServerProgIDText->setMaxLength( 100 );
-//	OpcServerProgIDText->setFrame( QLineEdit::Normal );
-//	OpcServerProgIDText->setFrame( TRUE );
-//	OpcServerProgIDText->setAlignment( AlignLeft );
-//	QLabel *qtarch_Label_21 = new QLabel(this, "Label_21");
-//	qtarch_Label_21->setGeometry(10, 40, 150, 30);
-//	qtarch_Label_21->setMinimumSize(0, 0);
-//	qtarch_Label_21->setMaximumSize(32767, 32767);
-//	qtarch_Label_21->setFocusPolicy(QWidget::NoFocus);
-//	qtarch_Label_21->setBackgroundMode(QWidget::PaletteBackground);
-//	#if QT_VERSION < 300
-//	qtarch_Label_21->setFontPropagation(QWidget::SameFont);
-//	qtarch_Label_21->setPalettePropagation(QWidget::SameFont);
-//	#endif
-//	qtarch_Label_21->setFrameStyle( 0 );
-//	qtarch_Label_21->setLineWidth( 1 );
-//	qtarch_Label_21->setMidLineWidth( 0 );
-//	qtarch_Label_21->QFrame::setMargin( 0 );
-//	qtarch_Label_21->setText( tr( "OPC Server ProgID" ) );
-//	qtarch_Label_21->setAlignment( AlignLeft|AlignVCenter|ExpandTabs );
-//	qtarch_Label_21->setMargin( 0 );
 
 	IEC104ServerIPAddressText = new QLineEdit(this, "LineEdit_7");
 	IEC104ServerIPAddressText->setGeometry(200, 80, 100, 30);

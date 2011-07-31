@@ -110,7 +110,7 @@ class IEC_104_DRIVERDRV Iec104driver_Instance : public DriverInstance
 	//  
 	int Sp; //Current sample point index under measurement
 	bool InTick; //tick sentinal
-	int OpcItems;
+	int IecItems;
 	
 	struct  Track
 	{
@@ -151,7 +151,7 @@ class IEC_104_DRIVERDRV Iec104driver_Instance : public DriverInstance
 	//
 	Iec104driver_Instance(Driver *parent, const QString &name) : 
 	DriverInstance(parent,name),fFail(0), Countdown(1),
-	State(STATE_RESET),InTick(0),Retry(0),Sp(0),OpcItems(1), Values(NULL),
+	State(STATE_RESET),InTick(0),Retry(0),Sp(0),IecItems(1), Values(NULL),
 	ParentDriver(parent),msg_sent_in_control_direction(0)
 	{
 		IT_IT("Iec104driver_Instance::Iec104driver_Instance");

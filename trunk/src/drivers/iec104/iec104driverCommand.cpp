@@ -67,7 +67,7 @@ void Iec104driverCommand::QueryResponse (QObject *p, const QString &c, int id, Q
 				strcpy(params->string2, (const char *)samplePointName);
 				strcpy(params->string3, (const char *)Value->text()); //For writing the string
 				
-				//Generazione del COMANDO OPC
+				//Generate IEC command
 				
 				GetDispatcher()->DoExec(NotificationEvent::CMD_SEND_COMMAND_TO_UNIT, (char *)parametri, sizeof(dispatcher_extra_params));  //broadcast to all tcp clients
 
