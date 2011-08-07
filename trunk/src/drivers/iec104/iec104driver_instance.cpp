@@ -381,8 +381,8 @@ void Iec104driver_Instance::Tick()
 
 	//This code runs inside main monitor.exe thread
 
-	cp56time2a time;
-	signed __int64 epoch_in_millisec;
+	//cp56time2a time;
+	//signed __int64 epoch_in_millisec;
 
 	unsigned char buf[sizeof(struct iec_item)];
 	int len, j;
