@@ -1,0 +1,136 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: modbus_master - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\WINNT\TEMP\RSPE3.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe .\modbus_masterInputData.h -o .\moc_modbus_masterInputData.cpp
+]
+Creating command line "C:\WINNT\TEMP\RSPE3.bat"
+Creating temporary file "C:\WINNT\TEMP\RSPE4.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe .\modbus_masterInput.h -o .\moc_modbus_masterInput.cpp
+]
+Creating command line "C:\WINNT\TEMP\RSPE4.bat"
+Creating temporary file "C:\WINNT\TEMP\RSPE5.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe .\modbus_masterConfigurationData.h -o .\moc_modbus_masterConfigurationData.cpp
+]
+Creating command line "C:\WINNT\TEMP\RSPE5.bat"
+Creating temporary file "C:\WINNT\TEMP\RSPE6.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe .\modbus_masterConfiguration.h -o .\moc_modbus_masterConfiguration.cpp
+]
+Creating command line "C:\WINNT\TEMP\RSPE6.bat"
+Creating temporary file "C:\WINNT\TEMP\RSPE7.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe .\modbus_masterCommandData.h -o .\moc_modbus_masterCommandData.cpp
+]
+Creating command line "C:\WINNT\TEMP\RSPE7.bat"
+Creating temporary file "C:\WINNT\TEMP\RSPE8.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe .\modbus_masterCommand.h -o .\moc_modbus_masterCommand.cpp
+]
+Creating command line "C:\WINNT\TEMP\RSPE8.bat"
+Creating temporary file "C:\WINNT\TEMP\RSPE9.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe .\modbus_master_instance.h -o .\moc_modbus_master_instance.cpp
+]
+Creating command line "C:\WINNT\TEMP\RSPE9.bat"
+Creating temporary file "C:\WINNT\TEMP\RSPEA.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe .\modbus_master.h -o .\moc_modbus_master.cpp
+]
+Creating command line "C:\WINNT\TEMP\RSPEA.bat"
+Creating temporary file "C:\WINNT\TEMP\RSPEB.tmp" with contents
+[
+/nologo /MDd /W3 /GX /Zi /Od /I "." /I "C:\Qt\3.1.2\include" /I "C:\Qt\3.1.2\mkspecs\win32-msvc" /I "..\..\gigabase" /I "..\..\common" /I ".." /I "..\..\database" /I "..\..\ui\widgets" /I "..\..\trace" /I "..\..\utilities" /I "..\..\fifo" /I "..\..\common\libds-2.2" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_USRDLL" /D "IEC_104_DRIVER_EXPORTS" /D "USING_GARRET" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_H_CPP" /D "_WIN32_DCOM" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
+"E:\scada\src\drivers\modbus_master\modbus_master.cpp"
+"E:\scada\src\drivers\modbus_master\modbus_master_instance.cpp"
+"E:\scada\src\drivers\modbus_master\modbus_masterCommand.cpp"
+"E:\scada\src\drivers\modbus_master\modbus_masterCommandData.cpp"
+"E:\scada\src\drivers\modbus_master\modbus_masterConfiguration.cpp"
+"E:\scada\src\drivers\modbus_master\modbus_masterConfigurationData.cpp"
+"E:\scada\src\drivers\modbus_master\modbus_masterInput.cpp"
+"E:\scada\src\drivers\modbus_master\modbus_masterInputData.cpp"
+"E:\scada\src\drivers\modbus_master\moc_modbus_master.cpp"
+"E:\scada\src\drivers\modbus_master\moc_modbus_master_instance.cpp"
+"E:\scada\src\drivers\modbus_master\moc_modbus_masterCommand.cpp"
+"E:\scada\src\drivers\modbus_master\moc_modbus_masterCommandData.cpp"
+"E:\scada\src\drivers\modbus_master\moc_modbus_masterConfiguration.cpp"
+"E:\scada\src\drivers\modbus_master\moc_modbus_masterConfigurationData.cpp"
+"E:\scada\src\drivers\modbus_master\moc_modbus_masterInput.cpp"
+"E:\scada\src\drivers\modbus_master\moc_modbus_masterInputData.cpp"
+]
+Creating command line "cl.exe @C:\WINNT\TEMP\RSPEB.tmp" 
+MOCing modbus_masterInputData.h...
+MOCing modbus_masterInput.h...
+MOCing modbus_masterConfigurationData.h...
+MOCing modbus_masterConfiguration.h...
+MOCing modbus_masterCommandData.h...
+MOCing modbus_masterCommand.h...
+MOCing modbus_master_instance.h...
+MOCing modbus_master.h...
+Creating temporary file "C:\WINNT\TEMP\RSPEC.tmp" with contents
+[
+advapi32.lib scadad.lib utilitiesd.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib shell32.lib uuid.lib WSOCK32.LIB snmpapi.lib qt-mt312.lib fifo.lib /nologo /dll /incremental:no /pdb:"Debug/modbus_master.pdb" /debug /machine:I386 /out:"c:\scada\Drivers/modbus_master.dll" /implib:"c:\scada\Drivers/modbus_master.lib" /pdbtype:sept /libpath:"C:\Qt\3.1.2\lib" /libpath:"c:\scada\lib" 
+.\Debug\modbus_master.obj
+.\Debug\modbus_master_instance.obj
+.\Debug\modbus_masterCommand.obj
+.\Debug\modbus_masterCommandData.obj
+.\Debug\modbus_masterConfiguration.obj
+.\Debug\modbus_masterConfigurationData.obj
+.\Debug\modbus_masterInput.obj
+.\Debug\modbus_masterInputData.obj
+.\Debug\moc_modbus_master.obj
+.\Debug\moc_modbus_master_instance.obj
+.\Debug\moc_modbus_masterCommand.obj
+.\Debug\moc_modbus_masterCommandData.obj
+.\Debug\moc_modbus_masterConfiguration.obj
+.\Debug\moc_modbus_masterConfigurationData.obj
+.\Debug\moc_modbus_masterInput.obj
+.\Debug\moc_modbus_masterInputData.obj
+]
+Creating command line "link.exe @C:\WINNT\TEMP\RSPEC.tmp"
+<h3>Output Window</h3>
+Compiling...
+modbus_master.cpp
+modbus_master_instance.cpp
+modbus_masterCommand.cpp
+modbus_masterCommandData.cpp
+modbus_masterConfiguration.cpp
+modbus_masterConfigurationData.cpp
+modbus_masterInput.cpp
+modbus_masterInputData.cpp
+moc_modbus_master.cpp
+moc_modbus_master_instance.cpp
+moc_modbus_masterCommand.cpp
+moc_modbus_masterCommandData.cpp
+moc_modbus_masterConfiguration.cpp
+moc_modbus_masterConfigurationData.cpp
+moc_modbus_masterInput.cpp
+moc_modbus_masterInputData.cpp
+Generating Code...
+Linking...
+LINK : fatal error LNK1181: cannot open input file "scadad.lib"
+Error executing link.exe.
+
+
+
+<h3>Results</h3>
+modbus_master.dll - 1 error(s), 0 warning(s)
+</pre>
+</body>
+</html>
