@@ -6,7 +6,7 @@
 --------------------Configuration: libevent - Win32 Debug--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating temporary file "C:\WINNT\TEMP\RSP3F.tmp" with contents
+Creating temporary file "C:\WINNT\TEMP\RSP33B.tmp" with contents
 [
 /nologo /MDd /W3 /Gm /GX /ZI /Od /I "..\\" /I "..\WIN32-Code" /I "..\compat" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /D "HAVE_CONFIG_H" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
 "E:\scada\src\drivers\iec104\libevent-1.4.13-stable\buffer.c"
@@ -21,8 +21,8 @@ Creating temporary file "C:\WINNT\TEMP\RSP3F.tmp" with contents
 "E:\scada\src\drivers\iec104\libevent-1.4.13-stable\strlcpy.c"
 "E:\scada\src\drivers\iec104\libevent-1.4.13-stable\WIN32-Code\win32.c"
 ]
-Creating command line "cl.exe @C:\WINNT\TEMP\RSP3F.tmp" 
-Creating temporary file "C:\WINNT\TEMP\RSP40.tmp" with contents
+Creating command line "cl.exe @C:\WINNT\TEMP\RSP33B.tmp" 
+Creating temporary file "C:\WINNT\TEMP\RSP33C.tmp" with contents
 [
 /nologo /out:"Debug\libevent.lib" 
 ".\Debug\buffer.obj"
@@ -37,7 +37,7 @@ Creating temporary file "C:\WINNT\TEMP\RSP40.tmp" with contents
 ".\Debug\strlcpy.obj"
 ".\Debug\win32.obj"
 ]
-Creating command line "link.exe -lib @C:\WINNT\TEMP\RSP40.tmp"
+Creating command line "link.exe -lib @C:\WINNT\TEMP\RSP33C.tmp"
 <h3>Output Window</h3>
 Compiling...
 buffer.c

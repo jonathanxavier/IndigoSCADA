@@ -101,6 +101,33 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name opc_client_hda
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name iec104driver
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name iec104master
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name iec104slave
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name dnp3driver
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name dnp3master
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name dnp3slave
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name modbus_driver
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name modbus_master
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name modbus_slave
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -119,6 +146,42 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name utilities
     End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "dnp3driver"=..\drivers\dnp3\dnp3driver.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "dnp3master"=..\drivers\modbus\drivers\dnp3\protocol\dnp3master.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "dnp3slave"=..\drivers\modbus\drivers\dnp3\protocol\dnp3slave.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
 }}}
 
 ###############################################################################
@@ -174,7 +237,103 @@ Package=<4>
 
 ###############################################################################
 
+Project: "iec104driver"=..\drivers\iec104\iec104driver.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "iec104master"="..\drivers\iec104\protocol-st\iec104master.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name fifo
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name libevent
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "iec104slave"="..\drivers\iec104\protocol-st\iec104slave.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name libevent
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name fifo
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "libevent"="..\drivers\iec104\libevent-1.4.13-stable\WIN32-Prj\libevent.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "manager"=..\manager\manager.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "modbus_driver"=..\drivers\modbus\modbus_driver.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "modbus_master"=..\drivers\modbus\protocol\modbus_master.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "modbus_slave"=..\drivers\modbus\protocol\modbus_slave.dsp - Package Owner=<4>
 
 Package=<5>
 {{{

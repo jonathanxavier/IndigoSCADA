@@ -1,0 +1,134 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: dnp3driver - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\WINNT\TEMP\RSP127.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe .\dnp3driverInputData.h -o .\moc_dnp3driverInputData.cpp
+]
+Creating command line "C:\WINNT\TEMP\RSP127.bat"
+Creating temporary file "C:\WINNT\TEMP\RSP128.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe .\dnp3driverInput.h -o .\moc_dnp3driverInput.cpp
+]
+Creating command line "C:\WINNT\TEMP\RSP128.bat"
+Creating temporary file "C:\WINNT\TEMP\RSP129.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe .\dnp3driverConfigurationData.h -o .\moc_dnp3driverConfigurationData.cpp
+]
+Creating command line "C:\WINNT\TEMP\RSP129.bat"
+Creating temporary file "C:\WINNT\TEMP\RSP12A.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe .\dnp3driverConfiguration.h -o .\moc_dnp3driverConfiguration.cpp
+]
+Creating command line "C:\WINNT\TEMP\RSP12A.bat"
+Creating temporary file "C:\WINNT\TEMP\RSP12B.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe .\dnp3driverCommandData.h -o .\moc_dnp3driverCommandData.cpp
+]
+Creating command line "C:\WINNT\TEMP\RSP12B.bat"
+Creating temporary file "C:\WINNT\TEMP\RSP12C.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe .\dnp3driverCommand.h -o .\moc_dnp3driverCommand.cpp
+]
+Creating command line "C:\WINNT\TEMP\RSP12C.bat"
+Creating temporary file "C:\WINNT\TEMP\RSP12D.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe .\dnp3driver_instance.h -o .\moc_dnp3driver_instance.cpp
+]
+Creating command line "C:\WINNT\TEMP\RSP12D.bat"
+Creating temporary file "C:\WINNT\TEMP\RSP12E.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe .\dnp3driver.h -o .\moc_dnp3driver.cpp
+]
+Creating command line "C:\WINNT\TEMP\RSP12E.bat"
+Creating temporary file "C:\WINNT\TEMP\RSP12F.tmp" with contents
+[
+/nologo /MD /W3 /GX /O2 /I "." /I "C:\Qt\3.1.2\include" /I "C:\Qt\3.1.2\mkspecs\win32-msvc" /I "..\..\gigabase" /I "..\..\common" /I ".." /I "..\..\database" /I "..\..\ui\widgets" /I "..\..\trace" /I "..\..\utilities" /I "..\..\fifo" /I "..\..\common\libds-2.2" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_USRDLL" /D "IEC_104_DRIVER_EXPORTS" /D "USING_GARRET" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_H_CPP" /D "_WIN32_DCOM" /Fo"Release/" /Fd"Release/" /FD /c 
+"E:\scada\src\drivers\dnp3\dnp3driver.cpp"
+"E:\scada\src\drivers\dnp3\dnp3driver_instance.cpp"
+"E:\scada\src\drivers\dnp3\dnp3driverCommand.cpp"
+"E:\scada\src\drivers\dnp3\dnp3driverCommandData.cpp"
+"E:\scada\src\drivers\dnp3\dnp3driverConfiguration.cpp"
+"E:\scada\src\drivers\dnp3\dnp3driverConfigurationData.cpp"
+"E:\scada\src\drivers\dnp3\dnp3driverInput.cpp"
+"E:\scada\src\drivers\dnp3\dnp3driverInputData.cpp"
+"E:\scada\src\drivers\dnp3\moc_dnp3driver.cpp"
+"E:\scada\src\drivers\dnp3\moc_dnp3driver_instance.cpp"
+"E:\scada\src\drivers\dnp3\moc_dnp3driverCommand.cpp"
+"E:\scada\src\drivers\dnp3\moc_dnp3driverCommandData.cpp"
+"E:\scada\src\drivers\dnp3\moc_dnp3driverConfiguration.cpp"
+"E:\scada\src\drivers\dnp3\moc_dnp3driverConfigurationData.cpp"
+"E:\scada\src\drivers\dnp3\moc_dnp3driverInput.cpp"
+"E:\scada\src\drivers\dnp3\moc_dnp3driverInputData.cpp"
+]
+Creating command line "cl.exe @C:\WINNT\TEMP\RSP12F.tmp" 
+MOCing dnp3driverInputData.h...
+MOCing dnp3driverInput.h...
+MOCing dnp3driverConfigurationData.h...
+MOCing dnp3driverConfiguration.h...
+MOCing dnp3driverCommandData.h...
+MOCing dnp3driverCommand.h...
+MOCing dnp3driver_instance.h...
+MOCing dnp3driver.h...
+Creating temporary file "C:\WINNT\TEMP\RSP130.tmp" with contents
+[
+scada.lib utilities.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib shell32.lib uuid.lib WSOCK32.LIB snmpapi.lib qt-mt312.lib fifo.lib /nologo /dll /incremental:no /pdb:"Debug/dnp3driver.pdb" /debug /machine:I386 /out:"c:\scada\Drivers/dnp3driver.dll" /implib:"c:\scada\Drivers/dnp3driver.lib" /pdbtype:sept /libpath:"C:\Qt\3.1.2\lib" /libpath:"c:\scada\lib" 
+.\Release\dnp3driver.obj
+.\Release\dnp3driver_instance.obj
+.\Release\dnp3driverCommand.obj
+.\Release\dnp3driverCommandData.obj
+.\Release\dnp3driverConfiguration.obj
+.\Release\dnp3driverConfigurationData.obj
+.\Release\dnp3driverInput.obj
+.\Release\dnp3driverInputData.obj
+.\Release\moc_dnp3driver.obj
+.\Release\moc_dnp3driver_instance.obj
+.\Release\moc_dnp3driverCommand.obj
+.\Release\moc_dnp3driverCommandData.obj
+.\Release\moc_dnp3driverConfiguration.obj
+.\Release\moc_dnp3driverConfigurationData.obj
+.\Release\moc_dnp3driverInput.obj
+.\Release\moc_dnp3driverInputData.obj
+]
+Creating command line "link.exe @C:\WINNT\TEMP\RSP130.tmp"
+<h3>Output Window</h3>
+Compiling...
+dnp3driver.cpp
+dnp3driver_instance.cpp
+dnp3driverCommand.cpp
+dnp3driverCommandData.cpp
+dnp3driverConfiguration.cpp
+dnp3driverConfigurationData.cpp
+dnp3driverInput.cpp
+dnp3driverInputData.cpp
+moc_dnp3driver.cpp
+moc_dnp3driver_instance.cpp
+moc_dnp3driverCommand.cpp
+moc_dnp3driverCommandData.cpp
+moc_dnp3driverConfiguration.cpp
+moc_dnp3driverConfigurationData.cpp
+moc_dnp3driverInput.cpp
+moc_dnp3driverInputData.cpp
+Generating Code...
+Linking...
+
+
+
+<h3>Results</h3>
+dnp3driver.dll - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>
