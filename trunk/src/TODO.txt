@@ -1,8 +1,9 @@
-IndigoSCADA list of TO DO on 22-05-2011
+IndigoSCADA list of TO DO on 06-09-2011
 
 - Reimplement the GUI interface in general and in particular the HMI interface.
-  Up to now IndigoSCADA does not support drag and drop for HMI widgets,
-  it is time to add support for it.
+  At the following links there is a possible solution, but only for QT version 4.x.x
+  http://processors.wiki.ti.com/index.php/XgxPerf_HMI
+  http://processors.wiki.ti.com/index.php/XgxPerfArch
 
 - Implement dinamic alarm and event lists, now alarm list is static
 
@@ -11,8 +12,6 @@ IndigoSCADA list of TO DO on 22-05-2011
 - Porting of GUI of IndigoSCADA to QT version 4.x.x
 
 - Porting to current Linux distributions
-
-- Porting to Symbian(?)
 
 - Upgrade the realtime and historical databases to current versions
 
