@@ -9,11 +9,17 @@ To fix we propose these steps:
 2) Choosing a subset of the ItemsID
 3) The OPC DA client adds only the subset of items select in fase 2)
 ---------------------------------------------------------------------------
-
 30-07-2011
+Added driver IEC 104
 
 Configuration data for iec104driver is now in PROPS table (in columns IKEY,DVAL) should be moved to TAGS table (column PARAMS )
 
 See #ifdef TEST_OF_IEC_104_DRIVER_IS_UNDER_WAY
 ---------------------------------------------------------------------------
+06-09-2011
+
+Added driver DNP3, it is in pre alpha state
+Added driver MODBUS, it is in pre alpha state
+
+OPC HDA is in pre alpha state
 
