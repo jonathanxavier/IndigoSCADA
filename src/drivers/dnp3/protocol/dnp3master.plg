@@ -1,0 +1,807 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: dnp3master - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\WINNT\TEMP\RSP1E4.tmp" with contents
+[
+/nologo /MD /W3 /GX /O2 /I "." /I "C:\Qt\3.1.2\include" /I "C:\Qt\3.1.2\mkspecs\win32-msvc" /I "..\..\gigabase" /I "..\..\common" /I ".." /I "..\..\database" /I "..\..\ui\widgets" /I "..\..\trace" /I "..\..\utilities" /I "..\..\fifo" /I "..\..\common\libds-2.2" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_USRDLL" /D "IEC_104_DRIVER_EXPORTS" /D "USING_GARRET" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_H_CPP" /D "_WIN32_DCOM" /Fo"Release/" /Fd"Release/" /FD /c 
+"E:\scada\src\drivers\dnp3\protocol\app.cpp"
+"E:\scada\src\drivers\dnp3\protocol\asdu.cpp"
+"E:\scada\src\drivers\dnp3\protocol\datalink.cpp"
+"E:\scada\src\drivers\dnp3\protocol\factory.cpp"
+"E:\scada\src\drivers\dnp3\protocol\lpdu.cpp"
+"E:\scada\src\drivers\dnp3\protocol\master.cpp"
+"E:\scada\src\drivers\dnp3\protocol\object.cpp"
+"E:\scada\src\drivers\dnp3\protocol\outstation.cpp"
+"E:\scada\src\drivers\dnp3\protocol\security.cpp"
+"E:\scada\src\drivers\dnp3\protocol\stats.cpp"
+"E:\scada\src\drivers\dnp3\protocol\transmit_interface.cpp"
+"E:\scada\src\drivers\dnp3\protocol\transport.cpp"
+]
+Creating command line "cl.exe @C:\WINNT\TEMP\RSP1E4.tmp" 
+Creating temporary file "C:\WINNT\TEMP\RSP1E5.tmp" with contents
+[
+scada.lib utilities.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib shell32.lib uuid.lib WSOCK32.LIB snmpapi.lib qt-mt312.lib fifo.lib /nologo /dll /incremental:no /pdb:"Debug/dnp3master.pdb" /debug /machine:I386 /out:"c:\scada\Drivers/dnp3master.dll" /implib:"c:\scada\Drivers/dnp3master.lib" /pdbtype:sept /libpath:"C:\Qt\3.1.2\lib" /libpath:"c:\scada\lib" 
+.\Release\app.obj
+.\Release\asdu.obj
+.\Release\common.obj
+.\Release\datalink.obj
+.\Release\event_interface.obj
+.\Release\factory.obj
+.\Release\lpdu.obj
+.\Release\master.obj
+.\Release\object.obj
+.\Release\outstation.obj
+.\Release\security.obj
+.\Release\stats.obj
+.\Release\timer_interface.obj
+.\Release\transmit_interface.obj
+.\Release\transport.obj
+]
+Creating command line "link.exe @C:\WINNT\TEMP\RSP1E5.tmp"
+<h3>Output Window</h3>
+Compiling...
+app.cpp
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2629: unexpected 'class Stats ('
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2059: syntax error : ']'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(72) : error C2059: syntax error : ')'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(72) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(87) : error C2143: syntax error : missing ']' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(87) : error C2059: syntax error : '+'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(87) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(89) : error C2143: syntax error : missing ']' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(89) : error C2059: syntax error : ']'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(89) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(439) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(439) : error C2252: 'ALL_STATIONS' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(440) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(440) : error C2252: 'CLASS1' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(441) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(441) : error C2252: 'CLASS2' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(442) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(442) : error C2252: 'CLASS3' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(443) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(443) : error C2252: 'NEED_TIME' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(444) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(444) : error C2252: 'LOCAL' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(445) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(445) : error C2252: 'DEVICE_TROUBLE' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(446) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(446) : error C2252: 'DEVICE_RESTART' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(447) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(447) : error C2252: 'FUNCTION_UNKNOWN' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(448) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(448) : error C2252: 'OBJECT_UNKNOWN' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(449) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(449) : error C2252: 'PARAMETER_ERROR' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(450) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(450) : error C2252: 'BUFFER_OVERFLOW' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(451) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(451) : error C2252: 'BAD_CONFIG' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(40) : error C2252: 'PACKED_WITHOUT_A_PREFIX' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(41) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(41) : error C2252: 'ONE_OCTET_INDEX' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(42) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(42) : error C2252: 'TWO_OCTET_INDEX' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(43) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(43) : error C2252: 'FOUR_OCTET_INDEX' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(44) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(44) : error C2252: 'ONE_OCTET_SIZE' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(45) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(45) : error C2252: 'TWO_OCTET_SIZE' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(46) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(46) : error C2252: 'FOUR_OCTET_SIZE' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(49) : error C2252: 'ONE_OCTET_START_STOP_INDEXES' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(50) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(50) : error C2252: 'TWO_OCTET_START_STOP_INDEXES' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(51) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(51) : error C2252: 'FOUR_OCTET_START_STOP_INDEXES' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(52) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(52) : error C2252: 'ONE_OCTET_START_STOP_VIRTUAL_ADDRESSES' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(53) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(53) : error C2252: 'TWO_OCTET_START_STOP_VIRTUAL_ADDRESSES' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(54) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(54) : error C2252: 'FOUR_OCTET_START_STOP_VIRTUAL_ADDRESSES' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(55) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(55) : error C2252: 'NO_RANGE_FIELD' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(56) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(56) : error C2252: 'ONE_OCTET_COUNT_OF_OBJECTS' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(57) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(57) : error C2252: 'TWO_OCTET_COUNT_OF_OBJECTS' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(58) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(58) : error C2252: 'FOUR_OCTET_COUNT_OF_OBJECTS' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(59) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(59) : error C2252: 'ONE_OCTET_COUNT_OF_OBJECTS_VARIABLE_FORMAT' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(94) : error C2027: use of undefined type 'Factory'
+        E:\scada\src\drivers\dnp3\protocol\factory.hpp(91) : see declaration of 'Factory'
+E:\scada\src\drivers\dnp3\protocol\transport.hpp(81) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\transport.hpp(81) : error C2252: 'FRAGMENT_NOT_FOUND' : pure specifier can only be specified for functions
+asdu.cpp
+E:\scada\src\drivers\dnp3\protocol\asdu.cpp(170) : error C2065: 'snprintf' : undeclared identifier
+datalink.cpp
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2629: unexpected 'class Stats ('
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2059: syntax error : ']'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(72) : error C2059: syntax error : ')'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(72) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(87) : error C2143: syntax error : missing ']' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(87) : error C2059: syntax error : '+'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(87) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(89) : error C2143: syntax error : missing ']' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(89) : error C2059: syntax error : ']'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(89) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(35) : error C2589: 'sizeof' : illegal token on right side of '::'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(35) : error C2143: syntax error : missing ']' before '::'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(35) : error C2143: syntax error : missing ';' before '::'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(35) : error C2133: 'name' : unknown size
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(35) : error C2589: 'sizeof' : illegal token on right side of '::'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(35) : error C2143: syntax error : missing ';' before '::'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(35) : error C2143: syntax error : missing ';' before ']'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(107) : error C2065: 'snprintf' : undeclared identifier
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(107) : error C2589: 'sizeof' : illegal token on right side of '::'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(107) : error C2059: syntax error : '::'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(107) : error C2143: syntax error : missing ';' before ','
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(109) : error C2661: 'Stats::Stats' : no overloaded function takes 7 parameters
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(121) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(121) : error C2661: 'build' : no overloaded function takes 5 parameters
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(121) : error C2143: syntax error : missing ';' before ','
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(122) : error C2059: syntax error : ')'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(166) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(166) : error C2059: syntax error : ')'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(167) : warning C4390: ';' : empty controlled statement found; is this the intent?
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(184) : error C2181: illegal else without matching if
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(184) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(184) : error C2059: syntax error : ')'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(185) : warning C4390: ';' : empty controlled statement found; is this the intent?
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(191) : error C2181: illegal else without matching if
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(191) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(191) : error C2059: syntax error : ')'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(192) : warning C4390: ';' : empty controlled statement found; is this the intent?
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(204) : error C2181: illegal else without matching if
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(204) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(204) : error C2059: syntax error : ')'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(205) : warning C4390: ';' : empty controlled statement found; is this the intent?
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(209) : error C2181: illegal else without matching if
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(221) : error C2143: syntax error : missing ':' before ';'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(221) : error C2143: syntax error : missing ';' before ':'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(236) : error C2143: syntax error : missing ':' before ';'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(236) : error C2143: syntax error : missing ';' before ':'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(259) : error C2143: syntax error : missing ':' before ';'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(259) : error C2143: syntax error : missing ';' before ':'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(286) : error C2143: syntax error : missing ':' before ';'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(286) : error C2143: syntax error : missing ';' before ':'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(297) : error C2143: syntax error : missing ':' before ';'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(297) : error C2143: syntax error : missing ';' before ':'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(303) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(303) : error C2661: 'build' : no overloaded function takes 5 parameters
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(303) : error C2143: syntax error : missing ';' before ','
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(304) : error C2059: syntax error : ')'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(334) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(334) : error C2661: 'build' : no overloaded function takes 5 parameters
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(334) : error C2143: syntax error : missing ';' before ','
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(334) : error C2059: syntax error : ')'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(341) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(341) : error C2661: 'build' : no overloaded function takes 5 parameters
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(341) : error C2143: syntax error : missing ';' before ','
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(341) : error C2059: syntax error : ')'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(348) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(348) : error C2661: 'build' : no overloaded function takes 5 parameters
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(348) : error C2143: syntax error : missing ';' before ','
+E:\scada\src\drivers\dnp3\protocol\datalink.cpp(348) : error C2059: syntax error : ')'
+factory.cpp
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2629: unexpected 'class Stats ('
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2059: syntax error : ']'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(72) : error C2059: syntax error : ')'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(72) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(87) : error C2143: syntax error : missing ']' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(87) : error C2059: syntax error : '+'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(87) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(89) : error C2143: syntax error : missing ']' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(89) : error C2059: syntax error : ']'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(89) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(439) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(439) : error C2252: 'ALL_STATIONS' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(440) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(440) : error C2252: 'CLASS1' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(441) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(441) : error C2252: 'CLASS2' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(442) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(442) : error C2252: 'CLASS3' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(443) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(443) : error C2252: 'NEED_TIME' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(444) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(444) : error C2252: 'LOCAL' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(445) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(445) : error C2252: 'DEVICE_TROUBLE' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(446) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(446) : error C2252: 'DEVICE_RESTART' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(447) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(447) : error C2252: 'FUNCTION_UNKNOWN' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(448) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(448) : error C2252: 'OBJECT_UNKNOWN' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(449) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(449) : error C2252: 'PARAMETER_ERROR' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(450) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(450) : error C2252: 'BUFFER_OVERFLOW' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(451) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(451) : error C2252: 'BAD_CONFIG' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(40) : error C2252: 'PACKED_WITHOUT_A_PREFIX' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(41) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(41) : error C2252: 'ONE_OCTET_INDEX' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(42) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(42) : error C2252: 'TWO_OCTET_INDEX' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(43) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(43) : error C2252: 'FOUR_OCTET_INDEX' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(44) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(44) : error C2252: 'ONE_OCTET_SIZE' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(45) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(45) : error C2252: 'TWO_OCTET_SIZE' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(46) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(46) : error C2252: 'FOUR_OCTET_SIZE' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(49) : error C2252: 'ONE_OCTET_START_STOP_INDEXES' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(50) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(50) : error C2252: 'TWO_OCTET_START_STOP_INDEXES' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(51) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(51) : error C2252: 'FOUR_OCTET_START_STOP_INDEXES' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(52) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(52) : error C2252: 'ONE_OCTET_START_STOP_VIRTUAL_ADDRESSES' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(53) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(53) : error C2252: 'TWO_OCTET_START_STOP_VIRTUAL_ADDRESSES' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(54) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(54) : error C2252: 'FOUR_OCTET_START_STOP_VIRTUAL_ADDRESSES' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(55) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(55) : error C2252: 'NO_RANGE_FIELD' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(56) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(56) : error C2252: 'ONE_OCTET_COUNT_OF_OBJECTS' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(57) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(57) : error C2252: 'TWO_OCTET_COUNT_OF_OBJECTS' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(58) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(58) : error C2252: 'FOUR_OCTET_COUNT_OF_OBJECTS' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(59) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(59) : error C2252: 'ONE_OCTET_COUNT_OF_OBJECTS_VARIABLE_FORMAT' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(94) : error C2027: use of undefined type 'Factory'
+        E:\scada\src\drivers\dnp3\protocol\factory.hpp(91) : see declaration of 'Factory'
+E:\scada\src\drivers\dnp3\protocol\factory.cpp(49) : error C2065: 'snprintf' : undeclared identifier
+E:\scada\src\drivers\dnp3\protocol\factory.cpp(58) : error C2065: 'ONE_OCTET_START_STOP_INDEXES' : undeclared identifier
+E:\scada\src\drivers\dnp3\protocol\factory.cpp(64) : error C2065: 'TWO_OCTET_START_STOP_INDEXES' : undeclared identifier
+E:\scada\src\drivers\dnp3\protocol\factory.cpp(70) : error C2065: 'ONE_OCTET_COUNT_OF_OBJECTS' : undeclared identifier
+E:\scada\src\drivers\dnp3\protocol\factory.cpp(75) : error C2065: 'TWO_OCTET_COUNT_OF_OBJECTS' : undeclared identifier
+E:\scada\src\drivers\dnp3\protocol\factory.cpp(80) : error C2065: 'ONE_OCTET_COUNT_OF_OBJECTS_VARIABLE_FORMAT' : undeclared identifier
+E:\scada\src\drivers\dnp3\protocol\factory.cpp(84) : error C2065: 'NO_RANGE_FIELD' : undeclared identifier
+E:\scada\src\drivers\dnp3\protocol\factory.cpp(243) : error C2039: 'TWO_OCTET_START_STOP_INDEXES' : is not a member of 'ObjectHeader'
+        E:\scada\src\drivers\dnp3\protocol\factory.hpp(37) : see declaration of 'ObjectHeader'
+E:\scada\src\drivers\dnp3\protocol\factory.cpp(244) : error C2039: 'ONE_OCTET_START_STOP_INDEXES' : is not a member of 'ObjectHeader'
+        E:\scada\src\drivers\dnp3\protocol\factory.hpp(37) : see declaration of 'ObjectHeader'
+E:\scada\src\drivers\dnp3\protocol\factory.cpp(246) : error C2039: 'PACKED_WITHOUT_A_PREFIX' : is not a member of 'ObjectHeader'
+        E:\scada\src\drivers\dnp3\protocol\factory.hpp(37) : see declaration of 'ObjectHeader'
+E:\scada\src\drivers\dnp3\protocol\factory.cpp(246) : error C2065: 'PACKED_WITHOUT_A_PREFIX' : undeclared identifier
+E:\scada\src\drivers\dnp3\protocol\factory.cpp(258) : error C2039: 'TWO_OCTET_COUNT_OF_OBJECTS' : is not a member of 'ObjectHeader'
+        E:\scada\src\drivers\dnp3\protocol\factory.hpp(37) : see declaration of 'ObjectHeader'
+E:\scada\src\drivers\dnp3\protocol\factory.cpp(259) : error C2039: 'ONE_OCTET_COUNT_OF_OBJECTS' : is not a member of 'ObjectHeader'
+        E:\scada\src\drivers\dnp3\protocol\factory.hpp(37) : see declaration of 'ObjectHeader'
+E:\scada\src\drivers\dnp3\protocol\factory.cpp(274) : error C2589: 'constant' : illegal token on right side of '::'
+E:\scada\src\drivers\dnp3\protocol\factory.cpp(274) : error C2059: syntax error : '::'
+E:\scada\src\drivers\dnp3\protocol\factory.cpp(275) : error C2181: illegal else without matching if
+E:\scada\src\drivers\dnp3\protocol\factory.cpp(287) : error C2039: 'ONE_OCTET_COUNT_OF_OBJECTS_VARIABLE_FORMAT' : is not a member of 'ObjectHeader'
+        E:\scada\src\drivers\dnp3\protocol\factory.hpp(37) : see declaration of 'ObjectHeader'
+E:\scada\src\drivers\dnp3\protocol\factory.cpp(293) : error C2039: 'ONE_OCTET_SIZE' : is not a member of 'ObjectHeader'
+        E:\scada\src\drivers\dnp3\protocol\factory.hpp(37) : see declaration of 'ObjectHeader'
+E:\scada\src\drivers\dnp3\protocol\factory.cpp(293) : error C2065: 'ONE_OCTET_SIZE' : undeclared identifier
+E:\scada\src\drivers\dnp3\protocol\factory.cpp(295) : error C2039: 'TWO_OCTET_SIZE' : is not a member of 'ObjectHeader'
+        E:\scada\src\drivers\dnp3\protocol\factory.hpp(37) : see declaration of 'ObjectHeader'
+E:\scada\src\drivers\dnp3\protocol\factory.cpp(295) : error C2065: 'TWO_OCTET_SIZE' : undeclared identifier
+E:\scada\src\drivers\dnp3\protocol\factory.cpp(297) : error C2039: 'FOUR_OCTET_SIZE' : is not a member of 'ObjectHeader'
+        E:\scada\src\drivers\dnp3\protocol\factory.hpp(37) : see declaration of 'ObjectHeader'
+E:\scada\src\drivers\dnp3\protocol\factory.cpp(297) : error C2065: 'FOUR_OCTET_SIZE' : undeclared identifier
+E:\scada\src\drivers\dnp3\protocol\factory.cpp(307) : error C2589: 'constant' : illegal token on right side of '::'
+E:\scada\src\drivers\dnp3\protocol\factory.cpp(307) : error C2059: syntax error : '::'
+E:\scada\src\drivers\dnp3\protocol\factory.cpp(307) : error C2143: syntax error : missing ';' before ','
+E:\scada\src\drivers\dnp3\protocol\factory.cpp(307) : fatal error C1003: error count exceeds 100; stopping compilation
+lpdu.cpp
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2629: unexpected 'class Stats ('
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2059: syntax error : ']'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(72) : error C2059: syntax error : ')'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(72) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(87) : error C2143: syntax error : missing ']' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(87) : error C2059: syntax error : '+'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(87) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(89) : error C2143: syntax error : missing ']' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(89) : error C2059: syntax error : ']'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(89) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(190) : error C2146: syntax error : missing ')' before identifier 'i'
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(190) : error C2059: syntax error : ';'
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(190) : error C2059: syntax error : ')'
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(191) : error C2143: syntax error : missing ';' before '{'
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(224) : error C2065: 'snprintf' : undeclared identifier
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(327) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(327) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(327) : error C2059: syntax error : ')'
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(327) : warning C4390: ';' : empty controlled statement found; is this the intent?
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(327) : error C2143: syntax error : missing ';' before '&&'
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(328) : error C2059: syntax error : ')'
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(329) : error C2143: syntax error : missing ';' before '{'
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(334) : warning C4146: unary minus operator applied to unsigned type, result still unsigned
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(334) : warning C4552: '-' : operator has no effect; expected operator with side-effect
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(346) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(346) : error C2059: syntax error : ')'
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(347) : warning C4390: ';' : empty controlled statement found; is this the intent?
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(365) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(365) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(365) : error C2059: syntax error : ')'
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(365) : warning C4390: ';' : empty controlled statement found; is this the intent?
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(365) : error C2143: syntax error : missing ';' before '&&'
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(365) : error C2059: syntax error : ')'
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(366) : error C2143: syntax error : missing ';' before '{'
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(383) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(383) : error C2059: syntax error : ')'
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(383) : error C2143: syntax error : missing ';' before '%'
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(386) : error C2146: syntax error : missing ')' before identifier 'j'
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(386) : error C2059: syntax error : ';'
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(386) : error C2059: syntax error : ')'
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(387) : error C2143: syntax error : missing ';' before '{'
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(512) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(512) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(512) : error C2059: syntax error : ')'
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(512) : warning C4390: ';' : empty controlled statement found; is this the intent?
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(512) : error C2143: syntax error : missing ';' before '=='
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(512) : error C2059: syntax error : ')'
+E:\scada\src\drivers\dnp3\protocol\lpdu.cpp(513) : error C2143: syntax error : missing ';' before '{'
+master.cpp
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2629: unexpected 'class Stats ('
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2059: syntax error : ']'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(72) : error C2059: syntax error : ')'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(72) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(87) : error C2143: syntax error : missing ']' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(87) : error C2059: syntax error : '+'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(87) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(89) : error C2143: syntax error : missing ']' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(89) : error C2059: syntax error : ']'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(89) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(439) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(439) : error C2252: 'ALL_STATIONS' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(440) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(440) : error C2252: 'CLASS1' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(441) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(441) : error C2252: 'CLASS2' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(442) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(442) : error C2252: 'CLASS3' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(443) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(443) : error C2252: 'NEED_TIME' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(444) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(444) : error C2252: 'LOCAL' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(445) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(445) : error C2252: 'DEVICE_TROUBLE' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(446) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(446) : error C2252: 'DEVICE_RESTART' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(447) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(447) : error C2252: 'FUNCTION_UNKNOWN' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(448) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(448) : error C2252: 'OBJECT_UNKNOWN' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(449) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(449) : error C2252: 'PARAMETER_ERROR' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(450) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(450) : error C2252: 'BUFFER_OVERFLOW' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(451) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(451) : error C2252: 'BAD_CONFIG' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(40) : error C2252: 'PACKED_WITHOUT_A_PREFIX' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(41) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(41) : error C2252: 'ONE_OCTET_INDEX' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(42) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(42) : error C2252: 'TWO_OCTET_INDEX' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(43) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(43) : error C2252: 'FOUR_OCTET_INDEX' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(44) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(44) : error C2252: 'ONE_OCTET_SIZE' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(45) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(45) : error C2252: 'TWO_OCTET_SIZE' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(46) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(46) : error C2252: 'FOUR_OCTET_SIZE' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(49) : error C2252: 'ONE_OCTET_START_STOP_INDEXES' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(50) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(50) : error C2252: 'TWO_OCTET_START_STOP_INDEXES' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(51) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(51) : error C2252: 'FOUR_OCTET_START_STOP_INDEXES' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(52) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(52) : error C2252: 'ONE_OCTET_START_STOP_VIRTUAL_ADDRESSES' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(53) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(53) : error C2252: 'TWO_OCTET_START_STOP_VIRTUAL_ADDRESSES' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(54) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(54) : error C2252: 'FOUR_OCTET_START_STOP_VIRTUAL_ADDRESSES' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(55) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(55) : error C2252: 'NO_RANGE_FIELD' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(56) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(56) : error C2252: 'ONE_OCTET_COUNT_OF_OBJECTS' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(57) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(57) : error C2252: 'TWO_OCTET_COUNT_OF_OBJECTS' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(58) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(58) : error C2252: 'FOUR_OCTET_COUNT_OF_OBJECTS' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(59) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(59) : error C2252: 'ONE_OCTET_COUNT_OF_OBJECTS_VARIABLE_FORMAT' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(94) : error C2027: use of undefined type 'Factory'
+        E:\scada\src\drivers\dnp3\protocol\factory.hpp(91) : see declaration of 'Factory'
+E:\scada\src\drivers\dnp3\protocol\transport.hpp(81) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\transport.hpp(81) : error C2252: 'FRAGMENT_NOT_FOUND' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\security.hpp(53) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\security.hpp(53) : error C2252: 'MIN_KEY_SIZE' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\security.hpp(55) : error C2065: 'MIN_KEY_SIZE' : undeclared identifier
+E:\scada\src\drivers\dnp3\protocol\master.cpp(122) : error C2039: 'FRAGMENT_NOT_FOUND' : is not a member of 'TransportFunction'
+        E:\scada\src\drivers\dnp3\protocol\transport.hpp(67) : see declaration of 'TransportFunction'
+E:\scada\src\drivers\dnp3\protocol\master.cpp(122) : error C2065: 'FRAGMENT_NOT_FOUND' : undeclared identifier
+E:\scada\src\drivers\dnp3\protocol\master.cpp(215) : warning C4800: 'int' : forcing value to bool 'true' or 'false' (performance warning)
+E:\scada\src\drivers\dnp3\protocol\master.cpp(241) : warning C4800: 'int' : forcing value to bool 'true' or 'false' (performance warning)
+E:\scada\src\drivers\dnp3\protocol\master.cpp(380) : error C2039: 'NEED_TIME' : is not a member of 'InternalIndications'
+        E:\scada\src\drivers\dnp3\protocol\object.hpp(435) : see declaration of 'InternalIndications'
+E:\scada\src\drivers\dnp3\protocol\master.cpp(380) : error C2065: 'NEED_TIME' : undeclared identifier
+E:\scada\src\drivers\dnp3\protocol\master.cpp(383) : error C2039: 'DEVICE_TROUBLE' : is not a member of 'InternalIndications'
+        E:\scada\src\drivers\dnp3\protocol\object.hpp(435) : see declaration of 'InternalIndications'
+E:\scada\src\drivers\dnp3\protocol\master.cpp(383) : error C2065: 'DEVICE_TROUBLE' : undeclared identifier
+E:\scada\src\drivers\dnp3\protocol\master.cpp(386) : error C2039: 'DEVICE_RESTART' : is not a member of 'InternalIndications'
+        E:\scada\src\drivers\dnp3\protocol\object.hpp(435) : see declaration of 'InternalIndications'
+E:\scada\src\drivers\dnp3\protocol\master.cpp(386) : error C2065: 'DEVICE_RESTART' : undeclared identifier
+E:\scada\src\drivers\dnp3\protocol\master.cpp(396) : error C2039: 'FUNCTION_UNKNOWN' : is not a member of 'InternalIndications'
+        E:\scada\src\drivers\dnp3\protocol\object.hpp(435) : see declaration of 'InternalIndications'
+E:\scada\src\drivers\dnp3\protocol\master.cpp(396) : error C2065: 'FUNCTION_UNKNOWN' : undeclared identifier
+E:\scada\src\drivers\dnp3\protocol\master.cpp(399) : error C2039: 'OBJECT_UNKNOWN' : is not a member of 'InternalIndications'
+        E:\scada\src\drivers\dnp3\protocol\object.hpp(435) : see declaration of 'InternalIndications'
+E:\scada\src\drivers\dnp3\protocol\master.cpp(399) : error C2065: 'OBJECT_UNKNOWN' : undeclared identifier
+E:\scada\src\drivers\dnp3\protocol\master.cpp(402) : error C2039: 'PARAMETER_ERROR' : is not a member of 'InternalIndications'
+        E:\scada\src\drivers\dnp3\protocol\object.hpp(435) : see declaration of 'InternalIndications'
+E:\scada\src\drivers\dnp3\protocol\master.cpp(402) : error C2065: 'PARAMETER_ERROR' : undeclared identifier
+E:\scada\src\drivers\dnp3\protocol\master.cpp(405) : error C2039: 'BUFFER_OVERFLOW' : is not a member of 'InternalIndications'
+        E:\scada\src\drivers\dnp3\protocol\object.hpp(435) : see declaration of 'InternalIndications'
+E:\scada\src\drivers\dnp3\protocol\master.cpp(405) : error C2065: 'BUFFER_OVERFLOW' : undeclared identifier
+E:\scada\src\drivers\dnp3\protocol\master.cpp(408) : error C2039: 'BAD_CONFIG' : is not a member of 'InternalIndications'
+        E:\scada\src\drivers\dnp3\protocol\object.hpp(435) : see declaration of 'InternalIndications'
+E:\scada\src\drivers\dnp3\protocol\master.cpp(408) : error C2065: 'BAD_CONFIG' : undeclared identifier
+E:\scada\src\drivers\dnp3\protocol\master.cpp(454) : error C2039: 'DEVICE_RESTART' : is not a member of 'InternalIndications'
+        E:\scada\src\drivers\dnp3\protocol\object.hpp(435) : see declaration of 'InternalIndications'
+E:\scada\src\drivers\dnp3\protocol\master.cpp(518) : error C2039: 'DEVICE_RESTART' : is not a member of 'InternalIndications'
+        E:\scada\src\drivers\dnp3\protocol\object.hpp(435) : see declaration of 'InternalIndications'
+E:\scada\src\drivers\dnp3\protocol\master.cpp(647) : error C2039: 'ONE_OCTET_START_STOP_INDEXES' : is not a member of 'ObjectHeader'
+        E:\scada\src\drivers\dnp3\protocol\factory.hpp(37) : see declaration of 'ObjectHeader'
+E:\scada\src\drivers\dnp3\protocol\master.cpp(647) : fatal error C1003: error count exceeds 100; stopping compilation
+object.cpp
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2629: unexpected 'class Stats ('
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2059: syntax error : ']'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(72) : error C2059: syntax error : ')'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(72) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(87) : error C2143: syntax error : missing ']' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(87) : error C2059: syntax error : '+'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(87) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(89) : error C2143: syntax error : missing ']' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(89) : error C2059: syntax error : ']'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(89) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(439) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(439) : error C2252: 'ALL_STATIONS' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(440) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(440) : error C2252: 'CLASS1' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(441) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(441) : error C2252: 'CLASS2' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(442) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(442) : error C2252: 'CLASS3' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(443) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(443) : error C2252: 'NEED_TIME' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(444) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(444) : error C2252: 'LOCAL' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(445) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(445) : error C2252: 'DEVICE_TROUBLE' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(446) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(446) : error C2252: 'DEVICE_RESTART' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(447) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(447) : error C2252: 'FUNCTION_UNKNOWN' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(448) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(448) : error C2252: 'OBJECT_UNKNOWN' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(449) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(449) : error C2252: 'PARAMETER_ERROR' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(450) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(450) : error C2252: 'BUFFER_OVERFLOW' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(451) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(451) : error C2252: 'BAD_CONFIG' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.cpp(118) : warning C4244: 'argument' : conversion from 'const unsigned __int64' to 'unsigned short', possible loss of data
+E:\scada\src\drivers\dnp3\protocol\object.cpp(209) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\object.cpp(209) : error C2059: syntax error : ','
+E:\scada\src\drivers\dnp3\protocol\object.cpp(225) : error C2630: ';' found in what should be a comma-separated list
+E:\scada\src\drivers\dnp3\protocol\object.cpp(225) : error C2059: syntax error : ','
+E:\scada\src\drivers\dnp3\protocol\object.cpp(506) : fatal error C1004: unexpected end of file found
+outstation.cpp
+E:\scada\src\drivers\dnp3\protocol\object.hpp(439) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(439) : error C2252: 'ALL_STATIONS' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(440) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(440) : error C2252: 'CLASS1' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(441) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(441) : error C2252: 'CLASS2' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(442) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(442) : error C2252: 'CLASS3' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(443) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(443) : error C2252: 'NEED_TIME' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(444) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(444) : error C2252: 'LOCAL' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(445) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(445) : error C2252: 'DEVICE_TROUBLE' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(446) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(446) : error C2252: 'DEVICE_RESTART' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(447) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(447) : error C2252: 'FUNCTION_UNKNOWN' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(448) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(448) : error C2252: 'OBJECT_UNKNOWN' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(449) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(449) : error C2252: 'PARAMETER_ERROR' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(450) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(450) : error C2252: 'BUFFER_OVERFLOW' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(451) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(451) : error C2252: 'BAD_CONFIG' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2629: unexpected 'class Stats ('
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2059: syntax error : ']'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(72) : error C2059: syntax error : ')'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(72) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(87) : error C2143: syntax error : missing ']' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(87) : error C2059: syntax error : '+'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(87) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(89) : error C2143: syntax error : missing ']' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(89) : error C2059: syntax error : ']'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(89) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(40) : error C2252: 'PACKED_WITHOUT_A_PREFIX' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(41) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(41) : error C2252: 'ONE_OCTET_INDEX' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(42) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(42) : error C2252: 'TWO_OCTET_INDEX' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(43) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(43) : error C2252: 'FOUR_OCTET_INDEX' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(44) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(44) : error C2252: 'ONE_OCTET_SIZE' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(45) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(45) : error C2252: 'TWO_OCTET_SIZE' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(46) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(46) : error C2252: 'FOUR_OCTET_SIZE' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(49) : error C2252: 'ONE_OCTET_START_STOP_INDEXES' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(50) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(50) : error C2252: 'TWO_OCTET_START_STOP_INDEXES' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(51) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(51) : error C2252: 'FOUR_OCTET_START_STOP_INDEXES' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(52) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(52) : error C2252: 'ONE_OCTET_START_STOP_VIRTUAL_ADDRESSES' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(53) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(53) : error C2252: 'TWO_OCTET_START_STOP_VIRTUAL_ADDRESSES' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(54) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(54) : error C2252: 'FOUR_OCTET_START_STOP_VIRTUAL_ADDRESSES' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(55) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(55) : error C2252: 'NO_RANGE_FIELD' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(56) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(56) : error C2252: 'ONE_OCTET_COUNT_OF_OBJECTS' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(57) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(57) : error C2252: 'TWO_OCTET_COUNT_OF_OBJECTS' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(58) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(58) : error C2252: 'FOUR_OCTET_COUNT_OF_OBJECTS' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(59) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(59) : error C2252: 'ONE_OCTET_COUNT_OF_OBJECTS_VARIABLE_FORMAT' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(94) : error C2027: use of undefined type 'Factory'
+        E:\scada\src\drivers\dnp3\protocol\factory.hpp(91) : see declaration of 'Factory'
+E:\scada\src\drivers\dnp3\protocol\security.hpp(53) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\security.hpp(53) : error C2252: 'MIN_KEY_SIZE' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\security.hpp(55) : error C2065: 'MIN_KEY_SIZE' : undeclared identifier
+E:\scada\src\drivers\dnp3\protocol\transport.hpp(81) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\transport.hpp(81) : error C2252: 'FRAGMENT_NOT_FOUND' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\outstation.cpp(50) : warning C4355: 'this' : used in base member initializer list
+E:\scada\src\drivers\dnp3\protocol\outstation.cpp(127) : error C2589: 'sizeof' : illegal token on right side of '::'
+E:\scada\src\drivers\dnp3\protocol\outstation.cpp(127) : error C2143: syntax error : missing ']' before '::'
+E:\scada\src\drivers\dnp3\protocol\outstation.cpp(127) : error C2143: syntax error : missing ';' before '::'
+E:\scada\src\drivers\dnp3\protocol\outstation.cpp(127) : error C2133: 'name' : unknown size
+E:\scada\src\drivers\dnp3\protocol\outstation.cpp(127) : error C2589: 'sizeof' : illegal token on right side of '::'
+E:\scada\src\drivers\dnp3\protocol\outstation.cpp(127) : error C2143: syntax error : missing ';' before '::'
+E:\scada\src\drivers\dnp3\protocol\outstation.cpp(127) : error C2143: syntax error : missing ';' before ']'
+E:\scada\src\drivers\dnp3\protocol\outstation.cpp(128) : error C2065: 'snprintf' : undeclared identifier
+E:\scada\src\drivers\dnp3\protocol\outstation.cpp(128) : error C2070: illegal sizeof operand
+E:\scada\src\drivers\dnp3\protocol\outstation.cpp(131) : error C2661: 'Stats::Stats' : no overloaded function takes 7 parameters
+E:\scada\src\drivers\dnp3\protocol\outstation.cpp(181) : error C2039: 'FRAGMENT_NOT_FOUND' : is not a member of 'TransportFunction'
+        E:\scada\src\drivers\dnp3\protocol\transport.hpp(67) : see declaration of 'TransportFunction'
+E:\scada\src\drivers\dnp3\protocol\outstation.cpp(181) : error C2065: 'FRAGMENT_NOT_FOUND' : undeclared identifier
+E:\scada\src\drivers\dnp3\protocol\outstation.cpp(419) : error C2146: syntax error : missing ')' before identifier 'and'
+E:\scada\src\drivers\dnp3\protocol\outstation.cpp(419) : error C2065: 'and' : undeclared identifier
+E:\scada\src\drivers\dnp3\protocol\outstation.cpp(419) : error C2059: syntax error : ')'
+E:\scada\src\drivers\dnp3\protocol\outstation.cpp(420) : error C2143: syntax error : missing ';' before '{'
+E:\scada\src\drivers\dnp3\protocol\outstation.cpp(426) : error C2039: 'DEVICE_RESTART' : is not a member of 'InternalIndications'
+        E:\scada\src\drivers\dnp3\protocol\object.hpp(435) : see declaration of 'InternalIndications'
+E:\scada\src\drivers\dnp3\protocol\outstation.cpp(426) : error C2065: 'DEVICE_RESTART' : undeclared identifier
+E:\scada\src\drivers\dnp3\protocol\outstation.cpp(428) : error C2039: 'DEVICE_RESTART' : is not a member of 'InternalIndications'
+        E:\scada\src\drivers\dnp3\protocol\object.hpp(435) : see declaration of 'InternalIndications'
+E:\scada\src\drivers\dnp3\protocol\outstation.cpp(474) : error C2039: 'FUNCTION_UNKNOWN' : is not a member of 'InternalIndications'
+        E:\scada\src\drivers\dnp3\protocol\object.hpp(435) : see declaration of 'InternalIndications'
+E:\scada\src\drivers\dnp3\protocol\outstation.cpp(474) : error C2065: 'FUNCTION_UNKNOWN' : undeclared identifier
+E:\scada\src\drivers\dnp3\protocol\outstation.cpp(474) : fatal error C1003: error count exceeds 100; stopping compilation
+security.cpp
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2629: unexpected 'class Stats ('
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2059: syntax error : ']'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(72) : error C2059: syntax error : ')'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(72) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(87) : error C2143: syntax error : missing ']' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(87) : error C2059: syntax error : '+'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(87) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(89) : error C2143: syntax error : missing ']' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(89) : error C2059: syntax error : ']'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(89) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(439) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(439) : error C2252: 'ALL_STATIONS' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(440) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(440) : error C2252: 'CLASS1' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(441) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(441) : error C2252: 'CLASS2' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(442) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(442) : error C2252: 'CLASS3' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(443) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(443) : error C2252: 'NEED_TIME' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(444) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(444) : error C2252: 'LOCAL' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(445) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(445) : error C2252: 'DEVICE_TROUBLE' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(446) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(446) : error C2252: 'DEVICE_RESTART' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(447) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(447) : error C2252: 'FUNCTION_UNKNOWN' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(448) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(448) : error C2252: 'OBJECT_UNKNOWN' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(449) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(449) : error C2252: 'PARAMETER_ERROR' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(450) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(450) : error C2252: 'BUFFER_OVERFLOW' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\object.hpp(451) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\object.hpp(451) : error C2252: 'BAD_CONFIG' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(40) : error C2252: 'PACKED_WITHOUT_A_PREFIX' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(41) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(41) : error C2252: 'ONE_OCTET_INDEX' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(42) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(42) : error C2252: 'TWO_OCTET_INDEX' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(43) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(43) : error C2252: 'FOUR_OCTET_INDEX' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(44) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(44) : error C2252: 'ONE_OCTET_SIZE' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(45) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(45) : error C2252: 'TWO_OCTET_SIZE' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(46) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(46) : error C2252: 'FOUR_OCTET_SIZE' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(49) : error C2252: 'ONE_OCTET_START_STOP_INDEXES' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(50) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(50) : error C2252: 'TWO_OCTET_START_STOP_INDEXES' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(51) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(51) : error C2252: 'FOUR_OCTET_START_STOP_INDEXES' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(52) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(52) : error C2252: 'ONE_OCTET_START_STOP_VIRTUAL_ADDRESSES' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(53) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(53) : error C2252: 'TWO_OCTET_START_STOP_VIRTUAL_ADDRESSES' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(54) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(54) : error C2252: 'FOUR_OCTET_START_STOP_VIRTUAL_ADDRESSES' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(55) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(55) : error C2252: 'NO_RANGE_FIELD' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(56) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(56) : error C2252: 'ONE_OCTET_COUNT_OF_OBJECTS' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(57) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(57) : error C2252: 'TWO_OCTET_COUNT_OF_OBJECTS' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(58) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(58) : error C2252: 'FOUR_OCTET_COUNT_OF_OBJECTS' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(59) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(59) : error C2252: 'ONE_OCTET_COUNT_OF_OBJECTS_VARIABLE_FORMAT' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\factory.hpp(94) : error C2027: use of undefined type 'Factory'
+        E:\scada\src\drivers\dnp3\protocol\factory.hpp(91) : see declaration of 'Factory'
+E:\scada\src\drivers\dnp3\protocol\transport.hpp(81) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\transport.hpp(81) : error C2252: 'FRAGMENT_NOT_FOUND' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\security.hpp(53) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\security.hpp(53) : error C2252: 'MIN_KEY_SIZE' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\security.hpp(55) : error C2065: 'MIN_KEY_SIZE' : undeclared identifier
+E:\scada\src\drivers\dnp3\protocol\security.cpp(35) : fatal error C1083: Cannot open include file: 'wrap.h': No such file or directory
+stats.cpp
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2629: unexpected 'class Stats ('
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2059: syntax error : ']'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(72) : error C2059: syntax error : ')'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(72) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(87) : error C2143: syntax error : missing ']' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(87) : error C2059: syntax error : '+'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(87) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(89) : error C2143: syntax error : missing ']' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(89) : error C2059: syntax error : ']'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(89) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\stats.cpp(38) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.cpp(38) : error C2143: syntax error : missing ']' before ')'
+E:\scada\src\drivers\dnp3\protocol\stats.cpp(38) : error C2244: 'Stats::Stats::Stats' : unable to resolve function overload
+E:\scada\src\drivers\dnp3\protocol\stats.cpp(38) : error C2143: syntax error : missing ';' before ']'
+E:\scada\src\drivers\dnp3\protocol\stats.cpp(42) : error C2059: syntax error : ')'
+E:\scada\src\drivers\dnp3\protocol\stats.cpp(43) : error C2065: 'eventInterface_p' : undeclared identifier
+E:\scada\src\drivers\dnp3\protocol\stats.cpp(43) : error C2501: 'db_p' : missing storage-class or type specifiers
+E:\scada\src\drivers\dnp3\protocol\stats.cpp(43) : error C2065: 'dnpAddr' : undeclared identifier
+E:\scada\src\drivers\dnp3\protocol\stats.cpp(43) : error C2501: 'addr' : missing storage-class or type specifiers
+E:\scada\src\drivers\dnp3\protocol\stats.cpp(43) : error C2065: 'pType' : undeclared identifier
+E:\scada\src\drivers\dnp3\protocol\stats.cpp(44) : error C2448: '<Unknown>' : function-style initializer appears to be a function definition
+E:\scada\src\drivers\dnp3\protocol\stats.cpp(128) : error C2065: 'snprintf' : undeclared identifier
+E:\scada\src\drivers\dnp3\protocol\stats.cpp(184) : error C2143: syntax error : missing ']' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.cpp(184) : error C2143: syntax error : missing ';' before ']'
+transmit_interface.cpp
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2629: unexpected 'class Stats ('
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2059: syntax error : ']'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(72) : error C2059: syntax error : ')'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(72) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(87) : error C2143: syntax error : missing ']' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(87) : error C2059: syntax error : '+'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(87) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(89) : error C2143: syntax error : missing ']' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(89) : error C2059: syntax error : ']'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(89) : error C2238: unexpected token(s) preceding ';'
+transport.cpp
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2629: unexpected 'class Stats ('
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2143: syntax error : missing ')' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(67) : error C2059: syntax error : ']'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(72) : error C2059: syntax error : ')'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(72) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(87) : error C2143: syntax error : missing ']' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(87) : error C2059: syntax error : '+'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(87) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(89) : error C2143: syntax error : missing ']' before ';'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(89) : error C2059: syntax error : ']'
+E:\scada\src\drivers\dnp3\protocol\stats.hpp(89) : error C2238: unexpected token(s) preceding ';'
+E:\scada\src\drivers\dnp3\protocol\transport.hpp(81) : error C2258: illegal pure syntax, must be '= 0'
+E:\scada\src\drivers\dnp3\protocol\transport.hpp(81) : error C2252: 'FRAGMENT_NOT_FOUND' : pure specifier can only be specified for functions
+E:\scada\src\drivers\dnp3\protocol\transport.cpp(75) : error C2065: 'snprintf' : undeclared identifier
+E:\scada\src\drivers\dnp3\protocol\transport.cpp(104) : error C2589: 'constant' : illegal token on right side of '::'
+E:\scada\src\drivers\dnp3\protocol\transport.cpp(104) : error C2059: syntax error : '::'
+E:\scada\src\drivers\dnp3\protocol\transport.cpp(104) : error C2143: syntax error : missing ';' before ')'
+E:\scada\src\drivers\dnp3\protocol\transport.cpp(105) : error C2143: syntax error : missing ';' before '{'
+E:\scada\src\drivers\dnp3\protocol\transport.cpp(116) : error C2181: illegal else without matching if
+E:\scada\src\drivers\dnp3\protocol\transport.cpp(122) : error C2589: 'constant' : illegal token on right side of '::'
+E:\scada\src\drivers\dnp3\protocol\transport.cpp(122) : error C2059: syntax error : '::'
+E:\scada\src\drivers\dnp3\protocol\transport.cpp(122) : error C2143: syntax error : missing ';' before ')'
+E:\scada\src\drivers\dnp3\protocol\transport.cpp(123) : error C2589: 'constant' : illegal token on right side of '::'
+E:\scada\src\drivers\dnp3\protocol\transport.cpp(123) : error C2059: syntax error : '::'
+E:\scada\src\drivers\dnp3\protocol\transport.cpp(143) : error C2065: 'FRAGMENT_NOT_FOUND' : undeclared identifier
+Generating Code...
+Error executing cl.exe.
+
+
+
+<h3>Results</h3>
+dnp3master.dll - 694 error(s), 14 warning(s)
+</pre>
+</body>
+</html>

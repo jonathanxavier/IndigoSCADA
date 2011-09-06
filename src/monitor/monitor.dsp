@@ -26,7 +26,6 @@ CFG=monitor - Win32 Debug
 # PROP Scc_ProjName ""
 # PROP Scc_LocalPath ""
 CPP=cl.exe
-F90=df.exe
 MTL=midl.exe
 RSC=rc.exe
 

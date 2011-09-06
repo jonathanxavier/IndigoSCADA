@@ -3,600 +3,264 @@
 <pre>
 <h1>Build Log</h1>
 <h3>
---------------------Configuration: ui - Win32 Debug--------------------
+--------------------Configuration: scada - Win32 Release--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPB1.tmp" with contents
+Creating temporary file "C:\WINNT\TEMP\RSP2CC.bat" with contents
 [
-/nologo /MTd /W3 /GX /Zi /Od /I "." /I "G:\qt\3.1.2\include" /I "G:\qt\3.1.2\mkspecs\win32-msvc" /I "..\gigabase" /I "..\common" /I "..\database" /I ".\userdialogs" /I ".\sysdialogs" /I ".\widgets" /I ".\map" /I "..\drivers" /I "..\drivers\Simulator" /I ".\widgets\extra" /I ".\widgets\gantt" /I "..\trace" /I "..\utilities" /I "..\containers\sglib-1.0.4" /I ".\qale3\src" /I ".\qale3\examples" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "USING_GARRET" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_H_CPP" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
-"G:\scada\src\UI\historic_inspect.cpp"
-"G:\scada\src\UI\inspect.cpp"
+@echo off
+%qtdir%\bin\moc.exe \scada\src\drivers\SerialConnect.h -o \scada\src\drivers\moc_SerialConnect.cpp
 ]
-Creating command line "cl.exe @C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPB1.tmp" 
-Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPB2.tmp" with contents
+Creating command line "C:\WINNT\TEMP\RSP2CC.bat"
+Creating temporary file "C:\WINNT\TEMP\RSP2CD.bat" with contents
 [
-kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib WSOCK32.LIB snmpapi.lib scadad.lib utilitiesd.lib qt-mt312.lib /nologo /subsystem:windows /incremental:no /pdb:"Debug/ist.pdb" /debug /machine:I386 /nodefaultlib:"libcmt.lib" /out:"c:\scada\bin/ist.exe" /pdbtype:sept /libpath:"G:\qt\3.1.2\lib" /libpath:"c:\scada\lib" 
-.\Debug\alarmdisplay.obj
-.\Debug\dbtable.obj
-.\Debug\display.obj
-.\Debug\graphpane.obj
-.\Debug\graphpanedata.obj
-.\Debug\historic_browsedb.obj
-.\Debug\historic_inspect.obj
-.\Debug\inspect.obj
-.\Debug\main.obj
-.\Debug\multitrace.obj
-.\Debug\qtmain_win.obj
-.\Debug\realtime_browsedb.obj
-.\Debug\rintro.obj
-.\Debug\statusdisplay.obj
-.\Debug\statuspane.obj
-.\Debug\sysmgr.obj
-.\Debug\user.obj
-.\Debug\ActionConfigure.obj
-.\Debug\ActionConfigureData.obj
-.\Debug\AlarmGroupCfg.obj
-.\Debug\AlarmGroupCfgData.obj
-.\Debug\BatchCfg.obj
-.\Debug\BatchCfgData.obj
-.\Debug\CheckTagEntries.obj
-.\Debug\CheckTagEntriesData.obj
-.\Debug\NewDlg.obj
-.\Debug\NewDlgData.obj
-.\Debug\ReceipeCfg.obj
-.\Debug\ReceipeCfgData.obj
-.\Debug\ReportCfg.obj
-.\Debug\ReportCfgData.obj
-.\Debug\SampleCfg.obj
-.\Debug\SampleCfgData.obj
-.\Debug\ScheduleCfg.obj
-.\Debug\ScheduleCfgData.obj
-.\Debug\SerialCfg.obj
-.\Debug\SerialCfgData.obj
-.\Debug\SystemCfg.obj
-.\Debug\SystemCfgData.obj
-.\Debug\TagCfg.obj
-.\Debug\TagCfgData.obj
-.\Debug\UnitCfg.obj
-.\Debug\UnitCfgData.obj
-.\Debug\UserCfgDlg.obj
-.\Debug\UserCfgDlgData.obj
-.\Debug\AckAlarmDlg.obj
-.\Debug\AckAlarmDlgData.obj
-.\Debug\InspectFrameDlg.obj
-.\Debug\InspectFrameDlgData.obj
-.\Debug\LoginDlg.obj
-.\Debug\LoginDlgData.obj
-.\Debug\MultiTraceDlg.obj
-.\Debug\MultiTraceDlgData.obj
-.\Debug\NewPassword.obj
-.\Debug\NewPasswordData.obj
-.\Debug\ReceipeSelect.obj
-.\Debug\ReceipeSelectData.obj
-.\Debug\ReportDir.obj
-.\Debug\ReportDirData.obj
-.\Debug\ReportSelect.obj
-.\Debug\ReportSelectData.obj
-.\Debug\SelectPrinterDlg.obj
-.\Debug\SelectPrinterDlgData.obj
-.\Debug\TimeFrameDlg.obj
-.\Debug\TimeFrameDlgData.obj
-.\Debug\moc_AckAlarmDlg.obj
-.\Debug\moc_AckAlarmDlgData.obj
-.\Debug\moc_ActionConfigure.obj
-.\Debug\moc_ActionConfigureData.obj
-.\Debug\moc_alarmdisplay.obj
-.\Debug\moc_AlarmGroupCfg.obj
-.\Debug\moc_AlarmGroupCfgData.obj
-.\Debug\moc_BatchCfg.obj
-.\Debug\moc_BatchCfgData.obj
-.\Debug\moc_CheckTagEntries.obj
-.\Debug\moc_CheckTagEntriesData.obj
-.\Debug\moc_dbtable.obj
-.\Debug\moc_graphpane.obj
-.\Debug\moc_graphpanedata.obj
-.\Debug\moc_historic_browsedb.obj
-.\Debug\moc_historic_inspect.obj
-.\Debug\moc_IconSelectDlg.obj
-.\Debug\moc_IconSelectDlgData.obj
-.\Debug\moc_InputDlg.obj
-.\Debug\moc_InputDlgData.obj
-.\Debug\moc_inspect.obj
-.\Debug\moc_InspectFrameDlg.obj
-.\Debug\moc_InspectFrameDlgData.obj
-.\Debug\moc_LoginDlg.obj
-.\Debug\moc_LoginDlgData.obj
-.\Debug\moc_mapapp.obj
-.\Debug\moc_mapdisplay.obj
-.\Debug\moc_multitrace.obj
-.\Debug\moc_MultiTraceDlg.obj
-.\Debug\moc_MultiTraceDlgData.obj
-.\Debug\moc_NewDlg.obj
-.\Debug\moc_NewDlgData.obj
-.\Debug\moc_NewPassword.obj
-.\Debug\moc_NewPasswordData.obj
-.\Debug\moc_plancanvas.obj
-.\Debug\moc_realtime_browsedb.obj
-.\Debug\moc_ReceipeCfg.obj
-.\Debug\moc_ReceipeCfgData.obj
-.\Debug\moc_ReceipeSelect.obj
-.\Debug\moc_ReceipeSelectData.obj
-.\Debug\moc_ReportCfg.obj
-.\Debug\moc_ReportCfgData.obj
-.\Debug\moc_ReportDir.obj
-.\Debug\moc_ReportDirData.obj
-.\Debug\moc_ReportSelect.obj
-.\Debug\moc_ReportSelectData.obj
-.\Debug\moc_rintro.obj
-.\Debug\moc_SampleCfg.obj
-.\Debug\moc_SampleCfgData.obj
-.\Debug\moc_ScheduleCfg.obj
-.\Debug\moc_ScheduleCfgData.obj
-.\Debug\moc_SelectActiveDlg.obj
-.\Debug\moc_SelectActiveDlgData.obj
-.\Debug\moc_SelectPrinterDlg.obj
-.\Debug\moc_SelectPrinterDlgData.obj
-.\Debug\moc_SerialCfg.obj
-.\Debug\moc_SerialCfgData.obj
-.\Debug\moc_SetPenStyle.obj
-.\Debug\moc_SetPenStyleData.obj
-.\Debug\moc_statusdisplay.obj
-.\Debug\moc_statuspane.obj
-.\Debug\moc_sysmgr.obj
-.\Debug\moc_SystemCfg.obj
-.\Debug\moc_SystemCfgData.obj
-.\Debug\moc_TagCfg.obj
-.\Debug\moc_TagCfgData.obj
-.\Debug\moc_TimeFrameDlg.obj
-.\Debug\moc_TimeFrameDlgData.obj
-.\Debug\moc_UnitCfg.obj
-.\Debug\moc_UnitCfgData.obj
-.\Debug\moc_user.obj
-.\Debug\moc_UserCfgDlg.obj
-.\Debug\moc_UserCfgDlgData.obj
-.\Debug\IconSelectDlg.obj
-.\Debug\IconSelectDlgData.obj
-.\Debug\InputDlg.obj
-.\Debug\InputDlgData.obj
-.\Debug\mapapp.obj
-.\Debug\mapdisplay.obj
-.\Debug\plancanvas.obj
-.\Debug\SelectActiveDlg.obj
-.\Debug\SelectActiveDlgData.obj
-.\Debug\SetPenStyle.obj
-.\Debug\SetPenStyleData.obj
-c:\scada\lib\utilitiesd.lib
+@echo off
+%qtdir%\bin\moc.exe \scada\src\drivers\driver.h -o \scada\src\drivers\moc_driver.cpp
 ]
-Creating command line "link.exe @C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPB2.tmp"
+Creating command line "C:\WINNT\TEMP\RSP2CD.bat"
+Creating temporary file "C:\WINNT\TEMP\RSP2CE.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe \scada\src\UI\widgets\table.h -o \scada\src\UI\widgets\moc_table.cpp
+]
+Creating command line "C:\WINNT\TEMP\RSP2CE.bat"
+Creating temporary file "C:\WINNT\TEMP\RSP2CF.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe \scada\src\ui\widgets\led.h -o \scada\src\ui\widgets\moc_led.cpp
+]
+Creating command line "C:\WINNT\TEMP\RSP2CF.bat"
+Creating temporary file "C:\WINNT\TEMP\RSP2D0.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe \scada\src\UI\widgets\helpwindow.h -o \scada\src\UI\widgets\moc_helpwindow.cpp
+]
+Creating command line "C:\WINNT\TEMP\RSP2D0.bat"
+Creating temporary file "C:\WINNT\TEMP\RSP2D1.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe \scada\src\UI\widgets\dclock.h -o \scada\src\UI\widgets\moc_dclock.cpp
+]
+Creating command line "C:\WINNT\TEMP\RSP2D1.bat"
+Creating temporary file "C:\WINNT\TEMP\RSP2D2.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe \scada\src\UI\widgets\datepopup.h -o \scada\src\UI\widgets\moc_datepopup.cpp
+]
+Creating command line "C:\WINNT\TEMP\RSP2D2.bat"
+Creating temporary file "C:\WINNT\TEMP\RSP2D3.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe \scada\src\UI\widgets\dateobj.h -o \scada\src\UI\widgets\moc_dateobj.cpp
+]
+Creating command line "C:\WINNT\TEMP\RSP2D3.bat"
+Creating temporary file "C:\WINNT\TEMP\RSP2D4.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe \scada\src\UI\widgets\DateNavigatorData.h -o \scada\src\UI\widgets\moc_DateNavigatorData.cpp
+]
+Creating command line "C:\WINNT\TEMP\RSP2D4.bat"
+Creating temporary file "C:\WINNT\TEMP\RSP2D5.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe \scada\src\UI\widgets\DateNavigator.h -o \scada\src\UI\widgets\moc_DateNavigator.cpp
+]
+Creating command line "C:\WINNT\TEMP\RSP2D5.bat"
+Creating temporary file "C:\WINNT\TEMP\RSP2D6.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe \scada\src\UI\widgets\datenav.h -o \scada\src\UI\widgets\moc_datenav.cpp
+]
+Creating command line "C:\WINNT\TEMP\RSP2D6.bat"
+Creating temporary file "C:\WINNT\TEMP\RSP2D7.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe \scada\src\UI\widgets\calendar.h -o \scada\src\UI\widgets\moc_calendar.cpp
+]
+Creating command line "C:\WINNT\TEMP\RSP2D7.bat"
+Creating temporary file "C:\WINNT\TEMP\RSP2D8.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe \scada\src\database\results.h -o \scada\src\database\moc_results.cpp
+]
+Creating command line "C:\WINNT\TEMP\RSP2D8.bat"
+Creating temporary file "C:\WINNT\TEMP\RSP2D9.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe \scada\src\database\qsgigabase.h -o \scada\src\database\moc_qsgigabase.cpp
+]
+Creating command line "C:\WINNT\TEMP\RSP2D9.bat"
+Creating temporary file "C:\WINNT\TEMP\RSP2DA.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe \scada\src\database\qsfastdb.h -o \scada\src\database\moc_qsfastdb.cpp
+]
+Creating command line "C:\WINNT\TEMP\RSP2DA.bat"
+Creating temporary file "C:\WINNT\TEMP\RSP2DB.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe \scada\src\database\dbase.h -o \scada\src\database\moc_dbase.cpp
+]
+Creating command line "C:\WINNT\TEMP\RSP2DB.bat"
+Creating temporary file "C:\WINNT\TEMP\RSP2DC.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe \scada\src\common\repgen.h -o \scada\src\common\moc_repgen.cpp
+]
+Creating command line "C:\WINNT\TEMP\RSP2DC.bat"
+Creating temporary file "C:\WINNT\TEMP\RSP2DD.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe \scada\src\common\printrep.h -o \scada\src\common\moc_printrep.cpp
+]
+Creating command line "C:\WINNT\TEMP\RSP2DD.bat"
+Creating temporary file "C:\WINNT\TEMP\RSP2DE.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe \scada\src\common\messages.h -o \scada\src\common\moc_messages.cpp
+]
+Creating command line "C:\WINNT\TEMP\RSP2DE.bat"
+Creating temporary file "C:\WINNT\TEMP\RSP2DF.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe \scada\src\common\loggen.h -o \scada\src\common\moc_loggen.cpp
+]
+Creating command line "C:\WINNT\TEMP\RSP2DF.bat"
+Creating temporary file "C:\WINNT\TEMP\RSP2E0.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe \scada\src\common\dispatch.h -o \scada\src\common\moc_dispatch.cpp
+]
+Creating command line "C:\WINNT\TEMP\RSP2E0.bat"
+Creating temporary file "C:\WINNT\TEMP\RSP2E1.tmp" with contents
+[
+/nologo /MD /W3 /GX /O2 /I "C:\Qt\3.1.2\include" /I "C:\Qt\3.1.2\mkspecs\win32-msvc" /I "..\common" /I "..\database" /I "..\ui" /I "..\ui\widgets" /I "..\ui\drivers" /I ".\userdialogs" /I ".\sysdialogs" /I ".\widgets" /I ".\map" /I ".\drivers" /I ".\drivers\Simulator" /I "..\gigabase" /I "..\dispatcher\client" /I "..\ui\widgets\extra" /I "..\trace" /I "..\utilities" /I "..\drivers" /I "..\common\libds-2.2" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_USRDLL" /D "SCADA_EXPORTS" /D "USING_GARRET" /D "SECURE_SERVER" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_H_CPP" /Fo"Release/" /Fd"Release/" /FD /c 
+"E:\scada\src\common\moc_dispatch.cpp"
+"E:\scada\src\common\moc_loggen.cpp"
+"E:\scada\src\common\moc_messages.cpp"
+"E:\scada\src\common\moc_printrep.cpp"
+"E:\scada\src\common\moc_repgen.cpp"
+"E:\scada\src\database\moc_dbase.cpp"
+"E:\scada\src\database\moc_qsfastdb.cpp"
+"E:\scada\src\database\moc_qsgigabase.cpp"
+"E:\scada\src\database\moc_results.cpp"
+"E:\scada\src\UI\widgets\moc_calendar.cpp"
+"E:\scada\src\UI\widgets\moc_datenav.cpp"
+"E:\scada\src\UI\widgets\moc_DateNavigator.cpp"
+"E:\scada\src\UI\widgets\moc_DateNavigatorData.cpp"
+"E:\scada\src\UI\widgets\moc_dateobj.cpp"
+"E:\scada\src\UI\widgets\moc_datepopup.cpp"
+"E:\scada\src\UI\widgets\moc_dclock.cpp"
+"E:\scada\src\UI\widgets\moc_helpwindow.cpp"
+"E:\scada\src\ui\widgets\moc_led.cpp"
+"E:\scada\src\UI\widgets\moc_table.cpp"
+"E:\scada\src\drivers\moc_driver.cpp"
+"E:\scada\src\drivers\moc_SerialConnect.cpp"
+]
+Creating command line "cl.exe @C:\WINNT\TEMP\RSP2E1.tmp" 
+Moc'ing SerialConnect.h ...
+Moc'ing driver.h ...
+Moc'ing table.h ...
+Moc'ing led.h ...
+Moc'ing helpwindow.h ...
+Moc'ing dclock.h ...
+Moc'ing datepopup.h ...
+Moc'ing dateobj.h ...
+Moc'ing DateNavigatorData.h ...
+Moc'ing DateNavigator.h ...
+Moc'ing datenav.h ...
+Moc'ing calendar.h ...
+Moc'ing results.h ...
+Moc'ing qsgigabase.h ...
+MOCing qsfastdb.h...
+Moc'ing dbase.h ...
+Moc'ing repgen.h ...
+Moc'ing printrep.h ...
+Moc'ing messages.h ...
+Moc'ing loggen.h ...
+Moc'ing dispatch.h ...
+Creating temporary file "C:\WINNT\TEMP\RSP2E2.tmp" with contents
+[
+kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib wsock32.lib utilities.lib qt-mt312.lib realtimedbase.lib /nologo /dll /incremental:no /pdb:"c:\scada\bin/scada.pdb" /debug /machine:I386 /out:"c:\scada\bin/scada.dll" /implib:"c:\scada\lib/scada.lib" /libpath:"C:\Qt\3.1.2\lib" /libpath:"c:\scada\lib" 
+.\Release\avltree.obj
+.\Release\combo.obj
+.\Release\common.obj
+.\Release\dispatch.obj
+.\Release\dispatch_reader.obj
+.\Release\graph.obj
+.\Release\graphdata.obj
+.\Release\hashtbl.obj
+.\Release\heap.obj
+.\Release\loggen.obj
+.\Release\moc_dispatch.obj
+.\Release\moc_loggen.obj
+.\Release\moc_messages.obj
+.\Release\moc_printrep.obj
+.\Release\moc_repgen.obj
+.\Release\mythread.obj
+.\Release\parray.obj
+.\Release\printrep.obj
+.\Release\queue.obj
+.\Release\repgen.obj
+.\Release\set.obj
+.\Release\smplhist.obj
+.\Release\smplstat.obj
+.\Release\stack.obj
+.\Release\dbase.obj
+.\Release\fastdbclient.obj
+.\Release\gigaclient.obj
+.\Release\helper_functions.obj
+.\Release\historicdb.obj
+.\Release\moc_dbase.obj
+.\Release\moc_qsfastdb.obj
+.\Release\moc_qsgigabase.obj
+.\Release\moc_results.obj
+.\Release\qsfastdb.obj
+.\Release\qsgigabase.obj
+.\Release\realtimedb.obj
+.\Release\results.obj
+.\Release\calendar.obj
+.\Release\datenav.obj
+.\Release\DateNavigator.obj
+.\Release\DateNavigatorData.obj
+.\Release\dateobj.obj
+.\Release\datepopup.obj
+.\Release\dclock.obj
+.\Release\helpwindow.obj
+.\Release\led.obj
+.\Release\moc_calendar.obj
+.\Release\moc_datenav.obj
+.\Release\moc_DateNavigator.obj
+.\Release\moc_DateNavigatorData.obj
+.\Release\moc_dateobj.obj
+.\Release\moc_datepopup.obj
+.\Release\moc_dclock.obj
+.\Release\moc_helpwindow.obj
+.\Release\moc_led.obj
+.\Release\moc_table.obj
+.\Release\table.obj
+.\Release\valedit.obj
+.\Release\driver.obj
+.\Release\moc_driver.obj
+.\Release\moc_SerialConnect.obj
+.\Release\SerialConnect.obj
+.\Release\cli_gigabase.obj
+.\Release\repsock.obj
+.\Release\symtab.obj
+.\Release\w32sock.obj
+.\Release\cli_dispatcher.obj
+.\Release\cli_fastdb.obj
+c:\scada\lib\utilities.lib
+c:\scada\lib\realtimedbase.lib
+]
+Creating command line "link.exe @C:\WINNT\TEMP\RSP2E2.tmp"
 <h3>Output Window</h3>
 Compiling...
-historic_inspect.cpp
-inspect.cpp
-Generating Code...
-Linking...
-<h3>
---------------------Configuration: realtimesqlserver - Win32 Debug--------------------
-</h3>
-<h3>Command Lines</h3>
-Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPB4.tmp" with contents
-[
-/nologo /MTd /W3 /GX /Zi /Od /I "G:\qt\3.1.2\mkspecs\win32-msvc" /I "." /I "..\fastdb\inc" /I "..\trace" /I "..\utilities" /I "G:\qt\3.1.2\include" /D "_CONSOLE" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "QT_THREAD_SUPPORT" /D "USE_LOCALE_SETTINGS" /D "SECURE_SERVER" /D "QT_DLL" /D "QT_H_CPP" /Fo"Debug/" /Fd"Debug/" /c 
-"G:\scada\src\realtimesqlserver\main.cpp"
-"G:\scada\src\realtimesqlserver\realtimesqlserver.cpp"
-"G:\scada\src\fastdb\src\server.cpp"
-]
-Creating command line "cl.exe @C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPB4.tmp" 
-Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPB5.tmp" with contents
-[
-advapi32.lib user32.lib snmpapi.lib utilitiesd.lib wsock32.lib realtimedbased.lib qt-mt312.lib /nologo /subsystem:console /incremental:no /pdb:"Debug/realtimesqlserver.pdb" /debug /machine:I386 /out:"c:\scada\bin/rtsqlserver.exe" /pdbtype:sept /libpath:"G:\qt\3.1.2\lib" /libpath:"c:\scada\lib" 
-.\Debug\main.obj
-.\Debug\realtimesqlserver.obj
-.\Debug\server.obj
-c:\scada\lib\realtimedbased.lib
-c:\scada\lib\utilitiesd.lib
-]
-Creating command line "link.exe @C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPB5.tmp"
-<h3>Output Window</h3>
-Compiling...
-main.cpp
-realtimesqlserver.cpp
-server.cpp
-Generating Code...
-Linking...
-<h3>
---------------------Configuration: dspserver - Win32 Debug--------------------
-</h3>
-<h3>Command Lines</h3>
-Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPB7.tmp" with contents
-[
-/nologo /MTd /W3 /Zi /Od /I "G:\qt\3.1.2\include" /I "G:\qt\3.1.2\mkspecs\win32-msvc" /I "." /I "..\gigabase" /I "..\dispatcher\client" /I "..\dispatcher\server" /I "..\trace" /I "..\utilities" /D "_CONSOLE" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "QT_THREAD_SUPPORT" /D "USE_LOCALE_SETTINGS" /D "QT_DLL" /D "QT_H_CPP" /D "SECURE_SERVER" /Fo"Debug/" /Fd"Debug/" /c 
-"G:\scada\src\dispatcher\server\dispatcher.cpp"
-"G:\scada\src\dispatcher\server\server_dispatcher.cpp"
-"G:\scada\src\dispatchserver\main.cpp"
-]
-Creating command line "cl.exe @C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPB7.tmp" 
-Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPB8.tmp" with contents
-[
-advapi32.lib user32.lib snmpapi.lib utilitiesd.lib dbased.lib wsock32.lib qt-mt312.lib /nologo /subsystem:console /incremental:no /pdb:"Debug/dspserver.pdb" /debug /machine:I386 /out:"c:\scada\bin/dspserver.exe" /pdbtype:sept /libpath:"G:\qt\3.1.2\lib" /libpath:"c:\scada\lib" 
-.\Debug\dispatcher.obj
-.\Debug\server_dispatcher.obj
-.\Debug\main.obj
-c:\scada\lib\utilitiesd.lib
-]
-Creating command line "link.exe @C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPB8.tmp"
-<h3>Output Window</h3>
-Compiling...
-dispatcher.cpp
-server_dispatcher.cpp
-main.cpp
-Generating Code...
-Linking...
-<h3>
---------------------Configuration: manager - Win32 Debug--------------------
-</h3>
-<h3>Command Lines</h3>
-Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPBA.bat" with contents
-[
-@echo off
-%qtdir%\bin\moc.exe .\buttongroups.h -o .\moc_buttongroups.cpp
-]
-Creating command line "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPBA.bat"
-Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPBB.tmp" with contents
-[
-/nologo /MTd /W3 /Zi /Od /I "G:\qt\3.1.2\include" /I "G:\qt\3.1.2\mkspecs\win32-msvc" /I "." /I "..\gigabase" /I "..\dispatcher\client" /I "..\dispatcher\server" /I "..\trace" /I "..\utilities" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "QT_THREAD_SUPPORT" /D "USE_LOCALE_SETTINGS" /D "QT_DLL" /D "QT_H_CPP" /D "SECURE_SERVER" /Fo"Debug/" /Fd"Debug/" /c 
-"G:\scada\src\manager\buttongroups.cpp"
-"G:\scada\src\manager\main.cpp"
-"G:\scada\src\manager\moc_buttongroups.cpp"
-"C:\Qt\3.1.2\src\kernel\qtmain_win.cpp"
-]
-Creating command line "cl.exe @C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPBB.tmp" 
-MOCing buttongroups.h...
-Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPBC.tmp" with contents
-[
-advapi32.lib user32.lib snmpapi.lib utilitiesd.lib wsock32.lib qt-mt312.lib /nologo /subsystem:windows /incremental:no /pdb:"Debug/manager.pdb" /debug /machine:I386 /out:"c:\scada\bin/manager.exe" /pdbtype:sept /libpath:"G:\qt\3.1.2\lib" /libpath:"c:\scada\lib" 
-.\Debug\buttongroups.obj
-.\Debug\main.obj
-.\Debug\moc_buttongroups.obj
-.\Debug\qtmain_win.obj
-]
-Creating command line "link.exe @C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPBC.tmp"
-<h3>Output Window</h3>
-Compiling...
-buttongroups.cpp
-main.cpp
-moc_buttongroups.cpp
-qtmain_win.cpp
-Generating Code...
-Linking...
-<h3>
---------------------Configuration: archiver - Win32 Debug--------------------
-</h3>
-<h3>Command Lines</h3>
-Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPBE.bat" with contents
-[
-@echo off
-%qtdir%\bin\moc.exe .\archiver.h -o .\moc_archiver.cpp
-]
-Creating command line "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPBE.bat"
-Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPBF.tmp" with contents
-[
-/nologo /MTd /W3 /Zi /Od /I "G:\qt\3.1.2\include" /I "G:\qt\3.1.2\mkspecs\win32-msvc" /I "..\common" /I "..\database" /I "..\gigabase" /I "..\ui" /I "..\drivers" /I "..\ui\widgets" /I "..\trace" /I "..\utilities" /I "..\containers\sglib-1.0.4" /D "_CONSOLE" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "USING_GARRET" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_H_CPP" /Fo"Debug/" /Fd"Debug/" /c 
-"G:\scada\src\archiver\archiver.cpp"
-"G:\scada\src\archiver\moc_archiver.cpp"
-]
-Creating command line "cl.exe @C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPBF.tmp" 
-MOCing archiver.h...
-Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPC0.tmp" with contents
-[
-kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib WSOCK32.LIB scadad.lib snmpapi.lib utilitiesd.lib qt-mt312.lib /nologo /subsystem:console /incremental:no /pdb:"Debug/archiver.pdb" /debug /machine:I386 /nodefaultlib:"libcmt.lib" /out:"c:\scada\bin/archiver.exe" /pdbtype:sept /libpath:"G:\qt\3.1.2\lib" /libpath:"c:\scada\lib" 
-.\Debug\archiver.obj
-.\Debug\moc_archiver.obj
-c:\scada\lib\scadad.lib
-c:\scada\lib\utilitiesd.lib
-]
-Creating command line "link.exe @C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPC0.tmp"
-<h3>Output Window</h3>
-Compiling...
-archiver.cpp
-moc_archiver.cpp
-Generating Code...
-Linking...
-<h3>
---------------------Configuration: fifo - Win32 Debug--------------------
-</h3>
-<h3>Command Lines</h3>
-Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPC2.tmp" with contents
-[
-/nologo /MDd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "BUILDING_DLL" /D "USE_BASED_POINTERS" /Fp"Debug/fifo.pch" /YX /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
-"G:\scada\src\fifo\fifoc.cpp"
-"G:\scada\src\fifo\shmem.cpp"
-"G:\scada\src\fifo\shmemc.cpp"
-]
-Creating command line "cl.exe @C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPC2.tmp" 
-Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPC3.tmp" with contents
-[
-kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /incremental:yes /pdb:"c:\scada\bin/fifo.pdb" /debug /machine:I386 /out:"c:\scada\bin/fifo.dll" /implib:"c:\scada\lib/fifo.lib" /pdbtype:sept 
-.\Debug\fifoc.obj
-.\Debug\shmem.obj
-.\Debug\shmemc.obj
-]
-Creating command line "link.exe @C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPC3.tmp"
-<h3>Output Window</h3>
-Compiling...
-fifoc.cpp
-shmem.cpp
-shmemc.cpp
-Linking...
-   Creating library c:\scada\lib/fifo.lib and object c:\scada\lib/fifo.exp
-<h3>
---------------------Configuration: Calculated - Win32 Debug--------------------
-</h3>
-<h3>Command Lines</h3>
-Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPC7.bat" with contents
-[
-@echo off
-%qtdir%\bin\moc.exe .\CalculatedInputData.h -o .\moc_CalculatedInputData.cpp
-]
-Creating command line "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPC7.bat"
-Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPC8.bat" with contents
-[
-@echo off
-%qtdir%\bin\moc.exe .\CalculatedInput.h -o .\moc_CalculatedInput.cpp
-]
-Creating command line "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPC8.bat"
-Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPC9.bat" with contents
-[
-@echo off
-%qtdir%\bin\moc.exe .\CalculatedConfigureData.h -o .\moc_CalculatedConfigureData.cpp
-]
-Creating command line "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPC9.bat"
-Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPCA.bat" with contents
-[
-@echo off
-%qtdir%\bin\moc.exe .\CalculatedConfigure.h -o .\moc_CalculatedConfigure.cpp
-]
-Creating command line "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPCA.bat"
-Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPCB.bat" with contents
-[
-@echo off
-%qtdir%\bin\moc.exe .\Calculated.h -o .\moc_Calculated.cpp
-]
-Creating command line "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPCB.bat"
-Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPCC.bat" with contents
-[
-@echo off
-%qtdir%\bin\moc.exe .\CalcEntryDlgData.h -o .\moc_CalcEntryDlgData.cpp
-]
-Creating command line "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPCC.bat"
-Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPCD.bat" with contents
-[
-@echo off
-%qtdir%\bin\moc.exe .\CalcEntryDlg.h -o .\moc_CalcEntryDlg.cpp
-]
-Creating command line "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPCD.bat"
-Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPCE.tmp" with contents
-[
-/nologo /MDd /W3 /GX /Zi /Od /I "G:\qt\3.1.2\include" /I "G:\qt\3.1.2\mkspecs\win32-msvc" /I "..\..\gigabase" /I "..\..\common" /I ".." /I "..\..\database" /I "..\..\ui\widgets" /I "..\..\trace" /I "..\..\utilities" /I "..\..\fifo" /I "..\..\containers\sglib-1.0.4" /I "..\opc_client_com" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_USRDLL" /D "CALCULATED_EXPORTS" /D "USING_GARRET" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_H_CPP" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
-"G:\scada\src\drivers\Calculated\CalcEntryDlg.cpp"
-"G:\scada\src\drivers\Calculated\CalcEntryDlgData.cpp"
-"G:\scada\src\drivers\Calculated\Calculated.cpp"
-"G:\scada\src\drivers\Calculated\CalculatedConfigure.cpp"
-"G:\scada\src\drivers\Calculated\CalculatedConfigureData.cpp"
-"G:\scada\src\drivers\Calculated\CalculatedInput.cpp"
-"G:\scada\src\drivers\Calculated\CalculatedInputData.cpp"
-"G:\scada\src\drivers\Calculated\embedEiC.c"
-"G:\scada\src\drivers\Calculated\moc_CalcEntryDlg.cpp"
-"G:\scada\src\drivers\Calculated\moc_CalcEntryDlgData.cpp"
-"G:\scada\src\drivers\Calculated\moc_Calculated.cpp"
-"G:\scada\src\drivers\Calculated\moc_CalculatedConfigure.cpp"
-"G:\scada\src\drivers\Calculated\moc_CalculatedConfigureData.cpp"
-"G:\scada\src\drivers\Calculated\moc_CalculatedInput.cpp"
-"G:\scada\src\drivers\Calculated\moc_CalculatedInputData.cpp"
-]
-Creating command line "cl.exe @C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPCE.tmp" 
-MOCing CalculatedInputData.h...
-MOCing CalculatedInput.h...
-MOCing CalculatedConfigureData.h...
-MOCing CalculatedConfigure.h...
-MOCing Calculated.h...
-MOCing CalcEntryDlgData.h...
-MOCing CalcEntryDlg.h...
-Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPCF.tmp" with contents
-[
-scadad.lib utilitiesd.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib WSOCK32.LIB qt-mt312.lib fifo.lib eic.lib /nologo /dll /incremental:no /pdb:"Debug/Calculated.pdb" /debug /machine:I386 /out:"c:\scada\Drivers/Calculated.dll" /implib:"c:\scada\Drivers/Calculated.lib" /pdbtype:sept /libpath:"G:\qt\3.1.2\lib" /libpath:"c:\scada\lib" /libpath:"..\..\softlogic\EiC-4.4.2\src" 
-.\Debug\CalcEntryDlg.obj
-.\Debug\CalcEntryDlgData.obj
-.\Debug\Calculated.obj
-.\Debug\CalculatedConfigure.obj
-.\Debug\CalculatedConfigureData.obj
-.\Debug\CalculatedInput.obj
-.\Debug\CalculatedInputData.obj
-.\Debug\embedEiC.obj
-.\Debug\moc_CalcEntryDlg.obj
-.\Debug\moc_CalcEntryDlgData.obj
-.\Debug\moc_Calculated.obj
-.\Debug\moc_CalculatedConfigure.obj
-.\Debug\moc_CalculatedConfigureData.obj
-.\Debug\moc_CalculatedInput.obj
-.\Debug\moc_CalculatedInputData.obj
-c:\scada\lib\fifo.lib
-]
-Creating command line "link.exe @C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPCF.tmp"
-<h3>Output Window</h3>
-Compiling...
-CalcEntryDlg.cpp
-CalcEntryDlgData.cpp
-Calculated.cpp
-CalculatedConfigure.cpp
-CalculatedConfigureData.cpp
-CalculatedInput.cpp
-CalculatedInputData.cpp
-Generating Code...
-Compiling...
-embedEiC.c
-Generating Code...
-Compiling...
-moc_CalcEntryDlg.cpp
-moc_CalcEntryDlgData.cpp
-moc_Calculated.cpp
-moc_CalculatedConfigure.cpp
-moc_CalculatedConfigureData.cpp
-moc_CalculatedInput.cpp
-moc_CalculatedInputData.cpp
-Generating Code...
-Linking...
-   Creating library c:\scada\Drivers/Calculated.lib and object c:\scada\Drivers/Calculated.exp
-LINK : warning LNK4098: defaultlib "MSVCRT" conflicts with use of other libs; use /NODEFAULTLIB:library
-<h3>
---------------------Configuration: opc_client_com - Win32 Debug--------------------
-</h3>
-<h3>Command Lines</h3>
-Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPD3.bat" with contents
-[
-@echo off
-%qtdir%\bin\moc.exe .\opc_client_comInputData.h -o .\moc_opc_client_comInputData.cpp
-]
-Creating command line "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPD3.bat"
-Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPD4.bat" with contents
-[
-@echo off
-%qtdir%\bin\moc.exe .\opc_client_comInput.h -o .\moc_opc_client_comInput.cpp
-]
-Creating command line "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPD4.bat"
-Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPD5.bat" with contents
-[
-@echo off
-%qtdir%\bin\moc.exe .\opc_client_comConfigurationData.h -o .\moc_opc_client_comConfigurationData.cpp
-]
-Creating command line "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPD5.bat"
-Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPD6.bat" with contents
-[
-@echo off
-%qtdir%\bin\moc.exe .\opc_client_comConfiguration.h -o .\moc_opc_client_comConfiguration.cpp
-]
-Creating command line "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPD6.bat"
-Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPD7.bat" with contents
-[
-@echo off
-%qtdir%\bin\moc.exe .\opc_client_comCommandData.h -o .\moc_opc_client_comCommandData.cpp
-]
-Creating command line "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPD7.bat"
-Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPD8.bat" with contents
-[
-@echo off
-%qtdir%\bin\moc.exe .\opc_client_comCommand.h -o .\moc_opc_client_comCommand.cpp
-]
-Creating command line "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPD8.bat"
-Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPD9.bat" with contents
-[
-@echo off
-%qtdir%\bin\moc.exe .\opc_client_com_instance.h -o .\moc_opc_client_com_instance.cpp
-]
-Creating command line "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPD9.bat"
-Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPDA.bat" with contents
-[
-@echo off
-%qtdir%\bin\moc.exe .\opc_client_com.h -o .\moc_opc_client_com.cpp
-]
-Creating command line "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPDA.bat"
-Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPDB.tmp" with contents
-[
-/nologo /MDd /W3 /GX /Zi /Od /I "." /I "G:\qt\3.1.2\include" /I "G:\qt\3.1.2\mkspecs\win32-msvc" /I "..\..\gigabase" /I "..\..\common" /I ".." /I "..\..\database" /I "..\..\ui\widgets" /I "..\..\trace" /I "..\..\utilities" /I "..\..\containers\sglib-1.0.4" /I "..\..\fifo" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_USRDLL" /D "OPC_CLIENT_COM_EXPORTS" /D "USING_GARRET" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_H_CPP" /D "_WIN32_DCOM" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
-"G:\scada\src\drivers\opc_client_com\moc_opc_client_com.cpp"
-"G:\scada\src\drivers\opc_client_com\moc_opc_client_com_instance.cpp"
-"G:\scada\src\drivers\opc_client_com\moc_opc_client_comCommand.cpp"
-"G:\scada\src\drivers\opc_client_com\moc_opc_client_comCommandData.cpp"
-"G:\scada\src\drivers\opc_client_com\moc_opc_client_comConfiguration.cpp"
-"G:\scada\src\drivers\opc_client_com\moc_opc_client_comConfigurationData.cpp"
-"G:\scada\src\drivers\opc_client_com\moc_opc_client_comInput.cpp"
-"G:\scada\src\drivers\opc_client_com\moc_opc_client_comInputData.cpp"
-"G:\scada\src\drivers\opc_client_com\opc_client_com.cpp"
-"G:\scada\src\drivers\opc_client_com\opc_client_com_instance.cpp"
-"G:\scada\src\drivers\opc_client_com\opc_client_comCommand.cpp"
-"G:\scada\src\drivers\opc_client_com\opc_client_comCommandData.cpp"
-"G:\scada\src\drivers\opc_client_com\opc_client_comConfiguration.cpp"
-"G:\scada\src\drivers\opc_client_com\opc_client_comConfigurationData.cpp"
-"G:\scada\src\drivers\opc_client_com\opc_client_comdriverthread.cpp"
-"G:\scada\src\drivers\opc_client_com\opc_client_comInput.cpp"
-"G:\scada\src\drivers\opc_client_com\opc_client_comInputData.cpp"
-"G:\scada\src\drivers\opc_client_com\opcclient.cpp"
-"G:\scada\src\drivers\opc_client_com\opccomn_i.c"
-"G:\scada\src\drivers\opc_client_com\Opcda_i.c"
-"G:\scada\src\drivers\opc_client_com\OpcEnum_i.c"
-]
-Creating command line "cl.exe @C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPDB.tmp" 
-MOCing opc_client_comInputData.h...
-MOCing opc_client_comInput.h...
-MOCing opc_client_comConfigurationData.h...
-MOCing opc_client_comConfiguration.h...
-MOCing opc_client_comCommandData.h...
-MOCing opc_client_comCommand.h...
-MOCing opc_client_com_instance.h...
-MOCing opc_client_com.h...
-Creating temporary file "C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPDC.tmp" with contents
-[
-advapi32.lib scadad.lib utilitiesd.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib shell32.lib uuid.lib WSOCK32.LIB snmpapi.lib qt-mt312.lib fifo.lib /nologo /dll /incremental:no /pdb:"Debug/opc_client_com.pdb" /debug /machine:I386 /out:"c:\scada\Drivers/opc_client_com.dll" /implib:"c:\scada\Drivers/opc_client_com.lib" /pdbtype:sept /libpath:"G:\qt\3.1.2\lib" /libpath:"c:\scada\lib" 
-.\Debug\moc_opc_client_com.obj
-.\Debug\moc_opc_client_com_instance.obj
-.\Debug\moc_opc_client_comCommand.obj
-.\Debug\moc_opc_client_comCommandData.obj
-.\Debug\moc_opc_client_comConfiguration.obj
-.\Debug\moc_opc_client_comConfigurationData.obj
-.\Debug\moc_opc_client_comInput.obj
-.\Debug\moc_opc_client_comInputData.obj
-.\Debug\opc_client_com.obj
-.\Debug\opc_client_com_instance.obj
-.\Debug\opc_client_comCommand.obj
-.\Debug\opc_client_comCommandData.obj
-.\Debug\opc_client_comConfiguration.obj
-.\Debug\opc_client_comConfigurationData.obj
-.\Debug\opc_client_comdriverthread.obj
-.\Debug\opc_client_comInput.obj
-.\Debug\opc_client_comInputData.obj
-.\Debug\opcclient.obj
-.\Debug\opccomn_i.obj
-.\Debug\Opcda_i.obj
-.\Debug\OpcEnum_i.obj
-c:\scada\lib\fifo.lib
-]
-Creating command line "link.exe @C:\DOCUME~1\ADMINI~1\IMPOST~1\Temp\RSPDC.tmp"
-<h3>Output Window</h3>
-Compiling...
-moc_opc_client_com.cpp
-moc_opc_client_com_instance.cpp
-moc_opc_client_comCommand.cpp
-moc_opc_client_comCommandData.cpp
-moc_opc_client_comConfiguration.cpp
-moc_opc_client_comConfigurationData.cpp
-moc_opc_client_comInput.cpp
-moc_opc_client_comInputData.cpp
-opc_client_com.cpp
-opc_client_com_instance.cpp
-opc_client_comCommand.cpp
-opc_client_comCommandData.cpp
-opc_client_comConfiguration.cpp
-opc_client_comConfigurationData.cpp
-opc_client_comdriverthread.cpp
-opc_client_comInput.cpp
-opc_client_comInputData.cpp
-opcclient.cpp
-Generating Code...
-Compiling...
-opccomn_i.c
-Opcda_i.c
-OpcEnum_i.c
-Generating Code...
-Linking...
-   Creating library c:\scada\Drivers/opc_client_com.lib and object c:\scada\Drivers/opc_client_com.exp
-<h3>
---------------------Configuration: all - Win32 Debug--------------------
-</h3>
-<h3>Command Lines</h3>
+moc_dispatch.cpp
+moc_loggen.cpp
+moc_messages.cpp
+cl.exe terminated at user request.
 
-
-
-<h3>Results</h3>
-all - 0 error(s), 1 warning(s)
 </pre>
 </body>
 </html>
