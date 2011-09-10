@@ -1799,7 +1799,30 @@ void UserFrameWork::About()
 								#else
 								+ tr("Build configuration: ") + QString("Debug")
 								#endif
-   							    + QString(" at enscada.com")
+   							    + QString(" at enscada.com\n")
+								+ QString("\nIndigoSCADA (\"Software\") is distributed under a license agreement (\"Agreement\") between you,\n\
+(\"Licensee\") and Enscada Limited (\"Licensor\"). By downloading\n\
+the Software electronically, installing, copying, or otherwise using the\n\
+Software, Licensee agrees to be bound by the terms and conditions of this\n\
+Agreement. If Licensee does not agree to the terms and conditions of this\n\
+agreement then do not download the Software, install or use the Software, and\n\
+immediately destroy the Software.\n\
+IndigoSCADA is free software and may be used in accordance\n\
+with the terms of the GNU LESSER GENERAL PUBLIC LICENSE v3 as published by the Free\n\
+Software Foundation <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.\n\
+\n\
+LICENSEE ACKNOWLEDGES THAT THE SOFTWARE IS SUPPLIED FREE, WITHOUT LICENSE FEES\n\
+AND IS THEREFORE PROVIDED WITH NO WARRANTIES OF ANY KIND INCLUDING THE\n\
+WARRANTIES OF DESIGN, MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE,\n\
+NONINFRINGEMENT, OR ARISING FROM A COURSE OF DEALING, USAGE OR TRADE PRACTICE.\n\
+EXCEPT TO THE EXTENT PROHIBITED BY APPLICABLE LAW LICENSOR SHALL HAVE NO\n\
+LIABILITY FOR DAMAGES OF ANY KIND INCLUDING ANY INDIRECT OR CONSEQUENTIAL LOSS\n\
+(INCLUDING WITHOUT LIMITATION, LOSS OF USE; DATA; INFORMATION; BUSINESS;\n\
+PRODUCTION OR GOODWILL), EXEMPLARY OR INCIDENTAL DAMAGES, LOST PROFITS OR OTHER\n\
+SPECIAL OR PUNITIVE DAMAGES WHATSOEVER, WHETHER IN CONTRACT, TORT, (INCLUDING\n\
+NEGLIGENCE, STRICT LIABILITY AND ALL OTHERS), WARRANTY, INDEMNITY OR UNDER\n\
+STATUTE, EVEN IF LICENSOR HAS BEEN ADVISED OF THE LIKELIHOOD OF SAME.\n\
+")
 							);
 	#endif
 };
