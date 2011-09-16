@@ -221,7 +221,7 @@ int PlanWindow::Load(QDataStream &is)
 			{
 				IT_COMMENT("PLAN_ICON");
 
-				is >> *( new PlanIcon(canvas()));   //qui ogni tanto c'e' un problema di carico icona            
+				is >> *( new PlanIcon(canvas()));   //here there is access violation with QT 3.2.1
 			};
 			break;
 			case PLAN_LABEL:
@@ -1687,7 +1687,9 @@ QCanvasPixmapArray * PlanIcon::GetImageArray(const QString &s)
 
 				if(p)
 				{
-					delete p;
+					#if (QT_VERSION < 0x030201)
+					delete p; //BUG somewhere here, commented for QT version 321  //apa 16-09-2011
+					#endif
 					p = NULL;
 				}
 			};

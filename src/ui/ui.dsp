@@ -54,7 +54,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib WSOCK32.LIB snmpapi.lib scadad.lib utilitiesd.lib qt-mt$(QTVER).lib /nologo /subsystem:windows /incremental:no /pdb:"Debug/ist.pdb" /debug /machine:I386 /nodefaultlib:"libcmt.lib" /out:"c:\scada\bin/ist.exe" /pdbtype:sept /libpath:"$(QTDIR)\lib" /libpath:"c:\scada\lib"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib WSOCK32.LIB snmpapi.lib scadad.lib utilitiesd.lib qt-mtnc$(QTVER).lib qtmain.lib /nologo /subsystem:windows /incremental:no /pdb:"Debug/ist.pdb" /debug /machine:I386 /nodefaultlib:"libcmtd.lib msvcrtd.lib" /out:"c:\scada\bin/ist.exe" /pdbtype:sept /libpath:"$(QTDIR)\lib" /libpath:"c:\scada\lib"
 # SUBTRACT LINK32 /pdb:none
 
 !ELSEIF  "$(CFG)" == "ui - Win32 Release"
@@ -84,7 +84,7 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib WSOCK32.LIB scada.lib snmpapi.lib qtdll.lib utilities.lib /nologo /subsystem:windows /debug /machine:I386 /nodefaultlib:"msvcrt.lib" /out:"c:\scada\bin/ist.exe" /pdbtype:sept /libpath:"$(QTDIR)\lib" /libpath:"c:\scada\lib"
 # SUBTRACT BASE LINK32 /pdb:none
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib snmpapi.lib wsock32.lib scada.lib utilities.lib qt-mt$(QTVER).lib /nologo /subsystem:windows /incremental:no /debug /machine:I386 /out:"c:\scada\bin/ist.exe" /libpath:"$(QTDIR)\lib" /libpath:"c:\scada\lib"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib snmpapi.lib wsock32.lib scada.lib utilities.lib qt-mtnc$(QTVER).lib qtmain.lib /nologo /subsystem:windows /incremental:no /debug /machine:I386 /nodefaultlib:"msvcrt.lib" /out:"c:\scada\bin/ist.exe" /libpath:"$(QTDIR)\lib" /libpath:"c:\scada\lib"
 # SUBTRACT LINK32 /pdb:none
 
 !ENDIF 
@@ -425,10 +425,6 @@ InputName=multitrace
 
 !ENDIF 
 
-# End Source File
-# Begin Source File
-
-SOURCE=C:\Qt\3.1.2\src\kernel\qtmain_win.cpp
 # End Source File
 # Begin Source File
 
@@ -3217,33 +3213,6 @@ InputName=SetPenStyleData
 # Begin Source File
 
 SOURCE=..\..\Setup\International\Italiano.po
-
-!IF  "$(CFG)" == "ui - Win32 Debug"
-
-# Begin Custom Build
-InputDir=\scada\Setup\International
-InputPath=..\..\Setup\International\Italiano.po
-InputName=Italiano
-
-"C:\scada\Translations\Italiano.qm" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	%qtdir%\bin\msg2qm.exe $(InputDir)\$(InputName).po C:\scada\Translations\Italiano.qm
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "ui - Win32 Release"
-
-# Begin Custom Build
-InputDir=\scada\Setup\International
-InputPath=..\..\Setup\International\Italiano.po
-InputName=Italiano
-
-"C:\scada\Translations\Italiano.qm" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	%qtdir%\bin\msg2qm.exe $(InputDir)\$(InputName).po C:\scada\Translations\Italiano.qm
-
-# End Custom Build
-
-!ENDIF 
-
 # End Source File
 # End Group
 # End Group
