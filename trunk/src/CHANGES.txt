@@ -22,4 +22,7 @@ Added driver DNP3, it is in pre alpha state
 Added driver MODBUS, it is in pre alpha state
 
 OPC HDA is in pre alpha state
+---------------------------------------------------------------------------
+16-09-2011
+Made porting to qt-win-noncommercial-msvc-3.2.1.exe
 

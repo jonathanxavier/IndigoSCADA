@@ -55,7 +55,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib wsock32.lib utilitiesd.lib qt-mt$(QTVER).lib realtimedbased.lib /nologo /dll /incremental:no /pdb:"Debug/scada.pdb" /debug /machine:I386 /out:"c:\scada\bin/scadad.dll" /implib:"c:\scada\lib/scadad.lib" /pdbtype:sept /libpath:"$(QTDIR)\lib" /libpath:"c:\scada\lib"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib wsock32.lib utilitiesd.lib qt-mtnc$(QTVER).lib realtimedbased.lib /nologo /dll /incremental:no /pdb:"Debug/scada.pdb" /debug /machine:I386 /out:"c:\scada\bin/scadad.dll" /implib:"c:\scada\lib/scadad.lib" /pdbtype:sept /libpath:"$(QTDIR)\lib" /libpath:"c:\scada\lib"
 # SUBTRACT LINK32 /pdb:none
 
 !ELSEIF  "$(CFG)" == "scada - Win32 Release"
@@ -86,7 +86,7 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib wsock32.lib qtdll.lib utilities.lib /nologo /dll /debug /machine:I386 /nodefaultlib:"msvcrt.lib" /implib:"c:\scada\lib/scada.lib" /pdbtype:sept /libpath:"$(QTDIR)\lib" /libpath:"c:\scada\lib"
 # SUBTRACT BASE LINK32 /pdb:none
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib wsock32.lib utilities.lib qt-mt$(QTVER).lib realtimedbase.lib /nologo /dll /incremental:no /debug /machine:I386 /implib:"c:\scada\lib/scada.lib" /libpath:"$(QTDIR)\lib" /libpath:"c:\scada\lib"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib wsock32.lib utilities.lib qt-mtnc$(QTVER).lib realtimedbase.lib /nologo /dll /incremental:no /debug /machine:I386 /implib:"c:\scada\lib/scada.lib" /libpath:"$(QTDIR)\lib" /libpath:"c:\scada\lib"
 # SUBTRACT LINK32 /pdb:none
 
 !ENDIF 

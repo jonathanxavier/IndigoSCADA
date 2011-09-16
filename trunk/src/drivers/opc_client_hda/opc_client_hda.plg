@@ -6,36 +6,6 @@
 --------------------Configuration: opc_client_hda - Win32 Release--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating temporary file "C:\WINNT\TEMP\RSP1D6.tmp" with contents
-[
-scada.lib utilities.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib shell32.lib uuid.lib WSOCK32.LIB snmpapi.lib qt-mt312.lib fifo.lib /nologo /dll /incremental:no /pdb:"Debug/opc_client_hda.pdb" /debug /machine:I386 /out:"c:\scada\Drivers/opc_client_hda.dll" /implib:"c:\scada\Drivers/opc_client_hda.lib" /pdbtype:sept /libpath:"C:\Qt\3.1.2\lib" /libpath:"c:\scada\lib" 
-.\Release\moc_opc_client_hda.obj
-.\Release\moc_opc_client_hda_instance.obj
-.\Release\moc_opc_client_hdaCommand.obj
-.\Release\moc_opc_client_hdaCommandData.obj
-.\Release\moc_opc_client_hdaConfiguration.obj
-.\Release\moc_opc_client_hdaConfigurationData.obj
-.\Release\moc_opc_client_hdaInput.obj
-.\Release\moc_opc_client_hdaInputData.obj
-.\Release\opc_client_hda.obj
-.\Release\opc_client_hda_instance.obj
-.\Release\opc_client_hdaCommand.obj
-.\Release\opc_client_hdaCommandData.obj
-.\Release\opc_client_hdaConfiguration.obj
-.\Release\opc_client_hdaConfigurationData.obj
-.\Release\opc_client_hdadriverthread.obj
-.\Release\opc_client_hdaInput.obj
-.\Release\opc_client_hdaInputData.obj
-.\Release\opcclient_hda.obj
-.\Release\opccomn_i.obj
-.\Release\OpcEnum_i.obj
-.\Release\opcda_i.obj
-.\Release\opchda_i.obj
-]
-Creating command line "link.exe @C:\WINNT\TEMP\RSP1D6.tmp"
-<h3>Output Window</h3>
-Linking...
-   Creating library c:\scada\Drivers/opc_client_hda.lib and object c:\scada\Drivers/opc_client_hda.exp
 
 
 
