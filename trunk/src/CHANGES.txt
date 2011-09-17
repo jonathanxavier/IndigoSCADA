@@ -1,4 +1,3 @@
-
 03-05-2011
 Development of OPC client A&E 1.10 and OPC client HDA 1.20 is under way
 
@@ -25,4 +24,6 @@ OPC HDA is in pre alpha state
 ---------------------------------------------------------------------------
 16-09-2011
 Made porting to qt-win-noncommercial-msvc-3.2.1.exe
-
+---------------------------------------------------------------------------
+17-09-2011
+Added driver IEC 101, it is in pre alpha state
