@@ -14,7 +14,7 @@ To compile under WIN32 go to .\src\daq directory
 and run daq.dsw with Visual Studio C++ 6.0 or later
 
 You need:
-Qt Development Frameworks version 3.1.2 or 2.3.2 for Windows
+Qt Development Frameworks version 3.1.2 commercial or 2.3.2 non commercial for Windows
 STLPort 6.4.6 or later
 
 Linux
