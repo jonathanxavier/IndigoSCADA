@@ -1349,7 +1349,7 @@ PlanActive * PlanWindow::FindActiveObject(const QString &n)
 *Outputs:none
 *Returns:none
 */
-void PlanWindow::UpdateActiveObject(const QString &name,const QString &Value, const QColor c)
+void PlanWindow::UpdateActiveObject(const QString &name,const QString &Value, const QColor c, int state)
 {
 	IT_IT("PlanWindow::UpdateActiveObject");
 
@@ -1359,10 +1359,9 @@ void PlanWindow::UpdateActiveObject(const QString &name,const QString &Value, co
 	{
 		p->SetValue(Value);
 		p->SetColour(c);
+		p->SetIState(state);
 		repaint(false);
 	};
-
-	
 };
 /*
 *Function:UpdateActiveValue
@@ -1370,7 +1369,7 @@ void PlanWindow::UpdateActiveObject(const QString &name,const QString &Value, co
 *Outputs:none
 *Returns:none
 */
-void PlanWindow::UpdateActiveValue(const QString &name,const QString &tag,const QString &Value)
+void PlanWindow::UpdateActiveValue(const QString &name,const QString &tag,const QString &Value, int state)
 {
 	IT_IT("PlanWindow::UpdateActiveValue");
 
@@ -1381,6 +1380,7 @@ void PlanWindow::UpdateActiveValue(const QString &name,const QString &tag,const 
 		if(p->GetTagName() == tag)
 		{
 			p->SetValue(Value);
+			p->SetIState(state);
 		};
 	};
 
@@ -1392,7 +1392,7 @@ void PlanWindow::UpdateActiveValue(const QString &name,const QString &tag,const 
 *Outputs:none
 *Returns:none
 */
-void PlanWindow::UpdateActiveColour(const QString &name, QColor c)
+void PlanWindow::UpdateActiveColour(const QString &name, QColor c, int state)
 {
 	IT_IT("PlanWindow::UpdateActiveColour");
 
@@ -1400,6 +1400,7 @@ void PlanWindow::UpdateActiveColour(const QString &name, QColor c)
 
 	if(p)
 	{
+		p->SetIState(state);
 		p->SetColour(c);
 		repaint(false);
 	};

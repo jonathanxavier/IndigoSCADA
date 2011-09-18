@@ -277,11 +277,15 @@ void MapDisplay::UpdateSamplePoint()
 
 	GetCurrentDb()->GotoBegin();
 
+	int state;
+
 	for(int i = 0; i < n; i++, GetCurrentDb()->FetchNext())
 	{
+		state = GetCurrentDb()->GetInt("STATE");
 		pMap->UpdateActiveColour(
 		GetCurrentDb()->GetString("NAME"),
-		GetAlarmStateBkColour(GetCurrentDb()->GetInt("STATE")));
+		GetAlarmStateBkColour(state),
+		state);
 		//
 		// set the flash state based onthe acknowldege state
 		pMap->UpdateActiveFlash(
@@ -318,7 +322,7 @@ void MapDisplay::UpdateTags() // handle tag updates - this updates the value str
 
 		pMap->UpdateActiveValue(name,
 			GetCurrentDb()->GetString("TAGNAME"),
-			val);
+			val, GetCurrentDb()->GetInt("STATE"));
 	};
 
 	pMap->repaint(true); // redraw the lot
