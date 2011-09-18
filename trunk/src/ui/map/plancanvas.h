@@ -156,6 +156,7 @@ class PlanIcon : public QCanvasSprite
 	//
 	QString Name;        // name of image array
 	double iValue;       // the current value if a ranged icon
+	int iState; //+++apa 18-09-2011
 	//
 	//
 	class  IconData // icon data - eventually hook in stuff to make this clever
@@ -163,11 +164,11 @@ class PlanIcon : public QCanvasSprite
 		public:
 		QCanvasPixmapArray *pArray; // array
 		double iMin,iMax;      // range if not animated - ranged icon
-		// this is a ranged icon - displayed frame varies with value
+
 		//12-08-09 
-		//Se e' una icona a sequenza di frame (tipo fiammata del forno), settare a 0 nel file .def
-		//Se e' una icona a sequenza di frame che dipendono dal valore analogico (tipo livello vasca), settare a 1 nel file .def         
-		//Se e' una icona a sequenza di frame che dipendono dal valore digitale (punto singolo o doppio), settare a 2 nel file .def                  
+		//If the icon is a sequence frame, set a 0 in  .def file
+		//If the icon is for analog point, set a 1 in  .def file
+		//If the icon is a digital point, set a 2 in  .def file
 		int Ranged; 
 		
 		IconData() :pArray(0),iMin(0),iMax(0),Ranged(0) {};
@@ -198,7 +199,7 @@ class PlanIcon : public QCanvasSprite
 	//
 	static IconMap Icons; // map of pixmaps
 	//
-	void advance(int i) //aggiorna la pixmap
+	void advance(int i) //update la pixmap
 	{
 		IT_IT("PlanIcon::advance");
 
@@ -237,16 +238,26 @@ class PlanIcon : public QCanvasSprite
 							}
 						}
 					}
-					else if((*i).second.Ranged == 2) // ranged digital display, i.e interruttore: led rosso per CHIUSO oppure led verde per APERTO
+					else if((*i).second.Ranged == 2) // ranged digital display, i.e single or double digital points 
 					{
 						IT_COMMENT1("Digital iValue = %f", iValue);
 
 						int f;
 
+						/*single point information 0 off, 1 on*/
+
+						/* double point 0 indeterminate or intermediate state
+							1 determinate state off
+							2 determinate state on
+							3 indeterminate state 
+						*/
+
 						if(iValue == 0x00){ f = 0; }
-						if(iValue == 0x01){ f = 1; }
-						if(iValue == 0x02){ f = 2; }
+						if(iValue == 0x01){ f = 1; } 
+						if(iValue == 0x02){ f = 2; }	
 						if(iValue == 0x03){ f = 3; }
+						if(iState == NoLevel){ f = 4; }	/* white led or no state*/
+						if(iState == FailureLevel){ f = 5; } /* blu led or communication driver failure state*/
 
 							IT_COMMENT1("Frame calcolato = %d", f);
 							//
@@ -262,7 +273,7 @@ class PlanIcon : public QCanvasSprite
 								this->show(); //Visualiszzo la pixmap solo dopo che e' stata selezionata
 							};
 					}
-					else // animated. Servono a simulare gli oggetti un rotazione
+					else // animated, i.e. rotating object 
 					{
 						if(frame() <  (frameCount() - 1))
 						{
@@ -431,6 +442,11 @@ class PlanActive : public PlanIcon
 			iValue = v; // update the associated icon index
 		};
 		//
+	};
+	virtual void SetIState(int i) 
+	{
+		IT_IT("PlanActive::SetIState");
+		iState = i;
 	};
 	const QString & GetValue() { return Value;};
 	void SetFlash(bool f) 
@@ -709,9 +725,9 @@ class PlanWindow : public QCanvasView // the map window
 	//
 	PlanActive * FindActiveObject(const QString &);
 	//
-	void UpdateActiveObject(const QString &name,const QString &Value, const QColor c);
-	void UpdateActiveValue(const QString &name,const QString &tag, const QString &Value);
-	void UpdateActiveColour(const QString &name, QColor c);
+	void UpdateActiveObject(const QString &name,const QString &Value, const QColor c, int state);
+	void UpdateActiveValue(const QString &name,const QString &tag, const QString &Value, int state);
+	void UpdateActiveColour(const QString &name, QColor c, int state);
 	void UpdateActiveFlash(const QString &name, bool f);
 	//
 	void deleteSelectedObject();
