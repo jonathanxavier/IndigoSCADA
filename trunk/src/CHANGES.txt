@@ -7,6 +7,8 @@ To fix we propose these steps:
 1) Browsing of server upto 40000 ItemsID
 2) Choosing a subset of the ItemsID
 3) The OPC DA client adds only the subset of items select in fase 2)
+4) We need to implement the configurator, in order to load from external file (.xml or .xls)
+   only the ItemsID requested
 ---------------------------------------------------------------------------
 30-07-2011
 Added driver IEC 104
