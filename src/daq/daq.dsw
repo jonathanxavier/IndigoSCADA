@@ -131,6 +131,12 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name iec101driver
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name dll_sample
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name exe_sample
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -153,6 +159,21 @@ Package=<4>
 
 ###############################################################################
 
+Project: "dll_sample"="..\drivers\opc_server_da\lo-0.888\LightOPC\samp_dll.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name lightopc_lib
+    End Project Dependency
+}}}
+
+###############################################################################
+
 Project: "dnp3driver"=..\drivers\dnp3\dnp3driver.dsp - Package Owner=<4>
 
 Package=<5>
@@ -165,7 +186,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "dnp3master"=..\drivers\modbus\drivers\dnp3\protocol\dnp3master.dsp - Package Owner=<4>
+Project: "dnp3master"=..\drivers\dnp3\protocol\dnp3master.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -177,7 +198,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "dnp3slave"=..\drivers\modbus\drivers\dnp3\protocol\dnp3slave.dsp - Package Owner=<4>
+Project: "dnp3slave"=..\drivers\dnp3\protocol\dnp3slave.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -199,6 +220,21 @@ Package=<4>
 {{{
     Begin Project Dependency
     Project_Dep_Name utilities
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "exe_sample"="..\drivers\opc_server_da\lo-0.888\LightOPC\samp_exe.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name lightopc_lib
     End Project Dependency
 }}}
 
@@ -264,43 +300,19 @@ Package=<4>
 
 ###############################################################################
 
-Project: "iec104master"="..\drivers\iec104\protocol-st\iec104master.dsp" - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-    Begin Project Dependency
-    Project_Dep_Name fifo
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name libevent
-    End Project Dependency
-}}}
-
-###############################################################################
-
-Project: "iec104slave"="..\drivers\iec104\protocol-st\iec104slave.dsp" - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-    Begin Project Dependency
-    Project_Dep_Name libevent
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name fifo
-    End Project Dependency
-}}}
-
-###############################################################################
-
 Project: "libevent"="..\drivers\iec104\libevent-1.4.13-stable\WIN32-Prj\libevent.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "lightopc_lib"="..\drivers\opc_server_da\lo-0.888\LightOPC\lightopc.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
