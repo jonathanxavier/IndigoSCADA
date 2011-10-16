@@ -11,9 +11,10 @@ To fix we propose these steps:
    only the ItemsID requested
 ---------------------------------------------------------------------------
 30-07-2011
-Added driver IEC 104
+Added driver IEC 104, it is missing the protocol implementation
 
-Configuration data for iec104driver is now in PROPS table (in columns IKEY,DVAL) should be moved to TAGS table (column PARAMS )
+The configuration data for iec104driver is now in PROPS table (in columns IKEY,DVAL) 
+That data should be moved to TAGS table (column PARAMS )
 
 See #ifdef TEST_OF_IEC_104_DRIVER_IS_UNDER_WAY
 ---------------------------------------------------------------------------
@@ -29,3 +30,6 @@ Made porting to qt-win-noncommercial-msvc-3.2.1.exe
 ---------------------------------------------------------------------------
 17-09-2011
 Added driver IEC 101, it is in pre alpha state
+---------------------------------------------------------------------------
+15-10-2011
+Added OPC Server DA 2.0, it is missing the interface between real time data and OPC DA server
