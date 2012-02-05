@@ -24,6 +24,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
 // OTHER DEALINGS IN THE SOFTWARE.
 
+// Modified by Enscada limited http://www.enscada.com
+
 #ifndef FACTORY_H
 #define FACTORY_H
 
@@ -37,6 +39,7 @@ class ObjectHeader
 {
 public:
     // object prefix codes
+	/*
     static const uint8_t PACKED_WITHOUT_A_PREFIX = 0;
     static const uint8_t ONE_OCTET_INDEX         = 1;
     static const uint8_t TWO_OCTET_INDEX         = 2;
@@ -57,6 +60,27 @@ public:
     static const uint8_t TWO_OCTET_COUNT_OF_OBJECTS                 = 8;
     static const uint8_t FOUR_OCTET_COUNT_OF_OBJECTS                = 9;
     static const uint8_t ONE_OCTET_COUNT_OF_OBJECTS_VARIABLE_FORMAT =0xb;
+	*/
+    static const uint8_t PACKED_WITHOUT_A_PREFIX;
+    static const uint8_t ONE_OCTET_INDEX;
+    static const uint8_t TWO_OCTET_INDEX;
+    static const uint8_t FOUR_OCTET_INDEX;
+    static const uint8_t ONE_OCTET_SIZE;
+    static const uint8_t TWO_OCTET_SIZE;
+    static const uint8_t FOUR_OCTET_SIZE;
+
+    // range specifier codes
+    static const uint8_t ONE_OCTET_START_STOP_INDEXES;
+    static const uint8_t TWO_OCTET_START_STOP_INDEXES;
+    static const uint8_t FOUR_OCTET_START_STOP_INDEXES;
+    static const uint8_t ONE_OCTET_START_STOP_VIRTUAL_ADDRESSES;
+    static const uint8_t TWO_OCTET_START_STOP_VIRTUAL_ADDRESSES;
+    static const uint8_t FOUR_OCTET_START_STOP_VIRTUAL_ADDRESSES;
+    static const uint8_t NO_RANGE_FIELD;
+    static const uint8_t ONE_OCTET_COUNT_OF_OBJECTS;
+    static const uint8_t TWO_OCTET_COUNT_OF_OBJECTS;
+    static const uint8_t FOUR_OCTET_COUNT_OF_OBJECTS;
+    static const uint8_t ONE_OCTET_COUNT_OF_OBJECTS_VARIABLE_FORMAT;
 
     // the object header size is dependent on the qualifier field
     ObjectHeader(uint8_t  group=0,
@@ -91,7 +115,7 @@ class Factory
 {
 public:
     typedef uint16_t ObjectKey;
-    typedef std::map<Factory::ObjectKey, DnpObject*> DnpObjectMap;
+    typedef std::map<ObjectKey, DnpObject*> DnpObjectMap;
 
     Factory(EventInterface* eventInterface_p);
 

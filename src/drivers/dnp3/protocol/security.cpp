@@ -24,6 +24,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
 // OTHER DEALINGS IN THE SOFTWARE.
 
+// Modified by Enscada limited http://www.enscada.com
+
 
 #include<algorithm>
 #include <assert.h>
@@ -32,10 +34,12 @@
 #include "master.hpp"
 #include "outstation.hpp"
 #include "security.hpp"
+#ifdef USE_CRIPTO
 #include "wrap.h"
 #include "sha1.h"
+#endif
 
-
+const int Key::MIN_KEY_SIZE = 16;
 
 const char* SecureAuthentication::stateStrings[ NUM_STATES] =
 {
@@ -130,6 +134,7 @@ bool SecureAuthenicationState::rxCriticalAsdu()
 bool SecureAuthenicationState::rxResponse()
 {
     assert(0);
+	return 0;
 }
 
 void SecureAuthenicationState::errorMsg()
@@ -803,6 +808,7 @@ void SecureAuthentication::calculateHmac(Bytes& hmac,
 					 const Bytes& challengeAsdu,
 					 const Bytes& challengedAsdu )
 {
+	#ifdef USE_CRIPTO
     unsigned char key[updateKey.size()];
     unsigned char input[challengeAsdu.size() + challengedAsdu.size()];
     unsigned char output[20];
@@ -822,11 +828,13 @@ void SecureAuthentication::calculateHmac(Bytes& hmac,
 
     // take left most 8 octects assuming we are going over TCP
     hmac = Bytes( output, output+8);
+	#endif
 }
 
 void SecureAuthentication::calculateHmac(Bytes& hmac,
 					 const Bytes& challengeAsdu )
 {
+	#ifdef USE_CRIPTO
     unsigned char key[updateKey.size()];
     unsigned char input[challengeAsdu.size()];
     unsigned char output[20];
@@ -838,6 +846,7 @@ void SecureAuthentication::calculateHmac(Bytes& hmac,
 
     // take left most 8 octects assuming we are going over TCP
     hmac = Bytes( output, output+8);
+	#endif
 }
 
 
@@ -850,7 +859,7 @@ MasterSecurity::MasterSecurity(Master* app_p, bool aggressiveMode) :
   waitForKeyStatus(this),
   waitForKeyConfirmation(this)
 {
-    char name[Stats::MAX_USER_NAME_LEN];
+    char name[MAX_USER_NAME_LEN];
     Stats::Element temp[] =
     {
 	// Error Reasons
@@ -898,7 +907,7 @@ MasterSecurity::MasterSecurity(Master* app_p, bool aggressiveMode) :
     assert (sizeof(temp)/sizeof(Stats::Element) == NUM_STATS);
     memcpy(statElements, temp, sizeof(temp));
     // MA - Master Authentication
-    snprintf(name, sizeof(name), "MA %6d ", app_p->addr);
+    sprintf(name, "MA %6d ", app_p->addr);
     stats = Stats( name, app_p->addr, app_p->debug_p, statElements, NUM_STATS,
 		   app_p->db_p, EventInterface::SA_AB_ST);
 }
@@ -1042,6 +1051,7 @@ void MasterSecurity::aes128KeyWrap( Bytes&       wrappedKeyData,
 				    const Bytes& monitorKey,
 				    const Bytes& keyStatus)
 {
+	#ifdef USE_CRIPTO
     unsigned char input[AES_MAX_PLAIN_LEN];
     unsigned char output[AES_MAX_WRAPPED_LEN];
     unsigned char key[AES_128_SIZE];
@@ -1071,6 +1081,7 @@ void MasterSecurity::aes128KeyWrap( Bytes&       wrappedKeyData,
 
     // put the char data into a Bytes container
     wrappedKeyData = Bytes( output, output+((len+1)*8));
+	#endif
 }
 
 OutstationSecurity::OutstationSecurity(Outstation* app_p, bool aggressiveMode):
@@ -1082,7 +1093,7 @@ OutstationSecurity::OutstationSecurity(Outstation* app_p, bool aggressiveMode):
     idle.id = SecureAuthentication::OUTSTATION_IDLE;
     waitForResponse.id = SecureAuthentication::OUTSTATION_WAIT_FOR_RESPONSE;
 
-    char name[Stats::MAX_USER_NAME_LEN];
+    char name[MAX_USER_NAME_LEN];
     Stats::Element temp[] =
     {
 	// Error Reasons
@@ -1132,7 +1143,7 @@ OutstationSecurity::OutstationSecurity(Outstation* app_p, bool aggressiveMode):
     assert (sizeof(temp)/sizeof(Stats::Element) == NUM_STATS);
     memcpy(statElements, temp, sizeof(temp));
     // OA - Outstation Authentication
-    snprintf(name, sizeof(name), "OA %6d ", app_p->addr);
+    sprintf(name, "OA %6d ", app_p->addr);
     stats = Stats( name, app_p->addr, app_p->debug_p, statElements, NUM_STATS,
 		   app_p->db_p, EventInterface::SA_AB_ST);
 
@@ -1242,6 +1253,7 @@ void OutstationSecurity::aes128KeyUnwrap( const Bytes&       wrappedKeyData,
 					  Bytes&             monitorKey,
 					  Bytes&             keyStatusEncoded)
 {
+	#ifdef USE_CRIPTO
     unsigned char input[AES_MAX_WRAPPED_LEN];
     unsigned char output[AES_MAX_PLAIN_LEN];
     unsigned char key[AES_128_SIZE];
@@ -1275,4 +1287,5 @@ void OutstationSecurity::aes128KeyUnwrap( const Bytes&       wrappedKeyData,
     monitorKey = Bytes( output_p, output_p + Key::MIN_KEY_SIZE);
     output_p += Key::MIN_KEY_SIZE;
     keyStatusEncoded = Bytes( output_p, output_p + sessionKeyStatus.size());
+	#endif
 }

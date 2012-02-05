@@ -24,6 +24,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
 // OTHER DEALINGS IN THE SOFTWARE.
 
+// Modified by Enscada limited http://www.enscada.com
+
 #include <assert.h>
 #include <string.h>  // for memcpy
 #include <stdio.h>
@@ -32,7 +34,7 @@
 Datalink::Datalink( DatalinkConfig& config,
 		    EventInterface* eventInterface_p)			  
 {
-    char name[Stats::MAX_USER_NAME_LEN];
+    char name[MAX_USER_NAME_LEN];
 
     isMaster                = config.isMaster;
     addr                    = config.addr;
@@ -104,7 +106,7 @@ Datalink::Datalink( DatalinkConfig& config,
 
     assert(sizeof(temp)/sizeof(Stats::Element) == NUM_STATS);
     memcpy(statElements, temp, sizeof(temp));
-    snprintf(name, Stats::MAX_USER_NAME_LEN, "DL %6d ", addr);
+    sprintf(name, "DL %6d ", addr);
     stats = Stats( name, addr, config.debugLevel_p, statElements, NUM_STATS,
 		   eventInterface_p, EventInterface::DL_AB_ST );
     rxLpdu = Lpdu( &stats);

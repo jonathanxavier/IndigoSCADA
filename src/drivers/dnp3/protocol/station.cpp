@@ -24,6 +24,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
 // OTHER DEALINGS IN THE SOFTWARE.
 
+// Modified by Enscada limited http://www.enscada.com
+
 #include <time.h>
 #include <stdio.h>
 #include <string.h>  // for memcpy
@@ -130,8 +132,8 @@ Station::Station( DnpAddr_t masterAddr, StationConfig& config,
     assert (sizeof(temp)/sizeof(Stats::Element) == NUM_STATS);
     memcpy(statElements, temp, sizeof(temp));
 
-    char name[Stats::MAX_USER_NAME_LEN];
-    snprintf(name, sizeof(name), "MS (%5d)", addr);
+    char name[MAX_USER_NAME_LEN];
+    sprintf(name, "MS (%5d)", addr);
     stats = Stats( name, addr, config.debugLevel_p, statElements, NUM_STATS,
 		   eventInterface_p,
 		   EventInterface::AP_AB_ST);

@@ -24,6 +24,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
 // OTHER DEALINGS IN THE SOFTWARE.
 
+// Modified by Enscada limited http://www.enscada.com
+
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
@@ -221,7 +223,7 @@ char* Lpdu::str(char* buf, int len) const
     int lenField = getLenField();
     int dest = getDest();
     int src = getSrc();
-    snprintf(buf, len,
+    sprintf(buf, 
 	  "%s [Dir:%d,Prm:%d,Fcv:%d] Len=%d, Dest=%d, Src=%d\n",
 	     fcStr, dir, prm, fcv, lenField, dest, src);
     return buf;

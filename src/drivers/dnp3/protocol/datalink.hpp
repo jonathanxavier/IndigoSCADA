@@ -24,6 +24,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
 // OTHER DEALINGS IN THE SOFTWARE.
 
+// Modified by Enscada limited http://www.enscada.com
+
 
 #ifndef DNP_DATALINK_H
 #define DNP_DATALINK_H
@@ -94,17 +96,17 @@ private:
 			   NUM_STATS       };
 
     // these function codes are valid only for PRM = 1
-    #define RESET_LINK     0x00;
-    #define TEST_LINK                      0x02;
-    #define CONFIRMED_USER_DATA            0x03;
-    #define UNCONFIRMED_USER_DATA          0x04;
-    #define REQUEST_LINK_STATUS            0x09;
+    #define RESET_LINK     0x00
+    #define TEST_LINK                      0x02
+    #define CONFIRMED_USER_DATA            0x03
+    #define UNCONFIRMED_USER_DATA          0x04
+    #define REQUEST_LINK_STATUS            0x09
 
     // these function codes are valid only for PRM = 0
-    #define ACK                            0x00;
-    #define NACK                           0x01;
-    #define LINK_STATUS                    0x0b;
-    #define NOT_SUPPORTED_L                  0x0f;
+    #define ACK                            0x00
+    #define NACK                           0x01
+    #define LINK_STATUS                    0x0b
+    #define NOT_SUPPORTED_L                  0x0f
 
     //internal states
     enum State{   IDLE,

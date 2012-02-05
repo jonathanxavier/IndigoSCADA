@@ -24,12 +24,34 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
 // OTHER DEALINGS IN THE SOFTWARE.
 
+// Modified by Enscada limited http://www.enscada.com
 
 #include "assert.h"
 #include "stdio.h"
 #include "common.hpp"
 #include "stats.hpp"
 #include "factory.hpp"
+
+const uint8_t ObjectHeader::PACKED_WITHOUT_A_PREFIX = 0;
+const uint8_t ObjectHeader::ONE_OCTET_INDEX         = 1;
+const uint8_t ObjectHeader::TWO_OCTET_INDEX         = 2;
+const uint8_t ObjectHeader::FOUR_OCTET_INDEX        = 3;
+const uint8_t ObjectHeader::ONE_OCTET_SIZE          = 4;
+const uint8_t ObjectHeader::TWO_OCTET_SIZE          = 5;
+const uint8_t ObjectHeader::FOUR_OCTET_SIZE         = 6;
+
+// range specifier codes
+const uint8_t ObjectHeader::ONE_OCTET_START_STOP_INDEXES               = 0;
+const uint8_t ObjectHeader::TWO_OCTET_START_STOP_INDEXES               = 1;
+const uint8_t ObjectHeader::FOUR_OCTET_START_STOP_INDEXES              = 2;
+const uint8_t ObjectHeader::ONE_OCTET_START_STOP_VIRTUAL_ADDRESSES     = 3;
+const uint8_t ObjectHeader::TWO_OCTET_START_STOP_VIRTUAL_ADDRESSES     = 4;
+const uint8_t ObjectHeader::FOUR_OCTET_START_STOP_VIRTUAL_ADDRESSES    = 5;
+const uint8_t ObjectHeader::NO_RANGE_FIELD                             = 6;
+const uint8_t ObjectHeader::ONE_OCTET_COUNT_OF_OBJECTS                 = 7;
+const uint8_t ObjectHeader::TWO_OCTET_COUNT_OF_OBJECTS                 = 8;
+const uint8_t ObjectHeader::FOUR_OCTET_COUNT_OF_OBJECTS                = 9;
+const uint8_t ObjectHeader::ONE_OCTET_COUNT_OF_OBJECTS_VARIABLE_FORMAT =0xb;
 
 ObjectHeader::ObjectHeader(uint8_t group,
 			   uint8_t variation,
@@ -46,7 +68,7 @@ ObjectHeader::ObjectHeader(uint8_t group,
 
 char* ObjectHeader::str( char* buf, int len) const
 {
-    snprintf( buf, len, "Oh: Grp:%d,Var=%d",grp,var);
+    sprintf( buf, "Oh: Grp:%d,Var=%d",grp,var);
     return buf;
 }
 
@@ -271,7 +293,7 @@ DnpObject* Factory::decode(const ObjectHeader& oh, Bytes& data,
 		index = removeUINT8(data);
 	    }
 	    else if (oh.indexSize == 0)
-		index = DnpObject::NO_INDEX;
+		index = NO_INDEX;
 	    else
 	    {
 		// something has gone wrong
@@ -304,8 +326,8 @@ DnpObject* Factory::decode(const ObjectHeader& oh, Bytes& data,
 
 	    stats.logNormal( "Decoding: 1 object of size %d", objectSize);
 	    createObjects(oh.grp, oh.var, data,
-			  DnpObject::NO_INDEX,
-			  DnpObject::NO_INDEX,
+			  NO_INDEX,
+			  NO_INDEX,
 			  addr,
 			  stats,
 			  objectSize );
@@ -404,7 +426,7 @@ void Factory::createObjects(uint8_t grp, uint8_t var, Bytes& data,
 
 	obj_p = objectMap[ key( grp, var)];
 
-	if (startIndex == DnpObject::NO_INDEX)
+	if (startIndex == NO_INDEX)
 	{
 	    if (objectSize > 0)
 	    {
@@ -423,7 +445,7 @@ void Factory::createObjects(uint8_t grp, uint8_t var, Bytes& data,
 	    {
 		obj_p->decode(data);    // init instance
 
-		if ((grp == 2) and (var == 2))
+		if ((grp == 2) && (var == 2))
 		    // handle another special case
 		    // we need to add the CTO to get a dnp time
 		    obj_p->timestamp += cto;

@@ -24,10 +24,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
 // OTHER DEALINGS IN THE SOFTWARE.
 
+// Modified by Enscada limited http://www.enscada.com
+
 #include <assert.h>
 #include <stdio.h>
 #include "asdu.hpp"
 
+uint8_t AppHeader::UNDEFINED_SEQ_NUM = 15;
 
 void AppSeqNum::increment( AppSeqNum_t& seqNum)
 {
@@ -167,7 +170,7 @@ char* AppHeader::str( char* buf, int len)
     FunctionCode fn = getFn();
     if (fn & 0x80)
     {
-	snprintf( buf, len,
+	sprintf( buf, 
                  "Ap: Rsp [Fn:%d,FIR=%d,FIN=%d,CON=%d,UNS=%d,SEQ=%d,II=%04x]",
 		  fn, getFirst(), getFinal(),
 		  getConfirm(), getUnsolicited(),
@@ -175,7 +178,7 @@ char* AppHeader::str( char* buf, int len)
     }
     else
     {
-	snprintf( buf, len,
+	sprintf( buf, 
 		  "Ap: Req [Fn:%d,FIR=%d,FIN=%d,CON=%d,UNS=%d,SEQ=%d]",
 		  fn, getFirst(), getFinal(),
 		  getConfirm(), getUnsolicited(),

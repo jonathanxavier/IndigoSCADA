@@ -24,6 +24,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
 // OTHER DEALINGS IN THE SOFTWARE.
 
+// Modified by Enscada limited http://www.enscada.com
+
 
 // The Oustation class contains all of the outstation specific DNP
 // application layer code.
@@ -124,8 +126,8 @@ Outstation::Outstation( OutstationConfig&             outstationConfig,
     assert (sizeof(temp)/sizeof(Stats::Element) == NUM_STATS);
     memcpy(statElements, temp, sizeof(temp));
 
-    char name[Stats::MAX_USER_NAME_LEN];
-    snprintf(name, sizeof(name), "OS  %5d ", addr);
+    char name[MAX_USER_NAME_LEN];
+    sprintf(name, "OS  %5d ", addr);
     stats = Stats( name, addr, outstationConfig.debugLevel_p,
 		   statElements, NUM_STATS, eventInterface_p,
 		   EventInterface::AP_AB_ST);
@@ -416,7 +418,7 @@ void Outstation::write()
 		secAuth.rxKeyChange((SessionKeyChange*) obj_p);
 	    }
 	}
-	else if ((oh.grp == 80) and (oh.var == 1))
+	else if ((oh.grp == 80) && (oh.var == 1))
 	{
 	    if ((oh.qual == 0) && (oh.start==7) && (oh.stop==7))
 	    {

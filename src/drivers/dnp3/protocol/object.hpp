@@ -24,6 +24,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
 // OTHER DEALINGS IN THE SOFTWARE.
 
+// Modified by Enscada limited http://www.enscada.com
+
 #ifndef DNP_OBJECT_H
 #define DNP_OBJECT_H
 
@@ -31,12 +33,12 @@
 #include "event_interface.hpp"
 #include "config.h"
 
-#define ONLINE                0x01;
+#define ONLINE                0x01
 
 class DnpObject
 {
   public:
-    #define NO_INDEX           0xffffffff;
+    #define NO_INDEX           0xffffffff
 
     // flag octect bits common to many DNP objects
     //#define ONLINE                0x01;
@@ -305,7 +307,7 @@ class Challenge : public DnpObject
 			      CRITICAL = 2,
 			      PERIODIC = 3 };
 
-    #define MIN_CHALLENGE_SIZE  4;
+    #define MIN_CHALLENGE_SIZE  4
 
     Challenge() {};
     Challenge(uint32_t challengeSeqNum, UserNumber_t num, 
@@ -436,6 +438,7 @@ class InternalIndications : DnpObject
 {
 
 public:
+	/*
     static const uint16_t ALL_STATIONS               = 0x0001;
     static const uint16_t CLASS1                     = 0x0002;
     static const uint16_t CLASS2                     = 0x0004;
@@ -449,6 +452,20 @@ public:
     static const uint16_t PARAMETER_ERROR            = 0x0400;
     static const uint16_t BUFFER_OVERFLOW            = 0x0800;
     static const uint16_t BAD_CONFIG                 = 0x2000;
+	*/
+    static const uint16_t ALL_STATIONS;
+    static const uint16_t CLASS1;
+    static const uint16_t CLASS2;
+    static const uint16_t CLASS3;
+    static const uint16_t NEED_TIME;
+    static const uint16_t LOCAL;
+    static const uint16_t DEVICE_TROUBLE;
+    static const uint16_t DEVICE_RESTART;
+    static const uint16_t FUNCTION_UNKNOWN;
+    static const uint16_t OBJECT_UNKNOWN;
+    static const uint16_t PARAMETER_ERROR;
+    static const uint16_t BUFFER_OVERFLOW;
+    static const uint16_t BAD_CONFIG;
 
     void str( char*buf);
 };
