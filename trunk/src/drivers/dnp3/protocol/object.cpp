@@ -24,11 +24,28 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
 // OTHER DEALINGS IN THE SOFTWARE.
 
+// Modified by Enscada limited http://www.enscada.com
+
 #include <assert.h>
 #include "stdio.h"
 #include "common.hpp"
 #include "stats.hpp"
 #include "object.hpp"
+
+const uint16_t InternalIndications :: ALL_STATIONS               = 0x0001;
+const uint16_t InternalIndications :: CLASS1                     = 0x0002;
+const uint16_t InternalIndications :: CLASS2                     = 0x0004;
+const uint16_t InternalIndications :: CLASS3                     = 0x0008;
+const uint16_t InternalIndications :: NEED_TIME                  = 0x0010;
+const uint16_t InternalIndications :: LOCAL                      = 0x0020;
+const uint16_t InternalIndications :: DEVICE_TROUBLE             = 0x0040;
+const uint16_t InternalIndications :: DEVICE_RESTART             = 0x0080;
+const uint16_t InternalIndications :: FUNCTION_UNKNOWN           = 0x0100;
+const uint16_t InternalIndications :: OBJECT_UNKNOWN             = 0x0200;
+const uint16_t InternalIndications :: PARAMETER_ERROR            = 0x0400;
+const uint16_t InternalIndications :: BUFFER_OVERFLOW            = 0x0800;
+const uint16_t InternalIndications :: BAD_CONFIG                 = 0x2000;
+
 
 DnpObject::DnpObject(int32_t                        val,
 		     uint8_t                        flags,
@@ -61,6 +78,7 @@ unsigned int DnpObject::size() const
 {
     // must be implemented by the derived class
     assert(0);
+	return 0;
 }
 
 DnpObject::~DnpObject()

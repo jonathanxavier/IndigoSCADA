@@ -24,6 +24,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
 // OTHER DEALINGS IN THE SOFTWARE.
 
+// Modified by Enscada limited http://www.enscada.com
+
 // Purpose: A generic class keep track of statistics
 
 // The abonormal stats are not necceessarily errors they are just
@@ -44,10 +46,11 @@ class Stats
 {
 public:
 
-    #define MAX_STAT_NAME_LEN    30;
-    #define MAX_USER_NAME_LEN    sizeof("AP (12345)"); // incl. null
-    // two chars for hex digit and one for space + one for null
-    #define MAX_LOG_LEN          3*2048 + 1;
+	#define MAX_STAT_NAME_LEN    30
+	#define MAX_USER_NAME_LEN    sizeof("AP (12345)") // incl. null
+	// two chars for hex digit and one for space + one for null
+	#define MAX_LOG_LEN          3*2048 + 1
+
     enum OutputLevel { ABNORMAL = 0, NORMAL = 1 };
 
     typedef struct {
@@ -64,7 +67,7 @@ public:
     //                     1 will log everything
     // -1 is only used for unit tests where abnormalities are
     // forces and we do not want to clutter the output
-    Stats( char userName[MAX_USER_NAME_LEN]=NULL,
+    Stats( char* userName = NULL,
 	   DnpAddr_t dnpAddr=0,
 	   int* debugLevel_p=NULL,
 	   Element* elements=NULL, int num_elements=0,
@@ -84,7 +87,7 @@ public:
 
 private:
 
-    char                   name[MAX_USER_NAME_LEN+1];
+    char                   name[MAX_USER_NAME_LEN];
     int                    nameLen;
     char                   buf[MAX_LOG_LEN];
     int*                   outputLevel_p;

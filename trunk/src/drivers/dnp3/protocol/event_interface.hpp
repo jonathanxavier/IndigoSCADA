@@ -24,6 +24,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
 // OTHER DEALINGS IN THE SOFTWARE.
 
+// Modified by Enscada limited http://www.enscada.com
+
 // abstract class that defines the interface for an event interface
 
 #ifndef EVENT_INTERFACE_H

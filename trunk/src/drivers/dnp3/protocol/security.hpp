@@ -24,6 +24,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
 // OTHER DEALINGS IN THE SOFTWARE.
 
+// Modified by Enscada limited http://www.enscada.com
+
 #ifndef SECURITY_H
 #define SECURITY_H
 
@@ -50,7 +52,8 @@ typedef Bytes Key_t;
 // this is not meant to be instantiated
 class Key{
   public:
-    static const int MIN_KEY_SIZE = 16;
+    //static const int MIN_KEY_SIZE = 16;
+	static const int MIN_KEY_SIZE;
     // Fill the key with random data of minimum length
     static void initKey(Key_t& key, int len=MIN_KEY_SIZE);
     // Fill the key with binary data of length 'len'
@@ -58,7 +61,6 @@ class Key{
   private:
     Key();
 };
-
 
 class SeqNum24
 {

@@ -24,6 +24,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
 // OTHER DEALINGS IN THE SOFTWARE.
 
+// Modified by Enscada limited http://www.enscada.com
+
 // abstract class that defines the interface for timers
 // this abstraction is so that timers can be manually expired during
 // unittesting, system testing or debugging

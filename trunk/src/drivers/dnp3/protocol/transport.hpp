@@ -24,6 +24,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
 // OTHER DEALINGS IN THE SOFTWARE.
 
+// Modified by Enscada limited http://www.enscada.com
 
 #ifndef TRANSPORT_H
 #define TRANSPORT_H
@@ -33,6 +34,8 @@
 #include "lpdu.hpp"
 #include "datalink.hpp"
 #include "stats.hpp"
+
+#pragma warning(disable: 4786)
 
 typedef struct {
     bool          inProgress;
@@ -78,7 +81,9 @@ public:
     // if the DNP protocol is ammended to use this address for something
     // we may have to change the way we return from the rxSegment method
     // when a fragment is not found
-    static const DnpAddr_t FRAGMENT_NOT_FOUND = 0xfff0;
+
+    //static const DnpAddr_t FRAGMENT_NOT_FOUND = 0xfff0;
+	static const DnpAddr_t FRAGMENT_NOT_FOUND;
 
     // returns the receiving station's dnp address
     // when a complete fragment is found

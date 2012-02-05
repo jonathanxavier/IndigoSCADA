@@ -24,6 +24,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
 // OTHER DEALINGS IN THE SOFTWARE.
 
+// Modified by Enscada limited http://www.enscada.com
+
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,7 +37,7 @@
 
 #include "stats.hpp"
 
-  Stats::Stats( char userName[MAX_USER_NAME_LEN], DnpAddr_t dnpAddr,
+  Stats::Stats( char* userName, DnpAddr_t dnpAddr,
 		int* debugLevel_p,
 		Element *elements, int num_elements,
 		EventInterface* eventInterface_p,
@@ -45,7 +47,7 @@
     if (userName != NULL)
     {
 	strncpy(name, userName, MAX_USER_NAME_LEN);
-	snprintf(buf, sizeof(buf), "%s", name );
+	sprintf(buf, "%s", name );
     }
     nameLen = strlen(buf);
     outputLevel_p = debugLevel_p;
@@ -125,7 +127,7 @@ void Stats::logNormal(const char *format, ...)
     if (*outputLevel_p >= 1)
     {
 	n = nameLen;
-	snprintf(buf+n, sizeof(buf)-n, " Info: ");
+	sprintf(buf+n, " Info: ");
 	n += 7;
         va_start(ap,format);
 #ifdef HAVE_VSNPRINTF
@@ -150,7 +152,7 @@ void Stats::logAbnormal(int use_errno, const char *format, ...)
     if (*outputLevel_p >= 0)
     {
 	n = nameLen;
-	snprintf(buf+n, sizeof(buf)-n, " Warn: ");
+	sprintf(buf+n, " Warn: ");
 	n += 7;
 	va_start(ap,format);
 #ifdef HAVE_VSNPRINTF
@@ -162,7 +164,7 @@ void Stats::logAbnormal(int use_errno, const char *format, ...)
 
 	n = strlen(buf);
 	if(use_errno)
-	    snprintf(buf+n, sizeof(buf)-n, ": %s", strerror(old_errno));
+	    sprintf(buf+n, ": %s", strerror(old_errno));
 	
 	strcat(buf,"\n");
 
@@ -198,7 +200,7 @@ void Stats::log( int logToSysLog, int use_errno, const char *format, ...)
     va_end(ap);
 
     if(use_errno)
-	snprintf(buf, sizeof(buf), "%s", strerror(old_errno));
+	sprintf(buf, "%s", strerror(old_errno));
 	
     strcat(buf,"\n");
 

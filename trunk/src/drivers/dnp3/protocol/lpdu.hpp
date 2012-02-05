@@ -24,6 +24,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
 // OTHER DEALINGS IN THE SOFTWARE.
 
+// Modified by Enscada limited http://www.enscada.com
+
 #ifndef DNP_LPDU_H
 #define DNP_LPDU_H
 
@@ -35,13 +37,13 @@ class Lpdu
 
 public:
     // includes start, len and crc bytes
-	#define HEADER_SIZE       10;
+	#define HEADER_SIZE       10
     // includes start, len and crc bytes
-    #define  MAX_LEN                    292;
+    #define  MAX_LEN                    292
     // doesn't incl dl header or crc bytes
-    #define  MAX_USER_DATA              234;
+    #define  MAX_USER_DATA              234
     // doesn't include transport header
-    #define  MAX_APP_DATA               233;
+    #define  MAX_APP_DATA               233
 
     enum StatIndex { RX_START_OCTETS = 0,
 		     LOST_BYTES,

@@ -24,6 +24,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
 // OTHER DEALINGS IN THE SOFTWARE.
 
+// Modified by Enscada limited http://www.enscada.com
+
 // The whole point of the transport function in DNP is:
 // If the application layer fragment is greater than MAX_APP_DATA_SIZE then the
 // transport function splits it into smaller segments (and vice versa.)
@@ -72,11 +74,12 @@ uint8_t TransportHeader::getSeqNum()
 
 char* TransportHeader::str(char* buf, int len)
 {
-    snprintf( buf, len,
+    sprintf( buf, 
 	     "Th: FIN:%d,FIR=%d,Seq:%d",
 	     getFinal(), getFirst(), getSeqNum());
     return buf;
 }
+
 
 TransportFunction::TransportFunction( Datalink&               datalink,
 				      const StationInfoMap&   stationInfoMap)
@@ -101,7 +104,7 @@ Uptime_t TransportFunction::transmit( DnpAddr_t         txAddr,
     while (i != fragment.end())
     {
 	segment.clear();
-	if (fragment.end() - i <= Lpdu::MAX_APP_DATA)
+	if (fragment.end() - i <= MAX_APP_DATA)
 	{
 	    // last segment in the sequence
 	    TransportHeader th(true, fir, seqNum);
@@ -119,8 +122,8 @@ Uptime_t TransportFunction::transmit( DnpAddr_t         txAddr,
 	    TransportHeader th(false, fir, seqNum);
 	    stats.logNormal("Tx %s",th.str(strbuf, sizeof(strbuf)));
 	    segment.push_back(th.b);
-	    segment.insert( segment.end(), i, i+Lpdu::MAX_APP_DATA);
-	    i += Lpdu::MAX_APP_DATA;
+	    segment.insert( segment.end(), i, i+ MAX_APP_DATA);
+	    i += MAX_APP_DATA;
 	    stats.increment(TransportStats::TX_SEGMENT);
 	    dl.transmit( txAddr, segment);
 	    fir = false; // all subsequent segments will not be the firstx
@@ -135,6 +138,8 @@ Uptime_t TransportFunction::transmit( DnpAddr_t         txAddr,
 
     assert(0);
 }
+
+const DnpAddr_t TransportFunction::FRAGMENT_NOT_FOUND = 0xfff0;
 
 DnpAddr_t TransportFunction::rxSegment( const Lpdu::UserData& segment)
 {
