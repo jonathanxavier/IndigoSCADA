@@ -33,3 +33,8 @@ Added driver IEC 101, it is in pre alpha state
 ---------------------------------------------------------------------------
 15-10-2011
 Added OPC Server DA 2.0, it is missing the interface between real time data and OPC DA server
+---------------------------------------------------------------------------
+05-02-2012
+Added IEC 103 driver, it is in pre alpha state
+DNP3 now compiles with MSVC++ 6.0
+---------------------------------------------------------------------------

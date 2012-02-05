@@ -33,6 +33,7 @@
 // one Transport Function object per DNP application layer object
 
 #include <assert.h>
+#include <stdio.h>
 #include "stats.hpp"
 #include "transport.hpp"
 

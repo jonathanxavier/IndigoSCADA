@@ -29,6 +29,7 @@
 
 #include<algorithm>
 #include <assert.h>
+#include <stdio.h>
 #include "common.hpp"
 #include "app.hpp"
 #include "master.hpp"

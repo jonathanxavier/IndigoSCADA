@@ -288,6 +288,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "iec103driver"=..\drivers\iec103\iec103driver.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "iec104driver"=..\drivers\iec104\iec104driver.dsp - Package Owner=<4>
 
 Package=<5>
@@ -337,30 +349,6 @@ Package=<4>
 ###############################################################################
 
 Project: "modbus_driver"=..\drivers\modbus\modbus_driver.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "modbus_master"=..\drivers\modbus\protocol\modbus_master.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "modbus_slave"=..\drivers\modbus\protocol\modbus_slave.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
