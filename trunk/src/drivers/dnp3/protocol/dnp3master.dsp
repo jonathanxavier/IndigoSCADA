@@ -26,7 +26,6 @@ CFG=dnp3master - Win32 Debug
 # PROP Scc_ProjName ""
 # PROP Scc_LocalPath ""
 CPP=cl.exe
-F90=df.exe
 RSC=rc.exe
 
 !IF  "$(CFG)" == "dnp3master - Win32 Release"
