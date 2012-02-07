@@ -47,11 +47,11 @@ public:
 
     typedef struct
     {
-	DnpAddr_t        addr;
-	int              consecutiveTimeoutsForCommsFail;
-	int*             integrityPollInterval_p;
-	UserNumber_t     userNum;
-	int*             debugLevel_p;
+	    DnpAddr_t        addr;
+	    int              consecutiveTimeoutsForCommsFail;
+	    int*             integrityPollInterval_p;
+	    UserNumber_t     userNum;
+	    int*             debugLevel_p;
     } MasterConfig;
 
     Master( MasterConfig&              masterConfig,

@@ -103,6 +103,10 @@ SOURCE=.\datalink.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\dummy.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\event_interface.cpp
 # End Source File
 # Begin Source File

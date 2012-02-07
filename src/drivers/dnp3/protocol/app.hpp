@@ -38,7 +38,7 @@
 #include "event_interface.hpp"
 #include "timer_interface.hpp"
 
-// Base class for Master and Outstation implemenations
+// Base class for Master and Outstation implementations
 class Application
 {
   public:

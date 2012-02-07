@@ -9,8 +9,43 @@
  *   for full copyright notice and license terms. 
  *
  */
+#include <time.h>
+#include <stdio.h>
+#include <string.h>
+#include <assert.h>
+#include "dummy.hpp"
+#include "station.hpp"
+#include "outstation.hpp"
+#include "datalink.hpp"
 
 int main( int argc, char **argv )
 {
+    Outstation* o_p;
+    DummyDb db;
+    int debugLevel = -1;
+    DummyTx masterTx(&debugLevel, 'M', 'S');
+    DummyTx outstationTx(&debugLevel, 'O', 'S');
+    DummyTimer masterTimer;
+    DummyTimer outstationTimer;
+    int integrityPollInterval = 10;
+
+    Datalink::DatalinkConfig      datalinkConfig;
+    Station::StationConfig        stationConfig;
+
+    stationConfig.addr = 2;
+    stationConfig.debugLevel_p = &debugLevel;
+
+    Outstation::OutstationConfig outstationConfig;
+    outstationConfig.addr           = stationConfig.addr;
+    outstationConfig.masterAddr     = 1;
+    outstationConfig.userNum        = 5;
+    outstationConfig.debugLevel_p   = &debugLevel;
+
+    datalinkConfig.addr             = stationConfig.addr;
+    datalinkConfig.isMaster         = 0;
+    datalinkConfig.tx_p             = &outstationTx;
+
+    o_p = new Outstation( outstationConfig, datalinkConfig, &db,
+			  &outstationTimer);
 	return 0;
 }

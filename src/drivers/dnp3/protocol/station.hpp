@@ -45,15 +45,15 @@ public:
 
     typedef struct
     {
-	DnpAddr_t      addr;
+          DnpAddr_t      addr;
 	//    DnpControlBlock_t   controlBlock;
     } ControlRequest;
 
     typedef struct
     {
-	DnpAddr_t      addr;
-	int*           debugLevel_p;
-	Master*        master_p;
+	      DnpAddr_t      addr;
+	      int*           debugLevel_p;
+	      Master*        master_p;
     } StationConfig;
 
 
