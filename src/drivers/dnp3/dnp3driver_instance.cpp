@@ -161,7 +161,7 @@ void Dnp3driver_Instance::QueryResponse(QObject *p, const QString &c, int id, QO
 				//
 				is >> IecItems;	  // how many IEC items there are in the RTU or PLC
 				is >> Cfg.SampleTime; // how long we sample for in milliseconds
-				is >> Cfg.IEC104ServerIPAddress; // IEC 104 server IP Address
+				is >> Cfg.DNP3ServerIPAddress; // DNP3 server IP Address
 
 				Countdown = 1;
 
@@ -179,10 +179,10 @@ void Dnp3driver_Instance::QueryResponse(QObject *p, const QString &c, int id, QO
 				};
 				//
 
-				//Start IEC 104 client driver
+				//Start DNP 3 client driver
 				if(!Connect())
 				{
-					QSLogAlarm(Name,tr("Failed to start IEC 104 client driver"));
+					QSLogAlarm(Name,tr("Failed to start DNP 3 client driver"));
 				}
 			}
 		}

@@ -49,7 +49,7 @@ Inherited( parent, name ),Receipe(receipe)
 	{
 		NItems->setEnabled(false);
 		//OpcServerProgIDText->setEnabled(false);
-		IEC104ServerIPAddressText->setEnabled(false);
+		DNP3ServerIPAddressText->setEnabled(false);
 	};
 }
 Dnp3driverConfiguration::~Dnp3driverConfiguration()
@@ -69,8 +69,8 @@ void Dnp3driverConfiguration::OkClicked()
 	GetConfigureDb()->DoExec(0,cmd,0); // delete the old value
 	//
 	cmd = "insert into PROPS values('"+Name->text() +"','" + Receipe + "','" + 
-	//NItems->text() + " " + PollInterval->text() + " " + OpcServerProgIDText->text() + " " + IEC104ServerIPAddressText->text() +"');";
-	NItems->text() + " " + PollInterval->text() + " " + IEC104ServerIPAddressText->text() +"');";
+	//NItems->text() + " " + PollInterval->text() + " " + OpcServerProgIDText->text() + " " + DNP3ServerIPAddressText->text() +"');";
+	NItems->text() + " " + PollInterval->text() + " " + DNP3ServerIPAddressText->text() +"');";
 	GetConfigureDb()->DoExec(0,cmd,0);
 	QSAuditTrail(this,caption(), tr("Edited"));
 
@@ -104,7 +104,7 @@ void Dnp3driverConfiguration::QueryResponse (QObject *p, const QString &c, int i
 				//is >> t;
 				//OpcServerProgIDText->setText(t);
 				is >> t;
-				IEC104ServerIPAddressText->setText(t);
+				DNP3ServerIPAddressText->setText(t);
 			}
 			else
 			{
@@ -115,7 +115,7 @@ void Dnp3driverConfiguration::QueryResponse (QObject *p, const QString &c, int i
 				GetConfigureDb()->DoExec(0,cmd,0);
 				NItems->setValue(8);
 				PollInterval->setValue(1000);
-				IEC104ServerIPAddressText->setText("");
+				DNP3ServerIPAddressText->setText("");
 			}
 		} 
 		break;
