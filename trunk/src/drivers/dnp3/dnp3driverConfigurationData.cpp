@@ -45,21 +45,21 @@ Dnp3driverConfigurationData::Dnp3driverConfigurationData(QWidget *parent, const 
 	Name->setAlignment( AlignLeft|AlignVCenter|ExpandTabs );
 	Name->setMargin( 0 );
 
-	IEC104ServerIPAddressText = new QLineEdit(this, "LineEdit_7");
-	IEC104ServerIPAddressText->setGeometry(200, 80, 100, 30);
-	IEC104ServerIPAddressText->setMinimumSize(0, 0);
-	IEC104ServerIPAddressText->setMaximumSize(32767, 32767);
-	IEC104ServerIPAddressText->setFocusPolicy(QWidget::StrongFocus);
-	IEC104ServerIPAddressText->setBackgroundMode(QWidget::PaletteBase);
+	DNP3ServerIPAddressText = new QLineEdit(this, "LineEdit_7");
+	DNP3ServerIPAddressText->setGeometry(200, 80, 100, 30);
+	DNP3ServerIPAddressText->setMinimumSize(0, 0);
+	DNP3ServerIPAddressText->setMaximumSize(32767, 32767);
+	DNP3ServerIPAddressText->setFocusPolicy(QWidget::StrongFocus);
+	DNP3ServerIPAddressText->setBackgroundMode(QWidget::PaletteBase);
 #if QT_VERSION < 300
-	IEC104ServerIPAddressText->setFontPropagation(QWidget::SameFont);
-	IEC104ServerIPAddressText->setPalettePropagation(QWidget::SameFont);
+	DNP3ServerIPAddressText->setFontPropagation(QWidget::SameFont);
+	DNP3ServerIPAddressText->setPalettePropagation(QWidget::SameFont);
 	#endif
-	IEC104ServerIPAddressText->setText( tr( "" ) );
-	IEC104ServerIPAddressText->setMaxLength( 100 );
-	IEC104ServerIPAddressText->setFrame( QLineEdit::Normal );
-	IEC104ServerIPAddressText->setFrame( TRUE );
-	IEC104ServerIPAddressText->setAlignment( AlignLeft );
+	DNP3ServerIPAddressText->setText( tr( "" ) );
+	DNP3ServerIPAddressText->setMaxLength( 100 );
+	DNP3ServerIPAddressText->setFrame( QLineEdit::Normal );
+	DNP3ServerIPAddressText->setFrame( TRUE );
+	DNP3ServerIPAddressText->setAlignment( AlignLeft );
 	QLabel *qtarch_Label_22 = new QLabel(this, "Label_21");
 	qtarch_Label_22->setGeometry(10, 80, 150, 30);
 	qtarch_Label_22->setMinimumSize(0, 0);
@@ -74,7 +74,7 @@ Dnp3driverConfigurationData::Dnp3driverConfigurationData(QWidget *parent, const 
 	qtarch_Label_22->setLineWidth( 1 );
 	qtarch_Label_22->setMidLineWidth( 0 );
 	qtarch_Label_22->QFrame::setMargin( 0 );
-	qtarch_Label_22->setText( tr( "IEC 104 slave IP address" ) );
+	qtarch_Label_22->setText( tr( "DNP 3 slave IP address" ) );
 	qtarch_Label_22->setAlignment( AlignLeft|AlignVCenter|ExpandTabs );
 	qtarch_Label_22->setMargin( 0 );
 /////////////////////////////////////////////////////////////////////////
