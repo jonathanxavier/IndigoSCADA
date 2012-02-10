@@ -61,12 +61,13 @@ void  DummyDb::registerName( DnpAddr_t      addr,
 
 // Transmit Interface -----------------
 
-DummyTx::DummyTx(int* debugLevel_p, char name1, char name2) :
-numTxs(0), debug_p(debugLevel_p)
+DummyTx::DummyTx(int* debugLevel_p, char name1, char name2, int sck) :
+numTxs(0), debug_p(debugLevel_p), socket(NULL)
 {
     n[0] = name1;
     n[1] = name2;
     n[2] = 0;
+	socket = sck;
 }
 
 Uptime_t DummyTx::transmit( const Lpdu& lpdu)
@@ -75,7 +76,20 @@ Uptime_t DummyTx::transmit( const Lpdu& lpdu)
     assert(lpdu.ab.size() >= 10);
     lastTxBytes = lpdu.ab;
     if (*debug_p > 0)
-	printf( "%s Tx %s\n", n, hex_repr( lpdu.ab, buf,sizeof(buf)));
+	printf( "%s Tx %s\n", n, hex_repr(lpdu.ab, buf,sizeof(buf)));
+
+	char buf_to_send[MAX_LEN*3+1];
+
+	for(int i = 0; i < lpdu.ab.size(); i++)
+    {
+        buf_to_send[i] = lpdu.ab[i];
+    }
+	
+	if(send(socket, (const char*)buf_to_send, lpdu.ab.size(),  0) == SOCKET_ERROR)   
+    {   
+      //Send Error
+    }
+
     numTxs++;
     return 0;
 }

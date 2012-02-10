@@ -513,7 +513,11 @@ void Master::sendConfirm( AppSeqNum_t txSeqNum)
 DnpStat_t Master::startNewTransaction()
 {
     unsigned int ii;
-    assert (stn_p->stats.get(Station::STATE) == Station::IDLE);
+    //assert (stn_p->stats.get(Station::STATE) == Station::IDLE);
+	if(stn_p->stats.get(Station::STATE) != Station::IDLE)
+	{
+		return false;
+	}
 
     ii = stn_p->stats.get(Station::IIN);
     if ( ii & InternalIndications::DEVICE_RESTART)
@@ -560,7 +564,11 @@ void Master::completedTransaction()
 
 DnpStat_t Master::control(ControlOutputRelayBlock& cb)
 {
-    assert (stn_p->stats.get(Station::STATE) == Station::IDLE);
+    //assert (stn_p->stats.get(Station::STATE) == Station::IDLE);
+	if(stn_p->stats.get(Station::STATE) != Station::IDLE)
+	{
+		return false;
+	}
 
     // perform the select
 
@@ -583,7 +591,13 @@ DnpStat_t Master::control(ControlOutputRelayBlock& cb)
 DnpStat_t Master::poll( PollType pollType)
 {
     // don't call this method if we are in the middle of a transaction
-    assert(stn_p->stats.get(Station::STATE) == Station::IDLE);
+    //assert(stn_p->stats.get(Station::STATE) == Station::IDLE);
+
+	if(stn_p->stats.get(Station::STATE) != Station::IDLE)
+	{
+		return false;
+	}
+
     stn_p->stats.logNormal("Begin Transaction ------------------------------");
 
     initRequest( AppHeader::READ);

@@ -119,7 +119,7 @@ void randGen(Bytes& data, int len)
 
     //gen_rand(seed, sizeof(seed), randData, randLen);
 
-    data = Bytes( *randData, *(randData + len));
+    //data = Bytes( *randData, *(randData + len)); //remove ASAP comment!
 }
 
 void appendUINT48(Bytes& data, uint64_t val)

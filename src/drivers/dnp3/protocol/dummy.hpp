@@ -34,6 +34,8 @@
 #include "transmit_interface.hpp"
 #include "timer_interface.hpp"
 
+#include <winsock2.h>
+
 class DummyDb : public EventInterface
 {
 public:
@@ -56,12 +58,13 @@ public:
 class DummyTx : public TransmitInterface
 {
 public:
-    DummyTx(int* debugLevel_p, char name1, char name2);
+    DummyTx(int* debugLevel_p, char name1, char name2, int sck);
     virtual Uptime_t transmit( const Lpdu& lpdu);
     Bytes lastTxBytes;
     int numTxs;
     char n[3]; // two char id
     int* debug_p;
+	int socket;
 
 };
 

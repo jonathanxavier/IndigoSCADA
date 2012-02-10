@@ -20,11 +20,12 @@
 
 int main( int argc, char **argv )
 {
+	int socket = 0;
     Outstation* o_p;
     DummyDb db;
     int debugLevel = -1;
-    DummyTx masterTx(&debugLevel, 'M', 'S');
-    DummyTx outstationTx(&debugLevel, 'O', 'S');
+    DummyTx masterTx(&debugLevel, 'M', 'S', socket);
+    DummyTx outstationTx(&debugLevel, 'O', 'S', socket);
     DummyTimer masterTimer;
     DummyTimer outstationTimer;
     int integrityPollInterval = 10;
