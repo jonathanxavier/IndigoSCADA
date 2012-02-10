@@ -354,6 +354,10 @@ int main( int argc, char **argv )
 
 			master_p->rxData(&bytes, 0);
 		}
+		else
+		{
+		    return 1;
+		}
 
         for(;;)   
         {   
@@ -386,7 +390,7 @@ int main( int argc, char **argv )
         master_app->CloseLink();   
     }  
 
-	return 0;
+    return 0;
 }
 
 
