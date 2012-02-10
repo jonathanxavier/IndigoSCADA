@@ -115,6 +115,10 @@ SOURCE=.\factory.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\getopt.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\lpdu.cpp
 # End Source File
 # Begin Source File
