@@ -33,7 +33,7 @@
 #include "event_interface.hpp"
 #include "transmit_interface.hpp"
 #include "timer_interface.hpp"
-
+#include <time.h>
 #include <winsock2.h>
 
 class DummyDb : public EventInterface

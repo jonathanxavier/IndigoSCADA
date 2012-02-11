@@ -135,6 +135,7 @@ class OPC_CLIENT_DADRV Opc_client_da_DriverThread : public DriverThread
 	int OpcStart(void);
 	int OpcStop(void);
 	int GetStatus(WORD *pwMav, WORD *pwMiv, WORD *pwB, LPWSTR *pswzV);
+    int chek_connection_with_server(void);
 	int AddItems(void);
 	void SyncRead(bool bFlag);
 	int AsyncRead(bool bFlag);

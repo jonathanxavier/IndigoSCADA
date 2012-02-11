@@ -56,6 +56,9 @@ int Opc_client_hda_DriverThread::Update()
 {
 	IT_IT("Opc_client_hda_DriverThread::Update");
 
+    int rc = 0;
+	int check_server = 0;
+
 	while(true)
 	{
 		if(fExit)
@@ -64,6 +67,23 @@ int Opc_client_hda_DriverThread::Update()
 			IT_COMMENT("Opc_client_hda_DriverThread exiting....");
 			m_hevtEnd.signal();
 			break; //terminate the thread
+		}
+
+        //check connection every g_dwUpdateRate*10
+		if((check_server%10) == 0)
+		{
+			rc = chek_connection_with_server();
+			fprintf(stderr,"check for server connection...\n");
+			fflush(stderr);
+		}
+
+		check_server++;
+
+		if(rc)
+		{ 
+			fprintf(stderr,"Opc_client_hda_DriverThread exiting...., due to lack of connection with server\n");
+			fflush(stderr);
+			break; 
 		}
 
 		::Sleep(g_dwUpdateRate);
@@ -657,6 +677,27 @@ int Opc_client_hda_DriverThread::GetStatus(WORD *pwMav, WORD *pwMiv, WORD *pwB, 
 	*pszV = pStatus->szVendorInfo;
 	::CoTaskMemFree(pStatus);
 	*/
+
+	return 0;
+}
+
+int Opc_client_hda_DriverThread::chek_connection_with_server(void)
+{
+	IT_IT("Opc_client_hda_DriverThread::chek_connection_with_server");
+
+	WORD wMajor, wMinor, wBuild;
+
+	LPWSTR pwsz = NULL;
+
+	if(!GetStatus(&wMajor, &wMinor, &wBuild, &pwsz))
+	{
+		::CoTaskMemFree(pwsz);
+	}
+	else
+	{
+		IT_EXIT;
+		return 1;
+	}
 
 	return 0;
 }

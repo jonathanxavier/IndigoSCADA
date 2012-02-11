@@ -54,6 +54,8 @@ CComModule _Module;
 int Opc_client_ae_DriverThread::Update()
 {
 	IT_IT("Opc_client_ae_DriverThread::Update");
+    int rc = 0;
+	int check_server = 0;
 
 	while(true)
 	{
@@ -63,6 +65,23 @@ int Opc_client_ae_DriverThread::Update()
 			IT_COMMENT("Opc_client_ae_DriverThread exiting....");
 			m_hevtEnd.signal();
 			break; //terminate the thread
+		}
+
+        //check connection every g_dwUpdateRate*10
+		if((check_server%10) == 0)
+		{
+			rc = chek_connection_with_server();
+			fprintf(stderr,"check for server connection...\n");
+			fflush(stderr);
+		}
+
+		check_server++;
+
+		if(rc)
+		{ 
+			fprintf(stderr,"Opc_client_ae_DriverThread exiting...., due to lack of connection with server\n");
+			fflush(stderr);
+			break; 
 		}
 
 		::Sleep(g_dwUpdateRate);
@@ -659,6 +678,34 @@ int Opc_client_ae_DriverThread::GetStatus(WORD *pwMav, WORD *pwMiv, WORD *pwB, L
 	*pwB = pStatus->wBuildNumber;
 	*pszV = pStatus->szVendorInfo;
 	::CoTaskMemFree(pStatus);
+
+	return 0;
+}
+
+int Opc_client_ae_DriverThread::chek_connection_with_server(void)
+{
+	IT_IT("Opc_client_ae_DriverThread::chek_connection_with_server");
+
+	if(m_ISubMgt != NULL)
+	{
+		HRESULT hr;
+		BOOL bActive;
+		DWORD dwBufferTime;
+		DWORD dwMaxSize;
+		DWORD hClientSubscription;
+
+		hr = m_ISubMgt->GetState(&bActive,&dwBufferTime,&dwMaxSize,&hClientSubscription);
+
+		//fprintf(stderr,"hr = 0x%x\n", hr);
+		//fflush(stderr);
+		IT_COMMENT1("hr = 0x%x\n", hr);
+
+		if(hr != S_OK)
+		{
+			IT_EXIT;
+			return 1;
+		}
+	}
 
 	return 0;
 }

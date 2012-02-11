@@ -122,6 +122,7 @@ class OPC_CLIENT_AEDRV Opc_client_ae_DriverThread : public DriverThread
 	int OpcStart();
 	int OpcStop();
 	int GetStatus(WORD *pwMav, WORD *pwMiv, WORD *pwB, LPWSTR *pswzV);
+    int chek_connection_with_server(void);
 	int Update();
 	static void ShowError(HRESULT hr, LPCSTR pszError);
 	static void ShowMessage(HRESULT hr, LPCSTR pszError, const char* name);
