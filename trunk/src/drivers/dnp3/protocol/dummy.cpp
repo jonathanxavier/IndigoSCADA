@@ -80,7 +80,7 @@ Uptime_t DummyTx::transmit( const Lpdu& lpdu)
 
 	char buf_to_send[MAX_LEN*3+1];
 
-	for(int i = 0; i < lpdu.ab.size(); i++)
+	for(unsigned int i = 0; i < lpdu.ab.size(); i++)
     {
         buf_to_send[i] = lpdu.ab[i];
     }
@@ -100,7 +100,6 @@ Uptime_t DummyTx::transmit( const Lpdu& lpdu)
     return 0;
 }
 
-#include <time.h>
 #define WAIT_FOREVER ((time_t)-1)
 
 enum error_codes {

@@ -638,6 +638,9 @@ int Opc_client_da_DriverThread::Async2Update()
 	//g_pIOPCAsyncIO2->SetEnable(FALSE); // turn off update callbacks 
 	////////////////////////end remove////////////////////////////////////
 
+    int rc = 0;
+    int check_server = 0;
+
 	while(true)
 	{
 		if(fExit)
@@ -646,6 +649,23 @@ int Opc_client_da_DriverThread::Async2Update()
 			IT_COMMENT("Opc_client_da_DriverThread exiting....");
 			m_hevtEnd.signal();
 			break; //terminate the thread
+		}
+
+        //check connection with server every g_dwUpdateRate*10
+		if((check_server%10) == 0)
+		{
+			rc = chek_connection_with_server();
+			fprintf(stderr,"check for server connection...\n");
+			fflush(stderr);
+		}
+
+		check_server++;
+
+		if(rc)
+		{ 
+			fprintf(stderr,"Opc_client_da_DriverThread exiting...., due to lack of connection with server\n");
+			fflush(stderr);
+			break; 
 		}
 
 		//fprintf(stderr, "Opc_client_da_DriverThread::g_bWriteComplete = %d\n", Opc_client_da_DriverThread::g_bWriteComplete);
@@ -1854,6 +1874,27 @@ int Opc_client_da_DriverThread::OpcStop()
 	printf("Server and all group interfaces terminated.\n");
 	
 	return 1;
+}
+
+int Opc_client_da_DriverThread::chek_connection_with_server(void)
+{
+	IT_IT("Opc_client_da_DriverThread::chek_connection_with_server");
+
+	WORD wMajor, wMinor, wBuild;
+
+	LPWSTR pwsz = NULL;
+
+	if(!GetStatus(&wMajor, &wMinor, &wBuild, &pwsz))
+	{
+		::CoTaskMemFree(pwsz);
+	}
+	else
+	{
+		IT_EXIT;
+		return 1;
+	}
+
+	return 0;
 }
 
 int Opc_client_da_DriverThread::GetStatus(WORD *pwMav, WORD *pwMiv, WORD *pwB, LPWSTR *pszV)
