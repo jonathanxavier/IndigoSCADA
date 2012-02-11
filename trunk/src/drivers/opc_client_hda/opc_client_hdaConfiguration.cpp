@@ -50,6 +50,7 @@ Inherited( parent, name ),Receipe(receipe)
 		NItems->setEnabled(false);
 		OpcServerProgIDText->setEnabled(false);
 		OpcServerIPAddressText->setEnabled(false);
+		OpcServerClassIDText->setEnabled(false);
 	};
 }
 Opc_client_hdaConfiguration::~Opc_client_hdaConfiguration()
@@ -69,7 +70,13 @@ void Opc_client_hdaConfiguration::OkClicked()
 	GetConfigureDb()->DoExec(0,cmd,0); // delete the old value
 	//
 	cmd = "insert into PROPS values('"+Name->text() +"','" + Receipe + "','" + 
-	NItems->text() + " " + PollInterval->text() + " " + OpcServerProgIDText->text() + " " + OpcServerIPAddressText->text() +"');";
+	NItems->text() + 
+	" " + PollInterval->text() + 
+	" " + OpcServerProgIDText->text() + 
+	" " + OpcServerIPAddressText->text() +
+	" " + OpcServerClassIDText->text() +
+	"');";
+
 	GetConfigureDb()->DoExec(0,cmd,0);
 	QSAuditTrail(this,caption(), tr("Edited"));
 
@@ -105,6 +112,8 @@ void Opc_client_hdaConfiguration::QueryResponse (QObject *p, const QString &c, i
 				OpcServerProgIDText->setText(t);
 				is >> t;
 				OpcServerIPAddressText->setText(t);
+				is >> t;
+				OpcServerClassIDText->setText(t);
 			}
 			else
 			{
@@ -118,6 +127,7 @@ void Opc_client_hdaConfiguration::QueryResponse (QObject *p, const QString &c, i
 				//SetComboItem(OpcServerProgID,"COM2");
 				OpcServerProgIDText->setText("");
 				OpcServerIPAddressText->setText("");
+				OpcServerClassIDText->setText("");
 			}
 		} 
 		break;

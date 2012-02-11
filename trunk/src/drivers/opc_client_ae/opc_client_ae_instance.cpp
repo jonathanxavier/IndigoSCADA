@@ -164,6 +164,7 @@ void Opc_client_ae_Instance::QueryResponse(QObject *p, const QString &c, int id,
 				is >> Cfg.SampleTime; // how long we sample for in milliseconds
 				is >> Cfg.OpcServerProgID;    // Opc Server ProgID
 				is >> Cfg.OpcServerIPAddress; // Opc Server IP Address
+				is >> Cfg.OpcclassId; // Opc Server Class ID
 
 				Countdown = 1;
 

@@ -60,6 +60,8 @@ class DummyTx : public TransmitInterface
 public:
     DummyTx(int* debugLevel_p, char name1, char name2, int sck);
     virtual Uptime_t transmit( const Lpdu& lpdu);
+	int read(SOCKET s, void* buf, size_t min_size, size_t max_size, time_t timeout);
+	bool write(SOCKET s, void const* buf, size_t size, time_t timeout);
     Bytes lastTxBytes;
     int numTxs;
     char n[3]; // two char id

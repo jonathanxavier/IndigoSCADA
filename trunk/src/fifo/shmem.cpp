@@ -23,6 +23,17 @@ shared_memory* shared_memory::chain;
 void* shared_memory_base_pointer;
 #endif
 
+#ifdef assert
+#undef assert
+#endif
+
+#define assert(exp) \
+if(!(exp))\
+{\
+	fprintf(stderr, "assert at line %d in file %s\n", __LINE__, __FILE__);\
+	exit(1);\
+}
+
 inline bool shared_memory::enter_critical_section(status& result)
 {
     if (InterlockedDecrement(&pMonitor->cs) != 0) { 
@@ -227,7 +238,7 @@ shared_memory::status shared_memory::open(const char* file_name,
 	pHdr = (header*)MapViewOfFileEx(hMap, access, 0, 0, 0,
 					pMonitor->base_address);
 #ifdef USE_BASED_POINTERS
-	//assert(shared_memory_base_pointer == NULL); //si va in assert alla seconda open della shared memory
+	assert(shared_memory_base_pointer == NULL);
 	// only one opened section is possible
 	if (pHdr == NULL) { 
 	    pHdr = (header*)MapViewOfFileEx(hMap, access, 0, 0, 0, NULL);

@@ -408,9 +408,6 @@ int Opc_client_da_DriverThread::AsyncRead(bool bFlag)
 
 	//OPCHANDLE hServer[MAX_ITEMS];
 	VARIANT Val[MAX_ITEMS];
-	#ifdef PROVA_SCRITTURA
-	VARIANT vCount;
-	#endif
 	VARIANT vCommandValue;
 	DWORD dw = 0;
 	
@@ -418,30 +415,10 @@ int Opc_client_da_DriverThread::AsyncRead(bool bFlag)
 	{
 		for(dw = 0; dw < g_dwNumItems; dw++)
 		{
-			//DWORD v = Item[dw].dwAccessRights && OPC_WRITEABLE;
-			//if (v == OPC_WRITEABLE)
-			//{
-			//	hServer[dw] = Item[dw].hServer;
-			//	::VariantInit(&Val[dw]);
-			//}
-			//else
-			//{
-			//	hServer[dw] = Item[dw].hServer;
-			//	::VariantInit(&Val[dw]);
-			//}
-
-			//hServer[dw] = Item[dw].hServer;
 			::VariantInit(&Val[dw]);
-
 		}
 	}
 	
-	#ifdef PROVA_SCRITTURA
-	::VariantInit(&vCount);
-	V_VT(&vCount) = VT_I2;
-	V_I2(&vCount) = 0;
-	#endif
-
 	::VariantInit(&vCommandValue);
 	V_VT(&vCommandValue) = VT_BOOL;
 	//V_BOOL(&vCommandValue) = commandValue;
@@ -452,14 +429,6 @@ int Opc_client_da_DriverThread::AsyncRead(bool bFlag)
 
 	while(true)
 	{
-		//IT_COMMENT("Opc_client_da_DriverThread Waiting....");
-		
-		//{
-		//	dbCriticalSection cs(mutex); //enter critical section
-		//	m_hevtSinc.wait(mutex);
-		//	m_hevtSinc.reset();
-		//}//exit critical section
-
 		if(fExit)
 		{
 			mandare_eventi = false;
@@ -467,15 +436,6 @@ int Opc_client_da_DriverThread::AsyncRead(bool bFlag)
 			m_hevtEnd.signal();
 			break; //terminate the thread
 		}
-		
-		//IT_COMMENT("Opc_client_da_DriverThread Past Wait Flag");
-
-		//if(!SendRece(*pinternal_packet))
-		//{
-		//	IT_COMMENT("SendRece failed");
-		//	fFail = true;
-		//}
-
 
 		if(g_bWriteEnable && Opc_client_da_DriverThread::g_bWriteComplete)
 		{
@@ -487,91 +447,58 @@ int Opc_client_da_DriverThread::AsyncRead(bool bFlag)
 				//::VariantChangeType(&Val[dw], &Val[dw], 0, V_VT(&Item[dw]));
 			}
 
-			//V_I2(&vCount)++;
-
-			//if((V_VT(&Item[0]) == VT_BOOL) && (V_I2(&vCount) > 1))
-			//{
-			//	V_I2(&vCount) = 0; // allow bool to toggle on/off
-			//}
-	
-
 			// write to one item at a time
 			for(dw = 0; dw < g_dwNumItems; dw++)
 			{
 				const char *a = Item[dw].spname;
-				
-				//USES_CONVERSION;
 
-				//if(strcmp(W2T(Item[dw].wszName), "Simulated Card.Simulated Node.STATE") == 0)
-				//	break;
-			
+				::VariantCopy(&Val[dw], &vCommandValue);
+				::VariantChangeType(&Val[dw], &Val[dw], 0, V_VT(&Item[dw]));
+
+				//IT_COMMENT2("Command for sample point %s, value: %lf", Item[dw].spname, commandValue);
+				//DWOERD index = Item[dw].hClient;
+				DWORD dwAccessRights = Item[dw].dwAccessRights;
+
+				dwAccessRights = dwAccessRights & OPC_WRITEABLE;
+
+				if(dwAccessRights == OPC_WRITEABLE)
 				{
+					Opc_client_da_DriverThread::g_bWriteComplete = false;
+					
+					g_Writecs.Lock(); // lock callbacks until we get transid
 
-					::VariantCopy(&Val[dw], &vCommandValue);
-					::VariantChangeType(&Val[dw], &Val[dw], 0, V_VT(&Item[dw]));
+					OPCHANDLE serversItemHandle = Item[dw].hServer;
+					
+					hr = g_pIOPCAsyncIO->Write(dwWriteConnection, 1,  &serversItemHandle, &Val[dw], &g_dwWriteTransID, &pErrorsWrite);
 
-					#ifdef PROVA_SCRITTURA
-					///////////////////////////////////INIZIO PROVA//////////////////////////////////////////
+					g_Writecs.Unlock();
 
-					V_I2(&vCount)++;
+					IT_COMMENT1("Write executed for sample point %s", Item[dw].spname);
 
-					if((V_VT(&Item[0]) == VT_BOOL) && (V_I2(&vCount) > 1))
+					if(FAILED(hr))
 					{
-						V_I2(&vCount) = 0; // allow bool to toggle on/off
+						ShowError(hr,"AsyncIO->Write()");
 					}
-
-					::VariantCopy(&Val[dw], &vCount);
-					::VariantChangeType(&Val[dw], &Val[dw], 0, V_VT(&Item[dw]));
-
-					//////////////////////////////fine prova//////////////////////////////////////////////////
-					#endif
-
-					//IT_COMMENT2("Command for sample point %s, value: %lf", Item[dw].spname, commandValue);
-					//DWOERD index = Item[dw].hClient;
-					DWORD dwAccessRights = Item[dw].dwAccessRights;
-
-					dwAccessRights = dwAccessRights & OPC_WRITEABLE;
-
-					if(dwAccessRights == OPC_WRITEABLE)
+					else if(hr == S_FALSE)
 					{
-						Opc_client_da_DriverThread::g_bWriteComplete = false;
-						
-						g_Writecs.Lock(); // lock callbacks until we get transid
-
-						OPCHANDLE serversItemHandle = Item[dw].hServer;
-						
-						hr = g_pIOPCAsyncIO->Write(dwWriteConnection, 1,  &serversItemHandle, &Val[dw], &g_dwWriteTransID, &pErrorsWrite);
-
-						g_Writecs.Unlock();
-
-						IT_COMMENT1("Write executed for sample point %s", Item[dw].spname);
-
-						if(FAILED(hr))
+						for(dw = 0; dw < g_dwNumItems; dw++)
 						{
-							ShowError(hr,"AsyncIO->Write()");
-						}
-						else if(hr == S_FALSE)
-						{
-							for(dw = 0; dw < g_dwNumItems; dw++)
+							if(FAILED(pErrorsWrite[dw]))
 							{
-								if(FAILED(pErrorsWrite[dw]))
-								{
-									ShowError(pErrorsWrite[dw],"AsyncIO->Write() item returned");
-								}
+								ShowError(pErrorsWrite[dw],"AsyncIO->Write() item returned");
 							}
+						}
 
-							::CoTaskMemFree(pErrorsWrite);
-						}
-						else // S_OK
-						{
-							::CoTaskMemFree(pErrorsWrite);
-						}
+						::CoTaskMemFree(pErrorsWrite);
 					}
-					else
+					else // S_OK
 					{
-						IT_COMMENT1("No access write for sample point %s", Item[dw].spname);
+						::CoTaskMemFree(pErrorsWrite);
 					}
-
+				}
+				else
+				{
+					IT_COMMENT1("No access write for sample point %s", Item[dw].spname);
 				}
 			}
 		}
@@ -1254,12 +1181,11 @@ int Opc_client_da_DriverThread::OpcStart()
 	IT_IT("Opc_client_da_DriverThread::OpcStart");
 
 	char show_msg[150];
-
 	TCHAR  ServerIPAddress[80];
 
 	strcpy(ServerIPAddress, ((Opc_client_da_Instance*)Parent)->Cfg.OpcServerIPAddress);
 
-	if((strlen(ServerIPAddress) == 0))
+	if(strlen(ServerIPAddress) == 0)
 	{
 		local_server = 1;
 	}
@@ -1483,7 +1409,7 @@ int Opc_client_da_DriverThread::OpcStart()
 		printf("Trying to connect to remote DA server on machine with IP: %s\n", ServerIPAddress);
 		sprintf(show_msg, "Trying to connect to remote DA server on machine with IP: %s", ServerIPAddress);
 
-		ShowMessage(S_OK, "", show_msg);
+		//ShowMessage(S_OK, "", show_msg);
 		
 		HRESULT	hr = ::CoInitializeEx(NULL,COINIT_MULTITHREADED); // setup COM lib
 
@@ -1494,7 +1420,16 @@ int Opc_client_da_DriverThread::OpcStart()
 			return 1;
 		}
 
-		CoInitializeSecurity(NULL, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_NONE, RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE, NULL);
+		hr = CoInitializeSecurity(NULL, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_NONE, RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE, NULL);
+
+		if(FAILED(hr))
+		{
+			fprintf(stderr,"CoInitializeSecurity failed\n");
+			fflush(stderr);
+			//ShowError(hr,"CoInitializeSecurity()");
+			IT_EXIT;
+			return 1;
+		}
 		
 		COAUTHINFO athn;
 		ZeroMemory(&athn, sizeof(COAUTHINFO));
@@ -1578,7 +1513,7 @@ int Opc_client_da_DriverThread::OpcStart()
 			}
 		}
 		
-		////////////////////////end getListOfDAServers
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		TCHAR serverName[100];
 		
@@ -1606,10 +1541,11 @@ int Opc_client_da_DriverThread::OpcStart()
 		HKEY keyHandle;
 		char classIdString[100];
 		CLSID classId;
+		TCHAR  OpcclassId[80];
 
 		hr = RegConnectRegistry(ServerIPAddress, HKEY_LOCAL_MACHINE, &remoteRegHandle);
 
-		if(hr)
+		if(hr != S_OK)
 		{
 			char show_msg[150];
 
@@ -1633,7 +1569,28 @@ int Opc_client_da_DriverThread::OpcStart()
 
 			LocalFree(lpMsgBuf);
 
-			return 1;
+			strcpy(OpcclassId, ((Opc_client_da_Instance*)Parent)->Cfg.OpcclassId);
+
+			if(strlen(OpcclassId) > 0)
+			{
+				//If this thread is run as Local Account, then you need to have the remote classId string (CLSID)
+								
+				strcpy(classIdString, OpcclassId);
+
+				USES_CONVERSION;
+
+				LPOLESTR sz = A2W(classIdString);
+
+				hr = CLSIDFromString(sz,&classId);
+
+				if(FAILED(hr))
+				{
+					fprintf(stderr,"CLSIDFromString failed\n");
+					fflush(stderr);
+					ShowError(hr,"CLSIDFromString failed");
+					return 1;
+				}
+			}
 		}
 		else
 		{
