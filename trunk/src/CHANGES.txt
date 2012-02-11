@@ -38,3 +38,17 @@ Added OPC Server DA 2.0, it is missing the interface between real time data and 
 Added IEC 103 driver, it is in pre alpha state
 DNP3 now compiles with MSVC++ 6.0
 ---------------------------------------------------------------------------
+11-02-2012
+Added the field "Class ID" to OPC DA, OPC AE, OPC HDA configuration windows.
+
+dnp3master.exe now runs and is loaded by manager.exe by adding the following section
+to C:\scada\bin\manager.ini
+
+[Process6]
+CommandLine = C:\scada\bin\dnp3master.exe -a 14.5.7.56 -p 20000
+WorkingDir= C:\scada\bin
+PauseStart= 1000
+PauseEnd= 1000
+UserInterface = Yes
+Restart = Yes 
+Monitored data is not yet passed to dnp3driver.dll
