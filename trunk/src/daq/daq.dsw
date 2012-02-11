@@ -137,6 +137,9 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name exe_sample
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name iec103driver
+    End Project Dependency
 }}}
 
 ###############################################################################
