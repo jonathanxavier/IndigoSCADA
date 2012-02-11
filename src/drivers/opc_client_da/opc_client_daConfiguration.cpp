@@ -50,6 +50,7 @@ Inherited( parent, name ),Receipe(receipe)
 		NItems->setEnabled(false);
 		OpcServerProgIDText->setEnabled(false);
 		OpcServerIPAddressText->setEnabled(false);
+		OpcServerClassIDText->setEnabled(false);
 	};
 }
 Opc_client_daConfiguration::~Opc_client_daConfiguration()
@@ -68,8 +69,26 @@ void Opc_client_daConfiguration::OkClicked()
 	QString cmd = QString("delete from PROPS where SKEY='")+QString(Name->text()) + QString("' and IKEY='") + Receipe + "';";
 	GetConfigureDb()->DoExec(0,cmd,0); // delete the old value
 	//
-	cmd = "insert into PROPS values('"+Name->text() +"','" + Receipe + "','" + 
-	NItems->text() + " " + PollInterval->text() + " " + OpcServerProgIDText->text() + " " + OpcServerIPAddressText->text() +"');";
+	if(strlen((const char*)OpcServerClassIDText->text()) > 0)
+	{
+		cmd = "insert into PROPS values('"+Name->text() +"','" + Receipe + "','" + 
+		NItems->text() + 
+		" " + PollInterval->text() + 
+		" " + OpcServerProgIDText->text() + 
+		" " + OpcServerIPAddressText->text() +
+		" " + OpcServerClassIDText->text() +
+		"');";
+	}
+	else
+	{
+		cmd = "insert into PROPS values('"+Name->text() +"','" + Receipe + "','" + 
+		NItems->text() + 
+		" " + PollInterval->text() + 
+		" " + OpcServerProgIDText->text() + 
+		" " + OpcServerIPAddressText->text() +
+		"');";
+	}
+
 	GetConfigureDb()->DoExec(0,cmd,0);
 	QSAuditTrail(this,caption(), tr("Edited"));
 
@@ -105,6 +124,8 @@ void Opc_client_daConfiguration::QueryResponse (QObject *p, const QString &c, in
 				OpcServerProgIDText->setText(t);
 				is >> t;
 				OpcServerIPAddressText->setText(t);
+				is >> t;
+				OpcServerClassIDText->setText(t);
 			}
 			else
 			{
@@ -118,6 +139,7 @@ void Opc_client_daConfiguration::QueryResponse (QObject *p, const QString &c, in
 				//SetComboItem(OpcServerProgID,"COM2");
 				OpcServerProgIDText->setText("");
 				OpcServerIPAddressText->setText("");
+				OpcServerClassIDText->setText("");
 			}
 		} 
 		break;

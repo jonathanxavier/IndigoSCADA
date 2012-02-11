@@ -160,11 +160,12 @@ void Opc_client_da_Instance::QueryResponse(QObject *p, const QString &c, int id,
 				QString s = UndoEscapeSQLText(GetConfigureDb()->GetString("DVAL")); // the top one is either the receipe or (default)
 				QTextIStream is(&s); // extract the values
 				//
-				is >> OpcItems;	  // how many OPC items there are in the TRU or PLC
+				is >> OpcItems;	  // how many OPC items there are in the RTU or PLC
 				is >> Cfg.SampleTime; // how long we sample for in milliseconds
 				is >> Cfg.OpcServerProgID;    // Opc Server ProgID
 				is >> Cfg.OpcServerIPAddress; // Opc Server IP Address
-
+				is >> Cfg.OpcclassId; // Opc Server Class ID
+				
 				Countdown = 1;
 
 				if(Values)

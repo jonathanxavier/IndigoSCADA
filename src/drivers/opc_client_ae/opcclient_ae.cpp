@@ -102,7 +102,16 @@ int Opc_client_ae_DriverThread::OpcStart()
 		return 1;
 	}
 
-	CoInitializeSecurity(NULL, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_NONE, RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE, NULL);
+	hr = CoInitializeSecurity(NULL, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_NONE, RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE, NULL);
+
+	if(FAILED(hr))
+	{
+		fprintf(stderr,"CoInitializeSecurity failed\n");
+		fflush(stderr);
+		ShowError(hr,"CoInitializeSecurity()");
+		IT_EXIT;
+		return 1;
+	}
 	
 	COAUTHINFO athn;
 	ZeroMemory(&athn, sizeof(COAUTHINFO));
@@ -188,7 +197,7 @@ int Opc_client_ae_DriverThread::OpcStart()
 		}
 	}
 	
-	////////////////////////end getListOfAEServers
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	TCHAR serverName[100];
 			
@@ -216,10 +225,11 @@ int Opc_client_ae_DriverThread::OpcStart()
 	HKEY keyHandle;
 	char classIdString[100];
 	CLSID classId;
+	TCHAR  OpcclassId[80];
 
 	hr = RegConnectRegistry(ServerIPAddress, HKEY_LOCAL_MACHINE, &remoteRegHandle);
 
-	if(hr)
+	if(hr != S_OK)
 	{
 		char show_msg[150];
 
@@ -243,7 +253,28 @@ int Opc_client_ae_DriverThread::OpcStart()
 
 		LocalFree(lpMsgBuf);
 
-		return 1;
+		strcpy(OpcclassId, ((Opc_client_ae_Instance*)Parent)->Cfg.OpcclassId);
+
+		if(strlen(OpcclassId) > 0)
+		{
+			//If this thread is run as Local Account, then you need to have the remote classId string (CLSID)
+							
+			strcpy(classIdString, OpcclassId);
+
+			USES_CONVERSION;
+
+			LPOLESTR sz = A2W(classIdString);
+
+			hr = CLSIDFromString(sz,&classId);
+
+			if(FAILED(hr))
+			{
+				fprintf(stderr,"CLSIDFromString failed\n");
+				fflush(stderr);
+				ShowError(hr,"CLSIDFromString failed");
+				return 1;
+			}
+		}
 	}
 	else
 	{

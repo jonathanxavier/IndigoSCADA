@@ -25,6 +25,7 @@ class Opc_client_hdaConfigurationData : public QDialog
 	QSpinBox *PollInterval;
 	QLineEdit *OpcServerProgIDText;
 	QLineEdit *OpcServerIPAddressText;
+	QLineEdit *OpcServerClassIDText;
 };
 #endif // Opc_client_hdaConfigurationData_included
 

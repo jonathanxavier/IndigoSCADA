@@ -41,17 +41,18 @@ struct InstanceCfg // friend to anyone
 {
 	QString OpcServerProgID;  // opc server ProgID
 	QString OpcServerIPAddress;  // opc server IP address
+	QString OpcclassId;  // opc server Class ID
 
-	unsigned SampleTime; // sampleing time 
+	unsigned SampleTime; // sampling time 
 
 	InstanceCfg() : 
-	OpcServerProgID(""),SampleTime(1000),OpcServerIPAddress("")
+	OpcServerProgID(""),SampleTime(1000),OpcServerIPAddress(""),OpcclassId("")
 	{
 	};
 
 	InstanceCfg(const InstanceCfg &m) : 
-
-	OpcServerProgID(m.OpcServerProgID),SampleTime(m.SampleTime),OpcServerIPAddress(m.OpcServerIPAddress)
+	OpcServerProgID(m.OpcServerProgID),SampleTime(m.SampleTime),
+	OpcServerIPAddress(m.OpcServerIPAddress),OpcclassId(m.OpcclassId)
 	{
 	};
 };

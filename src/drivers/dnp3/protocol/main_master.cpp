@@ -23,7 +23,6 @@
 #define ENOENT 1
 #define EIO 1
 #define EOK 0
-#define WAIT_FOREVER ((time_t)-1)
  
 class DNP3MasterApp { 
 private: 
@@ -194,82 +193,7 @@ int IsSingleInstance(const char* name)
    return 1;
 }
 
-enum error_codes {
-    ok = 0,
-    not_opened = -1,
-    broken_pipe = -2,
-    timeout_expired = -3
-};
-
-int read(SOCKET s, void* buf, size_t min_size, size_t max_size, time_t timeout)
-{ 
-	int errcode = 0;
-    size_t size = 0;
-    time_t start = 0;
-
-    if (timeout != WAIT_FOREVER) 
-	{ 
-        start = time(NULL); 
-    }
-
-    do{ 
-        int rc;
-
-        if (timeout != WAIT_FOREVER)
-		{ 
-            fd_set events;
-            struct timeval tm;
-            FD_ZERO(&events);
-            FD_SET(s, &events);
-            tm.tv_sec = (long)timeout;
-            tm.tv_usec = 0;
-            rc = select((int)s+1, &events, NULL, NULL, &tm);
-            if (rc < 0) 
-			{ 
-                errcode = WSAGetLastError();
-                fprintf(stderr, "Socket select is failed: %d\n", errcode);
-			    fflush(stderr);
-
-                return -1;
-            }
-
-            if (rc == 0) 
-			{
-                return size;
-            }
-
-            time_t now = time(NULL);
-            timeout = start + timeout >= now ? timeout + start - now : 0;  
-        }
-
-        rc = recv(s, (char*)buf + size, max_size - size, 0);
-
-        if (rc < 0) 
-		{ 
-            errcode = WSAGetLastError();
-            fprintf(stderr,"Socket read is failed: %d\n", errcode);
-			fflush(stderr);
-
-            return -1;
-        } 
-		else if (rc == 0) 
-		{
-            errcode = broken_pipe;
-            fprintf(stderr,"Socket is disconnected\n");
-			fflush(stderr);
-            return -1; 
-        }
-		else 
-		{
-            size += rc; 
-        }
-
-    }while (size < min_size); 
-
-    return (int)size;
-}
-
-#include "getopt.h" 
+#include "getopt.h"
 
 int main( int argc, char **argv )
 {
@@ -285,6 +209,10 @@ int main( int argc, char **argv )
 	sprintf(version, ""APPLICATION" - Built on %s %s %s",__DATE__,__TIME__,SUPPLIER);
 	fprintf(stderr, "%s\n", version);
 	fflush(stderr);
+	SYSTEMTIME oT;
+	::GetLocalTime(&oT);
+	fprintf(stdout,"%02d/%02d/%04d, %02d:%02d:%02d Starting ... %s\n",oT.wMonth,oT.wDay,oT.wYear,oT.wHour,oT.wMinute,oT.wSecond,APPLICATION); 
+	fflush(stdout);
 	////////////////////////////////////////////////////////////////////////////////
 
 	while( ( c = getopt ( argc, argv, "a:p:?" )) != EOF ) {
@@ -306,8 +234,8 @@ int main( int argc, char **argv )
 
 	master_app = new DNP3MasterApp();   
 
-    if(!master_app->OpenLink(dnp3ServerAddress, atoi(dnp3ServerPort)))
-    {  
+        if(!master_app->OpenLink(dnp3ServerAddress, atoi(dnp3ServerPort)))
+        {  
 		Master* master_p;
 		DummyDb db;
 		DummyTimer timer;
@@ -345,7 +273,7 @@ int main( int argc, char **argv )
 		char data_p[80];
 		int n_read;
 
-		n_read = read(master_app->getSocket(), data_p, 1, 80, 60);
+		n_read = tx.read(master_app->getSocket(), data_p, 1, 80, 15);
 
 		if(n_read > 0)
 		{
@@ -354,16 +282,16 @@ int main( int argc, char **argv )
 
 			master_p->rxData(&bytes, 0);
 		}
-		else
+		else	
 		{
-		    return 1;
+		        return 1;
 		}
 
-        for(;;)   
-        {   
+        	for(;;)   
+        	{   
 			master_p->startNewTransaction();
 
-			n_read = read(master_app->getSocket(), data_p, 1, 80, WAIT_FOREVER);
+			n_read = tx.read(master_app->getSocket(), data_p, 1, 80, 15);
 
 			if(n_read > 0)
 			{
@@ -376,21 +304,21 @@ int main( int argc, char **argv )
 			{
 				break; //exit loop
 			}
+	
+            		Sleep(500);   
+        	}   
 
-            Sleep(500);   
+	        Sleep(1000);   
+        	master_app->CloseLink();   
         }   
+        else   
+        {   
+               bool t = master_app->GetSockConnectStatus();   
+               Sleep(30000);   
+               master_app->CloseLink();   
+        }  
 
-        Sleep(1000);   
-        master_app->CloseLink();   
-    }   
-    else   
-    {   
-        bool t = master_app->GetSockConnectStatus();   
-        Sleep(30000);   
-        master_app->CloseLink();   
-    }  
-
-    return 0;
+        return 0;
 }
 
 
