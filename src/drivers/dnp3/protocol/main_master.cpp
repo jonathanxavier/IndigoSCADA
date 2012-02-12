@@ -21,6 +21,7 @@
 #include "custom.hpp"
 #include "iec104types.h"
 #include "iec_item.h"
+#include "process.h"
 
 #define ENOENT 1
 #define EIO 1
@@ -198,7 +199,6 @@ int IsSingleInstance(const char* name)
 }
 
 #include "getopt.h"
-#include "process.h"
 
 void PipeWorker(void* pParam);
 

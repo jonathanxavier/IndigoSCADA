@@ -136,8 +136,9 @@ Uptime_t TransportFunction::transmit( DnpAddr_t         txAddr,
 	    th.incrementSeqNum( seqNum);
 	}
     }
-
+    
     assert(0);
+    return 0; //apa+++
 }
 
 const DnpAddr_t TransportFunction::FRAGMENT_NOT_FOUND = 0xfff0;
