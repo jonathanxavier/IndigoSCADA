@@ -159,9 +159,9 @@ void Modbus_driver_Instance::QueryResponse(QObject *p, const QString &c, int id,
 				QString s = UndoEscapeSQLText(GetConfigureDb()->GetString("DVAL")); // the top one is either the receipe or (default)
 				QTextIStream is(&s); // extract the values
 				//
-				is >> IecItems;	  // how many IEC items there are in the RTU or PLC
+				is >> IecItems;	  // how many modbus items there are in the RTU or PLC
 				is >> Cfg.SampleTime; // how long we sample for in milliseconds
-				is >> Cfg.IEC104ServerIPAddress; // IEC 104 server IP Address
+				is >> Cfg.MODBUSServerIPAddress; // MODBUS server IP Address
 
 				Countdown = 1;
 
@@ -179,10 +179,10 @@ void Modbus_driver_Instance::QueryResponse(QObject *p, const QString &c, int id,
 				};
 				//
 
-				//Start IEC 104 client driver
+				//Start MODBUS client driver
 				if(!Connect())
 				{
-					QSLogAlarm(Name,tr("Failed to start IEC 104 client driver"));
+					QSLogAlarm(Name,tr("Failed to start MODBUS client driver"));
 				}
 			}
 		}

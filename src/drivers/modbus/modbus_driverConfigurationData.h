@@ -24,7 +24,7 @@ class Modbus_driverConfigurationData : public QDialog
 	QSpinBox *NItems;
 	QSpinBox *PollInterval;
 	//QLineEdit *OpcServerProgIDText;
-	QLineEdit *IEC104ServerIPAddressText;
+	QLineEdit *MODBUSServerIPAddressText;
 };
 #endif // Modbus_driverConfigurationData_included
 

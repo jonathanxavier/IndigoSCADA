@@ -45,21 +45,21 @@ Modbus_driverConfigurationData::Modbus_driverConfigurationData(QWidget *parent, 
 	Name->setAlignment( AlignLeft|AlignVCenter|ExpandTabs );
 	Name->setMargin( 0 );
 
-	IEC104ServerIPAddressText = new QLineEdit(this, "LineEdit_7");
-	IEC104ServerIPAddressText->setGeometry(200, 80, 100, 30);
-	IEC104ServerIPAddressText->setMinimumSize(0, 0);
-	IEC104ServerIPAddressText->setMaximumSize(32767, 32767);
-	IEC104ServerIPAddressText->setFocusPolicy(QWidget::StrongFocus);
-	IEC104ServerIPAddressText->setBackgroundMode(QWidget::PaletteBase);
+	MODBUSServerIPAddressText = new QLineEdit(this, "LineEdit_7");
+	MODBUSServerIPAddressText->setGeometry(200, 80, 100, 30);
+	MODBUSServerIPAddressText->setMinimumSize(0, 0);
+	MODBUSServerIPAddressText->setMaximumSize(32767, 32767);
+	MODBUSServerIPAddressText->setFocusPolicy(QWidget::StrongFocus);
+	MODBUSServerIPAddressText->setBackgroundMode(QWidget::PaletteBase);
 #if QT_VERSION < 300
-	IEC104ServerIPAddressText->setFontPropagation(QWidget::SameFont);
-	IEC104ServerIPAddressText->setPalettePropagation(QWidget::SameFont);
+	MODBUSServerIPAddressText->setFontPropagation(QWidget::SameFont);
+	MODBUSServerIPAddressText->setPalettePropagation(QWidget::SameFont);
 	#endif
-	IEC104ServerIPAddressText->setText( tr( "" ) );
-	IEC104ServerIPAddressText->setMaxLength( 100 );
-	IEC104ServerIPAddressText->setFrame( QLineEdit::Normal );
-	IEC104ServerIPAddressText->setFrame( TRUE );
-	IEC104ServerIPAddressText->setAlignment( AlignLeft );
+	MODBUSServerIPAddressText->setText( tr( "" ) );
+	MODBUSServerIPAddressText->setMaxLength( 100 );
+	MODBUSServerIPAddressText->setFrame( QLineEdit::Normal );
+	MODBUSServerIPAddressText->setFrame( TRUE );
+	MODBUSServerIPAddressText->setAlignment( AlignLeft );
 	QLabel *qtarch_Label_22 = new QLabel(this, "Label_21");
 	qtarch_Label_22->setGeometry(10, 80, 150, 30);
 	qtarch_Label_22->setMinimumSize(0, 0);
@@ -74,7 +74,7 @@ Modbus_driverConfigurationData::Modbus_driverConfigurationData(QWidget *parent, 
 	qtarch_Label_22->setLineWidth( 1 );
 	qtarch_Label_22->setMidLineWidth( 0 );
 	qtarch_Label_22->QFrame::setMargin( 0 );
-	qtarch_Label_22->setText( tr( "IEC 104 slave IP address" ) );
+	qtarch_Label_22->setText( tr( "MODBUS slave IP address" ) );
 	qtarch_Label_22->setAlignment( AlignLeft|AlignVCenter|ExpandTabs );
 	qtarch_Label_22->setMargin( 0 );
 /////////////////////////////////////////////////////////////////////////

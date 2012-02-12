@@ -23,8 +23,8 @@ class Dnp3driverConfigurationData : public QDialog
 	QLabel *Name;
 	QSpinBox *NItems;
 	QSpinBox *PollInterval;
-	//QLineEdit *OpcServerProgIDText;
 	QLineEdit *DNP3ServerIPAddressText;
+	QLineEdit *DNP3ServerIPPortText;
 };
 #endif // Dnp3driverConfigurationData_included
 

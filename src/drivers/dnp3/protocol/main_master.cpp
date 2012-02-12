@@ -18,11 +18,15 @@
 #include "station.hpp"
 #include "master.hpp"
 #include "datalink.hpp"
-#include "dummy.hpp"
+#include "custom.hpp"
+#include "iec104types.h"
+#include "iec_item.h"
 
 #define ENOENT 1
 #define EIO 1
 #define EOK 0
+
+static int timeout_connection_with_parent = 0;
  
 class DNP3MasterApp { 
 private: 
@@ -194,16 +198,23 @@ int IsSingleInstance(const char* name)
 }
 
 #include "getopt.h"
+#include "process.h"
+
+void PipeWorker(void* pParam);
+
+#define POLLING_TIME 1000 //<------------------- PARAMETER
 
 int main( int argc, char **argv )
 {
 	char version[100];
 	char dnp3ServerAddress[80];
 	char dnp3ServerPort[80];
+	char line_number[80];
 	int c;
-
+	
 	dnp3ServerAddress[0] = '\0';
 	dnp3ServerPort[0] = '\0';
+	line_number[0] = '\0';
 
 	//version control///////////////////////////////////////////////////////////////
 	sprintf(version, ""APPLICATION" - Built on %s %s %s",__DATE__,__TIME__,SUPPLIER);
@@ -211,36 +222,93 @@ int main( int argc, char **argv )
 	fflush(stderr);
 	SYSTEMTIME oT;
 	::GetLocalTime(&oT);
-	fprintf(stdout,"%02d/%02d/%04d, %02d:%02d:%02d Starting ... %s\n",oT.wMonth,oT.wDay,oT.wYear,oT.wHour,oT.wMinute,oT.wSecond,APPLICATION); 
-	fflush(stdout);
+	fprintf(stderr,"%02d/%02d/%04d, %02d:%02d:%02d Starting ... %s\n",oT.wMonth,oT.wDay,oT.wYear,oT.wHour,oT.wMinute,oT.wSecond,APPLICATION); 
+	fflush(stderr);
 	////////////////////////////////////////////////////////////////////////////////
 
-	while( ( c = getopt ( argc, argv, "a:p:?" )) != EOF ) {
+	while( ( c = getopt ( argc, argv, "a:p:l:?" )) != EOF ) {
 		switch ( c ) {
 			case 'a' :
-				strcpy(dnp3ServerAddress, optarg);
+			strcpy(dnp3ServerAddress, optarg);
 			break;
 			case 'p' :
-				strcpy(dnp3ServerPort, optarg);
+			strcpy(dnp3ServerPort, optarg);
+			break;
+			case 'l' :
+			strcpy(line_number, optarg);
 			break;
 			case '?' :
-				fprintf(stderr, "Run time usage: %s -a server IP address -p server IP port\n", argv[0]);
-				fflush(stderr);
-				exit( 0 );
+			fprintf(stderr, "Run time usage: %s -a server IP address -p server IP port -l line number\n", argv[0]);
+			fflush(stderr);
+			exit( 0 );
 		}
 	}
+
+	if(strlen(dnp3ServerAddress) == 0)
+	{
+		fprintf(stderr,"DNP3 server IP address is not known\n");
+		fflush(stderr);
+		return EXIT_FAILURE;
+	}
+
+	if(strlen(dnp3ServerPort) == 0)
+	{
+		fprintf(stderr,"DNP3 port is not known\n");
+		fflush(stderr);
+		return EXIT_FAILURE;
+	}
+
+	if(strlen(line_number) == 0)
+	{
+		fprintf(stderr,"line_number is not known\n");
+		fflush(stderr);
+		return EXIT_FAILURE;
+	}
+
+	char OldConsoleTitle[500];
+	char NewConsoleTitle[500];
+
+	strcpy(NewConsoleTitle, dnp3ServerAddress);
+	strcat(NewConsoleTitle, "   ");
+	strcat(NewConsoleTitle, dnp3ServerPort);
+	strcat(NewConsoleTitle, "   ");
+	strcat(NewConsoleTitle, line_number);
+
+	if(!IsSingleInstance(NewConsoleTitle))
+	{
+		fprintf(stderr,"Another instance is already running\n");
+		fflush(stderr);
+		return EXIT_FAILURE;
+	}
+
+	int rc;
+	if((rc = GetConsoleTitle(OldConsoleTitle, sizeof(OldConsoleTitle))) > 0)
+	{
+		SetConsoleTitle(NewConsoleTitle);
+	}
+
+	if(_beginthread(PipeWorker, 0, NULL) == -1)
+	{
+		long nError = GetLastError();
+
+		fprintf(stderr,"PipeWorker _beginthread failed, error code = %d", nError);
+		fflush(stderr);
+		return EXIT_FAILURE;	
+	}
+
+	///////////////////////////////////Start protocol//////////////////////////////////
 
 	DNP3MasterApp* master_app;
 
 	master_app = new DNP3MasterApp();   
 
-        if(!master_app->OpenLink(dnp3ServerAddress, atoi(dnp3ServerPort)))
-        {  
+	if(!master_app->OpenLink(dnp3ServerAddress, atoi(dnp3ServerPort)))
+	{  
 		Master* master_p;
-		DummyDb db;
-		DummyTimer timer;
+		CustomDb db;
+		CustomTimer timer;
 		int debugLevel = 1;
-    
+
 		int integrityPollInterval = 10;
 
 		Master::MasterConfig          masterConfig;
@@ -259,7 +327,7 @@ int main( int argc, char **argv )
 		datalinkConfig.isMaster              = 1;
 		datalinkConfig.keepAliveInterval_ms  = 10000;
 
-		DummyTx tx(&debugLevel, 'M', 'S', master_app->getSocket());
+		CustomInter tx(&debugLevel, 'M', 'S', master_app->getSocket());
 
 		datalinkConfig.tx_p                  = &tx;
 		datalinkConfig.debugLevel_p          = &debugLevel;
@@ -284,11 +352,11 @@ int main( int argc, char **argv )
 		}
 		else	
 		{
-		        return 1;
+			return 1;
 		}
 
-        	for(;;)   
-        	{   
+		for(;;)   
+		{   
 			master_p->startNewTransaction();
 
 			n_read = tx.read(master_app->getSocket(), data_p, 1, 80, 15);
@@ -304,23 +372,187 @@ int main( int argc, char **argv )
 			{
 				break; //exit loop
 			}
-	
-            		Sleep(500);   
-        	}   
 
-	        Sleep(1000);   
-        	master_app->CloseLink();   
-        }   
-        else   
-        {   
-               bool t = master_app->GetSockConnectStatus();   
-               Sleep(30000);   
-               master_app->CloseLink();   
-        }  
+			timeout_connection_with_parent++;
 
-        return 0;
+			if(timeout_connection_with_parent > 1000*20/POLLING_TIME)
+			{
+				break; //exit loop for timeout of connection with parent
+			}
+
+			Sleep(POLLING_TIME);
+		}   
+
+		Sleep(1000);   
+		master_app->CloseLink();   
+	}   
+	else   
+	{   
+		bool t = master_app->GetSockConnectStatus();   
+		Sleep(30000);   
+		master_app->CloseLink();   
+	}  
+
+	return 0;
 }
 
+#define BUF_SIZE 200
+#define N_PIPES 3
+
+void PipeWorker(void* pParam)
+{
+	HANDLE pipeHnds[N_PIPES];
+	char in_buffer[N_PIPES][BUF_SIZE];
+	OVERLAPPED ovrp[N_PIPES];
+	HANDLE evnt[N_PIPES];
+	DWORD rc, len, pipe_id;
+    unsigned long int j;
+    unsigned char buf[sizeof(struct iec_item)];
+    struct iec_item* p_item;
+    u_int message_checksum, msg_checksum;
+	char pipe_name[150];
+
+	strcpy(pipe_name, "\\\\.\\pipe\\dnp3master_namedpipe");
+
+	for(int i = 0; i < N_PIPES; i++)
+	{
+		if ((pipeHnds[i] = CreateNamedPipe(
+			pipe_name,
+			PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,
+			PIPE_TYPE_BYTE | PIPE_READMODE_BYTE, N_PIPES,
+			0, 
+			0, 
+			1000, 
+			NULL)) == INVALID_HANDLE_VALUE)
+		{
+			fprintf(stderr,"CreateNamedPipe for pipe %d failed with error %d\n", i, GetLastError());
+			fflush(stderr);
+			ExitProcess(0);
+		}
+
+		if ((evnt[i] = CreateEvent(NULL, TRUE, FALSE, NULL)) == NULL)
+		{
+			fprintf(stderr,"CreateEvent for pipe %d failed with error %d\n",	i, GetLastError());
+			fflush(stderr);
+			ExitProcess(0);
+		}
+
+		ZeroMemory(&ovrp[i], sizeof(OVERLAPPED));
+
+		ovrp[i].hEvent = evnt[i];
+
+		if (ConnectNamedPipe(pipeHnds[i], &ovrp[i]) == 0)
+		{
+			if (GetLastError() != ERROR_IO_PENDING)
+			{
+				fprintf(stderr,"ConnectNamedPipe for pipe %d failed with error %d\n", i, GetLastError());
+				fflush(stderr);
+				
+				CloseHandle(pipeHnds[i]);
+				ExitProcess(0);
+			}
+		}
+	}
+
+	while(1)
+	{
+		if((rc = WaitForMultipleObjects(N_PIPES, evnt, FALSE, INFINITE)) == WAIT_FAILED)
+		{
+			fprintf(stderr,"WaitForMultipleObjects failed with error %d\n", GetLastError());
+			fflush(stderr);
+			ExitProcess(0);
+		}
+
+		pipe_id = rc - WAIT_OBJECT_0;
+
+		ResetEvent(evnt[pipe_id]);
+
+		if(GetOverlappedResult(pipeHnds[pipe_id], &ovrp[pipe_id], &len, TRUE) == 0)
+		{
+			fprintf(stderr,"GetOverlapped result failed %d start over\n", GetLastError());
+			fflush(stderr);
+		
+			if(DisconnectNamedPipe(pipeHnds[pipe_id]) == 0)
+			{
+				fprintf(stderr,"DisconnectNamedPipe failed with error %d\n", GetLastError());
+				fflush(stderr);
+				ExitProcess(0);
+			}
+
+			if(ConnectNamedPipe(pipeHnds[pipe_id],	&ovrp[pipe_id]) == 0)
+			{
+				if(GetLastError() != ERROR_IO_PENDING)
+				{
+					fprintf(stderr,"ConnectNamedPipe for pipe %d failed with error %d\n", i, GetLastError());
+					fflush(stderr);
+					CloseHandle(pipeHnds[pipe_id]);
+				}
+			}
+		}
+		else
+		{
+			ZeroMemory(&ovrp[pipe_id], sizeof(OVERLAPPED));
+
+			ovrp[pipe_id].hEvent = evnt[pipe_id];
+
+			if((rc = ReadFile(pipeHnds[pipe_id], in_buffer[pipe_id], sizeof(struct iec_item), NULL, &ovrp[pipe_id])) == 0)
+			{
+				if(GetLastError() != ERROR_IO_PENDING)
+				{
+					fprintf(stderr,"ReadFile failed with error %d\n", GetLastError());
+					fflush(stderr);
+				}
+			}
+			
+			memcpy(buf, in_buffer[pipe_id], sizeof(struct iec_item));
+			
+			if(len)
+			{
+				p_item = (struct iec_item*)buf;
+
+				//fprintf(stderr, "Receiving from pipe %d th message\n", p_item->msg_id);
+				//fflush(stderr);
+											
+				//for (j = 0; j < len; j++) 
+				//{ 
+					//unsigned char c = *((unsigned char*)buf + j);
+					//fprintf(stderr, "rx pipe <--- 0x%02x-", c);
+					//fflush(stderr);
+					//
+				//}
+
+				//////calculate checksum with checksum byte set to value zero/////////
+				msg_checksum = p_item->checksum;
+
+				p_item->checksum = 0; //azzero
+
+				message_checksum = 0;
+
+				for(j = 0; j < len; j++) 
+				{ 
+					message_checksum = message_checksum + buf[j];
+				}
+
+				message_checksum = message_checksum%256;
+
+				if(message_checksum != msg_checksum)
+				{
+					fprintf(stderr, "Cheksum error\n");
+					fflush(stderr);
+					ExitProcess(0);
+				}
+				//////////////////end checksum////////////////////////////////////////
+
+				if(p_item->iec_obj.ioa == 4004)
+				{ 
+					timeout_connection_with_parent = 0;
+					fprintf(stderr, "Receive keep alive from front end %d\n", p_item->msg_id);
+				    fflush(stderr);
+				}
+			}
+		}
+	}
+}
 
 
 

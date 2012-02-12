@@ -99,11 +99,11 @@ SOURCE=.\common.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\datalink.cpp
+SOURCE=.\custom.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\dummy.cpp
+SOURCE=.\datalink.cpp
 # End Source File
 # Begin Source File
 

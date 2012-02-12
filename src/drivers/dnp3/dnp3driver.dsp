@@ -426,6 +426,10 @@ SOURCE=.\moc_dnp3driverInput.cpp
 
 SOURCE=.\moc_dnp3driverInputData.cpp
 # End Source File
+# Begin Source File
+
+SOURCE=..\..\common\proc_manager.cpp
+# End Source File
 # End Group
 # End Target
 # End Project

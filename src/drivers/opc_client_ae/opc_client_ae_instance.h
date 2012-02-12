@@ -18,26 +18,8 @@
 #include "fifo.h"
 #include "fifoc.h"
 
-//Record format of configuration database
-struct iec_item
-{
-	char opc_server_item_id[99]; //Item ID of opc server, i.e. Simulated Card.Simulated Node.Random.R8
-    u_char iec_type;
-	DWORD hClient; //Index inside table che è UGUALE a hClient della tabella struct structItem<--------------INDEX, starting from 1
-	unsigned char cause; //Per distingure tra spontanee e general interrogation
-	u_int   msg_id; //ID of the message
-	u_int	checksum; //Checksum of the message
-	union {
-		double	commandValue;  //rimuovere se non serve il double, quindi anche la union
-		char command_string[13];
-	};
-};
-
-
-#define	C_SC_NA_1	45
-#define	C_EX_IT_1 	200		//custom type
-#define	C_IC_NA_1	100     // general interrogation
-
+#include "iec104types.h"
+#include "iec_item.h"
 
 class Opc_client_ae_DriverThread;
 

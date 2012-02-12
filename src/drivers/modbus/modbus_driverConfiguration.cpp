@@ -49,7 +49,7 @@ Inherited( parent, name ),Receipe(receipe)
 	{
 		NItems->setEnabled(false);
 		//OpcServerProgIDText->setEnabled(false);
-		IEC104ServerIPAddressText->setEnabled(false);
+		MODBUSServerIPAddressText->setEnabled(false);
 	};
 }
 Modbus_driverConfiguration::~Modbus_driverConfiguration()
@@ -69,8 +69,7 @@ void Modbus_driverConfiguration::OkClicked()
 	GetConfigureDb()->DoExec(0,cmd,0); // delete the old value
 	//
 	cmd = "insert into PROPS values('"+Name->text() +"','" + Receipe + "','" + 
-	//NItems->text() + " " + PollInterval->text() + " " + OpcServerProgIDText->text() + " " + IEC104ServerIPAddressText->text() +"');";
-	NItems->text() + " " + PollInterval->text() + " " + IEC104ServerIPAddressText->text() +"');";
+	NItems->text() + " " + PollInterval->text() + " " + MODBUSServerIPAddressText->text() +"');";
 	GetConfigureDb()->DoExec(0,cmd,0);
 	QSAuditTrail(this,caption(), tr("Edited"));
 
@@ -101,21 +100,19 @@ void Modbus_driverConfiguration::QueryResponse (QObject *p, const QString &c, in
 				NItems->setValue(n);
 				is >> n;
 				PollInterval->setValue(n);
-				//is >> t;
-				//OpcServerProgIDText->setText(t);
 				is >> t;
-				IEC104ServerIPAddressText->setText(t);
+				MODBUSServerIPAddressText->setText(t);
 			}
 			else
 			{
 				// just generate the default properties
-				QString cmd = "insert into PROPS values('"+Name->text()+"','" + Receipe + "','1 5 COM2');";
+				QString cmd = "insert into PROPS values('"+Name->text()+"','" + Receipe + "','');";
 				GetConfigureDb()->DoExec(0,cmd,0);
-				cmd = "insert into PROPS values('"+Name->text()+"','(default)','1 5 COM2');"; // create default
+				cmd = "insert into PROPS values('"+Name->text()+"','(default)','');"; // create default
 				GetConfigureDb()->DoExec(0,cmd,0);
 				NItems->setValue(8);
 				PollInterval->setValue(1000);
-				IEC104ServerIPAddressText->setText("");
+				MODBUSServerIPAddressText->setText("");
 			}
 		} 
 		break;

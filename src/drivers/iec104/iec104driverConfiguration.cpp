@@ -109,9 +109,9 @@ void Iec104driverConfiguration::QueryResponse (QObject *p, const QString &c, int
 			else
 			{
 				// just generate the default properties
-				QString cmd = "insert into PROPS values('"+Name->text()+"','" + Receipe + "','1 5 COM2');";
+				QString cmd = "insert into PROPS values('"+Name->text()+"','" + Receipe + "','');";
 				GetConfigureDb()->DoExec(0,cmd,0);
-				cmd = "insert into PROPS values('"+Name->text()+"','(default)','1 5 COM2');"; // create default
+				cmd = "insert into PROPS values('"+Name->text()+"','(default)','');"; // create default
 				GetConfigureDb()->DoExec(0,cmd,0);
 				NItems->setValue(8);
 				PollInterval->setValue(1000);
