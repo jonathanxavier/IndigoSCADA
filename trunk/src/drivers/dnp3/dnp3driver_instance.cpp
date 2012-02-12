@@ -159,9 +159,10 @@ void Dnp3driver_Instance::QueryResponse(QObject *p, const QString &c, int id, QO
 				QString s = UndoEscapeSQLText(GetConfigureDb()->GetString("DVAL")); // the top one is either the receipe or (default)
 				QTextIStream is(&s); // extract the values
 				//
-				is >> IecItems;	  // how many IEC items there are in the RTU or PLC
+				is >> IecItems;	  // how many DNP3 items there are in the RTU or PLC
 				is >> Cfg.SampleTime; // how long we sample for in milliseconds
 				is >> Cfg.DNP3ServerIPAddress; // DNP3 server IP Address
+				is >> Cfg.DNP3ServerIPPort; // DNP3 server IP Port
 
 				Countdown = 1;
 
@@ -691,11 +692,47 @@ bool Dnp3driver_Instance::event(QEvent *e)
 *Returns:none
 */
 
+#include "proc_manager.h"
+
+char pCommandLine[nBufferSize+1];
+char pWorkingDir[nBufferSize+1];
+static struct args argomenti;
+
 bool Dnp3driver_Instance::Connect() 
 {	
 	IT_IT("Dnp3driver_Instance::Connect");
 	//return 0 on fail
-	//retunr 1 on success
+	//return 1 on success
+	///////////////////start child process dnp3master.exe////////////////////
+	char line_number[50];
+	char pipe_name[150];
+
+	strcpy(pipe_name, "\\\\.\\pipe\\dnp3master_namedpipe");
+
+	itoa(instanceID + 1, line_number, 10);
+		
+	strcpy(pCommandLine, "C:\\scada\\bin\\dnp3master.exe -a ");
+	strcat(pCommandLine, Cfg.DNP3ServerIPAddress);
+	strcat(pCommandLine, " -p ");
+	strcat(pCommandLine, Cfg.DNP3ServerIPPort);
+	strcat(pCommandLine, " -l ");
+	strcat(pCommandLine, line_number);
+	
+	strcpy(pWorkingDir,"C:\\scada\\bin");
+
+	PROCESS_INFORMATION* pProcInf = NULL;
+	
+	if(!StartProcess(pCommandLine, pWorkingDir))
+	{
+		return false;
+	}
+
+	strcpy(argomenti.pCommandLine, pCommandLine);
+	strcpy(argomenti.pWorkingDir, pWorkingDir);
+	strcpy(argomenti.pipe_name, pipe_name);
+	
+	begin_process_checker(&argomenti);
+
 /*
 	if(pConnect) delete pConnect;
 	

@@ -48,8 +48,8 @@ Inherited( parent, name ),Receipe(receipe)
 	if(Receipe != "(default)")
 	{
 		NItems->setEnabled(false);
-		//OpcServerProgIDText->setEnabled(false);
 		DNP3ServerIPAddressText->setEnabled(false);
+		DNP3ServerIPPortText->setEnabled(false);
 	};
 }
 Dnp3driverConfiguration::~Dnp3driverConfiguration()
@@ -69,8 +69,7 @@ void Dnp3driverConfiguration::OkClicked()
 	GetConfigureDb()->DoExec(0,cmd,0); // delete the old value
 	//
 	cmd = "insert into PROPS values('"+Name->text() +"','" + Receipe + "','" + 
-	//NItems->text() + " " + PollInterval->text() + " " + OpcServerProgIDText->text() + " " + DNP3ServerIPAddressText->text() +"');";
-	NItems->text() + " " + PollInterval->text() + " " + DNP3ServerIPAddressText->text() +"');";
+	NItems->text() + " " + PollInterval->text() + " " + DNP3ServerIPAddressText->text() + " " + DNP3ServerIPPortText->text() +"');";
 	GetConfigureDb()->DoExec(0,cmd,0);
 	QSAuditTrail(this,caption(), tr("Edited"));
 
@@ -101,21 +100,22 @@ void Dnp3driverConfiguration::QueryResponse (QObject *p, const QString &c, int i
 				NItems->setValue(n);
 				is >> n;
 				PollInterval->setValue(n);
-				//is >> t;
-				//OpcServerProgIDText->setText(t);
 				is >> t;
 				DNP3ServerIPAddressText->setText(t);
+				is >> t;
+				DNP3ServerIPPortText->setText(t);
 			}
 			else
 			{
 				// just generate the default properties
-				QString cmd = "insert into PROPS values('"+Name->text()+"','" + Receipe + "','1 5 COM2');";
+				QString cmd = "insert into PROPS values('"+Name->text()+"','" + Receipe + "','');";
 				GetConfigureDb()->DoExec(0,cmd,0);
-				cmd = "insert into PROPS values('"+Name->text()+"','(default)','1 5 COM2');"; // create default
+				cmd = "insert into PROPS values('"+Name->text()+"','(default)','');"; // create default
 				GetConfigureDb()->DoExec(0,cmd,0);
 				NItems->setValue(8);
 				PollInterval->setValue(1000);
 				DNP3ServerIPAddressText->setText("");
+				DNP3ServerIPPortText->setText("");
 			}
 		} 
 		break;

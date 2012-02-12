@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
-#include "dummy.hpp"
+#include "custom.hpp"
 #include "station.hpp"
 #include "outstation.hpp"
 #include "datalink.hpp"
@@ -22,12 +22,12 @@ int main( int argc, char **argv )
 {
 	int socket = 0;
     Outstation* o_p;
-    DummyDb db;
+    CustomDb db;
     int debugLevel = -1;
-    DummyTx masterTx(&debugLevel, 'M', 'S', socket);
-    DummyTx outstationTx(&debugLevel, 'O', 'S', socket);
-    DummyTimer masterTimer;
-    DummyTimer outstationTimer;
+    CustomInter masterTx(&debugLevel, 'M', 'S', socket);
+    CustomInter outstationTx(&debugLevel, 'O', 'S', socket);
+    CustomTimer masterTimer;
+    CustomTimer outstationTimer;
     int integrityPollInterval = 10;
 
     Datalink::DatalinkConfig      datalinkConfig;

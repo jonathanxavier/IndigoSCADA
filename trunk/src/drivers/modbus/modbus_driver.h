@@ -37,18 +37,18 @@ class Modbus_driver_Instance;
 
 struct InstanceCfg // friend to anyone
 {
-	QString IEC104ServerIPAddress;  // IEC 104 server IP address (slave)
+	QString MODBUSServerIPAddress;  // MODBUS server IP address (slave)
 
 	unsigned SampleTime; // sampleing time 
 
 	InstanceCfg() : 
-	SampleTime(1000),IEC104ServerIPAddress("")
+	SampleTime(1000),MODBUSServerIPAddress("")
 	{
 	};
 
 	InstanceCfg(const InstanceCfg &m) : 
 
-	SampleTime(m.SampleTime),IEC104ServerIPAddress(m.IEC104ServerIPAddress)
+	SampleTime(m.SampleTime),MODBUSServerIPAddress(m.MODBUSServerIPAddress)
 	{
 	};
 };

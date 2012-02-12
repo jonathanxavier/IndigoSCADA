@@ -38,17 +38,19 @@ class Dnp3driver_Instance;
 struct InstanceCfg // friend to anyone
 {
 	QString DNP3ServerIPAddress;  // DNP3 server IP address (slave)
+	QString DNP3ServerIPPort;  // DNP3 server IP port
 
 	unsigned SampleTime; // sampleing time 
 
 	InstanceCfg() : 
-	SampleTime(1000),DNP3ServerIPAddress("")
+	SampleTime(1000),DNP3ServerIPAddress(""),DNP3ServerIPPort("")
 	{
 	};
 
 	InstanceCfg(const InstanceCfg &m) : 
 
-	SampleTime(m.SampleTime),DNP3ServerIPAddress(m.DNP3ServerIPAddress)
+	SampleTime(m.SampleTime),DNP3ServerIPAddress(m.DNP3ServerIPAddress),
+	DNP3ServerIPPort(m.DNP3ServerIPPort)
 	{
 	};
 };
