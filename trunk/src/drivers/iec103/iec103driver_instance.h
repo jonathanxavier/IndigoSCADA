@@ -85,7 +85,7 @@ class IEC_103_DRIVERDRV Iec103driver_Instance : public DriverInstance
 	fifo_h fifo_monitor_direction;
 
 	//
-	Iec103driver_Instance(Driver *parent, const QString &name) : 
+	Iec103driver_Instance(Driver *parent, const QString &name, int instance_id) : 
 	DriverInstance(parent,name),fFail(0), Countdown(1),
 	State(STATE_RESET),InTick(0),Retry(0),Sp(0),IecItems(1), Values(NULL),
 	ParentDriver(parent),msg_sent_in_control_direction(0)
@@ -102,8 +102,22 @@ class IEC_103_DRIVERDRV Iec103driver_Instance : public DriverInstance
 		/////////////////////////////////////////////////////////////////////////////
 		const size_t max_fifo_queue_size = MAX_FIFO_SIZE;
 		//Init thread shared fifos
-		fifo_control_direction = fifo_open("fifo_control_direction1", max_fifo_queue_size);
-		fifo_monitor_direction = fifo_open("fifo_monitor_direction1", max_fifo_queue_size);
+        char fifo_ctr_name[150];
+        char fifo_mon_name[150];
+
+        char str_instance_id[20];
+        itoa(instance_id, str_instance_id, 10);
+ 
+        strcpy(fifo_ctr_name,"fifo_control_direction");
+        strcpy(fifo_mon_name,"fifo_monitor_direction");
+        strcat(fifo_ctr_name, str_instance_id);
+        strcat(fifo_mon_name, str_instance_id);
+        strcat(fifo_ctr_name, "iec103");
+        strcat(fifo_mon_name, "iec103");
+ 
+		fifo_control_direction = fifo_open(fifo_ctr_name, max_fifo_queue_size);
+		fifo_monitor_direction = fifo_open(fifo_mon_name, max_fifo_queue_size);
+        /////////////////////////////////////////////////////////////////////////////
 	};
 
 	~Iec103driver_Instance()

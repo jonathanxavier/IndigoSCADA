@@ -246,7 +246,7 @@ void Modbus_driver::QueryResponse (QObject *p, const QString &, int id, QObject*
 				for(int i = 0; i < n; i++,GetConfigureDb()->FetchNext())
 				{
 					QString unit_name = GetConfigureDb()->GetString("NAME");
-					Modbus_driver_Instance *p = new Modbus_driver_Instance(this, unit_name);
+					Modbus_driver_Instance *p = new Modbus_driver_Instance(this, unit_name, i);
 					IDict::value_type pr(unit_name, p);
 					Instances.insert(pr);
 					p->Start(); // kick it off 

@@ -246,7 +246,7 @@ void Iec104driver::QueryResponse (QObject *p, const QString &, int id, QObject*c
 				for(int i = 0; i < n; i++,GetConfigureDb()->FetchNext())
 				{
 					QString unit_name = GetConfigureDb()->GetString("NAME");
-					Iec104driver_Instance *p = new Iec104driver_Instance(this, unit_name);
+					Iec104driver_Instance *p = new Iec104driver_Instance(this, unit_name, i);
 					IDict::value_type pr(unit_name, p);
 					Instances.insert(pr);
 					p->Start(); // kick it off 
