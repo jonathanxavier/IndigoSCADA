@@ -44,3 +44,31 @@ Added the field "Class ID" to OPC DA, OPC AE, OPC HDA configuration windows.
 12-02-2012
 DNP3 runs, need testing with RTU. Volunteers are welcome
 ---------------------------------------------------------------------------
+21-02-2012
+With this release the real time config database has changed.
+The table TAGS has a new column UNIT.
+Is is necessary to create a new configdb.fdb
+using C:\scada\init_db\rtdbver356\configdb.sql with the following create table TAGS:
+
+--tag configuration
+create table TAGS
+(
+NAME string,
+TAG string,
+UPPERALARM real8,
+UPPERWARN real8,
+LOWERWARN real8,
+LOWERALARM real8,
+UAENABLE int4,
+UWENABLE int4,
+LWENABLE int4,
+LAENABLE int4,
+RECEIPE string,
+ENABLED int4,
+PARAMS string,
+UNIT string  
+);
+create index on TAGS.NAME;
+
+If you do not want to do this, please wait the next binary release.
+---------------------------------------------------------------------------
