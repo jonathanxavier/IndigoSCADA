@@ -13,6 +13,7 @@
 
 
 #include "modbus_driver_instance.h"
+#include "modbus_driverthread.h"
 
 /*
 *Function:
@@ -194,7 +195,11 @@ void Modbus_driver_Instance::QueryResponse(QObject *p, const QString &c, int id,
 			if(GetConfigureDb()->GetNumberResults() > 0)
 			{
 				// 
+				#ifdef DEPRECATED_MODBUS_CONFIG
 				QString SamplePointName = UndoEscapeSQLText(GetConfigureDb()->GetString("IKEY"));
+				#else
+				QString SamplePointName = UndoEscapeSQLText(GetConfigureDb()->GetString("NAME"));
+				#endif
 
 				double v = 0.0;
 
@@ -215,7 +220,11 @@ void Modbus_driver_Instance::QueryResponse(QObject *p, const QString &c, int id,
 			if(GetConfigureDb()->GetNumberResults() > 0)
 			{
 				// 
+				#ifdef DEPRECATED_MODBUS_CONFIG
 				QString IOACommand = UndoEscapeSQLText(GetConfigureDb()->GetString("DVAL"));
+				#else
+				QString IOACommand = UndoEscapeSQLText(GetConfigureDb()->GetString("PARAMS"));
+				#endif
 				
 				int command_value = 0;
 				int ioa_command = 0;
@@ -618,9 +627,14 @@ void Modbus_driver_Instance::Tick()
 			//{
 			//}
 			//break;
+            case C_EX_IT_1:
+			{
+                printf("Child process exiting...\n");
+			}
+			break;
 			default:
 			{
-				printf("Not supported type;");
+				printf("Not supported type\n");
 				value.sprintf("%d", 0);
 			}
 			break;
@@ -629,7 +643,11 @@ void Modbus_driver_Instance::Tick()
 		QString ioa;
 		ioa.sprintf("%d", p_item->iec_obj.ioa);
 
+		#ifdef DEPRECATED_MODBUS_CONFIG
 		QString cmd = "select IKEY from PROPS where DVAL='"+ ioa + "' and SKEY='SAMPLEPROPS';";
+		#else
+		QString cmd = "select NAME from TAGS where PARAMS='"+ ioa + "' and UNIT='"+ Name + "';";
+		#endif
 
 		GetConfigureDb()->DoExec(this, cmd, tGetSamplePointNamefromIOA, value, ioa);
 
@@ -684,6 +702,78 @@ bool Modbus_driver_Instance::event(QEvent *e)
 	return QObject::event(e);
 };
 
+#include <signal.h>
+
+char* get_date_time()
+{
+	static char sz[128];
+	time_t t = time(NULL);
+	struct tm *ptm = localtime(&t);
+	
+	strftime(sz, sizeof(sz)-2, "%m/%d/%y %H:%M:%S", ptm);
+
+	strcat(sz, "|");
+	return sz;
+}
+
+void iec_call_exit_handler(int line, char* file, char* reason)
+{
+	FILE* fp;
+	char program_path[_MAX_PATH];
+	char log_file[_MAX_FNAME+_MAX_PATH];
+	IT_IT("iec_call_exit_handler");
+
+	program_path[0] = '\0';
+#ifdef WIN32
+	if(GetModuleFileName(NULL, program_path, _MAX_PATH))
+	{
+		*(strrchr(program_path, '\\')) = '\0';        // Strip \\filename.exe off path
+		*(strrchr(program_path, '\\')) = '\0';        // Strip \\bin off path
+    }
+#elif __unix__
+	if(getcwd(program_path, _MAX_PATH))
+	{
+		*(strrchr(program_path, '/')) = '\0';        // Strip \\filename.exe off path
+		*(strrchr(program_path, '/')) = '\0';        // Strip \\bin off path
+    }
+#endif
+
+	strcpy(log_file, program_path);
+
+#ifdef WIN32
+	strcat(log_file, "\\logs\\modbus.log");
+#elif __unix__
+	strcat(log_file, "/logs/modbus.log");	
+#endif
+
+	fp = fopen(log_file, "a");
+
+	if(fp)
+	{
+		if(line && file && reason)
+		{
+			fprintf(fp, "PID:%d time:%s exit process at line: %d, file %s, reason:%s\n", GetCurrentProcessId, get_date_time(), line, file, reason);
+		}
+		else if(line && file)
+		{
+			fprintf(fp, "PID:%d time:%s exit process at line: %d, file %s\n", GetCurrentProcessId, get_date_time(), line, file);
+		}
+		else if(reason)
+		{
+			fprintf(fp, "PID:%d time:%s exit process for reason %s\n", GetCurrentProcessId, get_date_time(), reason);
+		}
+
+		fflush(fp);
+		fclose(fp);
+	}
+
+	//raise(SIGABRT);   //raise abort signal which in turn starts automatically a separete thread and call exit SignalHandler
+	ExitProcess(0);
+
+	IT_EXIT;
+}
+
+
 /*
 *Function: Connect
 *Inputs:none
@@ -695,17 +785,17 @@ bool Modbus_driver_Instance::Connect()
 {	
 	IT_IT("Modbus_driver_Instance::Connect");
 	//return 0 on fail
-	//retunr 1 on success
-/*
+	//return 1 on success
+
 	if(pConnect) delete pConnect;
 	
-	pConnect = new Modbus_driver_DriverThread(this); // create the connection
+	pConnect = new Modbus_DriverThread(this); // create the connection
 
 	if(pConnect->Ok()) 
 	{
 		pConnect->start();
 	}
-*/
+
 	return true;
 }
 
@@ -722,10 +812,12 @@ bool  Modbus_driver_Instance::Disconnect()
 	bool res = true;
 	
 	InQueue.clear();
-/*
-	if(pConnect) delete pConnect;	//added on 27-11-09
-	pConnect = NULL;	//added on 27-11-09
-*/
+
+    pConnect->TerminateIEC();
+
+	if(pConnect) delete pConnect;
+	pConnect = NULL;
+
 	return res;
 };
 
@@ -761,12 +853,15 @@ void Modbus_driver_Instance::Command(const QString & name, BYTE cmd, LPVOID lpPa
 
 	IT_COMMENT3("Received command for instance %s, sample point: %s, value: %lf", (const char*)name, (const char*)sample_point_name, (params->res[0]).value);
 
-	//Execute query on table PROPS
-
+	#ifdef DEPRECATED_MODBUS_CONFIG
 	QString pc = "select * from PROPS where IKEY='" + sample_point_name + "';"; 
+	#else
+	QString pc = "select * from TAGS where NAME='" + sample_point_name + "';";
+	#endif
 
 	QString value_for_command;
 	value_for_command.sprintf("%lf", (params->res[0]).value);
 	// 
 	GetConfigureDb()->DoExec(this, pc, tGetIOAfromSamplePointName, value_for_command);
 }
+

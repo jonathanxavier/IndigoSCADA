@@ -39,16 +39,18 @@ struct InstanceCfg // friend to anyone
 {
 	QString IEC103LinkAddress;  // IEC 103 Link address of slave
 
-	unsigned SampleTime; // sampleing time 
+	unsigned SampleTime; // sampleing time
+    QString COMPortName;
 
 	InstanceCfg() : 
-	SampleTime(1000),IEC103LinkAddress("")
+	SampleTime(1000),IEC103LinkAddress(""),COMPortName("")
 	{
 	};
 
 	InstanceCfg(const InstanceCfg &m) : 
 
-	SampleTime(m.SampleTime),IEC103LinkAddress(m.IEC103LinkAddress)
+	SampleTime(m.SampleTime),IEC103LinkAddress(m.IEC103LinkAddress),
+    COMPortName(m.COMPortName)
 	{
 	};
 };

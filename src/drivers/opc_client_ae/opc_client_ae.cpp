@@ -238,7 +238,7 @@ void Opc_client_ae::QueryResponse (QObject *p, const QString &, int id, QObject*
 				for(int i = 0; i < n; i++,GetConfigureDb()->FetchNext())
 				{
 					QString unit_name = GetConfigureDb()->GetString("NAME");
-					Opc_client_ae_Instance *p = new Opc_client_ae_Instance(this, unit_name);
+					Opc_client_ae_Instance *p = new Opc_client_ae_Instance(this, unit_name, i);
 					IDict::value_type pr(unit_name, p);
 					Instances.insert(pr);
 					p->Start(); // kick it off 

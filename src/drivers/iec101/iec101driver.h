@@ -38,17 +38,19 @@ class Iec101driver_Instance;
 struct InstanceCfg // friend to anyone
 {
 	QString IEC101LinkAddress;  // IEC 101 Link address of slave
-
-	unsigned SampleTime; // sampleing time 
+	QString IEC101CASDU;  // IEC 101 CASDU of slave
+	QString COMPortName;  //serial port name
+	unsigned SampleTime;  // sampleing time 
 
 	InstanceCfg() : 
-	SampleTime(1000),IEC101LinkAddress("")
+	SampleTime(1000),IEC101LinkAddress(""),IEC101CASDU(""),COMPortName("")
 	{
 	};
 
 	InstanceCfg(const InstanceCfg &m) : 
 
-	SampleTime(m.SampleTime),IEC101LinkAddress(m.IEC101LinkAddress)
+	SampleTime(m.SampleTime),IEC101LinkAddress(m.IEC101LinkAddress),
+	IEC101CASDU(m.IEC101CASDU),COMPortName(m.COMPortName)
 	{
 	};
 };

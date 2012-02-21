@@ -32,6 +32,7 @@ void Iec104driverInput::Load(const QString &s)// load the configuration
 {
 	IT_IT("Iec104driverInput::Load");
 
+	/*
 	if(GetConfigureDb()->GetNumberResults())
 	{ 
 		QString s = UndoEscapeSQLText(GetConfigureDb()->GetString("DVAL"));
@@ -52,7 +53,22 @@ void Iec104driverInput::Load(const QString &s)// load the configuration
 		//Time->setText("00:01:00");
 		//Mean->setText("100");
 		IOA->setText("10");
-	};
+	}
+	*/
+
+	if(GetConfigureDb()->GetNumberResults())
+	{ 
+		QString s = UndoEscapeSQLText(GetConfigureDb()->GetString("PARAMS"));
+		QTextIStream is (&s);
+		//
+		QString a;
+		is >> a;
+		IOA->setText(a.stripWhiteSpace());
+	}
+	else
+	{
+		IOA->setText("0");
+	}
 };
 
 void Iec104driverInput::Save(const QString &s)// save the configuration

@@ -566,8 +566,8 @@ void ReceipeCfg::QueryResponse (QObject *p, const QString &, int State, QObject*
 			{
 				QSTransaction &t = GetConfigureDb()->CurrentTransaction();
 			
-				//																				//nome ricetta corrente
-				QString cmd = "insert into TAGS values ('"+t.Data1+"','"+t.Data2+"'"TAG_VALS"'"+Name->currentText()+"',1);";
+				//																				//curren receipe name
+				QString cmd = "insert into TAGS values ('"+t.Data1+"','"+t.Data2+"'"TAG_VALS"'"+Name->currentText()+"',1,'','');";
 				GetConfigureDb()->DoExec(0,cmd,0);
 			};
 

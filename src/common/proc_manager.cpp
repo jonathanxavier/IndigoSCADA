@@ -44,8 +44,8 @@ BOOL StartProcess(char* pCommandLine, char* pWorkingDir)
 		// set the correct desktop for the process to be started
 		if(bUserInterface)
 		{
-			startUpInfo.wShowWindow = SW_SHOW;
-			//startUpInfo.wShowWindow = SW_SHOWMINIMIZED;
+			//startUpInfo.wShowWindow = SW_SHOW;
+			startUpInfo.wShowWindow = SW_SHOWMINIMIZED;
 			startUpInfo.lpDesktop = NULL;
 		}
 		else
@@ -254,6 +254,9 @@ int pipe_put(char *buf, int len, char* pipe_name)
    			return rc;
 		}
 	}
+
+	//fprintf(stderr, "Write to %s\n", pipe_name);
+	//fflush(stderr);
 
     rc = WriteFile(h_pipe, buf, len, &written, NULL);
  

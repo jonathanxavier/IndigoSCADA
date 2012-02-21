@@ -60,6 +60,9 @@ struct iec_item
 	unsigned char cause; //spontaneos or general interrogation cause
 	u_int   msg_id; //ID of the message
 	u_char	checksum; //Checksum of the message
+	unsigned int ioa_control_center; //unstructured
+	u_short casdu; //IEC 104 CASDU where this record is allocated
+    u_char	is_neg; //positive == 0 or negative == 1
 	union {
 		double	commandValue;
 		char command_string[13];

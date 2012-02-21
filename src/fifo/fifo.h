@@ -10,13 +10,16 @@
  *
  */
 
-#ifndef FIFO__H
-#define FIFO__H
-
 #include <stdio.h>
 #include "shmem.h"
 
+#ifndef ___FIFO___H
+#define ___FIFO___H
+
 #pragma warning (disable: 4291)
+
+//Comment the following line if you need a blocking FIFO when it is full
+#define USE_NOT_BLOCKING_FIFO_WHEN_FULL
 
 class fifo_obj { 
   protected: 
@@ -80,11 +83,12 @@ class fifo_obj {
 			exclusive_lock xlock(shmem);
 			// create object of varying size	
 			item* ip = new (shmem, message_length) item;
+
 			if (ip == NULL) 
 			{ 
 				not_full.reset();
-				return false; // not enough space in storage
-			}
+				return false;  // not enough space in storage
+    		}
 
 			ip->store(message, message_length);
 
@@ -121,12 +125,19 @@ class fifo_obj {
     char*         name;
     size_t        max_size;
 
+    char *gl_buf;
+
 	public:
-    bool open(char const* name, size_t max_size) 
+    bool open(char const* name, size_t max_size, p_call_exit_handler f_log_arg) 
 	{ 
+		global_func_log = f_log_arg;
+
 		shared_memory::status rc = shmem.open(NULL, name, max_size);
-		if (rc != shared_memory::ok) 
+
+		if (rc != shared_memory::ok)
 		{ 
+			fprintf(stderr, "rc not ok");
+			fflush(stderr);
 			return false;
 		}
 
@@ -138,7 +149,7 @@ class fifo_obj {
 			root = new (shmem) header;
 			shmem.set_root_object(root);
 		}
-
+		
 		size_t len = strlen(name);
 		char* global_name = new char[len+5];
 		strcpy(global_name, name);
@@ -159,8 +170,12 @@ class fifo_obj {
 		}
 
 		delete[] global_name;
+
+        gl_buf = NULL;
+
 		return true;
     }
+
     void close() 
 	{ 
 		shmem.close();
@@ -172,6 +187,25 @@ class fifo_obj {
 	{ 
 		while (!root->enqueue(shmem, not_full, message, length)) 
 		{ 
+            #ifdef USE_NOT_BLOCKING_FIFO_WHEN_FULL
+			//The queue is FULL! So remove from the head
+			fprintf(stderr, "The queue is full\n");
+			fflush(stderr);
+						
+			unsigned msec = 1;
+			
+			if(not_empty.wait(msec)) 
+			{
+                if(gl_buf == NULL) 
+                { 
+                    gl_buf = new char[length]; 
+                }
+
+				root->dequeue(shmem, gl_buf, length);
+				not_full.signal();
+			}
+            #endif
+
 			not_full.wait();
 		}
 		not_empty.signal();
@@ -182,7 +216,9 @@ class fifo_obj {
 		if (not_empty.wait(msec)) 
 		{
 			int len = root->dequeue(shmem, buf, buf_size);
-			assert(len >= 0);
+			//assert(len >= 0);
+			if(!(len >= 0))
+				global_func_log(__LINE__,__FILE__, NULL);
 			not_full.signal();
 			return len;
 		}
@@ -190,4 +226,4 @@ class fifo_obj {
     }
 };
 
-#endif //#define FIFO__H
+#endif //___FIFO___H

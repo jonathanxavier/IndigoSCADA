@@ -61,7 +61,7 @@ void Opc_client_da_DriverThread::run()
 	//Async2Read(false); 
 	/////////////////////////////////////////Variazioni come spontanee//////////////////////////////////////////////////////////////////////////////////////////////////////
 	//OPC DA 2.0 This function on the first transaction send all items 
-	//the arrives spontaneous variations (i.e. IEC 101 Spontaneaous variations)
+	//later all spontaneous variations are sent by the server (i.e. IEC 101 Spontaneaous variations)
 	Async2Update();
 
 	OpcStop();

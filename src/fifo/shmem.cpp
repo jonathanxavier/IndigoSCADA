@@ -12,6 +12,8 @@
 #include <stdio.h>
 #include <string.h>
 
+p_call_exit_handler global_func_log;
+
 shared_memory* shared_memory::chain;
 
 #ifdef _WIN32
@@ -22,17 +24,6 @@ shared_memory* shared_memory::chain;
 #ifdef USE_BASED_POINTERS
 void* shared_memory_base_pointer;
 #endif
-
-#ifdef assert
-#undef assert
-#endif
-
-#define assert(exp) \
-if(!(exp))\
-{\
-	fprintf(stderr, "assert at line %d in file %s\n", __LINE__, __FILE__);\
-	exit(1);\
-}
 
 inline bool shared_memory::enter_critical_section(status& result)
 {
@@ -58,12 +49,21 @@ inline bool shared_memory::leave_critical_section(status& result)
 
 shared_memory::status shared_memory::lock(lock_descriptor& lck, unsigned msec)
 {
-    assert(lck.mode == lck_shared || lck.mode == lck_exclusive);
+    //assert(lck.mode == lck_shared || lck.mode == lck_exclusive);
+
+	if(!(lck.mode == lck_shared || lck.mode == lck_exclusive))
+			global_func_log(__LINE__,__FILE__, NULL);
+
     unsigned self = GetCurrentThreadId();
     status result;
 
-    if (self == owner) { 
-	assert(n_nested_exclusive_locks != 0 && pMonitor->n_writers == 1);
+    if (self == owner) 
+	{ 
+	//assert(n_nested_exclusive_locks != 0 && pMonitor->n_writers == 1);
+
+	if(!(n_nested_exclusive_locks != 0 && pMonitor->n_writers == 1))
+			global_func_log(__LINE__,__FILE__, NULL);
+
 	if (lck.mode == lck_exclusive) { 
 	    n_nested_exclusive_locks += 1;
 	} else {
@@ -148,10 +148,18 @@ shared_memory::status shared_memory::lock(lock_descriptor& lck, unsigned msec)
 shared_memory::status shared_memory::unlock(lock_descriptor& lck)
 {
     status result;
-    assert(lck.mode == lck_shared || lck.mode == lck_exclusive);
+    //assert(lck.mode == lck_shared || lck.mode == lck_exclusive);
 
-    if (lck.mode == lck_exclusive) { 
-	assert(GetCurrentThreadId() == owner && n_nested_exclusive_locks > 0);
+	if(!(lck.mode == lck_shared || lck.mode == lck_exclusive))
+		global_func_log(__LINE__,__FILE__, NULL);
+
+
+    if (lck.mode == lck_exclusive) 
+	{ 
+	//assert(GetCurrentThreadId() == owner && n_nested_exclusive_locks > 0);
+	if(!(GetCurrentThreadId() == owner && n_nested_exclusive_locks > 0))
+		global_func_log(__LINE__,__FILE__, NULL);
+
 	if (--n_nested_exclusive_locks != 0) { 
 	    return ok;
 	}
@@ -165,14 +173,23 @@ shared_memory::status shared_memory::unlock(lock_descriptor& lck)
     if (lck.mode == lck_shared) { 
 	lock_descriptor *lp, **lpp = &shared_lock_chain;
 	while ((lp = *lpp) != &lck) { 
-	    assert(lp != NULL/*invalid lock descriptor*/);
+	    //assert(lp != NULL/*invalid lock descriptor*/);
+		if(!(lp != NULL))
+			global_func_log(__LINE__,__FILE__, NULL);
+
 	    lpp = &lp->next;
 	}
-	assert(pMonitor->n_readers > 0 && lp->owner == GetCurrentThreadId());
+	//assert(pMonitor->n_readers > 0 && lp->owner == GetCurrentThreadId());
+	if(!(pMonitor->n_readers > 0 && lp->owner == GetCurrentThreadId()))
+			global_func_log(__LINE__,__FILE__, NULL);
+
 	*lpp = lp->next;
 	pMonitor->n_readers -= 1;
     } else { 
-	assert(pMonitor->n_writers == 1);
+	//assert(pMonitor->n_writers == 1);
+	if(!(pMonitor->n_writers == 1))
+			global_func_log(__LINE__,__FILE__, NULL);
+
 	pMonitor->n_writers = 0;
     }
     if (pMonitor->n_waiters != 0) { 
@@ -238,7 +255,10 @@ shared_memory::status shared_memory::open(const char* file_name,
 	pHdr = (header*)MapViewOfFileEx(hMap, access, 0, 0, 0,
 					pMonitor->base_address);
 #ifdef USE_BASED_POINTERS
-	assert(shared_memory_base_pointer == NULL);
+	//assert(shared_memory_base_pointer == NULL);
+	if(!(shared_memory_base_pointer == NULL))
+		global_func_log(__LINE__,__FILE__, NULL);
+
 	// only one opened section is possible
 	if (pHdr == NULL) { 
 	    pHdr = (header*)MapViewOfFileEx(hMap, access, 0, 0, 0, NULL);
@@ -294,7 +314,10 @@ shared_memory::status shared_memory::open(const char* file_name,
 	pHdr = (header*)MapViewOfFileEx(hMap, FILE_MAP_ALL_ACCESS, 0, 0, 0,
 					desired_address);
 #ifdef USE_BASED_POINTERS
-	assert(shared_memory_base_pointer == NULL); 
+	//assert(shared_memory_base_pointer == NULL); 
+	if(!(shared_memory_base_pointer == NULL))
+		global_func_log(__LINE__,__FILE__, NULL);
+
 	// only one opened section is possible
 	if (pHdr == NULL) { 
 	    pHdr = (header*)MapViewOfFileEx(hMap, FILE_MAP_ALL_ACCESS, 0, 0, 0,
@@ -514,7 +537,10 @@ bool semaphore::wait(unsigned msec)
 		return rc == WAIT_OBJECT_0;
 	}
 
-	assert(rc == WAIT_OBJECT_0 || rc == WAIT_TIMEOUT); 
+	//assert(rc == WAIT_OBJECT_0 || rc == WAIT_TIMEOUT);
+
+	if(!(rc == WAIT_OBJECT_0 || rc == WAIT_TIMEOUT))
+		global_func_log(__LINE__,__FILE__, NULL);
 
     return rc == WAIT_OBJECT_0;
 }
@@ -540,7 +566,10 @@ void semaphore::close()
 bool event::wait(unsigned msec)
 {
     int rc = WaitForSingleObject(e, msec);
-    assert(rc == WAIT_OBJECT_0 || rc == WAIT_TIMEOUT);
+    //assert(rc == WAIT_OBJECT_0 || rc == WAIT_TIMEOUT);
+	if(!(rc == WAIT_OBJECT_0 || rc == WAIT_TIMEOUT))
+		global_func_log(__LINE__,__FILE__, NULL);
+
     return rc == WAIT_OBJECT_0;
 }
 
@@ -565,7 +594,7 @@ void event::close()
     CloseHandle(e);
 }
 
-#else // Unix
+#else // __unix__
 
 
 #include <unistd.h>
@@ -804,12 +833,20 @@ bool shared_memory::wait_resource(status& result, lck_t lck,
 
 shared_memory::status shared_memory::lock(lock_descriptor& lck, unsigned msec)
 {
-    assert(lck.mode == lck_shared || lck.mode == lck_exclusive);
+    //assert(lck.mode == lck_shared || lck.mode == lck_exclusive);
+
+	if(!(lck.mode == lck_shared || lck.mode == lck_exclusive))
+		global_func_log(__LINE__,__FILE__,""); //TODO: find good cause
+
     unsigned self = pthread_self();
     status result;
 
     if (self == owner && lck.mode == lck_exclusive) { 
-	assert(n_nested_exclusive_locks != 0 && pMonitor->n_writers == 1);
+	//assert(n_nested_exclusive_locks != 0 && pMonitor->n_writers == 1);
+
+	if(!(n_nested_exclusive_locks != 0 && pMonitor->n_writers == 1))
+		global_func_log(__LINE__,__FILE__,""); //TODO: find good cause
+
 	n_nested_exclusive_locks += 1;
 	return ok;
     }
@@ -817,7 +854,11 @@ shared_memory::status shared_memory::lock(lock_descriptor& lck, unsigned msec)
 	return result;
     }
     if (self == owner) { 
-	assert(lck.mode == lck_shared);
+	//assert(lck.mode == lck_shared);
+
+	if(!(lck.mode == lck_shared))
+		global_func_log(__LINE__,__FILE__,""); //TODO: find good cause
+
 	if (pMonitor->n_waiters != 0) { 
 	    static struct sembuf sops[] = {{READERS_SEM, 1, 0}}; 
 	    if (semop(sem, sops, 1) < 0) {
@@ -843,17 +884,31 @@ shared_memory::status shared_memory::lock(lock_descriptor& lck, unsigned msec)
 	    }
 	}
 	if (lck.mode == lck_shared) { 
-	    assert(pMonitor->n_writers == 0);
+	    //assert(pMonitor->n_writers == 0);
+
+		if(!(pMonitor->n_writers == 0))
+			global_func_log(__LINE__,__FILE__,""); //TODO: find good cause
+
 	    pMonitor->n_readers += 1;
 	    lck.owner = self;
 	    lck.next = shared_lock_chain;
 	    shared_lock_chain = &lck;
 	} else { // exclusive lock
-	    assert(pMonitor->n_writers == 0 
-		   && (pMonitor->n_readers == 0 
-		       || (pMonitor->n_readers == 1 
-			   && shared_lock_chain != NULL
-			   && shared_lock_chain->owner == self)));
+	    //assert(pMonitor->n_writers == 0 
+		//   && (pMonitor->n_readers == 0 
+		//       || (pMonitor->n_readers == 1 
+		//	   && shared_lock_chain != NULL
+		//	   && shared_lock_chain->owner == self)));
+
+			if(!(pMonitor->n_writers == 0 
+			   && (pMonitor->n_readers == 0 
+				   || (pMonitor->n_readers == 1 
+				   && shared_lock_chain != NULL
+				   && shared_lock_chain->owner == self))))
+			{
+				global_func_log(__LINE__,__FILE__,""); //TODO: find good cause
+			}
+
 	    { 
 		pMonitor->n_writers = 1;
 		n_nested_exclusive_locks = 1;
@@ -869,10 +924,17 @@ shared_memory::status shared_memory::lock(lock_descriptor& lck, unsigned msec)
 shared_memory::status shared_memory::unlock(lock_descriptor& lck)
 {
     status result;
-    assert(lck.mode == lck_shared || lck.mode == lck_exclusive);
+    //assert(lck.mode == lck_shared || lck.mode == lck_exclusive);
+
+	if(!(lck.mode == lck_shared || lck.mode == lck_exclusive))
+		global_func_log(__LINE__,__FILE__,""); //TODO: find good cause
 
     if (lck.mode == lck_exclusive) { 
-	assert(pthread_self() == owner && n_nested_exclusive_locks > 0);
+	//assert(pthread_self() == owner && n_nested_exclusive_locks > 0);
+
+	if(!(pthread_self() == owner && n_nested_exclusive_locks > 0))
+		global_func_log(__LINE__,__FILE__,""); //TODO: find good cause
+
 	if (--n_nested_exclusive_locks != 0) { 
 	    return ok;
 	}
@@ -886,14 +948,26 @@ shared_memory::status shared_memory::unlock(lock_descriptor& lck)
     if (lck.mode == lck_shared) { 
 	lock_descriptor *lp, **lpp = &shared_lock_chain;
 	while ((lp = *lpp) != &lck) { 
-	    assert(lp != NULL/*invalid lock descriptor*/);
+	    //assert(lp != NULL/*invalid lock descriptor*/);
+
+		if(!(lp != NULL))
+			global_func_log(__LINE__,__FILE__,""); //TODO: find good cause
+
 	    lpp = &lp->next;
 	}
-	assert(pMonitor->n_readers > 0 && lp->owner == pthread_self());
+	//assert(pMonitor->n_readers > 0 && lp->owner == pthread_self());
+
+	if(!(pMonitor->n_readers > 0 && lp->owner == pthread_self()))
+		global_func_log(__LINE__,__FILE__,""); //TODO: find good cause
+
 	*lpp = lp->next;
 	pMonitor->n_readers -= 1;
     } else { 
-	assert(pMonitor->n_writers == 1);
+	//assert(pMonitor->n_writers == 1);
+
+	if(!(pMonitor->n_writers == 1))
+		global_func_log(__LINE__,__FILE__,""); //TODO: find good cause
+
 	pMonitor->n_writers = 0;
     }
     if (pMonitor->n_waiters != 0) { 
@@ -939,7 +1013,8 @@ shared_memory::status shared_memory::open(const char* file_name,
 	if (fd < 0) { 
 	    goto return_error;
 	}	
-    } 
+    }
+
     key_len = strlen(shared_name);
     key_file_name = new char[key_len+12];
     if (strchr(shared_name, '/') < 0) { 
@@ -949,6 +1024,7 @@ shared_memory::status shared_memory::open(const char* file_name,
 	strcpy(key_file_name, shared_name);
     }
     strcpy(key_file_name+key_len, ".mutex");
+
     if (semp_init(&mutex, key_file_name, 1) < 0) { 
 	goto return_error;
     }
@@ -977,26 +1053,7 @@ shared_memory::status shared_memory::open(const char* file_name,
     if (pMonitor == INVALID_ADDRESS) { 
 	goto return_error;
     }
-#ifdef __linux__
-    // Bug in 2.0.32 kernel: shmid_ds in kernel and user includes are different
-    struct { // this definition is taken from kernel
-	struct ipc_perm shm_perm;	/* operation perms */
-	int	shm_segsz;		/* size of segment (bytes) */
-	time_t	shm_atime;		/* last attach time */
-	time_t	shm_dtime;		/* last detach time */
-	time_t	shm_ctime;		/* last change time */
-	unsigned short	shm_cpid;	/* pid of creator */
-	unsigned short	shm_lpid;	/* pid of last operator */
-	short	shm_nattch;		/* no. of current attaches */
-	/* the following are private */
-	unsigned short   shm_npages;	/* size of segment (pages) */
-	unsigned long   *shm_pages;	/* array of ptrs to frames -> SHMMAX */
-	struct vm_area_struct *attaches; /* descriptors for attaches */
-	char some_more_space[32];
-    } shm_desc;
-#else
     struct shmid_ds shm_desc;
-#endif
     if (shmctl(monid, IPC_STAT, (struct shmid_ds*)&shm_desc) < 0) { 
 	goto return_error;
     }
@@ -1064,7 +1121,7 @@ shared_memory::status shared_memory::open(const char* file_name,
 	}
 	pHdr = (header*)shmat(shmid, (char*)desired_address, 
 			      mode == read_only ? SHM_RDONLY : 0);
-	if (pHdr == INVALID_ADDRESS) { 
+	if (pHdr == INVALID_ADDRESS) {
 	    goto return_error;
 	}
 	if (pHdr->base_address != NULL) { 
@@ -1090,7 +1147,6 @@ shared_memory::status shared_memory::open(const char* file_name,
 
     next = chain;
     chain = this;
-
     if (semp_post(&mutex) < 0) { 
 	goto return_error;
     }
@@ -1223,7 +1279,11 @@ bool semaphore::wait(unsigned msec)
 {
     static struct sembuf sops[] = {{0, -1, 0}};
     wait_status ws = wait_semaphore(s, msec, sops, items(sops));
-    assert(ws != wait_error);
+    //assert(ws != wait_error);
+
+	if(!(ws != wait_error))
+		global_func_log(__LINE__,__FILE__,""); //TODO: find good cause
+
     return ws == wait_ok;
 }
 
@@ -1235,7 +1295,11 @@ void semaphore::signal(unsigned inc)
 	sops[0].sem_op  = inc;
 	sops[0].sem_flg = 0;
 	int rc = semop(s, sops, 1);
-	assert(rc == 0); 
+	//assert(rc == 0); 
+
+	if(!(rc == 0))
+		global_func_log(__LINE__,__FILE__,""); //TODO: find good cause
+
     }
 }
 
@@ -1254,7 +1318,11 @@ bool event::wait(unsigned msec)
 {
     static struct sembuf sops[] = {{0, -1, 0}, {0, 1, 0}};
     wait_status ws = wait_semaphore(e, msec, sops, items(sops));
-    assert(ws != wait_error);
+   //assert(ws != wait_error);
+
+	if(!(ws != wait_error))
+		global_func_log(__LINE__,__FILE__,""); //TODO: find good cause
+
     return ws == wait_ok;
 }
 
@@ -1262,14 +1330,20 @@ void event::signal()
 {
     static struct sembuf sops[] = {{0, 0, IPC_NOWAIT}, {0, 1, 0}};
     int rc = semop(e, sops, items(sops));
-    assert(rc == 0 || errno == EAGAIN); 
+    //assert(rc == 0 || errno == EAGAIN);
+
+	if(!(rc == 0 || errno == EAGAIN))
+		global_func_log(__LINE__,__FILE__,""); //TODO: find good cause
 }
 
 void event::reset()
 {
     static struct sembuf sops[] = {{0, -1, IPC_NOWAIT}};
     int rc = semop(e, sops, items(sops));
-    assert(rc == 0 || errno == EAGAIN); 
+    //assert(rc == 0 || errno == EAGAIN);
+
+	if(!(rc == 0 || errno == EAGAIN))
+		global_func_log(__LINE__,__FILE__,""); //TODO: find good cause
 }
 
 bool event::open(char const* name, bool signaled)
@@ -1285,13 +1359,18 @@ void event::close()
 
 
 #endif
-
-
-
+ 
 void* shared_memory::allocate(size_t size, bool initialize_by_zero)
 {
-    assert(n_nested_exclusive_locks != 0);
-    assert(mode != read_only);
+    //assert(n_nested_exclusive_locks != 0);
+
+	if(!(n_nested_exclusive_locks != 0))
+		global_func_log(__LINE__,__FILE__, NULL);
+
+    //assert(mode != read_only);
+
+	if(!(mode != read_only))
+		global_func_log(__LINE__,__FILE__, NULL);
 
     if (size == 0) {
 	size = 1;
@@ -1354,14 +1433,28 @@ void* shared_memory::reallocate(void* ptr, size_t new_size, bool initialize_by_z
    
 void shared_memory::free(void* ptr)
 {
-    assert(n_nested_exclusive_locks != 0);
-    assert(mode != read_only);
+    //assert(n_nested_exclusive_locks != 0);
+
+	if(!(n_nested_exclusive_locks != 0))
+		global_func_log(__LINE__,__FILE__, NULL);
+
+    //assert(mode != read_only);
+
+	if(!(mode != read_only))
+		global_func_log(__LINE__,__FILE__, NULL);
 
     free_block* bp = (free_block*)((char*)ptr - sizeof(allocation_block));
     size_t size = -bp->forward;
 
-    assert(((free_block*)((char*)bp + size + sizeof(allocation_block)))->
-	   backward == -int(size + sizeof(allocation_block)));
+    //assert(((free_block*)((char*)bp + size + sizeof(allocation_block)))->
+	//   backward == -int(size + sizeof(allocation_block)));
+
+	if(!(((free_block*)((char*)bp + size + sizeof(allocation_block)))->
+	   backward == -int(size + sizeof(allocation_block))))
+	{
+		global_func_log(__LINE__,__FILE__, NULL);
+	}
+
 
     if (bp->backward > 0) { 
 	// previous block is free
@@ -1389,7 +1482,11 @@ void shared_memory::free(void* ptr)
 	    next->backward = size + sizeof(allocation_block); 
 	}
     } else { // last block in file
-	assert(offs + size + sizeof(allocation_block) == pHdr->size); 
+	//assert(offs + size + sizeof(allocation_block) == pHdr->size);
+
+	if(!(offs + size + sizeof(allocation_block) == pHdr->size))
+		global_func_log(__LINE__,__FILE__, NULL);
+
 	// unlink block from l2-list of free blocks
 	bp->unlink(); 	    
 	// truncate file if object at the end of file was deallocated
@@ -1413,9 +1510,14 @@ void shared_memory::check_heap() const
 	    size -= sizeof(allocation_block);
 	    bp = (free_block*)((char*)bp - size);
 	}   
-	assert(size == bp->backward);
+	//assert(size == bp->backward);
+	if(!(size == bp->backward))
+		global_func_log(__LINE__,__FILE__, NULL);
     }
-    assert(bp == eof);
+    //assert(bp == eof);
+
+	if(!(bp == eof))
+		global_func_log(__LINE__,__FILE__, NULL);
 }
 
 shared_memory* shared_memory::find_storage(void* obj)

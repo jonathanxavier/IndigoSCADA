@@ -46,7 +46,7 @@ Dnp3driverConfigurationData::Dnp3driverConfigurationData(QWidget *parent, const 
 	Name->setMargin( 0 );
 
 	DNP3ServerIPAddressText = new QLineEdit(this, "LineEdit_7");
-	DNP3ServerIPAddressText->setGeometry(200, 80, 100, 30);
+	DNP3ServerIPAddressText->setGeometry(200, 40, 100, 30);
 	DNP3ServerIPAddressText->setMinimumSize(0, 0);
 	DNP3ServerIPAddressText->setMaximumSize(32767, 32767);
 	DNP3ServerIPAddressText->setFocusPolicy(QWidget::StrongFocus);
@@ -61,7 +61,7 @@ Dnp3driverConfigurationData::Dnp3driverConfigurationData(QWidget *parent, const 
 	DNP3ServerIPAddressText->setFrame( TRUE );
 	DNP3ServerIPAddressText->setAlignment( AlignLeft );
 	QLabel *qtarch_Label_22 = new QLabel(this, "Label_21");
-	qtarch_Label_22->setGeometry(10, 80, 150, 30);
+	qtarch_Label_22->setGeometry(10, 40, 150, 30);
 	qtarch_Label_22->setMinimumSize(0, 0);
 	qtarch_Label_22->setMaximumSize(32767, 32767);
 	qtarch_Label_22->setFocusPolicy(QWidget::NoFocus);
@@ -77,11 +77,44 @@ Dnp3driverConfigurationData::Dnp3driverConfigurationData(QWidget *parent, const 
 	qtarch_Label_22->setText( tr( "DNP 3 slave IP address" ) );
 	qtarch_Label_22->setAlignment( AlignLeft|AlignVCenter|ExpandTabs );
 	qtarch_Label_22->setMargin( 0 );
+
+	DNP3ServerIPPortText = new QLineEdit(this, "LineEdit_7");
+	DNP3ServerIPPortText->setGeometry(200, 80, 100, 30);
+	DNP3ServerIPPortText->setMinimumSize(0, 0);
+	DNP3ServerIPPortText->setMaximumSize(32767, 32767);
+	DNP3ServerIPPortText->setFocusPolicy(QWidget::StrongFocus);
+	DNP3ServerIPPortText->setBackgroundMode(QWidget::PaletteBase);
+#if QT_VERSION < 300
+	DNP3ServerIPPortText->setFontPropagation(QWidget::SameFont);
+	DNP3ServerIPPortText->setPalettePropagation(QWidget::SameFont);
+	#endif
+	DNP3ServerIPPortText->setText( tr( "" ) );
+	DNP3ServerIPPortText->setMaxLength( 100 );
+	DNP3ServerIPPortText->setFrame( QLineEdit::Normal );
+	DNP3ServerIPPortText->setFrame( TRUE );
+	DNP3ServerIPPortText->setAlignment( AlignLeft );
+	QLabel *qtarch_Label_23 = new QLabel(this, "Label_21");
+	qtarch_Label_23->setGeometry(10, 80, 150, 30);
+	qtarch_Label_23->setMinimumSize(0, 0);
+	qtarch_Label_23->setMaximumSize(32767, 32767);
+	qtarch_Label_23->setFocusPolicy(QWidget::NoFocus);
+	qtarch_Label_23->setBackgroundMode(QWidget::PaletteBackground);
+	#if QT_VERSION < 300
+	qtarch_Label_23->setFontPropagation(QWidget::SameFont);
+	qtarch_Label_23->setPalettePropagation(QWidget::SameFont);
+	#endif
+	qtarch_Label_23->setFrameStyle( 0 );
+	qtarch_Label_23->setLineWidth( 1 );
+	qtarch_Label_23->setMidLineWidth( 0 );
+	qtarch_Label_23->QFrame::setMargin( 0 );
+	qtarch_Label_23->setText( tr( "DNP 3 slave IP port" ) );
+	qtarch_Label_23->setAlignment( AlignLeft|AlignVCenter|ExpandTabs );
+	qtarch_Label_23->setMargin( 0 );
 /////////////////////////////////////////////////////////////////////////
 	
 /////////////////////////////////////////////////////////////////////////
 	QLabel *qtarch_Label_10 = new QLabel(this, "Label_10");
-	qtarch_Label_10->setGeometry(10, 130, 100, 30);
+	qtarch_Label_10->setGeometry(10, 120, 100, 30);
 	qtarch_Label_10->setMinimumSize(0, 0);
 	qtarch_Label_10->setMaximumSize(32767, 32767);
 	qtarch_Label_10->setFocusPolicy(QWidget::NoFocus);
@@ -99,7 +132,7 @@ Dnp3driverConfigurationData::Dnp3driverConfigurationData(QWidget *parent, const 
 	qtarch_Label_10->setMargin( 0 );
 
 	NItems = new QSpinBox(this, "SpinBox_3");
-	NItems->setGeometry(200, 130, 100, 30);
+	NItems->setGeometry(200, 120, 100, 30);
 	NItems->setMinimumSize(0, 0);
 	NItems->setMaximumSize(32767, 32767);
 	NItems->setFocusPolicy(QWidget::StrongFocus);
@@ -121,7 +154,7 @@ Dnp3driverConfigurationData::Dnp3driverConfigurationData(QWidget *parent, const 
 ///////////////////////////////////////////////////////////////////////////
 	
 	QLabel *qtarch_Label_11 = new QLabel(this, "Label_11");
-	qtarch_Label_11->setGeometry(10, 180, 200, 30);
+	qtarch_Label_11->setGeometry(10, 160, 200, 30);
 	qtarch_Label_11->setMinimumSize(0, 0);
 	qtarch_Label_11->setMaximumSize(32767, 32767);
 	qtarch_Label_11->setFocusPolicy(QWidget::NoFocus);
@@ -139,7 +172,7 @@ Dnp3driverConfigurationData::Dnp3driverConfigurationData(QWidget *parent, const 
 	qtarch_Label_11->setMargin( 0 );
 
 	PollInterval = new QSpinBox(this, "SpinBox_4");
-	PollInterval->setGeometry(200, 180, 50, 30);
+	PollInterval->setGeometry(200, 160, 50, 30);
 	PollInterval->setMinimumSize(0, 0);
 	PollInterval->setMaximumSize(32767, 32767);
 	PollInterval->setFocusPolicy(QWidget::StrongFocus);

@@ -30,6 +30,10 @@
 #define INFINITE (~0U)
 #endif
 
+typedef void (*p_call_exit_handler)(int line, char* file, char* reason);
+
+extern p_call_exit_handler global_func_log;
+
 #ifdef USE_BASED_POINTERS
 //extern SHMEM_DLL_ENTRY void* shared_memory_base_pointer;
 extern void* shared_memory_base_pointer;
@@ -46,13 +50,13 @@ class shared_memory {
     
     //class SHMEM_DLL_ENTRY lock_descriptor { 
 	class lock_descriptor { 
-	friend class shared_memory;
-      public:
-	const lck_t mode;
-	lock_descriptor(lck_t lck) : mode(lck) {}
-      protected:
-	lock_descriptor* next;
-	unsigned         owner;
+		friend class shared_memory;
+		  public:
+		const lck_t mode;
+		lock_descriptor(lck_t lck) : mode(lck) {}
+		  protected:
+		lock_descriptor* next;
+		unsigned         owner;
     };
 
     // Status returned by shared_memory methods are either connstants 
@@ -81,10 +85,14 @@ class shared_memory {
     void*  reallocate(void* ptr, size_t size, bool initialize_by_zero = true);
     void   free(void* ptr);
 
-    // Find storaghe containing specified object and free it
+    // Find storage containing specified object and free it
     static void deallocate(void* obj) { 
 		shared_memory* shmem = find_storage(obj);
-		assert(shmem != NULL);
+		//assert(shmem != NULL);
+
+		if(!(shmem != NULL))
+			global_func_log(__LINE__,__FILE__, NULL);
+
 		if(shmem)
 		{
 			shmem->free(obj);
@@ -197,11 +205,15 @@ class exclusive_lock : shared_memory::lock_descriptor {
       shmem(shm)
     {
 	shared_memory::status rc = shmem.lock(*this);
-	assert(rc == shared_memory::ok);
+	//assert(rc == shared_memory::ok);
+	if(!(rc == shared_memory::ok))
+		global_func_log(__LINE__,__FILE__, NULL);
     }
     ~exclusive_lock() { 
 	shared_memory::status rc = shmem.unlock(*this);
-	assert(rc == shared_memory::ok);
+	//assert(rc == shared_memory::ok);
+	if(!(rc == shared_memory::ok))
+		global_func_log(__LINE__,__FILE__, NULL);
     }
 };
 
@@ -214,11 +226,17 @@ class shared_lock : shared_memory::lock_descriptor {
       shmem(shm)
     {
 	shared_memory::status rc = shmem.lock(*this);
-	assert(rc == shared_memory::ok);
+	//assert(rc == shared_memory::ok);
+	if(!(rc == shared_memory::ok))
+		global_func_log(__LINE__,__FILE__, NULL);
+
     }
     ~shared_lock() { 
 	shared_memory::status rc = shmem.unlock(*this);
-	assert(rc == shared_memory::ok);
+	//assert(rc == shared_memory::ok);
+	if(!(rc == shared_memory::ok))
+		global_func_log(__LINE__,__FILE__, NULL);
+
     }
 };
 

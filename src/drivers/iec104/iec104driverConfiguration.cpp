@@ -23,8 +23,6 @@ Inherited( parent, name ),Receipe(receipe)
 	connect (GetConfigureDb (),
 	SIGNAL (TransactionDone (QObject *, const QString &, int, QObject*)), this,
 	SLOT (QueryResponse (QObject *, const QString &, int, QObject*)));	// connect to the database
-
-	//GetConfigureDb()->DoExec(this,"select * from SERIAL where ENABLED=1 order by NAME;",tSerial); // get the list of enabled serial ports 
 	// 
 	// get the properties for this unit and receipe
 	if(Receipe == "(default)")
@@ -44,12 +42,14 @@ Inherited( parent, name ),Receipe(receipe)
 		//
 		// get the properties SKEY = unit name IKEY = receipe name
 		GetConfigureDb()->DoExec(this,pc,tItem);
-	};
+	}
+
 	if(Receipe != "(default)")
 	{
 		NItems->setEnabled(false);
-		//OpcServerProgIDText->setEnabled(false);
 		IEC104ServerIPAddressText->setEnabled(false);
+		IEC104ServerIPPortText->setEnabled(false);
+		IEC104ServerCASDUText->setEnabled(false);
 	};
 }
 Iec104driverConfiguration::~Iec104driverConfiguration()
@@ -69,8 +69,7 @@ void Iec104driverConfiguration::OkClicked()
 	GetConfigureDb()->DoExec(0,cmd,0); // delete the old value
 	//
 	cmd = "insert into PROPS values('"+Name->text() +"','" + Receipe + "','" + 
-	//NItems->text() + " " + PollInterval->text() + " " + OpcServerProgIDText->text() + " " + IEC104ServerIPAddressText->text() +"');";
-	NItems->text() + " " + PollInterval->text() + " " + IEC104ServerIPAddressText->text() +"');";
+	NItems->text() + " " + IEC104ServerIPAddressText->text() + " " + IEC104ServerIPPortText->text() + " " + IEC104ServerCASDUText->text() + "');";
 	GetConfigureDb()->DoExec(0,cmd,0);
 	QSAuditTrail(this,caption(), tr("Edited"));
 
@@ -99,12 +98,12 @@ void Iec104driverConfiguration::QueryResponse (QObject *p, const QString &c, int
 				int n;
 				is >> n;
 				NItems->setValue(n);
-				is >> n;
-				PollInterval->setValue(n);
-				//is >> t;
-				//OpcServerProgIDText->setText(t);
 				is >> t;
 				IEC104ServerIPAddressText->setText(t);
+				is >> t;
+				IEC104ServerIPPortText->setText(t);
+				is >> t;
+				IEC104ServerCASDUText->setText(t);
 			}
 			else
 			{
@@ -114,8 +113,9 @@ void Iec104driverConfiguration::QueryResponse (QObject *p, const QString &c, int
 				cmd = "insert into PROPS values('"+Name->text()+"','(default)','');"; // create default
 				GetConfigureDb()->DoExec(0,cmd,0);
 				NItems->setValue(8);
-				PollInterval->setValue(1000);
 				IEC104ServerIPAddressText->setText("");
+				IEC104ServerIPPortText->setText("");
+				IEC104ServerCASDUText->setText("");
 			}
 		} 
 		break;
