@@ -708,25 +708,31 @@ void Monitor::ConfigQueryResponse (QObject *p,const QString &c, int id, QObject*
 				for(int i = 0 ; i < n ; i++, CfgDb->FetchNext())
 				{
 					QString s = CfgDb->GetString("UNITTYPE");
-					Driver *p = FindDriver(s);
-					
-					IT_COMMENT1("Loading UNIT %s", (const char*)s);
 
-					if(p)
-					{
-						QSLogEvent("Monitor",tr("Loading Module") + " " +s);
-						DDict::value_type pr(s,p);
-						drivers.insert(pr); // put in the dictionary
-						//
-						QObject::connect(this,SIGNAL(DoCommand(const QString &, BYTE, LPVOID , DWORD, DWORD)),
-						p,SLOT(Command(const QString &, BYTE , LPVOID, DWORD, DWORD ))); // connect the command slot
-						//
-						// connect the trace line to the top level application
-						// 
-						QObject::connect(p,SIGNAL(TraceOut(const QString &,const QString &)),
-						this,SLOT(Trace(const QString &, const QString &)));
-					};    
-				};
+                    DDict::iterator iter = drivers.find(s);
+
+                    if(iter == drivers.end()) //apa+++ 20-12-2012
+                    {
+					    Driver *p = FindDriver(s);
+					    
+					    IT_COMMENT1("Loading UNIT %s", (const char*)s);
+
+					    if(p)
+					    {
+						    QSLogEvent("Monitor",tr("Loading Module") + " " +s);
+						    DDict::value_type pr(s,p);
+						    drivers.insert(pr); // put in the dictionary
+						    //
+						    QObject::connect(this,SIGNAL(DoCommand(const QString &, BYTE, LPVOID , DWORD, DWORD)),
+						    p,SLOT(Command(const QString &, BYTE , LPVOID, DWORD, DWORD ))); // connect the command slot
+						    //
+						    // connect the trace line to the top level application
+						    // 
+						    QObject::connect(p,SIGNAL(TraceOut(const QString &,const QString &)),
+						    this,SLOT(Trace(const QString &, const QString &)));
+					    }
+                    }
+				}
 				//
 				// now we get the receipe if it is not (default)
 				//

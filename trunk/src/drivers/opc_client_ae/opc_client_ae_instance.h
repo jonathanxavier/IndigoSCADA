@@ -17,9 +17,10 @@
 #include "IndentedTrace.h"
 #include "fifo.h"
 #include "fifoc.h"
-
 #include "iec104types.h"
 #include "iec_item.h"
+
+void iec_call_exit_handler(int line, char* file, char* reason);
 
 class Opc_client_ae_DriverThread;
 
@@ -40,7 +41,8 @@ class OPC_CLIENT_AEDRV Opc_client_ae_Instance : public DriverInstance
 	QTimer *pTimer; // timer object for driving state machine
 	int Retry; // the retry count
 	int Countdown; // the countdown track
-	int State; // the state machine's state 
+	int State; // the state machine's state
+	int instanceID;
 	
 	//  
 	int Sp; //Current sample point index under measurement
@@ -83,10 +85,10 @@ class OPC_CLIENT_AEDRV Opc_client_ae_Instance : public DriverInstance
 	unsigned int msg_sent_in_control_direction;
 
 	//
-	Opc_client_ae_Instance(Driver *parent, const QString &name) : 
+	Opc_client_ae_Instance(Driver *parent, const QString &name, int instance_id) : 
 	DriverInstance(parent,name),fFail(0), Countdown(1), pConnect(NULL),
 	State(STATE_RESET),InTick(0),Retry(0),Sp(0),OpcItems(1), Values(NULL),
-	ParentDriver(parent),msg_sent_in_control_direction(0)
+	ParentDriver(parent),msg_sent_in_control_direction(0), instanceID(instance_id)
 	{
 		IT_IT("Opc_client_ae_Instance::Opc_client_ae_Instance");
 		connect (GetConfigureDb (),
@@ -98,10 +100,16 @@ class OPC_CLIENT_AEDRV Opc_client_ae_Instance : public DriverInstance
 		pTimer->start(1000); // start with a 1 second timer
 
 		/////////////////////////////////////////////////////////////////////////////
-		//const size_t max_fifo_queue_size = 4*1024;
+		char fifo_ctr_name[150];
+		char str_instance_id[20];
+        itoa(instance_id + 1, str_instance_id, 10);
+		strcpy(fifo_ctr_name,"fifo_control_direction");
+        strcat(fifo_ctr_name, str_instance_id);
+        strcat(fifo_ctr_name, "ae");
+        		
 		const size_t max_fifo_queue_size = 4*65536;
 		//Init thread shared fifos
-		fifo_control_direction = fifo_open("fifo_opc_command", max_fifo_queue_size);
+		fifo_control_direction = fifo_open(fifo_ctr_name, max_fifo_queue_size, iec_call_exit_handler);
 	};
 
 	~Opc_client_ae_Instance()

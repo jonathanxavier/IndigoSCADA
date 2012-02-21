@@ -605,6 +605,21 @@ void InspectMenu(QWidget *parent, const QString &name, bool AckState)
 		{
 			m.insertItem(QPixmap((const char **)button),QObject::tr("Send command..."),6); // Send command
 		}
+
+        if(name.contains("IEC101", false) > 0)
+		{
+			m.insertItem(QPixmap((const char **)button),QObject::tr("Send command..."),6); // Send command
+		}
+
+        if(name.contains("IEC103", false) > 0)
+		{
+			m.insertItem(QPixmap((const char **)button),QObject::tr("Send command..."),6); // Send command
+		}
+
+        if(name.contains("DNP3", false) > 0)
+		{
+			m.insertItem(QPixmap((const char **)button),QObject::tr("Send command..."),6); // Send command
+		}
 	}
 	
 	if(GetUserDetails ().privs &  PRIVS_ACK_ALARMS)

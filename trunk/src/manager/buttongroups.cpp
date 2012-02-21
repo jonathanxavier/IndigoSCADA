@@ -72,7 +72,8 @@ BOOL ButtonsGroups::StartProcess(int nIndex)
 			// set the correct desktop for the process to be started
 			if(bUserInterface)
 			{
-				startUpInfo.wShowWindow = SW_SHOW;
+				//startUpInfo.wShowWindow = SW_SHOW;
+				startUpInfo.wShowWindow = SW_SHOWMINIMIZED;
 				startUpInfo.lpDesktop = NULL;
 			}
 			else

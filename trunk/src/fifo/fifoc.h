@@ -33,8 +33,9 @@ extern "C" {
 #endif
 
 typedef struct fifo_t* fifo_h;
+typedef void (*p_call_exit_handler)(int line, char* file, char* reason);
 
-extern SHMEM_DLL_ENTRY fifo_h fifo_open(char const* name, size_t max_size);
+extern SHMEM_DLL_ENTRY fifo_h fifo_open(char const* name, size_t max_size, p_call_exit_handler f_log_arg);
 extern SHMEM_DLL_ENTRY void fifo_put(fifo_h hnd, char* message, int length);
 extern SHMEM_DLL_ENTRY int fifo_get(fifo_h hnd, char* buf, int buf_size, unsigned msec);
 extern SHMEM_DLL_ENTRY void fifo_close(fifo_h hnd);

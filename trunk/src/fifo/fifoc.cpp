@@ -12,33 +12,49 @@
 #include "fifo.h"
 #include "fifoc.h"
 
-SHMEM_DLL_ENTRY fifo_h fifo_open(char const* name, size_t max_size)
+SHMEM_DLL_ENTRY fifo_h fifo_open(char const* name, size_t max_size, p_call_exit_handler f_log_arg)
 {
     fifo_obj* fifo = new fifo_obj();
 
-    if(fifo->open(name, max_size))
+    if(fifo->open(name, max_size, f_log_arg))
 	{
         return (fifo_h)fifo;
     }
 
-	fprintf(stderr, "Failed to create queue buffer\n");
+	fprintf(stderr, "Failed to create queue buffer: %i\n", max_size);
 	fflush(stderr);
+
+	f_log_arg(0, NULL, "Failed to create queue buffer\n");
+
     delete fifo;
     return NULL;
 }
         
 SHMEM_DLL_ENTRY void fifo_put(fifo_h hnd, char* message, int length)
 {
-   ((fifo_obj*)hnd)->put(message, length);
+    if(hnd)
+    {
+        ((fifo_obj*)hnd)->put(message, length);
+    }
 }
 
 SHMEM_DLL_ENTRY int fifo_get(fifo_h hnd, char* buf, int buf_size, unsigned msec)
 {
-    return ((fifo_obj*)hnd)->get(buf, buf_size, msec);
+    if(hnd)
+    {
+        return ((fifo_obj*)hnd)->get(buf, buf_size, msec);
+    }
+    else
+    {
+        return -1;
+    }
 }
 
 SHMEM_DLL_ENTRY void fifo_close(fifo_h hnd)
 {
-    ((fifo_obj*)hnd)->close();
-    delete (fifo_obj*)hnd;
+    if(hnd)
+    {
+        ((fifo_obj*)hnd)->close();
+        delete (fifo_obj*)hnd;
+    }
 }

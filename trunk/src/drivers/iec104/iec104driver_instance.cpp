@@ -13,7 +13,7 @@
 
 
 #include "iec104driver_instance.h"
-
+#include "iec104driverthread.h"
 /*
 *Function:
 *Inputs:none
@@ -159,9 +159,10 @@ void Iec104driver_Instance::QueryResponse(QObject *p, const QString &c, int id, 
 				QString s = UndoEscapeSQLText(GetConfigureDb()->GetString("DVAL")); // the top one is either the receipe or (default)
 				QTextIStream is(&s); // extract the values
 				//
-				is >> IecItems;	  // how many IEC items there are in the RTU or PLC
-				is >> Cfg.SampleTime; // how long we sample for in milliseconds
+				is >> IecItems;	  // how many IEC items there are in the RTU
 				is >> Cfg.IEC104ServerIPAddress; // IEC 104 server IP Address
+				is >> Cfg.IEC104ServerIPPort;  // IEC 104 server IP port
+				is >> Cfg.IEC104ServerCASDU;  // IEC 104 server CASDU
 
 				Countdown = 1;
 
@@ -173,13 +174,13 @@ void Iec104driver_Instance::QueryResponse(QObject *p, const QString &c, int id, 
 
 				Values = new Track[IecItems+1];
 				//
-				if(InTest())
-				{
-					Cfg.SampleTime = 1000; // override sampling period
-				};
+				//if(InTest())
+				//{
+				//	Cfg.SampleTime = 1000; // override sampling period
+				//};
 				//
 
-				//Start IEC 104 client driver
+				//Start IEC 104 master driver
 				if(!Connect())
 				{
 					QSLogAlarm(Name,tr("Failed to start IEC 104 client driver"));
@@ -193,8 +194,12 @@ void Iec104driver_Instance::QueryResponse(QObject *p, const QString &c, int id, 
 
 			if(GetConfigureDb()->GetNumberResults() > 0)
 			{
-				// 
+				//
+				#ifdef DEPRECATED_IEC104_CONFIG
 				QString SamplePointName = UndoEscapeSQLText(GetConfigureDb()->GetString("IKEY"));
+				#else
+				QString SamplePointName = UndoEscapeSQLText(GetConfigureDb()->GetString("NAME"));
+				#endif
 
 				double v = 0.0;
 
@@ -215,7 +220,11 @@ void Iec104driver_Instance::QueryResponse(QObject *p, const QString &c, int id, 
 			if(GetConfigureDb()->GetNumberResults() > 0)
 			{
 				// 
+				#ifdef DEPRECATED_IEC104_CONFIG
 				QString IOACommand = UndoEscapeSQLText(GetConfigureDb()->GetString("DVAL"));
+				#else
+				QString IOACommand = UndoEscapeSQLText(GetConfigureDb()->GetString("PARAMS"));
+				#endif
 				
 				int command_value = 0;
 				int ioa_command = 0;
@@ -227,7 +236,7 @@ void Iec104driver_Instance::QueryResponse(QObject *p, const QString &c, int id, 
 					command_value = atoi((const char*)t.Data1);
 				}
 
-				printf("IOA command = %d, value = %d\n", ioa_command, command_value);
+				printf("Command from %s, IOA = %d, value = %d\n", (const char*)t.Data2, ioa_command, command_value);
 
 				//Send C_SC_NA_1
 				char buf[sizeof(struct iec_item)];
@@ -425,7 +434,7 @@ void Iec104driver_Instance::Tick()
 
 		if(message_checksum != msg_checksum)
 		{
-			assert(0);
+			ExitProcess(0);
 		}
 		//////////////////end checksum////////////////////////////////////////
 
@@ -618,9 +627,14 @@ void Iec104driver_Instance::Tick()
 			//{
 			//}
 			//break;
+            case C_EX_IT_1:
+			{
+                printf("Child process exiting...\n");
+			}
+			break;
 			default:
 			{
-				printf("Not supported type;");
+				printf("Not supported type\n");
 				value.sprintf("%d", 0);
 			}
 			break;
@@ -629,7 +643,11 @@ void Iec104driver_Instance::Tick()
 		QString ioa;
 		ioa.sprintf("%d", p_item->iec_obj.ioa);
 
+		#ifdef DEPRECATED_IEC104_CONFIG
 		QString cmd = "select IKEY from PROPS where DVAL='"+ ioa + "' and SKEY='SAMPLEPROPS';";
+		#else
+		QString cmd = "select NAME from TAGS where PARAMS='"+ ioa + "' and UNIT='"+ Name + "';";
+		#endif
 
 		GetConfigureDb()->DoExec(this, cmd, tGetSamplePointNamefromIOA, value, ioa);
 
@@ -695,17 +713,17 @@ bool Iec104driver_Instance::Connect()
 {	
 	IT_IT("Iec104driver_Instance::Connect");
 	//return 0 on fail
-	//retunr 1 on success
-/*
+	//return 1 on success
+
 	if(pConnect) delete pConnect;
 	
-	pConnect = new Iec104driver_DriverThread(this); // create the connection
+	pConnect = new Iec104DriverThread(this); // create the connection
 
 	if(pConnect->Ok()) 
 	{
 		pConnect->start();
 	}
-*/
+
 	return true;
 }
 
@@ -722,12 +740,15 @@ bool  Iec104driver_Instance::Disconnect()
 	bool res = true;
 	
 	InQueue.clear();
-/*
-	if(pConnect) delete pConnect;	//added on 27-11-09
-	pConnect = NULL;	//added on 27-11-09
-*/
+    
+    pConnect->TerminateIEC();
+    //while(!(pConnect->Done)) {Sleep(10);};
+
+	if(pConnect) delete pConnect;
+	pConnect = NULL;
+
 	return res;
-};
+}
 
 /*
 *Function:DoExec
@@ -761,12 +782,105 @@ void Iec104driver_Instance::Command(const QString & name, BYTE cmd, LPVOID lpPa,
 
 	IT_COMMENT3("Received command for instance %s, sample point: %s, value: %lf", (const char*)name, (const char*)sample_point_name, (params->res[0]).value);
 
-	//Execute query on table PROPS
-
+	#ifdef DEPRECATED_IEC104_CONFIG
 	QString pc = "select * from PROPS where IKEY='" + sample_point_name + "';"; 
+	#else
+	QString pc = "select * from TAGS where NAME='" + sample_point_name + "';";
+	#endif
 
 	QString value_for_command;
 	value_for_command.sprintf("%lf", (params->res[0]).value);
 	// 
-	GetConfigureDb()->DoExec(this, pc, tGetIOAfromSamplePointName, value_for_command);
+	GetConfigureDb()->DoExec(this, pc, tGetIOAfromSamplePointName, value_for_command, sample_point_name);
+}
+
+/*
+void Iec104driver_Instance::EndProcess(int nIndex)
+{	
+    PROCESS_INFORMATION* pProcInfo = pConnect->getProcInfo();
+
+	if(pProcInfo[nIndex].hProcess)
+	{
+		int nPauseEnd = 100;
+
+		// post a WM_QUIT message first
+		PostThreadMessage(pProcInfo[nIndex].dwThreadId,WM_QUIT,0,0);
+		// sleep for a while so that the process has a chance to terminate itself
+		::Sleep(nPauseEnd>0?nPauseEnd:50);
+		// terminate the process by force
+		TerminateProcess(pProcInfo[nIndex].hProcess,0);
+		pProcInfo[nIndex].hProcess = 0;
+	}
+}
+*/
+
+#include <signal.h>
+
+char* get_date_time()
+{
+	static char sz[128];
+	time_t t = time(NULL);
+	struct tm *ptm = localtime(&t);
+	
+	strftime(sz, sizeof(sz)-2, "%m/%d/%y %H:%M:%S", ptm);
+
+	strcat(sz, "|");
+	return sz;
+}
+
+void iec_call_exit_handler(int line, char* file, char* reason)
+{
+	FILE* fp;
+	char program_path[_MAX_PATH];
+	char log_file[_MAX_FNAME+_MAX_PATH];
+	IT_IT("iec_call_exit_handler");
+
+	program_path[0] = '\0';
+#ifdef WIN32
+	if(GetModuleFileName(NULL, program_path, _MAX_PATH))
+	{
+		*(strrchr(program_path, '\\')) = '\0';        // Strip \\filename.exe off path
+		*(strrchr(program_path, '\\')) = '\0';        // Strip \\bin off path
+    }
+#elif __unix__
+	if(getcwd(program_path, _MAX_PATH))
+	{
+		*(strrchr(program_path, '/')) = '\0';        // Strip \\filename.exe off path
+		*(strrchr(program_path, '/')) = '\0';        // Strip \\bin off path
+    }
+#endif
+
+	strcpy(log_file, program_path);
+
+#ifdef WIN32
+	strcat(log_file, "\\logs\\iec104.log");
+#elif __unix__
+	strcat(log_file, "/logs/iec104.log");	
+#endif
+
+	fp = fopen(log_file, "a");
+
+	if(fp)
+	{
+		if(line && file && reason)
+		{
+			fprintf(fp, "PID:%d time:%s exit process at line: %d, file %s, reason:%s\n", GetCurrentProcessId, get_date_time(), line, file, reason);
+		}
+		else if(line && file)
+		{
+			fprintf(fp, "PID:%d time:%s exit process at line: %d, file %s\n", GetCurrentProcessId, get_date_time(), line, file);
+		}
+		else if(reason)
+		{
+			fprintf(fp, "PID:%d time:%s exit process for reason %s\n", GetCurrentProcessId, get_date_time(), reason);
+		}
+
+		fflush(fp);
+		fclose(fp);
+	}
+
+	//raise(SIGABRT);   //raise abort signal which in turn starts automatically a separete thread and call exit SignalHandler
+	ExitProcess(0);
+
+	IT_EXIT;
 }

@@ -38,17 +38,18 @@ class Iec104driver_Instance;
 struct InstanceCfg // friend to anyone
 {
 	QString IEC104ServerIPAddress;  // IEC 104 server IP address (slave)
+	QString IEC104ServerIPPort;  // IEC 104 server IP port
+	QString IEC104ServerCASDU;  // IEC 104 server CASDU
 
-	unsigned SampleTime; // sampleing time 
 
 	InstanceCfg() : 
-	SampleTime(1000),IEC104ServerIPAddress("")
+	IEC104ServerIPAddress(""),IEC104ServerIPPort(""),IEC104ServerCASDU("")
 	{
 	};
 
 	InstanceCfg(const InstanceCfg &m) : 
-
-	SampleTime(m.SampleTime),IEC104ServerIPAddress(m.IEC104ServerIPAddress)
+	IEC104ServerIPAddress(m.IEC104ServerIPAddress),IEC104ServerIPPort(m.IEC104ServerIPPort),
+	IEC104ServerCASDU(m.IEC104ServerCASDU)
 	{
 	};
 };

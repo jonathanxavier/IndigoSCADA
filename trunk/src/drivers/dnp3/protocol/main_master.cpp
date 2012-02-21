@@ -178,7 +178,7 @@ int DNP3MasterApp::CloseLink(bool free)
 int IsSingleInstance(const char* name)
 {
    HANDLE hMutex;
-   char mutex_name[50];
+   char mutex_name[200];
 
    strcpy(mutex_name, ""APPLICATION"");
    strcat(mutex_name, name);
@@ -200,9 +200,11 @@ int IsSingleInstance(const char* name)
 
 #include "getopt.h"
 
-void PipeWorker(void* pParam);
+struct args{
+	char line_number[80];
+};
 
-#define POLLING_TIME 1000 //<------------------- PARAMETER
+void PipeWorker(void* pParam);
 
 int main( int argc, char **argv )
 {
@@ -210,11 +212,20 @@ int main( int argc, char **argv )
 	char dnp3ServerAddress[80];
 	char dnp3ServerPort[80];
 	char line_number[80];
+	char polling_time[80];
+	char fifo_monitor_direction_name[70];
+	char fifo_control_direction_name[70];
+	char OldConsoleTitle[500];
+	char NewConsoleTitle[500];
 	int c;
+	double pollingTime = 1000;
 	
 	dnp3ServerAddress[0] = '\0';
 	dnp3ServerPort[0] = '\0';
 	line_number[0] = '\0';
+	polling_time[0] = '\0';
+	fifo_monitor_direction_name[0] = '\0';
+	fifo_control_direction_name[0] = '\0';
 
 	//version control///////////////////////////////////////////////////////////////
 	sprintf(version, ""APPLICATION" - Built on %s %s %s",__DATE__,__TIME__,SUPPLIER);
@@ -226,7 +237,7 @@ int main( int argc, char **argv )
 	fflush(stderr);
 	////////////////////////////////////////////////////////////////////////////////
 
-	while( ( c = getopt ( argc, argv, "a:p:l:?" )) != EOF ) {
+	while( ( c = getopt ( argc, argv, "a:p:l:t:?" )) != EOF ) {
 		switch ( c ) {
 			case 'a' :
 			strcpy(dnp3ServerAddress, optarg);
@@ -237,8 +248,11 @@ int main( int argc, char **argv )
 			case 'l' :
 			strcpy(line_number, optarg);
 			break;
+			case 't' :
+			strcpy(polling_time, optarg);
+			break;
 			case '?' :
-			fprintf(stderr, "Run time usage: %s -a server IP address -p server IP port -l line number\n", argv[0]);
+			fprintf(stderr, "Run time usage: %s -a server IP address -p server IP port -l line number -t polling time\n", argv[0]);
 			fflush(stderr);
 			exit( 0 );
 		}
@@ -265,14 +279,35 @@ int main( int argc, char **argv )
 		return EXIT_FAILURE;
 	}
 
-	char OldConsoleTitle[500];
-	char NewConsoleTitle[500];
+	if(strlen(polling_time) == 0)
+	{
+		fprintf(stderr,"polling_time is not known\n");
+		fflush(stderr);
+		return EXIT_FAILURE;
+	}
 
-	strcpy(NewConsoleTitle, dnp3ServerAddress);
-	strcat(NewConsoleTitle, "   ");
+	pollingTime = atof(polling_time);
+
+	strcpy(fifo_monitor_direction_name, "fifo_monitor_direction");
+	strcpy(fifo_control_direction_name, "fifo_control_direction");
+	
+	if(strlen(line_number) > 0)
+	{
+		strcat(fifo_monitor_direction_name, line_number);
+		strcat(fifo_control_direction_name, line_number);
+	}
+
+    strcat(fifo_control_direction_name, "dnp3");
+    strcat(fifo_monitor_direction_name, "dnp3");
+
+	strcpy(NewConsoleTitle, "dnp3master IP ");
+	strcat(NewConsoleTitle, dnp3ServerAddress);
+	strcat(NewConsoleTitle, " PORT ");
 	strcat(NewConsoleTitle, dnp3ServerPort);
-	strcat(NewConsoleTitle, "   ");
+	strcat(NewConsoleTitle, " LINE ");
 	strcat(NewConsoleTitle, line_number);
+	strcat(NewConsoleTitle, " polling time ");
+	strcat(NewConsoleTitle, polling_time);
 
 	if(!IsSingleInstance(NewConsoleTitle))
 	{
@@ -287,7 +322,10 @@ int main( int argc, char **argv )
 		SetConsoleTitle(NewConsoleTitle);
 	}
 
-	if(_beginthread(PipeWorker, 0, NULL) == -1)
+    struct args arg;
+    strcpy(arg.line_number, line_number);
+
+	if(_beginthread(PipeWorker, 0, (void*)&arg) == -1)
 	{
 		long nError = GetLastError();
 
@@ -335,7 +373,7 @@ int main( int argc, char **argv )
 		master_p = new Master (masterConfig, datalinkConfig, &stationConfig, 1, &db, &timer);
 
 		//Write
-		master_p->poll( Master::INTEGRITY);
+		master_p->poll(Master::INTEGRITY);
 
 		//Read
 		char data_p[80];
@@ -375,12 +413,12 @@ int main( int argc, char **argv )
 
 			timeout_connection_with_parent++;
 
-			if(timeout_connection_with_parent > 1000*20/POLLING_TIME)
+			if(timeout_connection_with_parent > 1000*20/pollingTime)
 			{
 				break; //exit loop for timeout of connection with parent
 			}
 
-			Sleep(POLLING_TIME);
+			Sleep((unsigned long)pollingTime);
 		}   
 
 		Sleep(1000);   
@@ -396,6 +434,7 @@ int main( int argc, char **argv )
 	return 0;
 }
 
+///////////////////////////////////Keep alive pipe management/////////////////////////////////////////////////////
 #define BUF_SIZE 200
 #define N_PIPES 3
 
@@ -411,10 +450,14 @@ void PipeWorker(void* pParam)
     struct iec_item* p_item;
     u_int message_checksum, msg_checksum;
 	char pipe_name[150];
+    int i;
+
+    struct args* arg = (struct args*)pParam;
 
 	strcpy(pipe_name, "\\\\.\\pipe\\dnp3master_namedpipe");
+    strcat(pipe_name, arg->line_number);
 
-	for(int i = 0; i < N_PIPES; i++)
+	for(i = 0; i < N_PIPES; i++)
 	{
 		if ((pipeHnds[i] = CreateNamedPipe(
 			pipe_name,
@@ -546,13 +589,11 @@ void PipeWorker(void* pParam)
 				if(p_item->iec_obj.ioa == 4004)
 				{ 
 					timeout_connection_with_parent = 0;
-					fprintf(stderr, "Receive keep alive from front end %d\n", p_item->msg_id);
+					//fprintf(stderr, "Receive keep alive # %d from front end\n", p_item->msg_id);
+                    fprintf(stderr, "wdg %d\r", p_item->msg_id);
 				    fflush(stderr);
 				}
 			}
 		}
 	}
 }
-
-
-

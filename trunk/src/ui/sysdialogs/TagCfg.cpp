@@ -154,7 +154,7 @@ void TagCfg::Build () // build the update record - the insert needs the name rec
 	GetConfigureDb ()->AddBool("UWENABLE",UWEnabled->isChecked ());
 	// 
 };
-void TagCfg::QueryResponse (QObject *p, const QString &c, int State, QObject*caller) // notify transaction completerequestrt needs the name record addedtivityled int2);, tion text,repprint int2);ate text);
+void TagCfg::QueryResponse (QObject *p, const QString &c, int State, QObject*caller)
 {
 	if(p != this) return;
 	switch (State)
@@ -220,7 +220,7 @@ void TagCfg::QueryResponse (QObject *p, const QString &c, int State, QObject*cal
 				UWEnabled->setChecked (0);
 				UAEnabled->setChecked (0);
 				//
-				QString cmd = "insert into TAGS values ('"+SPName+"','"+Name->currentText()+"'"TAG_VALS"'"+ReceipeName+"');";
+				QString cmd = "insert into TAGS values ('"+SPName+"','"+Name->currentText()+"'"TAG_VALS"'"+ReceipeName+"',1,'','');";
 				GetConfigureDb()->DoExec(0,cmd,0);
 				//
 				// create the entry in the current values database

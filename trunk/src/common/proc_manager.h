@@ -17,7 +17,12 @@
 extern "C" {
 #endif
 
-extern BOOL StartProcess(char* pCommandLine, char* pWorkingDir);
+typedef int (*p_send_ack_to_child)(int address, int data, char* pipeName);
+
+typedef bool (*p_StartProcess)(char* pCommandLine, char* pWorkingDir, PROCESS_INFORMATION* pProcInfo);
+
+extern bool StartProcess(char* pCommandLine, char* pWorkingDir, PROCESS_INFORMATION* pProcInfo);
+//extern void EndProcess(int nIndex);
 extern void begin_process_checker(struct args* arg);
 
 const int nBufferSize = 500;
@@ -26,6 +31,9 @@ struct args{
 	char pCommandLine[nBufferSize+1];
 	char pWorkingDir[nBufferSize+1];
 	char pipe_name[150];
+    PROCESS_INFORMATION* pProcInfo;
+    p_send_ack_to_child send_ack_to_child;
+    p_StartProcess StartProcess;
 };
 
 #ifdef __cplusplus

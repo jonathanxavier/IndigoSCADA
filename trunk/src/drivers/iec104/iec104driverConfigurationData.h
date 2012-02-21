@@ -22,9 +22,10 @@ class Iec104driverConfigurationData : public QDialog
 	protected:
 	QLabel *Name;
 	QSpinBox *NItems;
-	QSpinBox *PollInterval;
-	//QLineEdit *OpcServerProgIDText;
 	QLineEdit *IEC104ServerIPAddressText;
+	QLineEdit *IEC104ServerIPPortText;
+	QLineEdit *IEC104ServerCASDUText;
+
 };
 #endif // Iec104driverConfigurationData_included
 

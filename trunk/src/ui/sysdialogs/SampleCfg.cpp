@@ -116,7 +116,7 @@ void SampleCfg::ShowConfig() // create the specific config
 			connect(this,SIGNAL(LoadConfig(const QString &)),pConfig,SLOT(Load(const QString &))); //
 			connect(this,SIGNAL(SaveConfig(const QString &)),pConfig,SLOT(Save(const QString &))); //
 			//
-			#ifdef TEST_OF_IEC_104_DRIVER_IS_UNDER_WAY
+			#ifdef DEPRECATED_IEC104_CONFIG
 			QString cmd = "select IKEY,DVAL from PROPS where SKEY ='SAMPLEPROPS' and IKEY='"+Name->text()+"';"; //commented out on 02-12-09
 			#else
 			QString cmd = "select NAME,PARAMS from TAGS where NAME ='"+ Name->text() +"';";
@@ -469,7 +469,7 @@ void SampleCfg::QueryResponse (QObject *p, const QString &, int State, QObject*c
 		break;
 		case tConfigLoad:
 		{
-			#ifdef TEST_OF_IEC_104_DRIVER_IS_UNDER_WAY
+			#ifdef DEPRECATED_IEC104_CONFIG
 			if(Name->text() == GetConfigureDb()->GetString("IKEY")) // may be several queued up
 			#else
 			if(Name->text() == GetConfigureDb()->GetString("NAME")) // may be several queued up

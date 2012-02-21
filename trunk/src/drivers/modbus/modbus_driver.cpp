@@ -278,6 +278,21 @@ void Modbus_driver::QueryResponse (QObject *p, const QString &, int id, QObject*
 					m.sprintf("%d",i);
 
 					CreateSamplePoint(spname, l, m);
+
+					////////////Modbus specific//////////////////////////////////////////
+					// update the tags
+					cmd = QString("update TAGS set PARAMS='");
+					cmd += m;
+					cmd += "' where NAME='" + spname + "';";
+
+					GetConfigureDb()->DoExec(0,cmd ,0);
+
+					cmd = QString("update TAGS set UNIT='");
+					cmd += iec_unit_name;
+					cmd += "' where NAME='" + spname + "';";
+
+					GetConfigureDb()->DoExec(0,cmd ,0);
+					//////////////////////////////////////////////////////////////////////
 				};
 			}
 		}

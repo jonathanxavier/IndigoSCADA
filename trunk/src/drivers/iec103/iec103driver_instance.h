@@ -18,7 +18,11 @@
 #include "fifo.h"
 #include "fifoc.h"
 
-#define MAX_FIFO_SIZE 33554432UL//2^25
+class Iec103DriverThread;
+
+void iec_call_exit_handler(int line, char* file, char* reason);
+
+#define MAX_FIFO_SIZE 65535
 
 #include "iec104types.h"
 #include "iec_item.h"
@@ -41,7 +45,7 @@ class IEC_103_DRIVERDRV Iec103driver_Instance : public DriverInstance
 	QTimer *pTimer; // timer object for driving state machine
 	int Retry; // the retry count
 	int Countdown; // the countdown track
-	int State; // the state machine's state 
+	int State; // the state machine's state
 	
 	//  
 	int Sp; //Current sample point index under measurement
@@ -79,16 +83,16 @@ class IEC_103_DRIVERDRV Iec103driver_Instance : public DriverInstance
 	};
 
 	public:
-//	Iec103driver_DriverThread *pConnect;
+	Iec103DriverThread *pConnect;
 	fifo_h fifo_control_direction;
 	unsigned int msg_sent_in_control_direction;
 	fifo_h fifo_monitor_direction;
-
 	//
 	Iec103driver_Instance(Driver *parent, const QString &name, int instance_id) : 
 	DriverInstance(parent,name),fFail(0), Countdown(1),
 	State(STATE_RESET),InTick(0),Retry(0),Sp(0),IecItems(1), Values(NULL),
-	ParentDriver(parent),msg_sent_in_control_direction(0)
+	ParentDriver(parent),msg_sent_in_control_direction(0), instanceID(instance_id),
+    pConnect(0)
 	{
 		IT_IT("Iec103driver_Instance::Iec103driver_Instance");
 		connect (GetConfigureDb (),
@@ -106,7 +110,7 @@ class IEC_103_DRIVERDRV Iec103driver_Instance : public DriverInstance
         char fifo_mon_name[150];
 
         char str_instance_id[20];
-        itoa(instance_id, str_instance_id, 10);
+        itoa(instance_id + 1, str_instance_id, 10);
  
         strcpy(fifo_ctr_name,"fifo_control_direction");
         strcpy(fifo_mon_name,"fifo_monitor_direction");
@@ -115,8 +119,8 @@ class IEC_103_DRIVERDRV Iec103driver_Instance : public DriverInstance
         strcat(fifo_ctr_name, "iec103");
         strcat(fifo_mon_name, "iec103");
  
-		fifo_control_direction = fifo_open(fifo_ctr_name, max_fifo_queue_size);
-		fifo_monitor_direction = fifo_open(fifo_mon_name, max_fifo_queue_size);
+		fifo_control_direction = fifo_open(fifo_ctr_name, max_fifo_queue_size, iec_call_exit_handler);
+		fifo_monitor_direction = fifo_open(fifo_mon_name, max_fifo_queue_size, iec_call_exit_handler);
         /////////////////////////////////////////////////////////////////////////////
 	};
 
@@ -140,6 +144,7 @@ class IEC_103_DRIVERDRV Iec103driver_Instance : public DriverInstance
 	InstanceCfg Cfg; // the cacheable stuff
 	Driver* ParentDriver;
 	QString unit_name;
+    int instanceID; //Equals to "line concept" of a SCADA driver
 	
 	void driverEvent(DriverEvent *); // message from thread to parent
 	bool event(QEvent *e);
@@ -148,9 +153,7 @@ class IEC_103_DRIVERDRV Iec103driver_Instance : public DriverInstance
 	bool DoExec(SendRecePacket *t);
 	bool expect(unsigned int cmd);
 	void removeTransaction();
-
-
-	//
+    //
 	public slots:
 	//
 	virtual void Start(); // start everything under this driver's control
