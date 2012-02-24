@@ -492,7 +492,6 @@ void Opc_client_ae_Instance::Command(const QString & name, BYTE cmd, LPVOID lpPa
 		struct iec_item item_to_send;
 		struct iec_item* p_item;
 		u_int message_checksum = 0;
-		int kk;
 
 		memset(&item_to_send,0x00, sizeof(struct iec_item));
 
@@ -530,14 +529,19 @@ void Opc_client_ae_Instance::Command(const QString & name, BYTE cmd, LPVOID lpPa
 					
 					//Send message to ocp_client.exe ///////////////////////////////////////////////////////////////////
 					memcpy(buf, &item_to_send, sizeof(struct iec_item));
+
+					#ifdef USE_CHECKSUM
 					//////calculate checksum with checsum byte set to value zero////
-										
-					for(kk = 0;kk < sizeof(struct iec_item); kk++)
+					for(int kk = 0;kk < sizeof(struct iec_item); kk++)
 					{
 						message_checksum = message_checksum + buf[kk];
 					}
 					p_item = (struct iec_item*)buf;
 					p_item->checksum = message_checksum%256;
+					#else
+					p_item = (struct iec_item*)buf;
+					p_item->checksum = clearCrc((unsigned char *)buf, sizeof(struct iec_item));
+					#endif
 					////////////////////////////////////////////////////////////////
 					fifo_put(fifo_control_direction, buf, sizeof(struct iec_item));
 					//////////////////////////////////////////////////////////////////////////////

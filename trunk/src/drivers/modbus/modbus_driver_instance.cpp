@@ -243,7 +243,6 @@ void Modbus_driver_Instance::QueryResponse(QObject *p, const QString &c, int id,
 				struct iec_item item_to_send;
 				struct iec_item* p_item;
 				u_int message_checksum = 0;
-				int kk;
 
 				memset(&item_to_send,0x00, sizeof(struct iec_item));
 
@@ -256,14 +255,18 @@ void Modbus_driver_Instance::QueryResponse(QObject *p, const QString &c, int id,
 				item_to_send.msg_id = msg_sent_in_control_direction;
 				
 				memcpy(buf, &item_to_send, sizeof(struct iec_item));
+				#ifdef USE_CHECKSUM
 				//////calculate checksum with checsum byte set to value zero////
-									
-				for(kk = 0;kk < sizeof(struct iec_item); kk++)
+				for(int kk = 0;kk < sizeof(struct iec_item); kk++)
 				{
 					message_checksum = message_checksum + buf[kk];
 				}
 				p_item = (struct iec_item*)buf;
 				p_item->checksum = message_checksum%256;
+				#else
+				p_item = (struct iec_item*)buf;
+				p_item->checksum = clearCrc((unsigned char *)buf, sizeof(struct iec_item));
+				#endif
 				////////////////////////////////////////////////////////////////
 				fifo_put(fifo_control_direction, buf, sizeof(struct iec_item));
 				//////////////////////////////////////////////////////////////////////////////
@@ -394,10 +397,9 @@ void Modbus_driver_Instance::Tick()
 	//signed __int64 epoch_in_millisec;
 
 	unsigned char buf[sizeof(struct iec_item)];
-	int len, j;
+	int len;
 	const unsigned wait_limit_ms = 1;
 	struct iec_item* p_item;
-	u_int message_checksum, msg_checksum;
 
 	for(int i = 0; (len = fifo_get(fifo_monitor_direction, (char*)buf, sizeof(struct iec_item), wait_limit_ms)) >= 0; i += 1)	
 	{ 
@@ -418,6 +420,8 @@ void Modbus_driver_Instance::Tick()
 
 		//printf("---------------\n");
 
+		#ifdef USE_CHECKSUM
+		u_int message_checksum, msg_checksum;
 		//////calculate checksum with checsum byte set to value zero//////////////////////////////////////
 		msg_checksum = p_item->checksum;
 
@@ -425,7 +429,7 @@ void Modbus_driver_Instance::Tick()
 
 		message_checksum = 0;
 
-		for (j = 0; j < len; j++) 
+		for (int j = 0; j < len; j++) 
 		{ 
 			message_checksum = message_checksum + buf[j];
 		}
@@ -434,9 +438,16 @@ void Modbus_driver_Instance::Tick()
 
 		if(message_checksum != msg_checksum)
 		{
-			assert(0);
+			ExitProcess(0);
 		}
 		//////////////////end checksum////////////////////////////////////////
+		#else
+		unsigned char rc = clearCrc((unsigned char *)buf, sizeof(struct iec_item));
+		if(rc != 0)
+		{
+			ExitProcess(0);
+		}
+		#endif
 
 		QString value;
 

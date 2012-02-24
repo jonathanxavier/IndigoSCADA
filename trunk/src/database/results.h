@@ -32,7 +32,7 @@ extern "C"
 		double current_value;
 		double next_value;
 		unsigned char write_to_driver;
-		unsigned int checksum;
+		unsigned char checksum;
 	};
 
 	#define MAX_SCADA_POINTS 5000

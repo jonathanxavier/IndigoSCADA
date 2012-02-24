@@ -36,6 +36,7 @@
 #include "IndentedTrace.h"
 #include "fifo.h"
 #include "fifoc.h"
+#include "clear_crc_eight.h"
 
 struct structItem
 {

@@ -34,7 +34,7 @@ struct scada_point{
 	char name[35];
 	char tag[20];
 	double value;
-	unsigned int checksum;
+	unsigned char checksum;
 };
 
 #define MAX_SCADA_POINTS 5000
