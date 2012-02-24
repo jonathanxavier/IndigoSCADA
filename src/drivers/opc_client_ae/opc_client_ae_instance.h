@@ -17,6 +17,7 @@
 #include "IndentedTrace.h"
 #include "fifo.h"
 #include "fifoc.h"
+#include "clear_crc_eight.h"
 #include "iec104types.h"
 #include "iec_item.h"
 

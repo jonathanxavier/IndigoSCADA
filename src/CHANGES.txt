@@ -70,5 +70,4 @@ UNIT string
 );
 create index on TAGS.NAME;
 
-If you do not want to do this, please wait the next binary release.
 ---------------------------------------------------------------------------

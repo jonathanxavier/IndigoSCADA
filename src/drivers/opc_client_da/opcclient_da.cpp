@@ -679,7 +679,6 @@ int Opc_client_da_DriverThread::Async2Update()
 			const unsigned wait_limit_ms = 1;
 			char buf[sizeof(struct iec_item)];
 			struct iec_item* p_item;
-			u_int message_checksum, msg_checksum;
 			
 			for(n = 0; (len = fifo_get(Opc_client_da_DriverThread::fifo_control_direction, buf, sizeof(struct iec_item), wait_limit_ms)) >= 0; n += 1)
 			{ 
@@ -687,7 +686,9 @@ int Opc_client_da_DriverThread::Async2Update()
 
 				//printf("Receiving %d th message \n", p_item->msg_id);
 				IT_COMMENT1("Receiving %d th message \n", p_item->msg_id);
-				
+
+				#ifdef USE_CHECKSUM
+				u_int message_checksum, msg_checksum;
 				//////calculate checksum with checksum byte set to value zero//////////////////////////////////////
 				msg_checksum = p_item->checksum;
 
@@ -706,6 +707,14 @@ int Opc_client_da_DriverThread::Async2Update()
 					continue;
 				}
 				//////////////////end checksum////////////////////////////////////////
+				#else
+				unsigned char rc = clearCrc((unsigned char *)buf, sizeof(struct iec_item));
+				if(rc != 0)
+				{
+					printf("Cheksum error\n");
+					continue;
+				}
+				#endif
 
 				memcpy(&queued_item, buf, sizeof(struct iec_item));
 

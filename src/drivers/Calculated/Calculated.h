@@ -10,6 +10,7 @@
 #include "sptypes.h"
 #include "fifo.h"
 #include "fifoc.h"
+#include "clear_crc_eight.h"
 
 #ifdef CALCULATED_EXPORTS
 #define CALCULATED_API __declspec(dllexport)

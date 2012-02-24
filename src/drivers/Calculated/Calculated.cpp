@@ -338,6 +338,7 @@ extern "C"
 		
 		//Send message///////////////////////////////////////////////////////////////////
 		memcpy(buf, &item_to_send, sizeof(struct scada_point));
+		#ifdef USE_CHECKSUM
 		//////calculate checksum with checsum byte set to value zero////
 		struct scada_point* p_item;
 		u_int message_checksum = 0;
@@ -348,6 +349,11 @@ extern "C"
 		p_item = (struct scada_point*)buf;
 		p_item->checksum = message_checksum%256;
 		////////////////////////////////////////////////////////////////
+		#else
+		struct scada_point* p_item;
+		p_item = (struct scada_point*)buf;
+		p_item->checksum = clearCrc((unsigned char *)buf, sizeof(struct scada_point));
+		#endif
 		if(((CalculatedInstance*)this_)->p_fifo_script)
 		{
 			fifo_put(((CalculatedInstance*)this_)->p_fifo_script, buf, sizeof(struct scada_point));
@@ -622,7 +628,6 @@ void CalculatedInstance::Tick()
     int len;
 	const unsigned wait_limit_ms = 1;
 	struct scada_point* p_item;
-	u_int message_checksum, msg_checksum;
 
 	if(p_fifo_script)
 	{
@@ -643,6 +648,8 @@ void CalculatedInstance::Tick()
 				//IT_COMMENT1("rx <--- 0x%02x-\n", c);
 			}
 
+			#ifdef USE_CHECKSUM
+			u_int message_checksum, msg_checksum;
 			//////calculate checksum with checsum byte set to value zero//////////////////////////////////////
 			msg_checksum = p_item->checksum;
 
@@ -657,9 +664,16 @@ void CalculatedInstance::Tick()
 
 			if(message_checksum != msg_checksum)
 			{
-				assert(0);
+				ExitProcess(1);
 			}
 			//////////////////end checksum////////////////////////////////////////
+			#else
+			unsigned char rc = clearCrc((unsigned char *)buf, sizeof(struct scada_point));
+			if(rc != 0)
+			{
+				ExitProcess(1);
+			}
+			#endif
 			
 			if(p_item->write_to_driver)
 			{

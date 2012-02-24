@@ -359,6 +359,10 @@ InputName=CalculatedInputData
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\utilities\clear_crc_eight.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\embedEiC.c
 # End Source File
 # Begin Source File
