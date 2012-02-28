@@ -385,9 +385,9 @@ int main( int argc, char **argv )
 		if(n_read > 0)
 		{
 			// put the char data into a Bytes container
-			//Bytes bytes((unsigned char*)data_p, (unsigned char*)data_p + n_read);
+			Bytes bytes((unsigned char*)data_p, (unsigned char*)data_p + n_read);
 
-			//master_p->rxData(&bytes, 0);
+			master_p->rxData(&bytes, 0);
 		}
 		else	
 		{
@@ -403,9 +403,9 @@ int main( int argc, char **argv )
 			if(n_read > 0)
 			{
 				// put the char data into a Bytes container
-				//Bytes bytes((unsigned char*)data_p, (unsigned char*)data_p + n_read);
+				Bytes bytes((unsigned char*)data_p, (unsigned char*)data_p + n_read);
 
-				//master_p->rxData(&bytes, 0);
+				master_p->rxData(&bytes, 0);
 			}
 			else
 			{
