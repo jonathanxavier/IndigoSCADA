@@ -19,6 +19,7 @@
 #include "master.hpp"
 #include "datalink.hpp"
 #include "custom.hpp"
+#include "clear_crc_eight.h"
 #include "iec104types.h"
 #include "iec_item.h"
 #include "process.h"
@@ -384,9 +385,9 @@ int main( int argc, char **argv )
 		if(n_read > 0)
 		{
 			// put the char data into a Bytes container
-			Bytes bytes((unsigned char*)data_p, (unsigned char*)data_p + n_read);
+			//Bytes bytes((unsigned char*)data_p, (unsigned char*)data_p + n_read);
 
-			master_p->rxData(&bytes, 0);
+			//master_p->rxData(&bytes, 0);
 		}
 		else	
 		{
@@ -402,9 +403,9 @@ int main( int argc, char **argv )
 			if(n_read > 0)
 			{
 				// put the char data into a Bytes container
-				Bytes bytes((unsigned char*)data_p, (unsigned char*)data_p + n_read);
+				//Bytes bytes((unsigned char*)data_p, (unsigned char*)data_p + n_read);
 
-				master_p->rxData(&bytes, 0);
+				//master_p->rxData(&bytes, 0);
 			}
 			else
 			{
@@ -445,10 +446,8 @@ void PipeWorker(void* pParam)
 	OVERLAPPED ovrp[N_PIPES];
 	HANDLE evnt[N_PIPES];
 	DWORD rc, len, pipe_id;
-    unsigned long int j;
     unsigned char buf[sizeof(struct iec_item)];
     struct iec_item* p_item;
-    u_int message_checksum, msg_checksum;
 	char pipe_name[150];
     int i;
 
@@ -564,6 +563,9 @@ void PipeWorker(void* pParam)
 					//
 				//}
 
+				#ifdef USE_CHECKSUM
+				unsigned long int j;
+				u_int message_checksum, msg_checksum;
 				//////calculate checksum with checksum byte set to value zero/////////
 				msg_checksum = p_item->checksum;
 
@@ -585,6 +587,13 @@ void PipeWorker(void* pParam)
 					ExitProcess(0);
 				}
 				//////////////////end checksum////////////////////////////////////////
+				#else
+				rc = clearCrc((unsigned char *)buf, sizeof(struct iec_item));
+				if(rc != 0)
+				{
+					ExitProcess(0);
+				}
+				#endif
 
 				if(p_item->iec_obj.ioa == 4004)
 				{ 

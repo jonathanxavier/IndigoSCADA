@@ -9,7 +9,6 @@ Credit to JohnPaul Adamovsky ( logarithm69@hotmail.com )
 
 #define BYTE_WIDTH 8
 #define REMAINDER_WIDTH 8
-#define MESSAGE_LENGTH 3
 
 // Define a boolean type as an enumeration.
 typedef enum { FALSE = 0, TRUE = 1 } Bool;
@@ -94,6 +93,8 @@ void printByteInBinary(unsigned char ThisByte)
 }
 
 #ifdef EXECUTE_CRC_TEST
+
+#define MESSAGE_LENGTH 3
 
 int main(){
 	unsigned int X;

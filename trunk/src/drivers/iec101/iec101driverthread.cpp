@@ -212,15 +212,12 @@ void Iec101DriverThread::EndProcess(int nIndex)
 	}
 }
 
-#include "iec104types.h"
-#include "iec_item.h"
-
 int Iec101DriverThread::send_ack_to_child(int address, int data, char* pipeName)
 {
 	char buf[sizeof(struct iec_item)];
 	struct iec_item* p_item;
 	u_int message_checksum = 0;
-	int kk, rc;
+	int rc;
 	int len = sizeof(struct iec_item);
 						
 	p_item = (struct iec_item*)buf;
@@ -232,14 +229,18 @@ int Iec101DriverThread::send_ack_to_child(int address, int data, char* pipeName)
 	p_item->iec_obj.o.type37.counter = data;
 	p_item->msg_id = msg_id++;
 
+	#ifdef USE_CHECKSUM
 	//////calculate checksum with checksum byte set to value zero////
-	for(kk = 0;kk < len; kk++)
+	for(int kk = 0;kk < len; kk++)
 	{
 		message_checksum = message_checksum + buf[kk];
 	}
 	
 	p_item->checksum = message_checksum%256;
 	////////////////////////////////////////////////////////////////
+	#else
+	p_item->checksum = clearCrc((unsigned char *)buf, sizeof(struct iec_item));
+	#endif
 
 	rc = pipe_put(buf, sizeof(struct iec_item), pipeName); //Send to process_manager the packet (the first packet is lost)
 
