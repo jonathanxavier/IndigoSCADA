@@ -22,25 +22,19 @@
 
 extern "C"
 { 
-	typedef struct scada_point SC_PT;
-	//begin variabili e funzioni condivise con l'interprete EiC
 
-	struct scada_point{
-		char name[35];
-		char tag[20];
-		//double previous_value;
-		double current_value;
-		double next_value;
-		unsigned char write_to_driver;
-		unsigned char checksum;
-	};
+typedef struct scada_point SC_PT;
+//begin variabili e funzioni condivise con l'interprete EiC
 
-	#define MAX_SCADA_POINTS 5000
+#include "scada_point.h"
+
+#define MAX_SCADA_POINTS 5000
 
 QSEXPORT extern struct scada_point scada_db[MAX_SCADA_POINTS];
 	
-	/** mutex for thread to stop the threads hitting data at the same time. */
+/** mutex for thread to stop the threads hitting data at the same time. */
 QSEXPORT extern ins_mutex_t * mut;
+
 };
 
 #include "iec104types.h"

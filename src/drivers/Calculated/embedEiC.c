@@ -45,15 +45,7 @@ void EiC_setMessageDisplay(void (*)(char *));
 
 typedef struct scada_point SC_PT;
 
-struct scada_point{
-	char name[35];
-	char tag[20];
-	//double previous_value;
-	double current_value;
-	double next_value;
-	unsigned char write_to_driver;
-	unsigned char checksum;
-};
+#include "scada_point.h"
 
 #define MAX_SCADA_POINTS 5000
 

@@ -686,36 +686,14 @@ int Opc_client_da_DriverThread::Async2Update()
 
 				//printf("Receiving %d th message \n", p_item->msg_id);
 				IT_COMMENT1("Receiving %d th message \n", p_item->msg_id);
-
-				#ifdef USE_CHECKSUM
-				u_int message_checksum, msg_checksum;
-				//////calculate checksum with checksum byte set to value zero//////////////////////////////////////
-				msg_checksum = p_item->checksum;
-
-				p_item->checksum = 0; //azzero
-
-				message_checksum = 0;
-				for (int k = 0; k < len; k++) 
-				{ 
-					message_checksum = message_checksum + buf[k];
-				}
-				message_checksum = message_checksum%256;
-
-				if(message_checksum != msg_checksum)
-				{
-					printf("Cheksum error\n");
-					continue;
-				}
-				//////////////////end checksum////////////////////////////////////////
-				#else
+				
 				unsigned char rc = clearCrc((unsigned char *)buf, sizeof(struct iec_item));
 				if(rc != 0)
 				{
 					printf("Cheksum error\n");
 					continue;
 				}
-				#endif
-
+				
 				memcpy(&queued_item, buf, sizeof(struct iec_item));
 
 				/////////////////////write command///////////////////////////////////////////////////////////

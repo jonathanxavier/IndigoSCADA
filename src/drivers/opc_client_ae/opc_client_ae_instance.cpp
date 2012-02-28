@@ -487,15 +487,9 @@ void Opc_client_ae_Instance::Command(const QString & name, BYTE cmd, LPVOID lpPa
 	{
 		USES_CONVERSION;
 
-		//Invio C_SC_NA_1
-		char buf[sizeof(struct iec_item)];
+		//Send C_SC_NA_1////////////////////////////////////////////////////////////////
 		struct iec_item item_to_send;
-		struct iec_item* p_item;
-		u_int message_checksum = 0;
-
 		memset(&item_to_send,0x00, sizeof(struct iec_item));
-
-		item_to_send.iec_type = C_SC_NA_1;
 
 		for(unsigned i = 0; i < pConnect->g_dwNumItems; i ++)
 		{
@@ -520,32 +514,13 @@ void Opc_client_ae_Instance::Command(const QString & name, BYTE cmd, LPVOID lpPa
 						}
 						break;
 					}
-					
+
+					item_to_send.iec_type = C_SC_NA_1;
 					item_to_send.hClient = pConnect->Item[i].hClient;
-
-					msg_sent_in_control_direction++;
-
-					item_to_send.msg_id = msg_sent_in_control_direction;
-					
-					//Send message to ocp_client.exe ///////////////////////////////////////////////////////////////////
-					memcpy(buf, &item_to_send, sizeof(struct iec_item));
-
-					#ifdef USE_CHECKSUM
-					//////calculate checksum with checsum byte set to value zero////
-					for(int kk = 0;kk < sizeof(struct iec_item); kk++)
-					{
-						message_checksum = message_checksum + buf[kk];
-					}
-					p_item = (struct iec_item*)buf;
-					p_item->checksum = message_checksum%256;
-					#else
-					p_item = (struct iec_item*)buf;
-					p_item->checksum = clearCrc((unsigned char *)buf, sizeof(struct iec_item));
-					#endif
-					////////////////////////////////////////////////////////////////
-					fifo_put(fifo_control_direction, buf, sizeof(struct iec_item));
-					//////////////////////////////////////////////////////////////////////////////
-
+					item_to_send.msg_id = msg_sent_in_control_direction++;
+					item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
+					fifo_put(fifo_control_direction, (char *)&item_to_send, sizeof(struct iec_item));
+					////////////////////////////////////////////////////////////////////////////////
 				//}
 			}
 		}

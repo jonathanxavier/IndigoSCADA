@@ -562,38 +562,12 @@ void PipeWorker(void* pParam)
 					//fflush(stderr);
 					//
 				//}
-
-				#ifdef USE_CHECKSUM
-				unsigned long int j;
-				u_int message_checksum, msg_checksum;
-				//////calculate checksum with checksum byte set to value zero/////////
-				msg_checksum = p_item->checksum;
-
-				p_item->checksum = 0; //azzero
-
-				message_checksum = 0;
-
-				for(j = 0; j < len; j++) 
-				{ 
-					message_checksum = message_checksum + buf[j];
-				}
-
-				message_checksum = message_checksum%256;
-
-				if(message_checksum != msg_checksum)
-				{
-					fprintf(stderr, "Cheksum error\n");
-					fflush(stderr);
-					ExitProcess(0);
-				}
-				//////////////////end checksum////////////////////////////////////////
-				#else
+				
 				rc = clearCrc((unsigned char *)buf, sizeof(struct iec_item));
 				if(rc != 0)
 				{
 					ExitProcess(0);
 				}
-				#endif
 
 				if(p_item->iec_obj.ioa == 4004)
 				{ 
