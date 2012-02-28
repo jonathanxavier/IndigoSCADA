@@ -13,6 +13,10 @@
 #ifndef IEC_ITEM__H
 #define IEC_ITEM__H
 
+#if defined( _MSC_VER)          /* Microsoft C */
+    #pragma pack(1)             /* Byte Alignment   */
+#endif
+
 /* Information object */
 struct iec_object {
 	u_int		ioa;	/* information object address */
@@ -63,15 +67,14 @@ struct iec_object {
 #define ITEMID_LENGTH 99
 
 //Record format of configuration database
-struct iec_item
-{
+struct iec_item {
+
 	char opc_server_item_id[ITEMID_LENGTH]; //Item ID of opc server
     u_char iec_type;
 	struct iec_object iec_obj;
 	DWORD hClient; //Index inside table is equal to hClient of table struct structItem<--------------INDEX, starting from 1
-	unsigned char cause; //spontaneos or general interrogation cause
+	unsigned char cause; //spontaneous or general interrogation cause
 	u_int   msg_id; //ID of the message
-	u_char	checksum; //Checksum of the message
 	unsigned int ioa_control_center; //unstructured
 	u_short casdu; //IEC 104 CASDU where this record is allocated
     u_char	is_neg; //positive == 0 or negative == 1
@@ -79,6 +82,11 @@ struct iec_item
 		double	commandValue;
 		char command_string[13];
 	};
+	u_char	checksum; //Checksum of the message, must be the last if filled with CRC 8
 };
 
+#if defined( _MSC_VER)          /* Microsoft C */
+    #pragma pack()              /* Byte Alignment   */
 #endif
+
+#endif //IEC_ITEM__H
