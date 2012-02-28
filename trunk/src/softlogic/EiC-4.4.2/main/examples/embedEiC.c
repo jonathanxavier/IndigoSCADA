@@ -30,12 +30,7 @@ void EiC_switches(char *);
 void EiC_parseString(char * command,...);
 void EiC_setMessageDisplay(void (*)(char *));
 
-struct scada_point{
-	char name[35];
-	char tag[20];
-	double value;
-	unsigned char checksum;
-};
+#include "scada_point.h"
 
 #define MAX_SCADA_POINTS 5000
 

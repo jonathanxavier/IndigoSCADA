@@ -238,38 +238,16 @@ void Modbus_driver_Instance::QueryResponse(QObject *p, const QString &c, int id,
 
 				printf("IOA command = %d, value = %d\n", ioa_command, command_value);
 
-				//Send C_SC_NA_1
-				char buf[sizeof(struct iec_item)];
+				//Send C_SC_NA_1//////////////////////////////////////////////////////////////////////////
 				struct iec_item item_to_send;
-				struct iec_item* p_item;
-				u_int message_checksum = 0;
-
 				memset(&item_to_send,0x00, sizeof(struct iec_item));
-
 				item_to_send.iec_type = C_SC_NA_1;
 				item_to_send.iec_obj.ioa = ioa_command;
 				item_to_send.iec_obj.o.type45.scs = command_value;
-					
-				msg_sent_in_control_direction++;
-
-				item_to_send.msg_id = msg_sent_in_control_direction;
-				
-				memcpy(buf, &item_to_send, sizeof(struct iec_item));
-				#ifdef USE_CHECKSUM
-				//////calculate checksum with checsum byte set to value zero////
-				for(int kk = 0;kk < sizeof(struct iec_item); kk++)
-				{
-					message_checksum = message_checksum + buf[kk];
-				}
-				p_item = (struct iec_item*)buf;
-				p_item->checksum = message_checksum%256;
-				#else
-				p_item = (struct iec_item*)buf;
-				p_item->checksum = clearCrc((unsigned char *)buf, sizeof(struct iec_item));
-				#endif
-				////////////////////////////////////////////////////////////////
-				fifo_put(fifo_control_direction, buf, sizeof(struct iec_item));
-				//////////////////////////////////////////////////////////////////////////////
+				item_to_send.msg_id = msg_sent_in_control_direction++;
+				item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
+				fifo_put(fifo_control_direction, (char *)&item_to_send, sizeof(struct iec_item));
+				///////////////////////////////////////////////////////////////////////////////////////////
 			}
 		}
 		break;
@@ -420,34 +398,11 @@ void Modbus_driver_Instance::Tick()
 
 		//printf("---------------\n");
 
-		#ifdef USE_CHECKSUM
-		u_int message_checksum, msg_checksum;
-		//////calculate checksum with checsum byte set to value zero//////////////////////////////////////
-		msg_checksum = p_item->checksum;
-
-		p_item->checksum = 0; //azzero
-
-		message_checksum = 0;
-
-		for (int j = 0; j < len; j++) 
-		{ 
-			message_checksum = message_checksum + buf[j];
-		}
-
-		message_checksum = message_checksum%256;
-
-		if(message_checksum != msg_checksum)
-		{
-			ExitProcess(0);
-		}
-		//////////////////end checksum////////////////////////////////////////
-		#else
 		unsigned char rc = clearCrc((unsigned char *)buf, sizeof(struct iec_item));
 		if(rc != 0)
 		{
 			ExitProcess(0);
 		}
-		#endif
 
 		QString value;
 

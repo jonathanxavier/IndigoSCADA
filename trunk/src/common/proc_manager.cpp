@@ -108,41 +108,20 @@ void EndProcess(int nIndex)
 #include "iec104types.h"
 #include "iec_item.h"
 
-int pipe_put(char *buf, int len, char* pipe_name);
+int pipe_put(char* pipe_name, char *buf, int len);
 
 static msg_id = 0;
 
 int send_ack_to_child(int address, int data, char* pipeName)
 {
-	char buf[sizeof(struct iec_item)];
-	struct iec_item* p_item;
-	u_int message_checksum = 0;
-	int kk, rc;
-	int len = sizeof(struct iec_item);
-						
-	p_item = (struct iec_item*)buf;
-
-	memset(p_item, 0x00, sizeof(struct iec_item));
-
-	p_item->iec_type = 37;
-	p_item->iec_obj.ioa = address;
-	p_item->iec_obj.o.type37.counter = data;
-	p_item->msg_id = msg_id++;
-
-	#ifdef USE_CHECKSUM
-	//////calculate checksum with checksum byte set to value zero////
-	for(kk = 0;kk < len; kk++)
-	{
-		message_checksum = message_checksum + buf[kk];
-	}
-	
-	p_item->checksum = message_checksum%256;
-	////////////////////////////////////////////////////////////////
-	#else
-	p_item->checksum = clearCrc((unsigned char *)buf, sizeof(struct iec_item));
-	#endif
-
-	rc = pipe_put(buf, sizeof(struct iec_item), pipeName); //Send to process_manager the packet (the first packet is lost)
+	struct iec_item item_to_send;
+	memset(&item_to_send,0x00, sizeof(struct iec_item));
+	item_to_send.iec_type = 37;
+	item_to_send.iec_obj.ioa = address;
+	item_to_send.iec_obj.o.type37.counter = data;
+	item_to_send.msg_id = msg_id++;
+	item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
+	int rc = pipe_put(pipeName, (char *)&item_to_send, sizeof(struct iec_item)); //Send to process_manager the packet (the first packet is lost)
 
 	return rc;
 }
@@ -231,7 +210,7 @@ void begin_process_checker(struct args* arg)
 	}
 }
 
-int pipe_put(char *buf, int len, char* pipe_name)
+int pipe_put(char* pipe_name, char *buf, int len)
 { 
 	int rc = 0;
 	unsigned long written, mode; 

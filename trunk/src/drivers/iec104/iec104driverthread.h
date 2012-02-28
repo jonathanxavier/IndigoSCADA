@@ -66,7 +66,7 @@ class IEC_104_DRIVERDRV Iec104DriverThread : public DriverThread
     bool StartProcess(char* pCommandLine, char* pWorkingDir);
     void EndProcess(int nIndex);
     int send_ack_to_child(int address, int data, char* pipeName);
-    int pipe_put(char *buf, int len, char* pipe_name);
+    int pipe_put(char* pipe_name, char *buf, int len);
 	/////////////////////////////////////////////////////////////////////////////////////////
 };
 
