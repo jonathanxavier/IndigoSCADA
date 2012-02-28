@@ -47,7 +47,7 @@ DNP3 runs, need testing with RTU. Volunteers are welcome
 21-02-2012
 With this release the real time config database has changed.
 The table TAGS has a new column UNIT.
-Is is necessary to create a new configdb.fdb
+It is necessary to create a new configdb.fdb
 using C:\scada\init_db\rtdbver356\configdb.sql with the following create table TAGS:
 
 --tag configuration
