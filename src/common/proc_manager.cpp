@@ -104,6 +104,7 @@ void EndProcess(int nIndex)
 
 ///////////////////////////////////////////////////////////////////////////
 #include <winsock2.h>
+#include "clear_crc_eight.h"
 #include "iec104types.h"
 #include "iec_item.h"
 
@@ -128,6 +129,7 @@ int send_ack_to_child(int address, int data, char* pipeName)
 	p_item->iec_obj.o.type37.counter = data;
 	p_item->msg_id = msg_id++;
 
+	#ifdef USE_CHECKSUM
 	//////calculate checksum with checksum byte set to value zero////
 	for(kk = 0;kk < len; kk++)
 	{
@@ -136,6 +138,9 @@ int send_ack_to_child(int address, int data, char* pipeName)
 	
 	p_item->checksum = message_checksum%256;
 	////////////////////////////////////////////////////////////////
+	#else
+	p_item->checksum = clearCrc((unsigned char *)buf, sizeof(struct iec_item));
+	#endif
 
 	rc = pipe_put(buf, sizeof(struct iec_item), pipeName); //Send to process_manager the packet (the first packet is lost)
 
