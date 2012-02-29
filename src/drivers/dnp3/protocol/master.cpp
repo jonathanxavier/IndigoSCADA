@@ -49,16 +49,16 @@ Master::Master( MasterConfig&                 masterConfig,
     // create each outstation object and store it in a map 
     for (i=0; i<numStations; i++)
     {
-	Station *op;
-	stationConfig[i].master_p = this;
-	op = new Station(masterConfig.addr, stationConfig[i], db_p);
-	stationMap[op->addr] = op;
+	    Station *op;
+	    stationConfig[i].master_p = this;
+	    op = new Station(masterConfig.addr, stationConfig[i], db_p);
+	    stationMap[op->addr] = op;
 
-	// fill in the station info to be used by the transport function
-	info.session_p = &op->session;
-	info.stats_p = &op->stats;
-	info.addr = op->addr;
-	stationInfoMap[ op->addr] = info;;
+	    // fill in the station info to be used by the transport function
+	    info.session_p = &op->session;
+	    info.stats_p = &op->stats;
+	    info.addr = op->addr;
+	    stationInfoMap[ op->addr] = info;
     }
 
     currentStationPair = stationMap.begin();
@@ -72,10 +72,12 @@ Master::Master( MasterConfig&                 masterConfig,
 void Master::enableSecureAuthentication(DnpAddr_t stationAddr, bool enable)
 {
     assert (stationMap.count(stationAddr) > 0);
+
     if (enable)
     {
-	stationMap[ stationAddr]->secAuth.init();
+    	stationMap[ stationAddr]->secAuth.init();
     }
+
     secureAuthenticationEnabled = enable;
 }
 
@@ -108,26 +110,27 @@ DnpStat_t Master::rxData(Bytes* buf, Uptime_t timeRxd)
 
     while (buf->size() > 0)
     {
-	Lpdu::UserData& segment = dl.rxData( *buf);
-	if (segment.data.size() > 0)
-	{
-	    // this data has completed a segment
-	    DnpAddr_t addr;
+	    Lpdu::UserData& segment = dl.rxData( *buf);
 
-	    if (timer_p->isActive(TimerInterface::RESPONSE))
-		// reset the timer so that large multi segment responses
-		// will have a chance to get through
-		timer_p->activate(TimerInterface::RESPONSE);
-
-	    addr = tf_p->rxSegment( segment);
-	    if (addr != TransportFunction::FRAGMENT_NOT_FOUND)
+	    if (segment.data.size() > 0)
 	    {
-		// this data had completed a fragment
-		lastRxdAsdu = stn_p->session.rxFragment;
-		stn_p = stationMap[addr];
-		processRxdFragment();
+	        // this data has completed a segment
+	        DnpAddr_t addr;
+
+	        if (timer_p->isActive(TimerInterface::RESPONSE))
+		    // reset the timer so that large multi segment responses
+		    // will have a chance to get through
+		    timer_p->activate(TimerInterface::RESPONSE);
+
+	        addr = tf_p->rxSegment( segment);
+	        if (addr != TransportFunction::FRAGMENT_NOT_FOUND)
+	        {
+		        // this data had completed a fragment
+		        lastRxdAsdu = stn_p->session.rxFragment;
+		        stn_p = stationMap[addr];
+		        processRxdFragment();
+	        }
 	    }
-	}
     }
 
     return stn_p->stats.get(Station::STATE);
@@ -138,54 +141,55 @@ DnpStat_t Master::timeout(TimerInterface::TimerId t)
 
     if (t == TimerInterface::RESPONSE)
     {
-	if (secureAuthenticationEnabled)
-	{
-	    DnpStat_t state;
-	    state = stn_p->secAuth.stats.get( SecureAuthentication::STATE);
-	    if ((state != SecureAuthentication::MASTER_IDLE) &&
-		(state != SecureAuthentication::INIT))
+	    if (secureAuthenticationEnabled)
 	    {
-		// we must be waiting for something so the response
-		// timeout will apply to the secure auth object
-		stn_p->secAuth.responseTimeout();
-	    }
-	}
+	        DnpStat_t state;
+	        state = stn_p->secAuth.stats.get( SecureAuthentication::STATE);
 
-	// were we waiting for anything?
-	if (stn_p->stats.get(Station::STATE) != Station::IDLE)
-	{
-	    stn_p->stats.increment( Station::RESPONSE_TIMEOUT);
-	    stn_p->stats.increment( Station::CONSECUTIVE_TIMEOUT);
-
-	    if (stn_p->stats.get(Station::CONSECUTIVE_TIMEOUT)>=maxConsecutive)
-	    {       
-		if (stn_p->stats.get(Station::COMMUNICATION) == 1)
-		{
-		    stn_p->stats.set(Station::COMMUNICATION, 0);
-		    // /* notify database */
-		    /* we should know attempt integrity polls */
-		    stn_p->sendIntegrityPoll = 1;
-		
-		    // 		    if (sendKeepAlives)
-		    // 			if endPoint.connectionIsUp()
-		}
+	        if ((state != SecureAuthentication::MASTER_IDLE) &&
+		    (state != SecureAuthentication::INIT))
+	        {
+		        // we must be waiting for something so the response
+		        // timeout will apply to the secure auth object
+		        stn_p->secAuth.responseTimeout();
+	        }
 	    }
 
-	    // don't bother waiting any longer for a response
-	    completedTransaction();
-	}
+	    // were we waiting for anything?
+	    if (stn_p->stats.get(Station::STATE) != Station::IDLE)
+	    {
+	        stn_p->stats.increment( Station::RESPONSE_TIMEOUT);
+	        stn_p->stats.increment( Station::CONSECUTIVE_TIMEOUT);
+
+	        if (stn_p->stats.get(Station::CONSECUTIVE_TIMEOUT)>=maxConsecutive)
+	        {       
+		        if (stn_p->stats.get(Station::COMMUNICATION) == 1)
+		        {
+		            stn_p->stats.set(Station::COMMUNICATION, 0);
+		            // /* notify database */
+		            /* we should know attempt integrity polls */
+		            stn_p->sendIntegrityPoll = 1;
+		        
+		            // 		    if (sendKeepAlives)
+		            // 			if endPoint.connectionIsUp()
+		        }
+	        }
+
+	        // don't bother waiting any longer for a response
+	        completedTransaction();
+	    }
     }
     else if (t == TimerInterface::KEY_CHANGE)
     {
-	stn_p->secAuth.keyChangeTimeout();
+    	stn_p->secAuth.keyChangeTimeout();
     }
     else if (t == TimerInterface::CHALLENGE)
     {
-	stn_p->secAuth.challengeTimeout();
+	    stn_p->secAuth.challengeTimeout();
     }
     else
     {
-	assert(0);
+	    assert(0);
     }
 
     return stn_p->stats.get(Station::STATE);

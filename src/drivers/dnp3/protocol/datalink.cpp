@@ -145,7 +145,7 @@ Lpdu::UserData& Datalink::rxData(Bytes& data)
 
 void Datalink::processRxdLpdu()
 {
-    DnpAddr_t      dest = rxLpdu.getDest();;
+    DnpAddr_t      dest = rxLpdu.getDest();
     unsigned int   func = rxLpdu.getFunctionCode();
     int            broadcast;
 

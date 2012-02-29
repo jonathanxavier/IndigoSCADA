@@ -31,8 +31,6 @@ DriverThread *Opc_client_ae_DriverThread::StaticThis = NULL;
 
 struct structItem* Opc_client_ae_DriverThread::Item;
 
-bool  Opc_client_ae_DriverThread::mandare_eventi = false;
-
 unsigned int msg_sent_in_control_direction = 0;
 
 fifo_h Opc_client_ae_DriverThread::fifo_control_direction = NULL; //fifo in control direction: SCADA-------------> RTU
@@ -43,14 +41,29 @@ void Opc_client_ae_DriverThread::run()
 
 	IT_COMMENT("Opc_client_ae_DriverThread Running");
 
-	int nRet = OpcStart(); // connect to an OPC server
-	if(nRet) return;
-	
-	Update();
+    //for(int i = 0;;i++) //Retry loop on connection fault with OPC server
+    //{
+        //if(i > 0)
+        //{
+        //    UnitUnFail("Trying to reconnect to OPC server...");
+        //}
 
-	OpcStop();
+	    int nRet = OpcStart(); // connect to an OPC server
+	    if(nRet) return;
+	    
+	    Update();
 
-	UnitFail("OPC driver stopped");
+	    OpcStop();
+
+	    UnitFail("OPC driver stopped");
+
+        //if(fExit)
+        //{
+        //    break; //Exit retry loop
+        //}
+
+        //Sleep(20000);
+    //}
 }
 
 void epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch_in_millisec)
@@ -234,8 +247,6 @@ void Opc_client_ae_DriverThread::SendEvent2(ONEVENTSTRUCT* pEvent)
 	fflush(stderr);
 */
 
-	
-	//if(Opc_client_ae_DriverThread::mandare_eventi)  //27-10-09
 	{
 		//ItemID = QString((const char*)W2T(Item[phClientItem - 1].wszName));
 

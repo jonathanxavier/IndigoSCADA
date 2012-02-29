@@ -431,7 +431,6 @@ int Opc_client_da_DriverThread::AsyncRead(bool bFlag)
 	{
 		if(fExit)
 		{
-			mandare_eventi = false;
 			IT_COMMENT("Opc_client_da_DriverThread exiting....");
 			m_hevtEnd.signal();
 			break; //terminate the thread
@@ -645,7 +644,6 @@ int Opc_client_da_DriverThread::Async2Update()
 	{
 		if(fExit)
 		{
-			mandare_eventi = false;
 			IT_COMMENT("Opc_client_da_DriverThread exiting....");
 			m_hevtEnd.signal();
 			break; //terminate the thread
@@ -677,25 +675,19 @@ int Opc_client_da_DriverThread::Async2Update()
 			struct iec_item queued_item;
 			int n, len;
 			const unsigned wait_limit_ms = 1;
-			char buf[sizeof(struct iec_item)];
-			struct iec_item* p_item;
-			
-			for(n = 0; (len = fifo_get(Opc_client_da_DriverThread::fifo_control_direction, buf, sizeof(struct iec_item), wait_limit_ms)) >= 0; n += 1)
+						
+			for(n = 0; (len = fifo_get(Opc_client_da_DriverThread::fifo_control_direction, (char*)&queued_item, sizeof(struct iec_item), wait_limit_ms)) >= 0; n += 1)
 			{ 
-				p_item = (struct iec_item*)buf;
-
-				//printf("Receiving %d th message \n", p_item->msg_id);
-				IT_COMMENT1("Receiving %d th message \n", p_item->msg_id);
+				//printf("Receiving %d th message \n", queued_item.msg_id);
+				IT_COMMENT1("Receiving %d th message \n", queued_item.msg_id);
 				
-				unsigned char rc = clearCrc((unsigned char *)buf, sizeof(struct iec_item));
+				unsigned char rc = clearCrc((unsigned char *)&queued_item, sizeof(struct iec_item));
 				if(rc != 0)
 				{
-					printf("Cheksum error\n");
+					printf("Cheksum error. Lost a command.\n");
 					continue;
 				}
 				
-				memcpy(&queued_item, buf, sizeof(struct iec_item));
-
 				/////////////////////write command///////////////////////////////////////////////////////////
 				#ifdef COMMAND_WITH_TIME
 				if(queued_item.iec_type == C_SC_TB_1)
@@ -1079,7 +1071,6 @@ int Opc_client_da_DriverThread::Async2Read(bool bFlag)
 	{
 		if(fExit)
 		{
-			mandare_eventi = false;
 			IT_COMMENT("Opc_client_da_DriverThread exiting....");
 			m_hevtEnd.signal();
 			break; //terminate the thread
@@ -1201,7 +1192,7 @@ int Opc_client_da_DriverThread::OpcStart()
 	{
 		//COM connection
 
-		// browse registry for OPC 1.0A Servers
+		// browse registry for OPC servers
 		HKEY hk = HKEY_CLASSES_ROOT;
 		TCHAR szKey[MAX_KEYLEN];
 
@@ -1248,7 +1239,6 @@ int Opc_client_da_DriverThread::OpcStart()
 
 		printf("Server ID found.\n");
 		IT_COMMENT("Server ID found.\n");
-
 		
 		hr = ::CoInitializeEx(NULL,COINIT_MULTITHREADED); // setup COM lib
 
@@ -2216,7 +2206,6 @@ void Opc_client_da_DriverThread::ShowError(HRESULT hr, LPCSTR pszError)
 
 void Opc_client_da_DriverThread::ShowMessage(HRESULT hr, LPCSTR pszError, const char* name)
 {
-	//if(Opc_client_da_DriverThread::mandare_eventi)
 	{	
 		LPWSTR pwszError = NULL;
 

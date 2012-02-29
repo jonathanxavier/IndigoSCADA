@@ -31,8 +31,6 @@ DriverThread *Opc_client_hda_DriverThread::StaticThis = NULL;
 
 struct structItem* Opc_client_hda_DriverThread::Item;
 
-bool  Opc_client_hda_DriverThread::mandare_eventi = false;
-
 unsigned int msg_sent_in_control_direction = 0;
 
 fifo_h Opc_client_hda_DriverThread::fifo_control_direction = NULL; //fifo in control direction: SCADA-------------> RTU

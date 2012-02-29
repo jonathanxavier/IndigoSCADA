@@ -85,8 +85,7 @@ class OPC_CLIENT_DADRV Opc_client_da_DriverThread : public DriverThread
 		fifo_control_direction = ((Opc_client_da_Instance*)Parent)->fifo_control_direction;
 	};
 
-		//Questo destructor viene chimato solo sulla Disconnect e non quando
-		//spento il programma, si potrebbe usare la static Opc_client_da_DriverThread OpcClients[3];
+	//Questo destructor is callen on Disconnect
 	~Opc_client_da_DriverThread()
 	{
 		IT_IT("Opc_client_da_DriverThread::~Opc_client_da_DriverThread");
@@ -113,8 +112,6 @@ class OPC_CLIENT_DADRV Opc_client_da_DriverThread : public DriverThread
 	/////////////comandi/////////////////////////////////
 	static fifo_h fifo_control_direction; //fifo in control direction: SCADA-------------> RTU
 	/////////////////////////////////////////////////////
-
-	static bool mandare_eventi;
 
 	// group interfaces
 	IDataObject *g_pIDataObject;
@@ -155,8 +152,6 @@ class OPC_CLIENT_DADRV Opc_client_da_DriverThread : public DriverThread
 	static DriverThread *StaticThis;
 	static signed __int64 Epoch_from_FILETIME(const FILETIME *fileTime);
 	//static QString Epoc_from_FILETIME_fast(const FILETIME *fileTime);
-	
-	//static Opc_client_da_DriverThread OpcClients[3];
 
 	static void post_val(SpValue &v, QString &name);
 

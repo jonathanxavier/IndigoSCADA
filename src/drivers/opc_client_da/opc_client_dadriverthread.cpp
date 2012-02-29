@@ -19,7 +19,6 @@
 *Returns:none
 */
 
-//Opc_client_da_DriverThread Opc_client_da_DriverThread::OpcClients[3];
 bool  Opc_client_da_DriverThread::g_bWriteComplete = true;
 bool  Opc_client_da_DriverThread::g_bReadComplete = true;
 bool  Opc_client_da_DriverThread::g_bPoll = false; // poll for values or async updates
@@ -33,8 +32,6 @@ DriverThread *Opc_client_da_DriverThread::StaticThis = NULL;
 
 struct structItem* Opc_client_da_DriverThread::Item;
 
-bool  Opc_client_da_DriverThread::mandare_eventi = false;
-
 unsigned int msg_sent_in_control_direction = 0;
 
 fifo_h Opc_client_da_DriverThread::fifo_control_direction = NULL; //fifo in control direction: SCADA-------------> RTU
@@ -45,28 +42,43 @@ void Opc_client_da_DriverThread::run()
 
 	IT_COMMENT("Opc_client_da_DriverThread Running");
 
-	int nRet = OpcStart(); // connect to an OPC server
-	if(nRet) return;
+    //for(int i = 0;; i++)  //Retry loop on connection fault with OPC server
+    //{
+       //if(i > 0)
+        //{
+        //    UnitUnFail("Trying to reconnect to OPC server...");
+        //}
 
-	nRet = AddItems(); // add some items
-	if(nRet) return;
+	    int nRet = OpcStart(); // connect to an OPC server
+	    if(nRet) return;
 
-	//OPC DA 1.0
-	//SyncRead(false);//Sincronous read from opc server (Read from Device)
-	//AsyncRead(false); //Asincronous read from opc server (Read from Device)
-	//AsyncUpdate();
-	/////////////////////////////////////////General interrogation//////////////////////////////////////////////////////////////////////////////////////////////////////
-	//OPC DA 2.0 This function sends all items (i.e IEC 101 General Interrogation)
-	//This function is called IF AND ONLY IF operator ask general interrogation
-	//Async2Read(false); 
-	/////////////////////////////////////////Variazioni come spontanee//////////////////////////////////////////////////////////////////////////////////////////////////////
-	//OPC DA 2.0 This function on the first transaction send all items 
-	//later all spontaneous variations are sent by the server (i.e. IEC 101 Spontaneaous variations)
-	Async2Update();
+	    nRet = AddItems(); // add some items
+	    if(nRet) return;
 
-	OpcStop();
+	    //OPC DA 1.0
+	    //SyncRead(false);//Sincronous read from opc server (Read from Device)
+	    //AsyncRead(false); //Asincronous read from opc server (Read from Device)
+	    //AsyncUpdate();
+	    /////////////////////////////////////////General interrogation/////////////////
+	    //OPC DA 2.0 This function sends all items (i.e IEC 101 General Interrogation)
+	    //This function is called IF AND ONLY IF operator ask general interrogation
+	    //Async2Read(false); 
+	    ///////////////////////////////////////////////////////////////////////////////
+	    //OPC DA 2.0 This function on the first transaction send all items 
+	    //later all spontaneous variations are sent by the server (i.e. IEC 101 Spontaneaous variations)
+	    Async2Update();
 
-	UnitFail("OPC driver stopped");
+	    OpcStop();
+
+	    UnitFail("OPC driver stopped");
+        
+        //if(fExit)
+        //{
+        //    break; //Exit retry loop
+        //}
+
+        //Sleep(20000);
+    //}
 }
 
 void Opc_client_da_DriverThread::SendEvent(const OPCITEMHEADER1* h, VARIANT *pValue, const FILETIME* ft)
@@ -77,8 +89,7 @@ void Opc_client_da_DriverThread::SendEvent(const OPCITEMHEADER1* h, VARIANT *pVa
 	double value;
 
 	USES_CONVERSION;
-	
-	if(Opc_client_da_DriverThread::mandare_eventi)  //27-10-09
+
 	{
 		if(h->wQuality == OPC_QUALITY_GOOD)
 		{
@@ -214,8 +225,7 @@ void Opc_client_da_DriverThread::SendEvent2(VARIANT *pValue, const FILETIME* ft,
 	IT_COMMENT1("phClientItem = %d", phClientItem);
 
 	epoch_in_millisec = Epoch_from_FILETIME(ft);
-	
-	//if(Opc_client_da_DriverThread::mandare_eventi)  //27-10-09
+
 	{
 		//ItemID = QString((const char*)W2T(Item[phClientItem - 1].wszName));
 
