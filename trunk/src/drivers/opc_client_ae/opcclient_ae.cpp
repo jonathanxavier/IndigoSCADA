@@ -61,7 +61,6 @@ int Opc_client_ae_DriverThread::Update()
 	{
 		if(fExit)
 		{
-			mandare_eventi = false;
 			IT_COMMENT("Opc_client_ae_DriverThread exiting....");
 			m_hevtEnd.signal();
 			break; //terminate the thread

@@ -41,7 +41,6 @@ END_COM_MAP()
 
 		IT_IT("COPCCallback::OnDataChange");
 
-		//if(Opc_client_da_DriverThread::mandare_eventi)
 		{
 			if(FAILED(hrMastererror))
 			{
@@ -178,7 +177,6 @@ END_COM_MAP()
 	{
 		IT_IT("COPCCallback::OnReadComplete");
 
-		//if(Opc_client_da_DriverThread::mandare_eventi)
 		{
 			if(FAILED(hrMastererror))
 			{

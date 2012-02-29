@@ -183,7 +183,7 @@ void Stats::log( const char* buf, int logToSysLog)
 }
 void Stats::log( int logToSysLog, int use_errno, const char *format, ...)
 {
-    char                   buf[MAX_LOG_LEN];;
+    char                   buf[MAX_LOG_LEN];
     char                   s[20];
     time_t                 t = time(NULL);
     va_list       ap;

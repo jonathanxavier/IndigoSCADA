@@ -333,7 +333,7 @@ void Opc_client_da_Instance::Tick()
 		{
 			if(pConnect)
 			{
-				if(pConnect->mandare_eventi == false)
+				//if(pConnect->mandare_eventi == false)
 				{
 					USES_CONVERSION;
 
@@ -541,7 +541,7 @@ void Opc_client_da_Instance::Tick()
 					}
 				}
 
-				pConnect->mandare_eventi = true;
+				//pConnect->mandare_eventi = true;
 			}
 		};
 		break;

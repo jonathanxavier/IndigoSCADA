@@ -35,7 +35,6 @@ END_COM_MAP()
    {
 	    IT_IT("CTestAdviseSink::OnDataChange");
 
-		if(Opc_client_da_DriverThread::mandare_eventi)
 		{
 			// Verify the format follows the OPC spec
 			if(TYMED_HGLOBAL != pFE->tymed)

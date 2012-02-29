@@ -104,8 +104,6 @@ class OPC_CLIENT_AEDRV Opc_client_ae_DriverThread : public DriverThread
 	static fifo_h fifo_control_direction; //fifo in control direction: SCADA-------------> RTU
 	/////////////////////////////////////////////////////
 
-	static bool mandare_eventi;
-
 	IOPCCommon *g_pIOPCCommon;
 	IUnknown *g_pIGroupUnknown;
 	IOPCEventSubscriptionMgt *g_pIOPCSubscriptionMgt;
