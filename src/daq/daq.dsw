@@ -140,6 +140,12 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name iec103driver
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name mpi_driver
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name mpi_master
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -365,6 +371,30 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name utilities
     End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "mpi_driver"=..\drivers\mpi\mpi_driver.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "mpi_master"="..\drivers\mpi\protocol\libnodave-0.8.4.6\mpi_master.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
 }}}
 
 ###############################################################################
