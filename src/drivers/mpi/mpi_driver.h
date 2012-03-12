@@ -39,14 +39,17 @@ struct InstanceCfg // friend to anyone
 {
 	QString MPIServerIPAddress;  // MPI server IP address (slave)
 	QString MPIServerIPPort;  // MPI server IP port (102 is the default)
+	QString MPIServerSlot;  // MPI server slot
+	QString PLCAddress;  // PLC address
 
 	InstanceCfg() : 
-	MPIServerIPAddress(""),MPIServerIPPort("")
+	MPIServerIPAddress(""),MPIServerIPPort(""),MPIServerSlot(""),PLCAddress("")
 	{
 	};
 
 	InstanceCfg(const InstanceCfg &m) : 
-	MPIServerIPAddress(m.MPIServerIPAddress),MPIServerIPPort(m.MPIServerIPPort)
+	MPIServerIPAddress(m.MPIServerIPAddress), MPIServerIPPort(m.MPIServerIPPort),
+	MPIServerSlot(m.MPIServerSlot), PLCAddress(m.PLCAddress)
 	{
 	};
 };

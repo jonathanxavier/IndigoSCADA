@@ -60,7 +60,7 @@ Mpi_driverConfigurationData::Mpi_driverConfigurationData(QWidget *parent, const 
 	MPIServerIPAddressText->setFrame( QLineEdit::Normal );
 	MPIServerIPAddressText->setFrame( TRUE );
 	MPIServerIPAddressText->setAlignment( AlignLeft );
-	QLabel *qtarch_Label_22 = new QLabel(this, "Label_21");
+	QLabel *qtarch_Label_22 = new QLabel(this, "Label_22");
 	qtarch_Label_22->setGeometry(10, 40, 150, 30);
 	qtarch_Label_22->setMinimumSize(0, 0);
 	qtarch_Label_22->setMaximumSize(32767, 32767);
@@ -94,7 +94,7 @@ Mpi_driverConfigurationData::Mpi_driverConfigurationData(QWidget *parent, const 
 	MPIServerIPPortText->setFrame( QLineEdit::Normal );
 	MPIServerIPPortText->setFrame( TRUE );
 	MPIServerIPPortText->setAlignment( AlignLeft );
-	QLabel *qtarch_Label_23 = new QLabel(this, "Label_21");
+	QLabel *qtarch_Label_23 = new QLabel(this, "Label_23");
 	qtarch_Label_23->setGeometry(10, 80, 150, 30);
 	qtarch_Label_23->setMinimumSize(0, 0);
 	qtarch_Label_23->setMaximumSize(32767, 32767);
@@ -111,11 +111,79 @@ Mpi_driverConfigurationData::Mpi_driverConfigurationData(QWidget *parent, const 
 	qtarch_Label_23->setText( tr( "MPI slave IP port" ) );
 	qtarch_Label_23->setAlignment( AlignLeft|AlignVCenter|ExpandTabs );
 	qtarch_Label_23->setMargin( 0 );
+
+	MPIServerSlotText = new QLineEdit(this, "LineEdit_7");
+	MPIServerSlotText->setGeometry(200, 120, 100, 30);
+	MPIServerSlotText->setMinimumSize(0, 0);
+	MPIServerSlotText->setMaximumSize(32767, 32767);
+	MPIServerSlotText->setFocusPolicy(QWidget::StrongFocus);
+	MPIServerSlotText->setBackgroundMode(QWidget::PaletteBase);
+#if QT_VERSION < 300
+	MPIServerSlotText->setFontPropagation(QWidget::SameFont);
+	MPIServerSlotText->setPalettePropagation(QWidget::SameFont);
+	#endif
+	MPIServerSlotText->setText( tr( "" ) );
+	MPIServerSlotText->setMaxLength( 100 );
+	MPIServerSlotText->setFrame( QLineEdit::Normal );
+	MPIServerSlotText->setFrame( TRUE );
+	MPIServerSlotText->setAlignment( AlignLeft );
+	QLabel *qtarch_Label_24 = new QLabel(this, "Label_24");
+	qtarch_Label_24->setGeometry(10, 120, 150, 30);
+	qtarch_Label_24->setMinimumSize(0, 0);
+	qtarch_Label_24->setMaximumSize(32767, 32767);
+	qtarch_Label_24->setFocusPolicy(QWidget::NoFocus);
+	qtarch_Label_24->setBackgroundMode(QWidget::PaletteBackground);
+	#if QT_VERSION < 300
+	qtarch_Label_24->setFontPropagation(QWidget::SameFont);
+	qtarch_Label_24->setPalettePropagation(QWidget::SameFont);
+	#endif
+	qtarch_Label_24->setFrameStyle( 0 );
+	qtarch_Label_24->setLineWidth( 1 );
+	qtarch_Label_24->setMidLineWidth( 0 );
+	qtarch_Label_24->QFrame::setMargin( 0 );
+	qtarch_Label_24->setText( tr( "CP 343 or CP 443 slot" ) );
+	qtarch_Label_24->setAlignment( AlignLeft|AlignVCenter|ExpandTabs );
+	qtarch_Label_24->setMargin( 0 );
+
+
+	PLCAddressText = new QLineEdit(this, "LineEdit_7");
+	PLCAddressText->setGeometry(200, 160, 100, 30);
+	PLCAddressText->setMinimumSize(0, 0);
+	PLCAddressText->setMaximumSize(32767, 32767);
+	PLCAddressText->setFocusPolicy(QWidget::StrongFocus);
+	PLCAddressText->setBackgroundMode(QWidget::PaletteBase);
+#if QT_VERSION < 300
+	PLCAddressText->setFontPropagation(QWidget::SameFont);
+	PLCAddressText->setPalettePropagation(QWidget::SameFont);
+	#endif
+	PLCAddressText->setText( tr( "" ) );
+	PLCAddressText->setMaxLength( 100 );
+	PLCAddressText->setFrame( QLineEdit::Normal );
+	PLCAddressText->setFrame( TRUE );
+	PLCAddressText->setAlignment( AlignLeft );
+	QLabel *qtarch_Label_25 = new QLabel(this, "Label_25");
+	qtarch_Label_25->setGeometry(10, 160, 150, 30);
+	qtarch_Label_25->setMinimumSize(0, 0);
+	qtarch_Label_25->setMaximumSize(32767, 32767);
+	qtarch_Label_25->setFocusPolicy(QWidget::NoFocus);
+	qtarch_Label_25->setBackgroundMode(QWidget::PaletteBackground);
+	#if QT_VERSION < 300
+	qtarch_Label_25->setFontPropagation(QWidget::SameFont);
+	qtarch_Label_25->setPalettePropagation(QWidget::SameFont);
+	#endif
+	qtarch_Label_25->setFrameStyle( 0 );
+	qtarch_Label_25->setLineWidth( 1 );
+	qtarch_Label_25->setMidLineWidth( 0 );
+	qtarch_Label_25->QFrame::setMargin( 0 );
+	qtarch_Label_25->setText( tr( "PLC address" ) );
+	qtarch_Label_25->setAlignment( AlignLeft|AlignVCenter|ExpandTabs );
+	qtarch_Label_25->setMargin( 0 );
+
 /////////////////////////////////////////////////////////////////////////
 	
 /////////////////////////////////////////////////////////////////////////
 	QLabel *qtarch_Label_10 = new QLabel(this, "Label_10");
-	qtarch_Label_10->setGeometry(10, 120, 100, 30);
+	qtarch_Label_10->setGeometry(10, 200, 100, 30);
 	qtarch_Label_10->setMinimumSize(0, 0);
 	qtarch_Label_10->setMaximumSize(32767, 32767);
 	qtarch_Label_10->setFocusPolicy(QWidget::NoFocus);
@@ -133,7 +201,7 @@ Mpi_driverConfigurationData::Mpi_driverConfigurationData(QWidget *parent, const 
 	qtarch_Label_10->setMargin( 0 );
 
 	NItems = new QSpinBox(this, "SpinBox_3");
-	NItems->setGeometry(200, 120, 100, 30);
+	NItems->setGeometry(200, 200, 100, 30);
 	NItems->setMinimumSize(0, 0);
 	NItems->setMaximumSize(32767, 32767);
 	NItems->setFocusPolicy(QWidget::StrongFocus);

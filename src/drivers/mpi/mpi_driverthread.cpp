@@ -41,6 +41,10 @@ void Mpi_DriverThread::run()
 	strcat(pCommandLine, ((Mpi_driver_Instance*)Parent)->Cfg.MPIServerIPAddress);
 	strcat(pCommandLine, " -p ");
 	strcat(pCommandLine, ((Mpi_driver_Instance*)Parent)->Cfg.MPIServerIPPort);
+	strcat(pCommandLine, " -s ");
+	strcat(pCommandLine, ((Mpi_driver_Instance*)Parent)->Cfg.MPIServerSlot);
+	strcat(pCommandLine, " -c ");
+	strcat(pCommandLine, ((Mpi_driver_Instance*)Parent)->Cfg.PLCAddress);
 	strcat(pCommandLine, " -l ");
 	strcat(pCommandLine, line_number);
 		

@@ -162,6 +162,8 @@ void Mpi_driver_Instance::QueryResponse(QObject *p, const QString &c, int id, QO
 				is >> IecItems;	  // how many IEC items there are in the RTU
 				is >> Cfg.MPIServerIPAddress; // MPI server IP Address
 				is >> Cfg.MPIServerIPPort;  // MPI server IP port (102 is the dafault)
+				is >> Cfg.MPIServerSlot;  // MPI server slot
+				is >> Cfg.PLCAddress;  // PLCAddress
 
 				Countdown = 1;
 

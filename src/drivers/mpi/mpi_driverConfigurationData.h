@@ -24,6 +24,8 @@ class Mpi_driverConfigurationData : public QDialog
 	QSpinBox *NItems;
 	QLineEdit *MPIServerIPAddressText;
 	QLineEdit *MPIServerIPPortText;
+	QLineEdit *MPIServerSlotText;
+	QLineEdit *PLCAddressText;
 };
 #endif // Mpi_driverConfigurationData_included
 
