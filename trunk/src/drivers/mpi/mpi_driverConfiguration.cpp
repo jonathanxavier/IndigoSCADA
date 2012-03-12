@@ -49,7 +49,9 @@ Inherited( parent, name ),Receipe(receipe)
 		NItems->setEnabled(false);
 		MPIServerIPAddressText->setEnabled(false);
 		MPIServerIPPortText->setEnabled(false);
-	};
+		MPIServerSlotText->setEnabled(false);
+		PLCAddressText->setEnabled(false);
+	}
 }
 Mpi_driverConfiguration::~Mpi_driverConfiguration()
 {
@@ -68,7 +70,7 @@ void Mpi_driverConfiguration::OkClicked()
 	GetConfigureDb()->DoExec(0,cmd,0); // delete the old value
 	//
 	cmd = "insert into PROPS values('"+Name->text() +"','" + Receipe + "','" + 
-	NItems->text() + " " + MPIServerIPAddressText->text() + " " + MPIServerIPPortText->text() + "');";
+	NItems->text() + " " + MPIServerIPAddressText->text() + " " + MPIServerIPPortText->text() +  " " + MPIServerSlotText->text() + " " + PLCAddressText->text() + "');";
 	GetConfigureDb()->DoExec(0,cmd,0);
 	QSAuditTrail(this,caption(), tr("Edited"));
 
@@ -101,6 +103,10 @@ void Mpi_driverConfiguration::QueryResponse (QObject *p, const QString &c, int i
 				MPIServerIPAddressText->setText(t);
 				is >> t;
 				MPIServerIPPortText->setText(t);
+				is >> t;
+				MPIServerSlotText->setText(t);
+				is >> t;
+				PLCAddressText->setText(t);
 			}
 			else
 			{
@@ -112,6 +118,8 @@ void Mpi_driverConfiguration::QueryResponse (QObject *p, const QString &c, int i
 				NItems->setValue(8);
 				MPIServerIPAddressText->setText("");
 				MPIServerIPPortText->setText("");
+				MPIServerSlotText->setText("");
+				PLCAddressText->setText("");
 			}
 		} 
 		break;

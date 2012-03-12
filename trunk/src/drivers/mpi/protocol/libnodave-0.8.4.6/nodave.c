@@ -24,6 +24,9 @@
  along with Libnodave; see the file COPYING.  If not, write to
  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.  
 */
+
+// Modified by Enscada limited http://www.enscada.com
+
 #include "nodave.h"
 #include <stdio.h>
 #include "log2.h"
@@ -60,7 +63,6 @@ int daveDebug=0;
 
 #ifdef BCCWIN
 #include <winsock2.h>
-#include "openS7online.h"	// We can use the Siemens transport dlls only on Windows
 
 void setTimeOut(daveInterface * di, int tmo) {
     COMMTIMEOUTS cto;

@@ -25,7 +25,18 @@
 
 //#define PLAY_WITH_KEEPALIVE
 #include "nodave.h"
-#include "openSocket.h"
+
+#ifdef BCCWIN
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <stdio.h>
+#endif
+
+#include <string.h>
+#include <errno.h>
+#include <fcntl.h>
+#include "log2.h"
+#include <winsock2.h>
 
 #ifdef LINUX
 #include <unistd.h>
@@ -250,6 +261,8 @@ int main( int argc, char **argv )
 	char version[100];
 	char mpi_ServerAddress[80];
 	char mpi_ServerPort[80];
+	char ethSlot[80];
+	char plc_address[80];
 	char line_number[80];
 	char fifo_monitor_direction_name[70];
 	char fifo_control_direction_name[70];
@@ -259,6 +272,8 @@ int main( int argc, char **argv )
 		
 	mpi_ServerAddress[0] = '\0';
 	mpi_ServerPort[0] = '\0';
+	ethSlot[0] = '\0';
+	plc_address[0] = '\0';
 	line_number[0] = '\0';
 	fifo_monitor_direction_name[0] = '\0';
 	fifo_control_direction_name[0] = '\0';
@@ -280,6 +295,12 @@ int main( int argc, char **argv )
 			break;
 			case 'p' :
 			strcpy(mpi_ServerPort, optarg);
+			break;
+			case 's' :
+			strcpy(ethSlot, optarg);
+			break;
+			case 'c' :
+			strcpy(plc_address, optarg);
 			break;
 			case 'l' :
 			strcpy(line_number, optarg);
@@ -305,6 +326,20 @@ int main( int argc, char **argv )
 		return EXIT_FAILURE;
 	}
 
+	if(strlen(ethSlot) == 0)
+	{
+		fprintf(stderr,"CP 343 or 443 slot is not known\n");
+		fflush(stderr);
+		return EXIT_FAILURE;
+	}
+
+	if(strlen(plc_address) == 0)
+	{
+		fprintf(stderr,"PLC address is not known\n");
+		fflush(stderr);
+		return EXIT_FAILURE;
+	}
+	
 	if(strlen(line_number) == 0)
 	{
 		fprintf(stderr,"line_number is not known\n");
@@ -328,6 +363,10 @@ int main( int argc, char **argv )
 	strcat(NewConsoleTitle, mpi_ServerAddress);
 	strcat(NewConsoleTitle, " PORT ");
 	strcat(NewConsoleTitle, mpi_ServerPort);
+	strcat(NewConsoleTitle, " SLOT ");
+	strcat(NewConsoleTitle, ethSlot);
+	strcat(NewConsoleTitle, " PLC_ADDRESS ");
+	strcat(NewConsoleTitle, plc_address);
 	strcat(NewConsoleTitle, " LINE ");
 	strcat(NewConsoleTitle, line_number);
 
@@ -360,8 +399,8 @@ int main( int argc, char **argv )
 
 	int a, b, adrPos,doWrite,doBenchmark, doSZLread, doMultiple, doClear,
 	res, useProtocol,doSZLreadAll, doRun, doStop, doCopyRAMtoROM, doReadout, doSFBandSFC,
-	doNewfunctions, saveDebug,
-	useSlot, mpi_port;
+	doNewfunctions, saveDebug, useSlot, mpi_port, plc_addr;
+
 #ifdef PLAY_WITH_KEEPALIVE    	
     int opt;
 #endif    
@@ -387,8 +426,9 @@ int main( int argc, char **argv )
     doSFBandSFC=0;
     doNewfunctions=0;
     
-    useProtocol=daveProtoISOTCP;
-    useSlot=2;
+    useProtocol = daveProtoISOTCP;
+    useSlot = 2;
+	plc_addr = 2;
     
     /*
     if (argc<2) {
@@ -444,8 +484,41 @@ int main( int argc, char **argv )
 	*/
 
 	mpi_port = atoi(mpi_ServerPort);
-    
-    fds.rfd=openSocket(mpi_port, mpi_ServerAddress);
+
+	useSlot = atoi(ethSlot);
+
+	plc_addr = atoi(plc_address);
+
+	///////////open the socket//////////////////////////////////////////
+	SOCKET fd;
+    struct sockaddr_in addr;
+    int addrlen;
+    WSADATA wsadata;
+
+    res=WSAStartup(MAKEWORD(2,0), &wsadata);
+
+    addr.sin_family = AF_INET;
+    addr.sin_port =htons(mpi_port);
+    addr.sin_addr.s_addr=inet_addr(mpi_ServerAddress);
+
+    fd = socket(AF_INET, SOCK_STREAM, AF_UNSPEC);
+    addrlen = sizeof(addr);
+
+    if(connect(fd, (struct sockaddr *) & addr, addrlen)) 
+	{
+		closesocket(fd);
+		fd = 0;
+    } 
+	else 
+	{
+	    fprintf(stderr, "Connected to host: %s \n", mpi_ServerAddress);
+		fflush(stderr);
+		errno = 0;
+    }
+
+	fds.rfd = (HANDLE)fd;
+	/////////////////open soscket done///////////////////////////////////
+
 #ifdef PLAY_WITH_KEEPALIVE
     errno=0;    
     opt=1;
@@ -454,15 +527,15 @@ int main( int argc, char **argv )
 #endif
     fds.wfd=fds.rfd;
     
-    if (fds.rfd>0) 
+    if(fds.rfd > 0) 
 	{ 
-		di =daveNewInterface(fds,"IF1",0, useProtocol, daveSpeed187k);
+		di = daveNewInterface(fds,"IF1",0, useProtocol, daveSpeed187k);
 
 		daveSetTimeout(di,5000000);
 
-		dc =daveNewConnection(di,2,0,useSlot);  // insert your rack and slot here
+		dc = daveNewConnection(di, plc_addr, 0, useSlot);  // insert your rack and slot here
 	
-		if (daveConnectPLC(dc) == 0) 
+		if(daveConnectPLC(dc) == 0) 
 		{
 			printf("Connected.\n");
 
@@ -812,7 +885,8 @@ int main( int argc, char **argv )
 	} // doBenchmark
 	*/
 
-	closeSocket(fds.rfd);
+	closesocket((SOCKET)(fds.rfd));
+	
 	printf("Finished.\n");
 	
 	return 0;
@@ -821,7 +895,7 @@ int main( int argc, char **argv )
 	else 
 	{
 	    printf("Couldn't connect to PLC.\n Please make sure you use the -2 option with a CP243 but not with CPs 343 or 443.\n");	
-	    closeSocket(fds.rfd);
+	    closesocket((SOCKET)(fds.rfd));
 	    return -2;
 	}
 

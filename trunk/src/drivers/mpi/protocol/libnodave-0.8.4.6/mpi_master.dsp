@@ -101,14 +101,6 @@ SOURCE=.\main_master.cpp
 
 SOURCE=.\nodave.c
 # End Source File
-# Begin Source File
-
-SOURCE=.\openSocketw.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\setportw.c
-# End Source File
 # End Group
 # End Target
 # End Project
