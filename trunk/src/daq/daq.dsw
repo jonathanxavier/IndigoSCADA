@@ -146,6 +146,12 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name mpi_master
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name rfc1006client
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name rfc1006driver
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -375,30 +381,6 @@ Package=<4>
 
 ###############################################################################
 
-Project: "mpi_driver"=..\drivers\mpi\mpi_driver.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "mpi_master"="..\drivers\mpi\protocol\libnodave-0.8.4.6\mpi_master.dsp" - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
 Project: "opc_client_ae"=..\drivers\opc_client_ae\opc_client_ae.dsp - Package Owner=<4>
 
 Package=<5>
@@ -449,6 +431,30 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name utilities
     End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "rfc1006client"=..\drivers\rfc1006\protocol\rfc1006client.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "rfc1006driver"=..\drivers\rfc1006\rfc1006driver.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
 }}}
 
 ###############################################################################
