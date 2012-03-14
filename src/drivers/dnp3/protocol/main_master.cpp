@@ -207,6 +207,12 @@ struct args{
 
 void PipeWorker(void* pParam);
 
+void usage(char** argv)
+{
+	fprintf(stderr, "Run time usage: %s -a server IP address -p server IP port -l line number -t polling time\n", argv[0]);
+	fflush(stderr);
+}
+
 int main( int argc, char **argv )
 {
 	char version[100];
@@ -258,6 +264,12 @@ int main( int argc, char **argv )
 			exit( 0 );
 		}
 	}
+
+	if(argc < 2) 
+	{
+		usage(argv);
+		exit(-1);
+    }
 
 	if(strlen(dnp3ServerAddress) == 0)
 	{

@@ -78,3 +78,8 @@ MPI driver added. It is composed by mpi_master.exe and mpi_driver.dll
 It needs testing with RTU. Volunteers are welcome
 It is still missing the mapping of PLC data types to IEC 104 IndigoSCADA working types
 It is still missing the Inter Process Communication between the mpi_master.exe and mpi_driver.dll
+---------------------------------------------------------------------------
+14-03-2012
+MPI driver renamed to RFC1006
+
+
