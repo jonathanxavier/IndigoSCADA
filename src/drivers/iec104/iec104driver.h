@@ -38,7 +38,7 @@ class Iec104driver_Instance;
 struct InstanceCfg // friend to anyone
 {
 	QString IEC104ServerIPAddress;  // IEC 104 server IP address (slave)
-	QString IEC104ServerIPPort;  // IEC 104 server IP port
+	QString IEC104ServerIPPort;  // IEC 104 server TCP port
 	QString IEC104ServerCASDU;  // IEC 104 server CASDU
 
 

@@ -207,9 +207,11 @@ struct args{
 
 void PipeWorker(void* pParam);
 
+#define RUNTIME_USAGE "Run time usage: %s -a server IP address -p server TCP port -l line number -t polling time\n"
+
 void usage(char** argv)
 {
-	fprintf(stderr, "Run time usage: %s -a server IP address -p server IP port -l line number -t polling time\n", argv[0]);
+	fprintf(stderr, RUNTIME_USAGE, argv[0]);
 	fflush(stderr);
 }
 
@@ -259,7 +261,7 @@ int main( int argc, char **argv )
 			strcpy(polling_time, optarg);
 			break;
 			case '?' :
-			fprintf(stderr, "Run time usage: %s -a server IP address -p server IP port -l line number -t polling time\n", argv[0]);
+			fprintf(stderr, RUNTIME_USAGE, argv[0]);
 			fflush(stderr);
 			exit( 0 );
 		}
@@ -280,7 +282,7 @@ int main( int argc, char **argv )
 
 	if(strlen(dnp3ServerPort) == 0)
 	{
-		fprintf(stderr,"DNP3 port is not known\n");
+		fprintf(stderr,"DNP3 TCP port is not known\n");
 		fflush(stderr);
 		return EXIT_FAILURE;
 	}

@@ -161,7 +161,7 @@ void Iec104driver_Instance::QueryResponse(QObject *p, const QString &c, int id, 
 				//
 				is >> IecItems;	  // how many IEC items there are in the RTU
 				is >> Cfg.IEC104ServerIPAddress; // IEC 104 server IP Address
-				is >> Cfg.IEC104ServerIPPort;  // IEC 104 server IP port
+				is >> Cfg.IEC104ServerIPPort;  // IEC 104 server TCP port
 				is >> Cfg.IEC104ServerCASDU;  // IEC 104 server CASDU
 
 				Countdown = 1;

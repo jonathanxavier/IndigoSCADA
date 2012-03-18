@@ -998,14 +998,14 @@ double zuzu =
 
 
 /***************************************************************************
- EXE-specefic stuff
+ EXE-specific stuff
  ***************************************************************************/
 
 const char eClsidName[] = "LightOPC Sample server (exe)";
 const char eProgID[] = "OPC.LightOPC-exe";
 
 HMODULE server_module = 0;
-static int mymine(HINSTANCE hInstance, int argc, char *argv[]);
+static int server_main(HINSTANCE hInstance, int argc, char *argv[]);
 
 extern "C"
   int APIENTRY WinMain(HINSTANCE hInstance,
@@ -1013,15 +1013,15 @@ extern "C"
 {
   static char *argv[3] = { "fake.exe", NULL, NULL };
   argv[1] = lpCmdLine;
-  return mymine(hInstance, 2, argv);
+  return server_main(hInstance, 2, argv);
 }
 
 extern "C" int main(int argc, char *argv[])
 {
-  return mymine(GetModuleHandle(NULL), argc, argv);
+  return server_main(GetModuleHandle(NULL), argc, argv);
 }
 
-int mymine(HINSTANCE hInstance, int argc, char *argv[])
+int server_main(HINSTANCE hInstance, int argc, char *argv[])
 {
   int main_rc = 0;
   DWORD objid;
