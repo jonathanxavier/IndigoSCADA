@@ -38,7 +38,7 @@ class Rfc1006driver_Instance;
 struct InstanceCfg // friend to anyone
 {
 	QString RFC1006ServerIPAddress;  // RFC1006 server IP address (slave)
-	QString RFC1006ServerIPPort;  // RFC1006 server IP port (102 is the default)
+	QString RFC1006ServerIPPort;  // RFC1006 server TCP port (102 is the default)
 	QString RFC1006ServerSlot;  // RFC1006 server slot
 	QString PLCAddress;  // PLC address
 

@@ -163,7 +163,7 @@ void Dnp3driver_Instance::QueryResponse(QObject *p, const QString &c, int id, QO
 				is >> IecItems;	  // how many DNP3 items there are in the RTU or PLC
 				is >> Cfg.SampleTime; // how long we sample for in milliseconds
 				is >> Cfg.DNP3ServerIPAddress; // DNP3 server IP Address
-				is >> Cfg.DNP3ServerIPPort; // DNP3 server IP Port
+				is >> Cfg.DNP3ServerIPPort; // DNP3 server TCP port
 
 				Countdown = 1;
 

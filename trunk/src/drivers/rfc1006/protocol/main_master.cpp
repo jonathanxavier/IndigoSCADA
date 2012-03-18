@@ -93,9 +93,11 @@ struct args{
 
 void PipeWorker(void* pParam);
 
+#define RUNTIME_USAGE "Run time usage: %s -a server IP address -p server TCP port -s position of 343 or 443 PLC slot -c PLC address -l line number\n"
+
 void usage(char** argv)
 {
-	fprintf(stderr, "Run time usage: %s -a server IP address -p server IP port -s position of 343 or 443 PLC slot -c PLC address -l line number\n", argv[0]);
+	fprintf(stderr, RUNTIME_USAGE, argv[0]);
 	fflush(stderr);
 }
 
@@ -149,7 +151,7 @@ int main( int argc, char **argv )
 			strcpy(line_number, optarg);
 			break;
 			case '?' :
-			fprintf(stderr, "Run time usage: %s -a server IP address -p server IP port -s position of 343 or 443 PLC slot -c PLC address -l line number\n", argv[0]);
+			fprintf(stderr, RUNTIME_USAGE, argv[0]);
 			fflush(stderr);
 			exit( 0 );
 		}
@@ -170,7 +172,7 @@ int main( int argc, char **argv )
 
 	if(strlen(rfc1006ServerPort) == 0)
 	{
-		fprintf(stderr,"RFC1006 port is not known\n");
+		fprintf(stderr,"RFC1006 TCP port is not known\n");
 		fflush(stderr);
 		return EXIT_FAILURE;
 	}

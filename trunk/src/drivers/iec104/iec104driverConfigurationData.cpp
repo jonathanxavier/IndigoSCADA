@@ -108,7 +108,7 @@ Iec104driverConfigurationData::Iec104driverConfigurationData(QWidget *parent, co
 	qtarch_Label_23->setLineWidth( 1 );
 	qtarch_Label_23->setMidLineWidth( 0 );
 	qtarch_Label_23->QFrame::setMargin( 0 );
-	qtarch_Label_23->setText( tr( "IEC 104 slave IP port" ) );
+	qtarch_Label_23->setText( tr( "IEC 104 slave TCP port" ) );
 	qtarch_Label_23->setAlignment( AlignLeft|AlignVCenter|ExpandTabs );
 	qtarch_Label_23->setMargin( 0 );
 

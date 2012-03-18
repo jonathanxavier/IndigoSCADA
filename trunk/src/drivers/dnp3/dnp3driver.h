@@ -38,7 +38,7 @@ class Dnp3driver_Instance;
 struct InstanceCfg // friend to anyone
 {
 	QString DNP3ServerIPAddress;  // DNP3 server IP address (slave)
-	QString DNP3ServerIPPort;  // DNP3 server IP port
+	QString DNP3ServerIPPort;  // DNP3 server TCP port
 
 	unsigned SampleTime; // sampleing time 
 

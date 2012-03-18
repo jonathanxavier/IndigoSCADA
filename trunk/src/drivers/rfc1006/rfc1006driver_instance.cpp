@@ -161,7 +161,7 @@ void Rfc1006driver_Instance::QueryResponse(QObject *p, const QString &c, int id,
 				//
 				is >> IecItems;	  // how many IEC items there are in the RTU
 				is >> Cfg.RFC1006ServerIPAddress; // RFC1006 server IP Address
-				is >> Cfg.RFC1006ServerIPPort;  // RFC1006 server IP port (102 is the dafault)
+				is >> Cfg.RFC1006ServerIPPort;  // RFC1006 server TCP port (102 is the dafault)
 				is >> Cfg.RFC1006ServerSlot;  // RFC1006 server slot
 				is >> Cfg.PLCAddress;  // PLCAddress
 

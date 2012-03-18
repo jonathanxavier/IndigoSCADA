@@ -105,12 +105,6 @@ Package=<4>
     Project_Dep_Name iec104driver
     End Project Dependency
     Begin Project Dependency
-    Project_Dep_Name iec104master
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name iec104slave
-    End Project Dependency
-    Begin Project Dependency
     Project_Dep_Name dnp3driver
     End Project Dependency
     Begin Project Dependency
@@ -132,9 +126,6 @@ Package=<4>
     Project_Dep_Name iec101driver
     End Project Dependency
     Begin Project Dependency
-    Project_Dep_Name dll_sample
-    End Project Dependency
-    Begin Project Dependency
     Project_Dep_Name exe_sample
     End Project Dependency
     Begin Project Dependency
@@ -151,6 +142,9 @@ Package=<4>
     End Project Dependency
     Begin Project Dependency
     Project_Dep_Name rfc1006driver
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name opc_server_da
     End Project Dependency
 }}}
 
@@ -169,21 +163,6 @@ Package=<4>
     End Project Dependency
     Begin Project Dependency
     Project_Dep_Name utilities
-    End Project Dependency
-}}}
-
-###############################################################################
-
-Project: "dll_sample"="..\drivers\opc_server_da\lo-0.888\LightOPC\samp_dll.dsp" - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-    Begin Project Dependency
-    Project_Dep_Name lightopc_lib
     End Project Dependency
 }}}
 
@@ -235,21 +214,6 @@ Package=<4>
 {{{
     Begin Project Dependency
     Project_Dep_Name utilities
-    End Project Dependency
-}}}
-
-###############################################################################
-
-Project: "exe_sample"="..\drivers\opc_server_da\lo-0.888\LightOPC\samp_exe.dsp" - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-    Begin Project Dependency
-    Project_Dep_Name lightopc_lib
     End Project Dependency
 }}}
 
@@ -406,6 +370,18 @@ Package=<4>
 ###############################################################################
 
 Project: "opc_client_hda"=..\drivers\opc_client_hda\opc_client_hda.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "opc_server_da"="..\drivers\opc_server_da\lo-0.888\LightOPC\opc_server_da.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
