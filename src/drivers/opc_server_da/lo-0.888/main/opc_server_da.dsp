@@ -8,12 +8,12 @@ CFG=opc_server_da - Win32 Debug
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
-!MESSAGE NMAKE /f "samp_exe.mak".
+!MESSAGE NMAKE /f "opc_server_da.mak".
 !MESSAGE 
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "samp_exe.mak" CFG="opc_server_da - Win32 Debug"
+!MESSAGE NMAKE /f "opc_server_da.mak" CFG="opc_server_da - Win32 Debug"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
@@ -54,7 +54,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib wsock32.lib unilog.lib lightopc.lib /nologo /subsystem:console /pdb:none /map /machine:I386 /out:"c:\scada\bin/opc_server_da.exe" /libpath:"c:\scada\lib" /libpath:"..\bin" /libpath:"..\unilog"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib wsock32.lib unilog.lib lightopc.lib /nologo /subsystem:console /pdb:none /map /machine:I386 /libpath:"c:\scada\lib" /libpath:"..\bin" /libpath:"..\unilog"
 
 !ELSEIF  "$(CFG)" == "opc_server_da - Win32 Debug"
 
@@ -70,7 +70,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /G4 /MDd /W3 /Gm /ZI /Od /I "..\unilog" /I "..\opc" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c
+# ADD CPP /nologo /MDd /W3 /Gm /ZI /Od /I "..\unilog" /I "..\opc" /I "..\LightOPC" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
@@ -80,7 +80,8 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib wsock32.lib unilog.lib lightopc.lib /nologo /subsystem:console /profile /map /debug /machine:I386 /out:"c:\scada\bin/opc_server_da.exe" /libpath:"c:\scada\lib" /libpath:"..\bin" /libpath:"..\unilog"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib wsock32.lib unilog.lib lightopc.lib /nologo /subsystem:console /profile /debug /machine:I386 /libpath:"c:\scada\lib" /libpath:"..\bin" /libpath:"..\unilog"
+# SUBTRACT LINK32 /map
 
 !ENDIF 
 
@@ -93,21 +94,8 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
-SOURCE=.\sample.cpp
-
-!IF  "$(CFG)" == "opc_server_da - Win32 Release"
-
-# SUBTRACT CPP /YX
-
-!ELSEIF  "$(CFG)" == "opc_server_da - Win32 Debug"
-
-!ENDIF 
-
+SOURCE=.\opc_main.cpp
 # End Source File
-# End Group
-# Begin Group "Header Files"
-
-# PROP Default_Filter "h;hpp;hxx;hm;inl"
 # End Group
 # End Target
 # End Project

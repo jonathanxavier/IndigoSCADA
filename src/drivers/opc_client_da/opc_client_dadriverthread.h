@@ -152,7 +152,7 @@ class OPC_CLIENT_DADRV Opc_client_da_DriverThread : public DriverThread
 	static DriverThread *StaticThis;
 	static signed __int64 Epoch_from_FILETIME(const FILETIME *fileTime);
 	//static QString Epoc_from_FILETIME_fast(const FILETIME *fileTime);
-
+	static void EpochInSecondsToFileTime(time_t t, LPFILETIME pft);
 	static void post_val(SpValue &v, QString &name);
 
 	protected:
