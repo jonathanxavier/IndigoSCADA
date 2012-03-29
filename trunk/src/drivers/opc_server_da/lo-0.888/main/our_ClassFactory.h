@@ -1,3 +1,15 @@
+/*
+ *                         IndigoSCADA
+ *
+ *   This software and documentation are Copyright 2002 to 2012 Enscada 
+ *   Limited and its licensees. All rights reserved. See file:
+ *
+ *                     $HOME/LICENSE 
+ *
+ *   for full copyright notice and license terms. 
+ *
+ */
+
 class our_ClassFactory: public IClassFactory	
 {
   public:
@@ -47,7 +59,7 @@ class our_ClassFactory: public IClassFactory
   }
 };
 
-//----- IUnknown -------------------------------------------------------------------------
+//IUnknown
 STDMETHODIMP our_ClassFactory::QueryInterface(REFIID iid, LPVOID* ppInterface)
 {
   if (ppInterface == NULL) return E_INVALIDARG;	// pointer to interface missed (NULL)
@@ -85,7 +97,7 @@ STDMETHODIMP_(ULONG) our_ClassFactory::Release(void)	// client has been disconne
   return rv;
 }
 
-//----- IClassFactory ----------------------------------------------------------------------
+//IClassFactory
 STDMETHODIMP our_ClassFactory::LockServer(BOOL fLock)
 {
   if (fLock)	AddRef();

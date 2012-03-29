@@ -381,7 +381,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "opc_server_da"="..\drivers\opc_server_da\lo-0.888\LightOPC\opc_server_da.dsp" - Package Owner=<4>
+Project: "opc_server_da"="..\drivers\opc_server_da\lo-0.888\main\opc_server_da.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
