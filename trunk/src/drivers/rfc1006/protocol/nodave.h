@@ -56,7 +56,8 @@ typedef struct dost {
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
-#define DECL2 __stdcall
+//#define DECL2 __stdcall
+#define DECL2 //apa+++
 #define tmotype int
 
 #ifdef DOEXPORT

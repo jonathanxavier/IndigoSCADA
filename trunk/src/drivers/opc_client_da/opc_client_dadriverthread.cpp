@@ -832,6 +832,13 @@ void Opc_client_da_DriverThread::SendEvent2(VARIANT *pValue, const FILETIME* ft,
 	}
 }
 
+void Opc_client_da_DriverThread::EpochInSecondsToFileTime(time_t t, LPFILETIME pft)
+{   
+	LONGLONG ll = Int32x32To64(t, 10000000) + 116444736000000000;
+    pft->dwLowDateTime = (DWORD) ll;
+    pft->dwHighDateTime =  (ULONG)(ll >>32);
+}
+
 //The FILETIME structure is a 64-bit value representing the number 
 //of 100-nanosecond intervals since January 1, 1601.
 //

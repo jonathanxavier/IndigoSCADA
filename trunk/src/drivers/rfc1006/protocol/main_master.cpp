@@ -316,9 +316,26 @@ int main( int argc, char **argv )
 		{
 			printf("Connected.\n");
 
-			//Do some read of Data Blocks
+			fprintf(stderr, "Trying to read 100 bytes (50 dwords) from data block 20\n");
+			fflush(stderr);
+
+			//Read a data block
+
+			res = daveReadBytes(dc, daveDB, 20, 0, 100, NULL);
+
+			if(res == 0)
+			{
+				int a;
+				a = daveGetU16(dc);
+				printf("DB20:DW0: %d\n", a);
+			} 
+			else 
+				printf("failed! (%d)\n",res);  
+
 			closesocket((SOCKET)(fds.rfd));
+
 			printf("Finished.\n");
+
 			return 0;
 		} 
 		else 
