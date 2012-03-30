@@ -22,18 +22,11 @@
 #define LOGID logg,0				// log identifiner
 #define LOG_FNAME	"opc_server_da.log"	// log name
 #define CFG_FILE	"opc_server_da.ini"	// cfg name
-#define MAX_ENSCADA_NUM		5			// maximum number of controllers
+#define MAX_CASDU_NUM		1			// maximum number of CASDUs (alias groups of tags)
 #define TAGS_NUM_MAX	5000		// maximum number of tags
 #define DATALEN_MAX		150			// maximum lenght of the tags
 
 typedef unsigned UINT;
-
-typedef struct _PrmEN PrmEN;
-
-struct _PrmEN {
-  SHORT	prm;
-  CHAR  name[100];
-};
 
 typedef struct _DataEN DataEN;
 
@@ -42,18 +35,7 @@ struct _DataEN {
   CHAR  name[30];
   SHORT prm;
   SHORT status;
-  UINT	tn;
+  UINT	ti;
   CHAR  value[20];
   SHORT pipe;
-};
-
-typedef struct _FlatEN FlatEN;
-
-struct _FlatEN {
-  UINT	flat;
-  CHAR  name[30];
-  SHORT prm;
-  SHORT status;
-  UINT	tn;
-  CHAR  value[20];
 };

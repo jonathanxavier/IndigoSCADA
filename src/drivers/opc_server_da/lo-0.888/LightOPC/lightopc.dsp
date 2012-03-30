@@ -54,8 +54,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib wsock32.lib unilog.lib /nologo /subsystem:windows /dll /map /machine:I386 /def:".\lightopc.def" /implib:"C:\scada\lib/lightopc.lib" /libpath:"..\bin" /libpath:"..\unilog"
-# SUBTRACT LINK32 /pdb:none
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib wsock32.lib unilog.lib /nologo /subsystem:windows /dll /machine:I386 /def:".\lightopc.def" /implib:"C:\scada\lib/lightopc.lib" /libpath:"..\bin" /libpath:"..\unilog"
 
 !ELSEIF  "$(CFG)" == "lightopc_lib - Win32 Debug"
 
@@ -72,7 +71,8 @@ LINK32=link.exe
 # PROP Target_Dir ""
 LIB32=link.exe -lib
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /c
-# ADD CPP /nologo /G4 /MDd /W3 /Gm /Zi /Od /I "..\unilog" /I "..\opc" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /FD /TP /c
+# ADD CPP /nologo /G4 /MDd /W3 /Od /I "..\unilog" /I "..\opc" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /FD /TP /c
+# SUBTRACT CPP /Z<none>
 # ADD BASE MTL /nologo /D "_DEBUG" /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
@@ -82,7 +82,8 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /debug /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib wsock32.lib unilog.lib /nologo /subsystem:windows /dll /profile /map /debug /machine:I386 /def:".\lightopc.def" /implib:"C:\scada\lib/lightopc.lib" /libpath:"c:\scada\lib" /libpath:"..\unilog"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib wsock32.lib unilog.lib /nologo /subsystem:windows /dll /incremental:no /debug /machine:I386 /def:".\lightopc.def" /implib:"C:\scada\lib/lightopc.lib" /libpath:"c:\scada\lib" /libpath:"..\unilog"
+# SUBTRACT LINK32 /profile
 
 !ENDIF 
 
