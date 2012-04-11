@@ -81,5 +81,7 @@ It is still missing the Inter Process Communication between the mpi_master.exe a
 ---------------------------------------------------------------------------
 14-03-2012
 MPI driver renamed to RFC1006
-
+---------------------------------------------------------------------------
+22-03-2012
+Development of OPC serverDA 2.0 is under way: opc_server_da.exe
 
