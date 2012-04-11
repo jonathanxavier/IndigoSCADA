@@ -181,6 +181,9 @@ struct SpValue // a measured result
 			case M_ME_TN_1:
 			v150_q =  *(is_type150*)v;
 			break;
+            case M_ME_TQ_1:
+            v153_q =  *(is_type153*)v;
+            break;
 			default:
 			v150_q.mv = *((double*)v);
 			type = 150;
@@ -227,6 +230,9 @@ struct SpValue // a measured result
 			break;
 			case M_ME_TN_1:
 			v150_q = s.v150_q;
+			break;
+            case M_ME_TQ_1:
+            v153_q = s.v153_q;
 			break;
 			default:
 			v150_q = s.v150_q;
