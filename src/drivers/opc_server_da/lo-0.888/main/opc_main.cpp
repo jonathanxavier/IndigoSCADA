@@ -213,14 +213,22 @@ void timetToFileTime( time_t t, LPFILETIME pft )
     pft->dwHighDateTime = (unsigned long)(ll >>32);
 }
 
-char *absPath(char *fileName)
+char *logPath(char *fileName)
 {
-  static char path[sizeof(argv0)]="\0";
-  char *cp;
+  static char path[MAX_PATH]="\0";
+//  char *cp;
   
-  if(*path=='\0') strcpy(path, argv0);
-  if(NULL==(cp=strrchr(path,'\\'))) cp=path; else cp++;
-  cp=strcpy(cp,fileName);
+  strcpy(path, argv0);
+  //if(NULL==(cp=strrchr(path,'\\'))) cp=path; else cp++;
+  //cp=strcpy(cp,fileName);
+
+  *(strrchr(path, '\\')) = '\0';        // Strip \\filename.exe off path
+  *(strrchr(path, '\\')) = '\0';        // Strip \\bin off path
+
+  strcat(path, "\\logs");
+  strcat(path, "\\");
+  strcat(path, fileName);
+
   return path;
 }
 
@@ -233,8 +241,7 @@ static void server_finished(void *a, loService *b, loClient *c)
 
 inline void init_common(void)
 {
-
-  logg = unilog_Create(ECL_SID, absPath(LOG_FNAME), NULL,
+  logg = unilog_Create(ECL_SID, logPath(LOG_FNAME), NULL,
 		      -1, /* Max filesize: -1 unlimited, -2 -don't change */
 		      ll_DEBUG); /* level [ll_FATAL...ll_DEBUG] */
 
@@ -679,14 +686,14 @@ void poll_device(void)
 
     UL_DEBUG((LOGID, "Driver poll <%d:%d>", devp->ids[i], ecode));
 
-    if(ecode == ERROR_SUCCESS)
-	{
-      timetToFileTime(devp->mtime, &ft);
-	}
-    else
-	{
+    //if(ecode == ERROR_SUCCESS)
+	//{
+    //  timetToFileTime(devp->mtime, &ft);
+	//}
+    //else
+	//{
       GetSystemTimeAsFileTime(&ft);
-	}
+	//}
 
     EnterCriticalSection(&lk_values);
 
@@ -779,7 +786,7 @@ int driver_init(int lflags)
   //ld.ldConvertTags = ConvertTags;
   //ld.ldAskItemID = AskItemID;
   ld.ldFlags = lflags | loDF_IGNCASE;
-  ld.ldBranchSep = '/'; /* Hierarchial branch separator */
+  ld.ldBranchSep = '.'; /* Hierarchial branch separator */
 
   ecode = loServiceCreate(&our_service, &ld, tTotal);
   UL_TRACE((LOGID, "%!e loServiceCreate()=", ecode));
