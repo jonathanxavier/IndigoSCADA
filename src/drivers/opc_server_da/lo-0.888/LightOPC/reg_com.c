@@ -69,7 +69,7 @@ int loServerRegister(const GUID *CLSID_Svr, const char *ProgID,
 /* Should "vendor" be a subkey or a named value? */
   if (ERROR_SUCCESS == RegCreateKey(hKeyAux, "Vendor", &vendor))
     {
-     RegSetValue(vendor, NULL, REG_SZ, "Lab43", sizeof("Lab43"));
+     RegSetValue(vendor, NULL, REG_SZ, "Enscada", sizeof("Enscada"));
      RegCloseKey(vendor);
     }
   RegCloseKey(hKeyAux);
