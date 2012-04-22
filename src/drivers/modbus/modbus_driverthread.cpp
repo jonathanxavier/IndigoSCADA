@@ -39,6 +39,8 @@ void Modbus_DriverThread::run()
 		
 	strcpy(pCommandLine, "C:\\scada\\bin\\modbus_master.exe -a ");
 	strcat(pCommandLine, ((Modbus_driver_Instance*)Parent)->Cfg.MODBUSServerIPAddress);
+	strcat(pCommandLine, " -p ");
+	strcat(pCommandLine, ((Modbus_driver_Instance*)Parent)->Cfg.MODBUSServerIPPort);
 	strcat(pCommandLine, " -l ");
 	strcat(pCommandLine, line_number);
 	strcat(pCommandLine, " -t ");
@@ -118,7 +120,7 @@ void Modbus_DriverThread::run()
         /////////////////////////////////////////////////////////////////////////////
 	}
 	
-	UnitFail("IEC 104 driver stopped");
+	UnitFail("MODBUS driver stopped");
 
     Done = true;
 }

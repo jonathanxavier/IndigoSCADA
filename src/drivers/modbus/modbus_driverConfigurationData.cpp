@@ -46,7 +46,7 @@ Modbus_driverConfigurationData::Modbus_driverConfigurationData(QWidget *parent, 
 	Name->setMargin( 0 );
 
 	MODBUSServerIPAddressText = new QLineEdit(this, "LineEdit_7");
-	MODBUSServerIPAddressText->setGeometry(200, 80, 100, 30);
+	MODBUSServerIPAddressText->setGeometry(200, 40, 100, 30);
 	MODBUSServerIPAddressText->setMinimumSize(0, 0);
 	MODBUSServerIPAddressText->setMaximumSize(32767, 32767);
 	MODBUSServerIPAddressText->setFocusPolicy(QWidget::StrongFocus);
@@ -61,7 +61,7 @@ Modbus_driverConfigurationData::Modbus_driverConfigurationData(QWidget *parent, 
 	MODBUSServerIPAddressText->setFrame( TRUE );
 	MODBUSServerIPAddressText->setAlignment( AlignLeft );
 	QLabel *qtarch_Label_22 = new QLabel(this, "Label_21");
-	qtarch_Label_22->setGeometry(10, 80, 150, 30);
+	qtarch_Label_22->setGeometry(10, 40, 180, 30);
 	qtarch_Label_22->setMinimumSize(0, 0);
 	qtarch_Label_22->setMaximumSize(32767, 32767);
 	qtarch_Label_22->setFocusPolicy(QWidget::NoFocus);
@@ -77,6 +77,39 @@ Modbus_driverConfigurationData::Modbus_driverConfigurationData(QWidget *parent, 
 	qtarch_Label_22->setText( tr( "MODBUS slave IP address" ) );
 	qtarch_Label_22->setAlignment( AlignLeft|AlignVCenter|ExpandTabs );
 	qtarch_Label_22->setMargin( 0 );
+
+	MODBUSServerIPPortText = new QLineEdit(this, "LineEdit_8");
+	MODBUSServerIPPortText->setGeometry(200, 80, 100, 30);
+	MODBUSServerIPPortText->setMinimumSize(0, 0);
+	MODBUSServerIPPortText->setMaximumSize(32767, 32767);
+	MODBUSServerIPPortText->setFocusPolicy(QWidget::StrongFocus);
+	MODBUSServerIPPortText->setBackgroundMode(QWidget::PaletteBase);
+#if QT_VERSION < 300
+	MODBUSServerIPPortText->setFontPropagation(QWidget::SameFont);
+	MODBUSServerIPPortText->setPalettePropagation(QWidget::SameFont);
+	#endif
+	MODBUSServerIPPortText->setText( tr( "" ) );
+	MODBUSServerIPPortText->setMaxLength( 100 );
+	MODBUSServerIPPortText->setFrame( QLineEdit::Normal );
+	MODBUSServerIPPortText->setFrame( TRUE );
+	MODBUSServerIPPortText->setAlignment( AlignLeft );
+	QLabel *qtarch_Label_23 = new QLabel(this, "Label_21");
+	qtarch_Label_23->setGeometry(10, 80, 150, 30);
+	qtarch_Label_23->setMinimumSize(0, 0);
+	qtarch_Label_23->setMaximumSize(32767, 32767);
+	qtarch_Label_23->setFocusPolicy(QWidget::NoFocus);
+	qtarch_Label_23->setBackgroundMode(QWidget::PaletteBackground);
+	#if QT_VERSION < 300
+	qtarch_Label_23->setFontPropagation(QWidget::SameFont);
+	qtarch_Label_23->setPalettePropagation(QWidget::SameFont);
+	#endif
+	qtarch_Label_23->setFrameStyle( 0 );
+	qtarch_Label_23->setLineWidth( 1 );
+	qtarch_Label_23->setMidLineWidth( 0 );
+	qtarch_Label_23->QFrame::setMargin( 0 );
+	qtarch_Label_23->setText( tr( "MODBUS slave TCP port" ) );
+	qtarch_Label_23->setAlignment( AlignLeft|AlignVCenter|ExpandTabs );
+	qtarch_Label_23->setMargin( 0 );
 /////////////////////////////////////////////////////////////////////////
 	
 /////////////////////////////////////////////////////////////////////////

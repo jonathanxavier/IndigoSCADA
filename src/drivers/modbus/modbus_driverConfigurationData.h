@@ -23,8 +23,8 @@ class Modbus_driverConfigurationData : public QDialog
 	QLabel *Name;
 	QSpinBox *NItems;
 	QSpinBox *PollInterval;
-	//QLineEdit *OpcServerProgIDText;
 	QLineEdit *MODBUSServerIPAddressText;
+	QLineEdit *MODBUSServerIPPortText;
 };
 #endif // Modbus_driverConfigurationData_included
 

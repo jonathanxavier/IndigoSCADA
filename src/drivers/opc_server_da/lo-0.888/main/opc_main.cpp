@@ -273,15 +273,28 @@ extern "C" int main(int argc, char *argv[])
   return opc_main(GetModuleHandle(NULL), argc, argv);
 }
 
+#define SUPPLIER "@ enscada.com"
+#define APPLICATION "opc_server_da.exe"
+
 int opc_main(HINSTANCE hInstance, int argc, char *argv[]) {
   const char eClsidName [] = ECL_SID;
   const char eProgID [] = PROG_ID;
   DWORD objid;
   char *cp;
 
+  //version control///////////////////////////////////////////////////////////////
+  char version[100];
+  sprintf(version, ""APPLICATION" - Built on %s %s %s",__DATE__,__TIME__,SUPPLIER);
+  fprintf(stderr, "%s\n", version);
+  fflush(stderr);
+  SYSTEMTIME oT;
+  ::GetLocalTime(&oT);
+  fprintf(stderr,"%02d/%02d/%04d, %02d:%02d:%02d Starting ... %s\n",oT.wMonth,oT.wDay,oT.wYear,oT.wHour,oT.wMinute,oT.wSecond,APPLICATION); 
+  fflush(stderr);
+  ////////////////////////////////////////////////////////////////////////////////
+
   objid=::GetModuleFileName(NULL, argv0, sizeof(argv0));
   if(objid==0 || objid+50 > sizeof(argv0)) return 0;
-
 
   init_common();
 

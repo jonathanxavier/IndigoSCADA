@@ -163,6 +163,7 @@ void Modbus_driver_Instance::QueryResponse(QObject *p, const QString &c, int id,
 				is >> IecItems;	  // how many modbus items there are in the RTU or PLC
 				is >> Cfg.SampleTime; // how long we sample for in milliseconds
 				is >> Cfg.MODBUSServerIPAddress; // MODBUS server IP Address
+				is >> Cfg.MODBUSServerIPPort; // MODBUS server TCP port
 
 				Countdown = 1;
 

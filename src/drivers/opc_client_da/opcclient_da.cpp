@@ -1183,7 +1183,7 @@ int Opc_client_da_DriverThread::OpcStart()
 
 	strcpy(ServerIPAddress, ((Opc_client_da_Instance*)Parent)->Cfg.OpcServerIPAddress);
 
-	if(strlen(ServerIPAddress) == 0)
+	if((strlen(ServerIPAddress) == 0) || (strcmp(ServerIPAddress, "127.0.0.1") == 0))
 	{
 		local_server = 1;
 	}
@@ -1568,7 +1568,8 @@ int Opc_client_da_DriverThread::OpcStart()
 
 			strcpy(OpcclassId, ((Opc_client_da_Instance*)Parent)->Cfg.OpcclassId);
 
-			if(strlen(OpcclassId) > 0)
+			//if(strlen(OpcclassId) > 0)
+			if(strcmp(OpcclassId, "{}") != 0)
 			{
 				//If this thread is run as Local Account, then you need to have the remote classId string (CLSID)
 								
@@ -1928,6 +1929,13 @@ int Opc_client_da_DriverThread::AddItems()
 		
 	USES_CONVERSION;
 
+	if(g_pIOPCBrowse == NULL)
+	{
+		hr = -1;
+		ShowError(hr, _T("g_pIOPCBrowse == NULL"));
+		return 1;
+	}
+
     hr = g_pIOPCBrowse->BrowseOPCItemIDs(OPC_FLAT, L""/*NULL*/, VT_EMPTY, 0, &pEnumString);
 
 	if(FAILED(hr))
@@ -1956,7 +1964,6 @@ int Opc_client_da_DriverThread::AddItems()
 		Item = (struct structItem*)malloc(g_dwNumItems*sizeof(struct structItem));
 
 		pEnumString->Release();
-	
 
 		hr = g_pIOPCBrowse->BrowseOPCItemIDs(OPC_FLAT, L""/*NULL*/, VT_EMPTY, 0, &pEnumString);
 
@@ -2207,8 +2214,9 @@ void Opc_client_da_DriverThread::ShowError(HRESULT hr, LPCSTR pszError)
 void Opc_client_da_DriverThread::ShowMessage(HRESULT hr, LPCSTR pszError, const char* name)
 {
 	{	
+		//A BUG is here!
 		LPWSTR pwszError = NULL;
-
+		
 		if((g_pIOPCServer != NULL) && SUCCEEDED(g_pIOPCServer->GetErrorString(hr, 0, &pwszError)))
 		{
 			QString err;
