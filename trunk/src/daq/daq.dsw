@@ -330,6 +330,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "modbus_master"=..\drivers\modbus\protocol\modbus_master.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "monitor"=..\monitor\monitor.dsp - Package Owner=<4>
 
 Package=<5>

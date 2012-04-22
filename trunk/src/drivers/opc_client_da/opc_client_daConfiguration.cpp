@@ -69,7 +69,7 @@ void Opc_client_daConfiguration::OkClicked()
 	QString cmd = QString("delete from PROPS where SKEY='")+QString(Name->text()) + QString("' and IKEY='") + Receipe + "';";
 	GetConfigureDb()->DoExec(0,cmd,0); // delete the old value
 	//
-	if(strlen((const char*)OpcServerClassIDText->text()) > 0)
+	if( (strlen((const char*)OpcServerClassIDText->text()) > 0) &&  (strlen((const char*)OpcServerIPAddressText->text()) > 0) )
 	{
 		cmd = "insert into PROPS values('"+Name->text() +"','" + Receipe + "','" + 
 		NItems->text() + 
@@ -79,13 +79,24 @@ void Opc_client_daConfiguration::OkClicked()
 		" " + OpcServerClassIDText->text() +
 		"');";
 	}
-	else
+	else if( (strlen((const char*)OpcServerClassIDText->text()) == 0) &&  (strlen((const char*)OpcServerIPAddressText->text()) > 0) )
 	{
 		cmd = "insert into PROPS values('"+Name->text() +"','" + Receipe + "','" + 
 		NItems->text() + 
 		" " + PollInterval->text() + 
 		" " + OpcServerProgIDText->text() + 
 		" " + OpcServerIPAddressText->text() +
+		" " + "{}" +
+		"');";
+	}
+	else
+	{
+		cmd = "insert into PROPS values('"+Name->text() +"','" + Receipe + "','" + 
+		NItems->text() + 
+		" " + PollInterval->text() + 
+		" " + OpcServerProgIDText->text() + 
+		" " + "127.0.0.1" +
+		" " + "{}" +
 		"');";
 	}
 
@@ -136,7 +147,6 @@ void Opc_client_daConfiguration::QueryResponse (QObject *p, const QString &c, in
 				GetConfigureDb()->DoExec(0,cmd,0);
 				NItems->setValue(8);
 				PollInterval->setValue(1000);
-				//SetComboItem(OpcServerProgID,"COM2");
 				OpcServerProgIDText->setText("");
 				OpcServerIPAddressText->setText("");
 				OpcServerClassIDText->setText("");

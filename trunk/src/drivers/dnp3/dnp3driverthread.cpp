@@ -120,7 +120,7 @@ void Dnp3DriverThread::run()
         /////////////////////////////////////////////////////////////////////////////
 	}
 	
-	UnitFail("IEC 104 driver stopped");
+	UnitFail("DNP3 driver stopped");
 
     Done = true;
 }

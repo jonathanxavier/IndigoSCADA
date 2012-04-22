@@ -48,8 +48,8 @@ Inherited( parent, name ),Receipe(receipe)
 	if(Receipe != "(default)")
 	{
 		NItems->setEnabled(false);
-		//OpcServerProgIDText->setEnabled(false);
 		MODBUSServerIPAddressText->setEnabled(false);
+		MODBUSServerIPPortText->setEnabled(false);
 	};
 }
 Modbus_driverConfiguration::~Modbus_driverConfiguration()
@@ -69,7 +69,7 @@ void Modbus_driverConfiguration::OkClicked()
 	GetConfigureDb()->DoExec(0,cmd,0); // delete the old value
 	//
 	cmd = "insert into PROPS values('"+Name->text() +"','" + Receipe + "','" + 
-	NItems->text() + " " + PollInterval->text() + " " + MODBUSServerIPAddressText->text() +"');";
+	NItems->text() + " " + PollInterval->text() + " " + MODBUSServerIPAddressText->text() + " " + MODBUSServerIPPortText->text() +"');";
 	GetConfigureDb()->DoExec(0,cmd,0);
 	QSAuditTrail(this,caption(), tr("Edited"));
 
@@ -102,6 +102,8 @@ void Modbus_driverConfiguration::QueryResponse (QObject *p, const QString &c, in
 				PollInterval->setValue(n);
 				is >> t;
 				MODBUSServerIPAddressText->setText(t);
+				is >> t;
+				MODBUSServerIPPortText->setText(t);
 			}
 			else
 			{
@@ -113,6 +115,7 @@ void Modbus_driverConfiguration::QueryResponse (QObject *p, const QString &c, in
 				NItems->setValue(8);
 				PollInterval->setValue(1000);
 				MODBUSServerIPAddressText->setText("");
+				MODBUSServerIPPortText->setText("");
 			}
 		} 
 		break;

@@ -38,17 +38,19 @@ class Modbus_driver_Instance;
 struct InstanceCfg // friend to anyone
 {
 	QString MODBUSServerIPAddress;  // MODBUS server IP address (slave)
+	QString MODBUSServerIPPort;  // MODBUS server TCP port
 
 	unsigned SampleTime; // sampleing time 
 
 	InstanceCfg() : 
-	SampleTime(1000),MODBUSServerIPAddress("")
+	SampleTime(1000),MODBUSServerIPAddress(""),MODBUSServerIPPort("")
 	{
 	};
 
 	InstanceCfg(const InstanceCfg &m) : 
 
-	SampleTime(m.SampleTime),MODBUSServerIPAddress(m.MODBUSServerIPAddress)
+	SampleTime(m.SampleTime),MODBUSServerIPAddress(m.MODBUSServerIPAddress),
+	MODBUSServerIPPort(m.MODBUSServerIPPort)
 	{
 	};
 };
