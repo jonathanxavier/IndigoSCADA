@@ -325,9 +325,9 @@ void Opc_client_ae_DriverThread::SendEvent2(ONEVENTSTRUCT* pEvent)
 			break;
 			case VT_I1:
 			{
-				is_type153 var;
+				iec_type35 var;
 
-				memset(&var, 0x00, sizeof(is_type153));
+				memset(&var, 0x00, sizeof(iec_type35));
 
 				var.mv = V_I1(pValue);
 
@@ -345,7 +345,7 @@ void Opc_client_ae_DriverThread::SendEvent2(ONEVENTSTRUCT* pEvent)
 
 				var.time = time;
 
-				SpValue v(VALUE_TAG, &var, M_ME_TQ_1);
+				SpValue v(VALUE_TAG, &var, M_ME_TE_1);
 
 				post_val(v, name);
 				
@@ -355,9 +355,9 @@ void Opc_client_ae_DriverThread::SendEvent2(ONEVENTSTRUCT* pEvent)
 			break;
 			case VT_UI1:
 			{
-				iec_type35 var;
+				is_type153 var;
 
-				memset(&var, 0x00, sizeof(iec_type35));
+				memset(&var, 0x00, sizeof(is_type153));
 
 				var.mv = V_UI1(pValue);
 
@@ -375,7 +375,7 @@ void Opc_client_ae_DriverThread::SendEvent2(ONEVENTSTRUCT* pEvent)
 
 				var.time = time;
 
-				SpValue v(VALUE_TAG, &var, M_ME_TE_1);
+				SpValue v(VALUE_TAG, &var, M_ME_TQ_1);
 
 				post_val(v, name);
 			
@@ -384,9 +384,9 @@ void Opc_client_ae_DriverThread::SendEvent2(ONEVENTSTRUCT* pEvent)
 			break;
 			case VT_I2:
 			{
-				is_type153 var;
+				iec_type35 var;
 
-				memset(&var, 0x00, sizeof(is_type153));
+				memset(&var, 0x00, sizeof(iec_type35));
 
 				var.mv = V_I2(pValue);
 
@@ -404,7 +404,7 @@ void Opc_client_ae_DriverThread::SendEvent2(ONEVENTSTRUCT* pEvent)
 
 				var.time = time;
 
-				SpValue v(VALUE_TAG, &var, M_ME_TQ_1);
+				SpValue v(VALUE_TAG, &var, M_ME_TE_1);
 
 				post_val(v, name);
 				
@@ -413,9 +413,9 @@ void Opc_client_ae_DriverThread::SendEvent2(ONEVENTSTRUCT* pEvent)
 			break;
 			case VT_UI2:
 			{
-				iec_type35 var;
+				is_type153 var;
 
-				memset(&var, 0x00, sizeof(iec_type35));
+				memset(&var, 0x00, sizeof(is_type153));
 
 				var.mv = V_UI2(pValue);
 
@@ -433,7 +433,7 @@ void Opc_client_ae_DriverThread::SendEvent2(ONEVENTSTRUCT* pEvent)
 
 				var.time = time;
 
-				SpValue v(VALUE_TAG, &var, M_ME_TE_1);
+				SpValue v(VALUE_TAG, &var, M_ME_TQ_1);
 
 				post_val(v, name);
 				
