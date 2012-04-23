@@ -124,9 +124,26 @@ typedef struct _iec_type7 {
 	u_char		iv	:1; /* valid/invalid */
 }iec_type7;
 
+
+//See clause 7.2.6.6
+//NVA := F16[1..16]<-1..+1-2^-15>
+//Letter F means positive or negative fixed point number
+//F16 means 16 bits in size 
+
+//The maximum value of a fixed-point type is 
+//simply the largest value that can be represented 
+//in the underlying integer type, 
+//multiplied by the scaling factor; and similarly for the minimum value. 
+//For example, consider a fixed-point type represented as a binary 
+//integer with b=16 bits in two's complement format, 
+//with a scaling factor of 1/2^f where f = 15 
+//(that is, the last f=15 bits are fraction bits): 
+//the minimum representable value is -2^(b-1)/2^f = -1 and
+//the maximum value is (2^(b-1)-1)/2^f = +1-2^-15 .
+
 /* M_ME_NA_1 - normalized measured value */
 typedef struct _iec_type9 {
-	u_short		mv;	/* normalized value: from 32767 to -32768 */
+	short		mv;	/* normalized value: from -1 to +1 */
 	u_char		ov	:1; /* overflow/no overflow */
 	u_char		res	:3;
 	u_char		bl	:1; /* blocked/not blocked */
@@ -135,9 +152,14 @@ typedef struct _iec_type9 {
 	u_char		iv	:1; /* valid/invalid */
 }iec_type9;
 
+//See clause 7.2.6.7
+//SVA := I16[1..16]<-2^15..+2^15 - 1>
+//Letter I means positive or negative integer number
+//I16 means 16 bits in size 
+
 /* M_ME_NB_1 - scaled measured value */
 typedef struct _iec_type11 {
-	u_short		mv;	/* scaled value: from 32767 to -32768 */
+	short		mv;	/* scaled value: from -32768 to 32767*/
 	u_char		ov	:1; /* overflow/no overflow */
 	u_char		res	:3;
 	u_char		bl	:1; /* blocked/not blocked */
@@ -156,6 +178,9 @@ typedef struct _iec_type13 {
 	u_char		nt	:1; /* not topical/topical */
 	u_char		iv	:1; /* valid/invalid */
 }iec_type13;
+
+//BCR See clause 7.2.6.9
+//Counter reading := I32[1..32]<-2^31..+2^31 - 1> 
 
 /* M_IT_NA_1 - itegrated totals */
 typedef struct _iec_type15 {
@@ -203,7 +228,7 @@ typedef struct _iec_type33 {
 
 /* M_ME_TD_1 - normalized measured value with time tag */
 typedef struct _iec_type34 {
-	u_short		mv;	/* normalized value */
+	short		mv;	/* normalized value */
 	u_char		ov	:1; /* overflow/no overflow */
 	u_char		res	:3;
 	u_char		bl	:1; /* blocked/not blocked */
@@ -215,7 +240,7 @@ typedef struct _iec_type34 {
 
 /* M_ME_TE_1 - scaled measured value with time tag*/
 typedef struct _iec_type35 {
-	u_short		mv;	/* scaled value */
+	short		mv;	/* scaled value */
 	u_char		ov	:1; /* overflow/no overflow */
 	u_char		res	:3;
 	u_char		bl	:1; /* blocked/not blocked */
@@ -298,7 +323,6 @@ typedef struct _iec_type100 {
 typedef struct _iec_type103 {
 	cp56time2a	time;
 }iec_type103;
-
 
 /* C_TS_NA_1 - Test command*/
 typedef struct _iec_type104 {
@@ -419,9 +443,9 @@ typedef struct _is_type152 {
 	cp56time2a	time;
 }is_type152;
 
-/* M_ME_TQ_1 - 16 bit signed short measurement value and time tag */
+/* M_ME_TQ_1 - 16 bit unsigned short measurement value and time tag */
 typedef struct _is_type153 {
-	short mv;
+	u_short		mv;
 	u_char		ov	:1; /* overflow/no overflow */
 	u_char		res	:3;
 	u_char		bl	:1; /* blocked/not blocked */
