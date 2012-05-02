@@ -43,7 +43,6 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 LIB32=link.exe -lib
-
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "GIGABASE_DLL" /D "WIN32" /D "_WIN32" /D "_DEBUG" /D "_WINDOWS" /D "USE_LOCALE_SETTINGS" /D "_MBCS" /YX /FD /c
 # ADD CPP /nologo /MD /W3 /GX /O2 /I "$(QTDIR)\include" /I "..\trace" /I ".\inc" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "FASTDB_DLL" /D "USE_LOCALE_SETTINGS" /D "SECURE_SERVER" /D "_WIN32" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
@@ -55,7 +54,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
-# ADD LINK32 wsock32.lib /nologo /dll /debug /machine:I386 /out:"c:\scada\bin/realtimedbase.dll" /implib:"c:\scada\lib/realtimedbase.lib" /libpath:"c:\scada\lib"
+# ADD LINK32 wsock32.lib /nologo /dll /pdb:"Release/realtimedbase.pdb" /debug /machine:I386 /out:"c:\scada\bin/realtimedbase.dll" /implib:"c:\scada\lib/realtimedbase.lib" /libpath:"c:\scada\lib"
 # SUBTRACT LINK32 /pdb:none
 
 !ELSEIF  "$(CFG)" == "fastdb - Win32 Debug"
@@ -74,7 +73,6 @@ LINK32=link.exe
 LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo
 # ADD LIB32 /nologo
-
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "GIGABASE_DLL" /D "WIN32" /D "_WIN32" /D "_DEBUG" /D "_WINDOWS" /D "USE_LOCALE_SETTINGS" /D "_MBCS" /GZ /c
 # ADD CPP /nologo /MDd /W3 /GX /Zi /Od /I "$(QTDIR)\include" /I "..\trace" /I ".\inc" /D "FASTDB_DLL" /D "WIN32" /D "_WIN32" /D "_DEBUG" /D "_WINDOWS" /D "USE_LOCALE_SETTINGS" /D "_MBCS" /GZ /c
 # ADD BASE MTL /nologo /win32

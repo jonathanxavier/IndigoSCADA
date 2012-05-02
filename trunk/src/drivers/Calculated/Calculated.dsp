@@ -86,7 +86,7 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib WSOCK32.LIB scada.lib qtdll.lib /nologo /dll /pdb:"Debug/Calculated.pdb" /debug /machine:I386 /nodefaultlib:"msvcrt.lib" /pdbtype:sept /libpath:"$(QTDIR)\lib" /libpath:"c:\scada\lib"
 # SUBTRACT BASE LINK32 /pdb:none
-# ADD LINK32 scada.lib utilities.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib WSOCK32.LIB qt-mtnc$(QTVER).lib eic.lib /nologo /dll /incremental:no /debug /machine:I386 /nodefaultlib:"LIBCMT" /libpath:"$(QTDIR)\lib" /libpath:"c:\scada\lib" /libpath:"..\..\softlogic\EiC-4.4.2\src" /libpath:"..\..\fifo\Release"
+# ADD LINK32 scada.lib utilities.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib WSOCK32.LIB qt-mtnc$(QTVER).lib eic.lib /nologo /dll /incremental:no /pdb:"Release/Calculated.pdb" /debug /machine:I386 /nodefaultlib:"LIBCMT" /libpath:"$(QTDIR)\lib" /libpath:"c:\scada\lib" /libpath:"..\..\softlogic\EiC-4.4.2\src" /libpath:"..\..\fifo\Release"
 # SUBTRACT LINK32 /pdb:none
 
 !ENDIF 

@@ -149,6 +149,12 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name lightopc_lib
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name librtps
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name rtps_mngr
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -283,6 +289,18 @@ Package=<4>
 ###############################################################################
 
 Project: "iec104driver"=..\drivers\iec104\iec104driver.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "librtps"=..\middleware\rtps\librtps\msvc\librtps.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -442,6 +460,18 @@ Package=<4>
 ###############################################################################
 
 Project: "rfc1006driver"=..\drivers\rfc1006\rfc1006driver.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "rtps_mngr"=..\middleware\rtps\manager\mcvs\rtps_mngr.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
