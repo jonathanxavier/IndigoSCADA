@@ -88,7 +88,11 @@ Development of OPC serverDA 2.0 is under way: opc_server_da.exe
 21-04-2012
 modbus_master.exe runs.
 It needs testing with RTU. Volunteers are welcome
-The Modubus modules are modbus_master.exe and modbus_driver.dll
+The Modbus modules are modbus_master.exe and modbus_driver.dll
 It is still missing the mapping of Modbus data types to IEC 104 IndigoSCADA internal types
 It is still missing the Inter Process Communication between the mpi_master.exe and mpi_driver.dll
----------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
+02-May-2012
+Added Real Time Publisher Subscriber (RTPS) as middleware protocol for inter process communication between SCADA processes
+-------------------------------------------------------------------------------------------------------
+

@@ -54,7 +54,8 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib wsock32.lib unilog.lib lightopc.lib /nologo /subsystem:console /pdb:none /machine:I386 /libpath:"c:\scada\lib" /libpath:"..\bin" /libpath:"..\unilog"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib wsock32.lib unilog.lib lightopc.lib /nologo /subsystem:console /pdb:"Release/opc_server_da.pdb" /machine:I386 /libpath:"c:\scada\lib" /libpath:"..\bin" /libpath:"..\unilog"
+# SUBTRACT LINK32 /pdb:none
 
 !ELSEIF  "$(CFG)" == "opc_server_da - Win32 Debug"
 
@@ -80,8 +81,8 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib wsock32.lib unilog.lib lightopc.lib /nologo /subsystem:console /incremental:no /debug /machine:I386 /libpath:"c:\scada\lib" /libpath:"..\bin" /libpath:"..\unilog"
-# SUBTRACT LINK32 /profile
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib wsock32.lib unilog.lib lightopc.lib /nologo /subsystem:console /incremental:no /pdb:"Debug/opc_server_da.pdb" /debug /machine:I386 /libpath:"c:\scada\lib" /libpath:"..\bin" /libpath:"..\unilog"
+# SUBTRACT LINK32 /pdb:none
 
 !ENDIF 
 
