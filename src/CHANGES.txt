@@ -95,4 +95,6 @@ It is still missing the Inter Process Communication between the mpi_master.exe a
 02-May-2012
 Added Real Time Publisher Subscriber (RTPS) as middleware protocol for inter process communication between SCADA processes
 -------------------------------------------------------------------------------------------------------
+05-May-2012
+Added protocol configurator, based on SQLite 3 database files
 

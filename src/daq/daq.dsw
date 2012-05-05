@@ -155,6 +155,9 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name rtps_mngr
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name protocol_configurator
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -425,6 +428,18 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name lightopc_lib
     End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "protocol_configurator"=..\configurator\browser\protocol_configurator.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
 }}}
 
 ###############################################################################
