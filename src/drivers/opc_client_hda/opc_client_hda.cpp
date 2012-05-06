@@ -189,7 +189,7 @@ Opc_client_hda * Opc_client_hda::pDriver = 0; // only one instance should be cre
 */
 void Opc_client_hda::Start() // start everything under this driver's control
 {
-		QString cmd = "select * from UNITS where UNITTYPE='opc_client_hda' and NAME in(" + DriverInstance::FormUnitList()+ ");";
+		QString cmd = "select * from UNITS where UNITTYPE='opc_client_hda_driver' and NAME in(" + DriverInstance::FormUnitList()+ ");";
 		GetConfigureDb()->DoExec(this,cmd,tListUnits);
 };
 /*

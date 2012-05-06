@@ -32,7 +32,8 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 	//
 	enum
 	{
-		tUnitProperties = 1,tList, tSamplePointProperties, tListUnits
+		tUnitProperties = 1,tList, tSamplePointProperties, tListUnits,
+		tGetSamplePointNamefromIOA, tGetIOAfromSamplePointName
 	};
 	//
 	//
@@ -43,7 +44,6 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 	int Retry; // the retry count
 	int Countdown; // the countdown track
 	int State; // the state machine's state
-	int instanceID;
 	
 	//  
 	int Sp; //Current sample point index under measurement
@@ -134,6 +134,7 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 	InstanceCfg Cfg; // the cacheable stuff
 	Driver* ParentDriver;
 	QString unit_name;
+	int instanceID;
 	
 	void driverEvent(DriverEvent *); // message from thread to parent
 	bool event(QEvent *e);
