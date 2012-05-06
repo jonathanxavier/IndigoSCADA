@@ -40,39 +40,6 @@ QSEXPORT extern ins_mutex_t * mut;
 #include "iec104types.h"
 
 ////////////////////////////////////////////////////////////////////////////////////
-//measurement_type
-enum m_type
-{
-	M_SP_NA_1 =		1,
-	M_DP_NA_1 =		3,
-	M_BO_NA_1 =		7,
-	M_ME_NA_1 =		9,
-	M_ME_NB_1 =		11,
-	M_ME_NC_1 =		13,
-	M_SP_TB_1 =		30,
-	M_DP_TB_1 =		31,
-	M_BO_TB_1 =		33,
-	M_ME_TD_1 =		34,
-	M_ME_TE_1 =		35,
-	M_ME_TF_1 =		36,
-	M_ME_TN_1 =		150, //custom type
-	M_ME_TO_1 =		151,
-	M_ME_TP_1 =		152,
-	M_ME_TQ_1 =		153,
-	M_ME_TR_1 =		154,
-	M_ME_TS_1 =		155,
-	M_ME_TT_1 =		156,
-	s8bit	  =		200, //custom type
-	u8bit	  =		201, //custom type
-	s16bit	  =		202, //custom type
-	u16bit	  =		203, //custom type
-	s32bit	  =		204, //custom type
-	u32bit	  =		205, //custom type
-	s64bit	  =		206, //custom type
-	u64bit	  =		207, //custom type
-	f32bit	  =		208, //custom type
-	f64bit	  =		209 //custom type
-};
 
 struct SpValue // a measured result
 {

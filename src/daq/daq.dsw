@@ -158,6 +158,15 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name protocol_configurator
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name opc_client_ae_driver
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name opc_client_da_driver
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name opc_client_hda_driver
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -381,7 +390,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "opc_client_ae"=..\drivers\opc_client_ae\opc_client_ae.dsp - Package Owner=<4>
+Project: "opc_client_ae"=..\drivers\opc_client_ae\protocol\opc_client_ae.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -393,7 +402,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "opc_client_da"=..\drivers\opc_client_da\opc_client_da.dsp - Package Owner=<4>
+Project: "opc_client_ae_driver"=..\drivers\opc_client_ae\opc_client_ae_driver.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -405,7 +414,31 @@ Package=<4>
 
 ###############################################################################
 
-Project: "opc_client_hda"=..\drivers\opc_client_hda\opc_client_hda.dsp - Package Owner=<4>
+Project: "opc_client_da"=..\drivers\opc_client_da\protocol\opc_client_da.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "opc_client_da_driver"=..\drivers\opc_client_da\opc_client_da_driver.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "opc_client_hda_driver"=..\drivers\opc_client_hda\opc_client_hda_driver.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
