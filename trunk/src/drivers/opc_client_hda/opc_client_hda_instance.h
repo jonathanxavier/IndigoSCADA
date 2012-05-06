@@ -32,7 +32,8 @@ class OPC_CLIENT_HDADRV Opc_client_hda_Instance : public DriverInstance
 	//
 	enum
 	{
-		tUnitProperties = 1,tList, tSamplePointProperties, tListUnits
+		tUnitProperties = 1,tList, tSamplePointProperties, tListUnits,
+		tGetSamplePointNamefromIOA, tGetIOAfromSamplePointName
 	};
 	//
 	//
@@ -43,7 +44,6 @@ class OPC_CLIENT_HDADRV Opc_client_hda_Instance : public DriverInstance
 	int Retry; // the retry count
 	int Countdown; // the countdown track
 	int State; // the state machine's state
-	int instanceID;
 	
 	//  
 	int Sp; //Current sample point index under measurement
@@ -84,6 +84,7 @@ class OPC_CLIENT_HDADRV Opc_client_hda_Instance : public DriverInstance
 	Opc_client_hda_DriverThread *pConnect;
 	fifo_h fifo_control_direction;
 	unsigned int msg_sent_in_control_direction;
+	int instanceID;
 
 	//
 	Opc_client_hda_Instance(Driver *parent, const QString &name, int instance_id) : 

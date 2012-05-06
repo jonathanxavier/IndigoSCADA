@@ -1,24 +1,24 @@
-# Microsoft Developer Studio Project File - Name="opc_client_da" - Package Owner=<4>
+# Microsoft Developer Studio Project File - Name="opc_client_da_driver" - Package Owner=<4>
 # Microsoft Developer Studio Generated Build File, Format Version 6.00
 # ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (x86) Dynamic-Link Library" 0x0102
 
-CFG=opc_client_da - Win32 Release
+CFG=opc_client_da_driver - Win32 Release
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
-!MESSAGE NMAKE /f "opc_client_da.mak".
+!MESSAGE NMAKE /f "opc_client_da_driver.mak".
 !MESSAGE 
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "opc_client_da.mak" CFG="opc_client_da - Win32 Release"
+!MESSAGE NMAKE /f "opc_client_da_driver.mak" CFG="opc_client_da_driver - Win32 Release"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "opc_client_da - Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
-!MESSAGE "opc_client_da - Win32 Release" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "opc_client_da_driver - Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "opc_client_da_driver - Win32 Release" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE 
 
 # Begin Project
@@ -29,7 +29,7 @@ CPP=cl.exe
 MTL=midl.exe
 RSC=rc.exe
 
-!IF  "$(CFG)" == "opc_client_da - Win32 Debug"
+!IF  "$(CFG)" == "opc_client_da_driver - Win32 Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -55,10 +55,10 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 advapi32.lib scadad.lib utilitiesd.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib shell32.lib uuid.lib WSOCK32.LIB snmpapi.lib qt-mtnc$(QTVER).lib fifo.lib /nologo /dll /incremental:no /pdb:"Debug/opc_client_da.pdb" /debug /machine:I386 /pdbtype:sept /libpath:"$(QTDIR)\lib" /libpath:"c:\scada\lib" /libpath:"..\..\fifo\Debug"
+# ADD LINK32 advapi32.lib scadad.lib utilitiesd.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib shell32.lib uuid.lib WSOCK32.LIB snmpapi.lib qt-mtnc$(QTVER).lib fifo.lib /nologo /dll /incremental:no /pdb:"Debug/opc_client_da_driver.pdb" /debug /machine:I386 /pdbtype:sept /libpath:"$(QTDIR)\lib" /libpath:"c:\scada\lib" /libpath:"..\..\fifo\Debug"
 # SUBTRACT LINK32 /pdb:none
 
-!ELSEIF  "$(CFG)" == "opc_client_da - Win32 Release"
+!ELSEIF  "$(CFG)" == "opc_client_da_driver - Win32 Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -84,17 +84,17 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib WSOCK32.LIB scada.lib snmpapi.lib qtdll.lib /nologo /dll /pdb:"Debug/opc_client_da.pdb" /debug /machine:I386 /nodefaultlib:"msvcrt.lib" /pdbtype:sept /libpath:"$(QTDIR)\lib" /libpath:"c:\scada\lib"
+# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib WSOCK32.LIB scada.lib snmpapi.lib qtdll.lib /nologo /dll /pdb:"Debug/opc_client_da_driver.pdb" /debug /machine:I386 /nodefaultlib:"msvcrt.lib" /pdbtype:sept /libpath:"$(QTDIR)\lib" /libpath:"c:\scada\lib"
 # SUBTRACT BASE LINK32 /pdb:none
-# ADD LINK32 scada.lib utilities.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib shell32.lib uuid.lib WSOCK32.LIB snmpapi.lib qt-mtnc$(QTVER).lib fifo.lib /nologo /dll /incremental:no /pdb:"Release/opc_client_da.pdb" /debug /machine:I386 /pdbtype:sept /libpath:"$(QTDIR)\lib" /libpath:"c:\scada\lib" /libpath:"..\..\fifo\Release"
+# ADD LINK32 scada.lib utilities.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib shell32.lib uuid.lib WSOCK32.LIB snmpapi.lib qt-mtnc$(QTVER).lib fifo.lib /nologo /dll /incremental:no /pdb:"Release/opc_client_da_driver.pdb" /debug /machine:I386 /pdbtype:sept /libpath:"$(QTDIR)\lib" /libpath:"c:\scada\lib" /libpath:"..\..\fifo\Release"
 # SUBTRACT LINK32 /pdb:none
 
 !ENDIF 
 
 # Begin Target
 
-# Name "opc_client_da - Win32 Debug"
-# Name "opc_client_da - Win32 Release"
+# Name "opc_client_da_driver - Win32 Debug"
+# Name "opc_client_da_driver - Win32 Release"
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
@@ -142,7 +142,7 @@ SOURCE=.\opc_client_da.cpp
 
 SOURCE=.\opc_client_da.h
 
-!IF  "$(CFG)" == "opc_client_da - Win32 Debug"
+!IF  "$(CFG)" == "opc_client_da_driver - Win32 Debug"
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - MOCing opc_client_da.h...
@@ -155,7 +155,7 @@ InputName=opc_client_da
 
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "opc_client_da - Win32 Release"
+!ELSEIF  "$(CFG)" == "opc_client_da_driver - Win32 Release"
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - MOCing opc_client_da.h...
@@ -179,7 +179,7 @@ SOURCE=.\opc_client_da_instance.cpp
 
 SOURCE=.\opc_client_da_instance.h
 
-!IF  "$(CFG)" == "opc_client_da - Win32 Debug"
+!IF  "$(CFG)" == "opc_client_da_driver - Win32 Debug"
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - MOCing opc_client_da_instance.h...
@@ -192,7 +192,7 @@ InputName=opc_client_da_instance
 
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "opc_client_da - Win32 Release"
+!ELSEIF  "$(CFG)" == "opc_client_da_driver - Win32 Release"
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - MOCing opc_client_da_instance.h...
@@ -216,7 +216,7 @@ SOURCE=.\opc_client_daCommand.cpp
 
 SOURCE=.\opc_client_daCommand.h
 
-!IF  "$(CFG)" == "opc_client_da - Win32 Debug"
+!IF  "$(CFG)" == "opc_client_da_driver - Win32 Debug"
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - MOCing opc_client_daCommand.h...
@@ -229,7 +229,7 @@ InputName=opc_client_daCommand
 
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "opc_client_da - Win32 Release"
+!ELSEIF  "$(CFG)" == "opc_client_da_driver - Win32 Release"
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - MOCing opc_client_daCommand.h...
@@ -253,7 +253,7 @@ SOURCE=.\opc_client_daCommandData.cpp
 
 SOURCE=.\opc_client_daCommandData.h
 
-!IF  "$(CFG)" == "opc_client_da - Win32 Debug"
+!IF  "$(CFG)" == "opc_client_da_driver - Win32 Debug"
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - MOCing opc_client_daCommandData.h...
@@ -266,7 +266,7 @@ InputName=opc_client_daCommandData
 
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "opc_client_da - Win32 Release"
+!ELSEIF  "$(CFG)" == "opc_client_da_driver - Win32 Release"
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - MOCing opc_client_daCommandData.h...
@@ -290,7 +290,7 @@ SOURCE=.\opc_client_daConfiguration.cpp
 
 SOURCE=.\opc_client_daConfiguration.h
 
-!IF  "$(CFG)" == "opc_client_da - Win32 Debug"
+!IF  "$(CFG)" == "opc_client_da_driver - Win32 Debug"
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - MOCing opc_client_daConfiguration.h...
@@ -303,7 +303,7 @@ InputName=opc_client_daConfiguration
 
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "opc_client_da - Win32 Release"
+!ELSEIF  "$(CFG)" == "opc_client_da_driver - Win32 Release"
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - MOCing opc_client_daConfiguration.h...
@@ -327,7 +327,7 @@ SOURCE=.\opc_client_daConfigurationData.cpp
 
 SOURCE=.\opc_client_daConfigurationData.h
 
-!IF  "$(CFG)" == "opc_client_da - Win32 Debug"
+!IF  "$(CFG)" == "opc_client_da_driver - Win32 Debug"
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - MOCing opc_client_daConfigurationData.h...
@@ -340,7 +340,7 @@ InputName=opc_client_daConfigurationData
 
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "opc_client_da - Win32 Release"
+!ELSEIF  "$(CFG)" == "opc_client_da_driver - Win32 Release"
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - MOCing opc_client_daConfigurationData.h...
@@ -372,7 +372,7 @@ SOURCE=.\opc_client_daInput.cpp
 
 SOURCE=.\opc_client_daInput.h
 
-!IF  "$(CFG)" == "opc_client_da - Win32 Debug"
+!IF  "$(CFG)" == "opc_client_da_driver - Win32 Debug"
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - MOCing opc_client_daInput.h...
@@ -385,7 +385,7 @@ InputName=opc_client_daInput
 
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "opc_client_da - Win32 Release"
+!ELSEIF  "$(CFG)" == "opc_client_da_driver - Win32 Release"
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - MOCing opc_client_daInput.h...
@@ -409,7 +409,7 @@ SOURCE=.\opc_client_daInputData.cpp
 
 SOURCE=.\opc_client_daInputData.h
 
-!IF  "$(CFG)" == "opc_client_da - Win32 Debug"
+!IF  "$(CFG)" == "opc_client_da_driver - Win32 Debug"
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - MOCing opc_client_daInputData.h...
@@ -422,7 +422,7 @@ InputName=opc_client_daInputData
 
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "opc_client_da - Win32 Release"
+!ELSEIF  "$(CFG)" == "opc_client_da_driver - Win32 Release"
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - MOCing opc_client_daInputData.h...
@@ -437,30 +437,6 @@ InputName=opc_client_daInputData
 
 !ENDIF 
 
-# End Source File
-# Begin Source File
-
-SOURCE=.\opcclient_da.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\opccomn.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\opccomn_i.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\opcda.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\Opcda_i.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\OpcEnum_i.c
 # End Source File
 # End Group
 # End Target

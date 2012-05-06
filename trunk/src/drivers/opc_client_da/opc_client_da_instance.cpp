@@ -27,7 +27,7 @@ void Opc_client_da_Instance::Start()
 	IT_IT("Opc_client_da_Instance::Start");
 
 	State = STATE_RESET;
-	QString cmd = "select * from UNITS where UNITTYPE='opc_client_da' and NAME in(" + DriverInstance::FormUnitList()+ ");";
+	QString cmd = "select * from UNITS where UNITTYPE='opc_client_da_driver' and NAME in(" + DriverInstance::FormUnitList()+ ");";
 	GetConfigureDb()->DoExec(this,cmd,tListUnits);
 };
 /*
@@ -182,11 +182,74 @@ void Opc_client_da_Instance::QueryResponse(QObject *p, const QString &c, int id,
 				};
 				//
 
-				//Start opc client driver
+				//Start OPC client DA driver
 				if(!Connect())
 				{
 					QSLogAlarm(Name,tr("Failed to start OPC client driver"));
 				}
+			}
+		}
+		break;
+		case tGetSamplePointNamefromIOA:
+		{
+			QSTransaction &t = GetConfigureDb()->CurrentTransaction();
+
+			if(GetConfigureDb()->GetNumberResults() > 0)
+			{
+				//
+				#ifdef DEPRECATED_OPC_CLIENT_DA_CONFIG
+				QString SamplePointName = UndoEscapeSQLText(GetConfigureDb()->GetString("IKEY"));
+				#else
+				QString SamplePointName = UndoEscapeSQLText(GetConfigureDb()->GetString("NAME"));
+				#endif
+
+				double v = 0.0;
+
+				if(strlen((const char*)t.Data1) > 0)
+				{
+					v = atof((const char*)t.Data1);
+					PostValue(SamplePointName, "BIT", v); //Post the value directly in memory database
+				}
+
+				printf("SamplePointName = %s, IOA = %s, value = %lf\n", (const char*)SamplePointName, (const char*)t.Data2, v);
+			}
+		}
+		break;
+		case tGetIOAfromSamplePointName:
+		{
+			QSTransaction &t = GetConfigureDb()->CurrentTransaction();
+
+			if(GetConfigureDb()->GetNumberResults() > 0)
+			{
+				// 
+				#ifdef DEPRECATED_OPC_CLIENT_DA_CONFIG
+				QString IOACommand = UndoEscapeSQLText(GetConfigureDb()->GetString("DVAL"));
+				#else
+				QString IOACommand = UndoEscapeSQLText(GetConfigureDb()->GetString("PARAMS"));
+				#endif
+				
+				int command_value = 0;
+				int ioa_command = 0;
+
+				ioa_command = atoi((const char*)IOACommand);
+
+				if(strlen((const char*)t.Data1) > 0)
+				{
+					command_value = atoi((const char*)t.Data1);
+				}
+
+				printf("Command from %s, IOA = %d, value = %d\n", (const char*)t.Data2, ioa_command, command_value);
+
+				//Send C_SC_NA_1//////////////////////////////////////////////////////////////////////////
+				struct iec_item item_to_send;
+				memset(&item_to_send,0x00, sizeof(struct iec_item));
+				item_to_send.iec_type = C_SC_NA_1;
+				item_to_send.iec_obj.ioa = ioa_command;
+				item_to_send.iec_obj.o.type45.scs = command_value;
+				item_to_send.msg_id = msg_sent_in_control_direction++;
+				item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
+				fifo_put(fifo_control_direction, (char *)&item_to_send, sizeof(struct iec_item));
+				///////////////////////////////////////////////////////////////////////////////////////////
 			}
 		}
 		break;
@@ -333,8 +396,10 @@ void Opc_client_da_Instance::Tick()
 		{
 			if(pConnect)
 			{
+				/*
 				//if(pConnect->mandare_eventi == false)
 				{
+
 					USES_CONVERSION;
 
 					for(unsigned i = 0; i < pConnect->g_dwNumItems; i ++)
@@ -542,6 +607,7 @@ void Opc_client_da_Instance::Tick()
 				}
 
 				//pConnect->mandare_eventi = true;
+				*/
 			}
 		};
 		break;
@@ -696,6 +762,24 @@ void Opc_client_da_Instance::Command(const QString & name, BYTE cmd, LPVOID lpPa
 
 	if(pConnect)
 	{
+		dispatcher_extra_params* params = (dispatcher_extra_params *)lpPa;
+
+		QString sample_point_name = QString(params->string2);
+
+		IT_COMMENT3("Received command for instance %s, sample point: %s, value: %lf", (const char*)name, (const char*)sample_point_name, (params->res[0]).value);
+
+		#ifdef DEPRECATED_OPC_CLIENT_DA_CONFIG
+		QString pc = "select * from PROPS where IKEY='" + sample_point_name + "';"; 
+		#else
+		QString pc = "select * from TAGS where NAME='" + sample_point_name + "';";
+		#endif
+
+		QString value_for_command;
+		value_for_command.sprintf("%lf", (params->res[0]).value);
+		// 
+		GetConfigureDb()->DoExec(this, pc, tGetIOAfromSamplePointName, value_for_command, sample_point_name);
+	
+		/*
 		USES_CONVERSION;
 
 		//Send C_SC_NA_1////////////////////////////////////////////////////////////////
@@ -735,6 +819,7 @@ void Opc_client_da_Instance::Command(const QString & name, BYTE cmd, LPVOID lpPa
 				//}
 			}
 		}
+		*/
 	}
 }
 

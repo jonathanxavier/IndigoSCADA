@@ -189,7 +189,7 @@ Opc_client_ae * Opc_client_ae::pDriver = 0; // only one instance should be creat
 */
 void Opc_client_ae::Start() // start everything under this driver's control
 {
-		QString cmd = "select * from UNITS where UNITTYPE='opc_client_ae' and NAME in(" + DriverInstance::FormUnitList()+ ");";
+		QString cmd = "select * from UNITS where UNITTYPE='opc_client_ae_driver' and NAME in(" + DriverInstance::FormUnitList()+ ");";
 		GetConfigureDb()->DoExec(this,cmd,tListUnits);
 };
 /*
