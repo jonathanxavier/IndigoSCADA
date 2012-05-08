@@ -31,6 +31,7 @@ class DNP_3_DRIVERDRV Dnp3DriverThread : public DriverThread
 	char pipe_name[150];
     HANDLE h_pipe;
     int pipe_sends_cont;
+	int restart_count; //apa++ 07-05-2012
     int msg_id;
     int instanceID;
     bool Done;
@@ -38,7 +39,7 @@ class DNP_3_DRIVERDRV Dnp3DriverThread : public DriverThread
 
 	Dnp3DriverThread(DriverInstance *parent) : 
 		DriverThread(parent),h_pipe(NULL), nIndex(1), pipe_sends_cont(0),
-        msg_id(0), Done(false)
+        msg_id(0), Done(false), restart_count(0)
 	{ 
 		IT_IT("Dnp3DriverThread::Dnp3DriverThread");
 
@@ -57,7 +58,7 @@ class DNP_3_DRIVERDRV Dnp3DriverThread : public DriverThread
 		IT_IT("Dnp3DriverThread::~Dnp3DriverThread");
 	}
 
-    void TerminateIEC(); // parent requests the thread close
+    void TerminateProtocol(); // parent requests the thread close
     //PROCESS_INFORMATION* getProcInfo(void);
 
 	protected:

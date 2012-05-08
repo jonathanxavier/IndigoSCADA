@@ -69,49 +69,54 @@ void Opc_client_ae_DriverThread::run()
             break;
         }
         
-        if(pProcInfo[nIndex].hProcess)
-	    {
-		    DWORD dwCode;
+		restart_count++;
 
-		    if(::GetExitCodeProcess(pProcInfo[nIndex].hProcess, &dwCode))
-		    {
-			    if(dwCode != STILL_ACTIVE)
-			    {
-				    pProcInfo[nIndex].hProcess = 0;
+		if(restart_count%10 == 0) //Check every 10 seconds
+		{
+			if(pProcInfo[nIndex].hProcess)
+			{
+				DWORD dwCode;
 
-				    rc = send_ack_to_child(4004, 5, pipe_name); //Send a packet every 5 seconds
+				if(::GetExitCodeProcess(pProcInfo[nIndex].hProcess, &dwCode))
+				{
+					if(dwCode != STILL_ACTIVE)
+					{
+						pProcInfo[nIndex].hProcess = 0;
 
-				    if(rc != 0)
-				    {
-					    //wait the orphan child process to stop
-					    CloseHandle(h_pipe);
-					    h_pipe = NULL;
-					    Sleep(30000);
-				    }
-				    else
-				    {
-					    CloseHandle(h_pipe);
-					    h_pipe = NULL;
-				    }
+						rc = send_ack_to_child(4004, 5, pipe_name);
 
-				    if(StartProcess(pCommandLine, pWorkingDir))
-				    {
-					    fprintf(stderr, "Restarted process %s\n", pCommandLine);
-					    fflush(stderr);
-				    }
-				    else
-				    {
-					    fprintf(stderr, "Failed to restart process %s\n", pCommandLine);
-					    fflush(stderr);
-				    }
-			    }
-		    }
-		    else
-		    {
-			    fprintf(stderr, "GetExitCodeProcess failed, error code = %d\n", GetLastError());
-			    fflush(stderr);
-		    }
-	    }
+						if(rc != 0)
+						{
+							//wait the orphan child process to stop
+							CloseHandle(h_pipe);
+							h_pipe = NULL;
+							Sleep(30000);
+						}
+						else
+						{
+							CloseHandle(h_pipe);
+							h_pipe = NULL;
+						}
+						
+						if(StartProcess(pCommandLine, pWorkingDir))
+						{
+							fprintf(stderr, "Restarted process %s\n", pCommandLine);
+							fflush(stderr);
+						}
+						else
+						{
+							fprintf(stderr, "Failed to restart process %s\n", pCommandLine);
+							fflush(stderr);
+						}
+					}
+				}
+				else
+				{
+					fprintf(stderr, "GetExitCodeProcess failed, error code = %d\n", GetLastError());
+					fflush(stderr);
+				}
+			}
+		}
 
         pipe_sends_cont++;
 
@@ -261,9 +266,9 @@ int Opc_client_ae_DriverThread::pipe_put(char* pipe_name, char *buf, int len)
 	return rc; 
 }
 
-void Opc_client_ae_DriverThread::TerminateProc() // parent requests the thread close
+void Opc_client_ae_DriverThread::TerminateProtocol() // parent requests the thread close
 {
-	IT_IT("Opc_client_ae_DriverThread::TerminateProc");
+	IT_IT("Opc_client_ae_DriverThread::TerminateProtocol");
 
     EndProcess(nIndex); //stop the child process
 

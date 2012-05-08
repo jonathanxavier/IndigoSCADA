@@ -41,7 +41,7 @@ QSEXPORT extern ins_mutex_t * mut;
 
 ////////////////////////////////////////////////////////////////////////////////////
 //measurement_type
-
+/*
 enum m_type
 {
 	M_SP_NA_1 =		1,
@@ -64,7 +64,7 @@ enum m_type
 	M_ME_TS_1 =		155,
 	M_ME_TT_1 =		156
 };
-
+*/
 
 struct SpValue // a measured result
 {
