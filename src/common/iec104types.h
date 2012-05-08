@@ -13,9 +13,55 @@
 #ifndef IEC104TYPES_H
 #define IEC104TYPES_H
 
+#define M_SP_NA_1	1
+#define	M_DP_NA_1	3
+#define M_BO_NA_1	7
+#define M_ME_NA_1	9
+#define M_ME_NB_1	11
+#define	M_ME_NC_1	13
+#define	M_IT_NA_1	15
+#define	M_SP_TB_1	30
+#define	M_DP_TB_1	31
+#define M_BO_TB_1	33
+#define M_ME_TD_1	34
+#define M_ME_TE_1	35
+#define M_ME_TF_1	36
+#define	M_IT_TB_1	37
 #define	C_SC_NA_1	45
-#define	C_IC_NA_1	100     //general interrogation
+#define	C_DC_NA_1	46
+#define	C_SE_NA_1   48
+#define	C_SE_NB_1   49
+#define	C_SE_NC_1   50
+#define	C_BO_NA_1	51
+#define	C_SC_TA_1	58
+#define	C_DC_TA_1	59
+#define	C_SE_TA_1   61
+#define	C_SE_TB_1   62
+#define	C_SE_TC_1   63
+#define	C_BO_TA_1	64
+#define	M_EI_NA_1	70	// end of initialization
+#define	C_IC_NA_1	100     // general interrogation
+#define	C_CS_NA_1	103	// clock sync
+#define	C_TS_NA_1	104	// test command
+#define	C_RP_NA_1	105	// reset process command
+#define	C_CD_NA_1	106	// delay acquisition command (non supported by iec 104)
+#define C_TS_TA_1   107	//test command with cp56time2a timestamp
+#define F_FR_NA_1	120
+#define F_SR_NA_1	121
+#define F_SC_NA_1	122
+#define F_LS_NA_1	123
+#define F_AF_NA_1	124
+#define F_SG_NA_1	125
+#define F_DR_TA_1	126
+#define	M_ME_TN_1 	150		//custom type
+#define	M_ME_TO_1 	151		//custom type
+#define	M_ME_TP_1 	152		//custom type
+#define	M_ME_TQ_1 	153		//custom type
+#define	M_ME_TR_1 	154		//custom type
+#define	M_ME_TS_1 	155		//custom type
+#define	M_ME_TT_1 	156		//custom type
 #define	C_EX_IT_1 	200		//custom type
+#define	C_LO_ST_1 	201		//custom type
 
 #if defined( _MSC_VER)          /* Microsoft C */
     #pragma pack(1)             /* Byte Alignment   */
@@ -124,7 +170,6 @@ typedef struct _iec_type7 {
 	u_char		iv	:1; /* valid/invalid */
 }iec_type7;
 
-
 //See clause 7.2.6.6
 //NVA := F16[1..16]<-1..+1-2^-15>
 //Letter F means positive or negative fixed point number
@@ -190,7 +235,6 @@ typedef struct _iec_type15 {
 	u_char		ca	:1; /* 0 = counter was not adjusted / 1 = counter was adjusted */
 	u_char		iv	:1; /* 0 = valid/ 1 = invalid */
 }iec_type15;
-
 
 /* M_SP_TB_1 - single point information with quality description and time tag */
 typedef struct _iec_type30 {
@@ -273,40 +317,92 @@ typedef struct _iec_type37 {
 }iec_type37;
 
 /* C_SC_NA_1 - Single command */
-typedef struct _iec_type45 {
+struct iec_type45 {
 	u_char		scs:1;//See 7.2.6.15 Qualifier of command
 	u_char		res:1;
 	u_char		qu:5; //See 7.2.6.26 Qualifier of command
 	u_char		se:1;//See 7.2.6.26 Qualifier of command
-}iec_type45;
+};
 
 /* C_DC_NA_1 - Double command */
-typedef struct _iec_type46 {
+struct iec_type46 {
 	u_char		dcs:2;//See 7.2.6.16 Qualifier of command
 	u_char		qu:5;//See 7.2.6.26 Qualifier of command
 	u_char		se:1;//See 7.2.6.26 Qualifier of command
-}iec_type46;
+};
+
+/* C_SE_NA_1 - Set point command, normalized value */
+struct iec_type48 {
+	short		sv;	/* normalized value, See 7.2.6*/
+	u_char		ql:7;//See 7.2.6.39 Qualifier of command
+	u_char		se:1;//See 7.2.6.39 Qualifier of command
+};
+
+/* C_SE_NB_1 - Set point command, scaled value */
+struct iec_type49 {
+	short		sv;	/* scaled value, See 7.2.6.7 */
+	u_char		ql:7;//See 7.2.6.39 Qualifier of command
+	u_char		se:1;//See 7.2.6.39 Qualifier of command
+};
+
+/* C_SE_NC_1 - Set point command, short floating point number */
+struct iec_type50 {
+	float		sv;	/* short floating point number, See 7.2.6.8*/
+	u_char		ql:7;//See 7.2.6.39 Qualifier of command
+	u_char		se:1;//See 7.2.6.39 Qualifier of command
+};
 
 /* C_BO_NA_1 - Bitstring of 32 bit*/
-typedef struct _iec_type51 {
+struct iec_type51 {
 	struct iec_stcd	stcd;
-}iec_type51;
+};
 
 /* C_SC_TA_1 - Single command with time tag*/
-typedef struct _iec_type58 {
+struct iec_type58 {
 	u_char		scs:1;//See 7.2.6.15 Qualifier of command
 	u_char		res:1;
 	u_char		qu:5; //See 7.2.6.26 Qualifier of command
 	u_char		se:1; //See 7.2.6.26 Qualifier of command
 	cp56time2a	time; //contains the UTC time
-}iec_type58;
+};
+
+/* C_DC_TA_1 - Double command with time tag*/
+struct iec_type59 {
+	u_char		dcs:2;//See 7.2.6.16 Qualifier of command
+	u_char		qu:5; //See 7.2.6.26 Qualifier of command
+	u_char		se:1; //See 7.2.6.26 Qualifier of command
+	cp56time2a	time; //contains the UTC time
+};
+
+/* C_SE_TA_1 - Set point command, normalized value */
+struct iec_type61 {
+	short		sv;	/* normalized value, See 7.2.6*/
+	u_char		ql:7;//See 7.2.6.39 Qualifier of command
+	u_char		se:1;//See 7.2.6.39 Qualifier of command
+	cp56time2a	time; //contains the UTC time
+};
+
+/* C_SE_TB_1 - Set point command, scaled value */
+struct iec_type62 {
+	short		sv;	/* scaled value, See 7.2.6.7 */
+	u_char		ql:7;//See 7.2.6.39 Qualifier of command
+	u_char		se:1;//See 7.2.6.39 Qualifier of command
+	cp56time2a	time; //contains the UTC time
+};
+
+/* C_SE_TC_1 - Set point command, short floating point number */
+struct iec_type63 {
+	float		sv;	/* short floating point number, See 7.2.6.8*/
+	u_char		ql:7;//See 7.2.6.39 Qualifier of command
+	u_char		se:1;//See 7.2.6.39 Qualifier of command
+	cp56time2a	time; //contains the UTC time
+};
 
 /* C_BO_TA_1 - Bitstring of 32 bit command with time tag*/
-typedef struct _iec_type64 {
+struct iec_type64 {
 	struct iec_stcd	stcd;
-	u_char chs;
 	cp56time2a	time; //contains the UTC time
-}iec_type64;
+};
 
 /* M_EI_NA_1 - End of initialization*/
 typedef struct _iec_type70 {
@@ -385,7 +481,6 @@ typedef struct _iec_type124 {
 	u_char		afq_ui4low:4; /*ACK file or section qualifier cfr.7.2.6.32*/
 	u_char		afq_ui4high:4; /*ACK file or section qualifier cfr.7.2.6.32*/
 }iec_type124;
-
 
 /* F_SG_NA_1 - Segment*/
 typedef struct _iec_type125 {

@@ -37,8 +37,15 @@ struct iec_object {
 		 iec_type37	type37;
 		 iec_type45	type45;
 		 iec_type46	type46;
+		 iec_type48	type48;
+		 iec_type49	type49;
+		 iec_type50	type50;
 		 iec_type51	type51;
 		 iec_type58	type58;
+		 iec_type59	type59;
+		 iec_type61	type61;
+		 iec_type62	type62;
+		 iec_type63	type63;
 		 iec_type64	type64;
 		 iec_type70	type70;
 		 iec_type100	type100;

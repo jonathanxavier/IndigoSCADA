@@ -708,7 +708,7 @@ bool  Rfc1006driver_Instance::Disconnect()
 	
 	InQueue.clear();
     
-    pConnect->TerminateIEC();
+    pConnect->TerminateProtocol();
     //while(!(pConnect->Done)) {Sleep(10);};
 
 	if(pConnect) delete pConnect;

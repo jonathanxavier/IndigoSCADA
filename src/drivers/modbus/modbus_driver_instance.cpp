@@ -780,7 +780,7 @@ bool  Modbus_driver_Instance::Disconnect()
 	
 	InQueue.clear();
 
-    pConnect->TerminateIEC();
+    pConnect->TerminateProtocol();
 
 	if(pConnect) delete pConnect;
 	pConnect = NULL;

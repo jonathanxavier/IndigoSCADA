@@ -157,7 +157,7 @@ void WorkerProc(void* pParam)
 				{
 					pProcInfo[nIndex].hProcess = 0;
 
-					rc = send_ack_to_child(4004, 5, pipe_name); //Send a packet every 5 seconds
+					rc = send_ack_to_child(4004, 5, pipe_name);
 
 					if(rc != 0)
 					{
