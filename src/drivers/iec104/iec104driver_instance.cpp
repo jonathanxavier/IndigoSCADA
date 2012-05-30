@@ -371,9 +371,6 @@ void Iec104driver_Instance::Tick()
 
 	//This code runs inside main monitor.exe thread
 
-	//cp56time2a time;
-	//signed __int64 epoch_in_millisec;
-
 	unsigned char buf[sizeof(struct iec_item)];
 	int len;
 	const unsigned wait_limit_ms = 1;
@@ -384,6 +381,7 @@ void Iec104driver_Instance::Tick()
 		p_item = (struct iec_item*)buf;
 			
 		//printf("Receiving %d th message \n", p_item->msg_id);
+		printf("Receiving %d th iec104 message for line = %d\n", p_item->msg_id, instanceID + 1);
 
 		//for (int j = 0; j < len; j++) 
 		//{ 

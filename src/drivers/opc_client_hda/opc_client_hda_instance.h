@@ -15,13 +15,9 @@
 
 #include "opc_client_hda.h"
 #include "IndentedTrace.h"
-#include "fifo.h"
-#include "fifoc.h"
 #include "clear_crc_eight.h"
 #include "iec104types.h"
 #include "iec_item.h"
-
-void iec_call_exit_handler(int line, char* file, char* reason);
 
 class Opc_client_hda_DriverThread;
 
@@ -82,7 +78,6 @@ class OPC_CLIENT_HDADRV Opc_client_hda_Instance : public DriverInstance
 
 	public:
 	Opc_client_hda_DriverThread *pConnect;
-	fifo_h fifo_control_direction;
 	unsigned int msg_sent_in_control_direction;
 	int instanceID;
 
@@ -109,9 +104,9 @@ class OPC_CLIENT_HDADRV Opc_client_hda_Instance : public DriverInstance
         strcat(fifo_ctr_name, str_instance_id);
         strcat(fifo_ctr_name, "hda");
 
-		const size_t max_fifo_queue_size = 4*65536;
+//		const size_t max_fifo_queue_size = 4*65536;
 		//Init thread shared fifos
-		fifo_control_direction = fifo_open("fifo_opc_command", max_fifo_queue_size, iec_call_exit_handler);
+//		fifo_control_direction = fifo_open("fifo_opc_command", max_fifo_queue_size, iec_call_exit_handler);
 	};
 
 	~Opc_client_hda_Instance()

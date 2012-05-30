@@ -153,7 +153,7 @@ class IEC_104_DRIVERDRV Iec104driver_Instance : public DriverInstance
 	bool DoExec(SendRecePacket *t);
 	bool expect(unsigned int cmd);
 	void removeTransaction();
-
+	
 	public slots:
 	//
 	virtual void Start(); // start everything under this driver's control

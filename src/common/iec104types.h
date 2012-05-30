@@ -40,7 +40,7 @@
 #define	C_SE_TC_1   63
 #define	C_BO_TA_1	64
 #define	M_EI_NA_1	70	// end of initialization
-#define	C_IC_NA_1	100     // general interrogation
+#define	C_IC_NA_1	100 // general interrogation
 #define	C_CS_NA_1	103	// clock sync
 #define	C_TS_NA_1	104	// test command
 #define	C_RP_NA_1	105	// reset process command

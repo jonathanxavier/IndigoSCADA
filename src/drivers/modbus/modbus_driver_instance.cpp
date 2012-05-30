@@ -247,7 +247,7 @@ void Modbus_driver_Instance::QueryResponse(QObject *p, const QString &c, int id,
 				item_to_send.iec_obj.o.type45.scs = command_value;
 				item_to_send.msg_id = msg_sent_in_control_direction++;
 				item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
-				fifo_put(fifo_control_direction, (char *)&item_to_send, sizeof(struct iec_item));
+//				fifo_put(fifo_control_direction, (char *)&item_to_send, sizeof(struct iec_item));
 				///////////////////////////////////////////////////////////////////////////////////////////
 			}
 		}
@@ -380,7 +380,7 @@ void Modbus_driver_Instance::Tick()
 	const unsigned wait_limit_ms = 1;
 	struct iec_item* p_item;
 
-	for(int i = 0; (len = fifo_get(fifo_monitor_direction, (char*)buf, sizeof(struct iec_item), wait_limit_ms)) >= 0; i += 1)	
+//	for(int i = 0; (len = fifo_get(fifo_monitor_direction, (char*)buf, sizeof(struct iec_item), wait_limit_ms)) >= 0; i += 1)	
 	{ 
 		p_item = (struct iec_item*)buf;
 			
@@ -620,10 +620,10 @@ void Modbus_driver_Instance::Tick()
 
 		//printf("ioa %s, value %s\n", (const char*)ioa, (const char*)value);
 
-		if(i > 50)
-		{
-			break;
-		}
+//		if(i > 50)
+//		{
+//			break;
+//		}
 	}
 }
 

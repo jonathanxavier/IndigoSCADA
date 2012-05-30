@@ -248,7 +248,7 @@ void Opc_client_hda_Instance::QueryResponse(QObject *p, const QString &c, int id
 				item_to_send.iec_obj.o.type45.scs = command_value;
 				item_to_send.msg_id = msg_sent_in_control_direction++;
 				item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
-				fifo_put(fifo_control_direction, (char *)&item_to_send, sizeof(struct iec_item));
+//				fifo_put(fifo_control_direction, (char *)&item_to_send, sizeof(struct iec_item));
 				///////////////////////////////////////////////////////////////////////////////////////////
 			}
 		}

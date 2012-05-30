@@ -15,13 +15,15 @@
 
 #include "opc_client_da.h"
 #include "IndentedTrace.h"
-#include "fifo.h"
-#include "fifoc.h"
 #include "clear_crc_eight.h"
 #include "iec104types.h"
 #include "iec_item.h"
-
-void iec_call_exit_handler(int line, char* file, char* reason);
+////////////////////////////Middleware/////////////////////////////////////////////////////////////
+#include "iec_item_type.h"
+extern void onRegFail(void *param);
+extern Boolean  quite;
+extern void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackParam); 
+/////////////////////////////////////////////////////////////////////////////////////////////
 
 class Opc_client_da_DriverThread;
 
@@ -82,9 +84,7 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 
 	public:
 	Opc_client_da_DriverThread *pConnect;
-	fifo_h fifo_control_direction;
 	unsigned int msg_sent_in_control_direction;
-
 	//
 	Opc_client_da_Instance(Driver *parent, const QString &name, int instance_id) : 
 	DriverInstance(parent,name),fFail(0), Countdown(1), pConnect(NULL),
@@ -100,18 +100,74 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 		connect(pTimer,SIGNAL(timeout()),this,SLOT(Tick()));
 		pTimer->start(1000); // start with a 1 second timer
 
-		/////////////////////////////////////////////////////////////////////////////
-		char fifo_ctr_name[150];
+		char fifo_control_name[150];
 		char str_instance_id[20];
         itoa(instance_id + 1, str_instance_id, 10);
-		strcpy(fifo_ctr_name,"fifo_control_direction");
-        strcat(fifo_ctr_name, str_instance_id);
-        strcat(fifo_ctr_name, "da");
+		strcpy(fifo_control_name,"fifo_control_direction");
+        strcat(fifo_control_name, str_instance_id);
+        strcat(fifo_control_name, "da");
 
-		const size_t max_fifo_queue_size = 4*65536;
+		/////////////////////Middleware/////////////////////////////////////////////////////////////////
+		ORTEDomainProp          dp; 
+		ORTESubscription        *s = NULL;
+		int32_t                 strength=1;
+		NtpTime                 persistence,deadline,minimumSeparation,delay;
+		Boolean                 havePublisher = ORTE_FALSE;
+		Boolean                 haveSubscriber = ORTE_FALSE;
+		IPAddress				smIPAddress = IPADDRESS_INVALID;
+		ORTEDomainAppEvents     events;
 
-		//Init thread shared fifos
-		fifo_control_direction = fifo_open("fifo_opc_command", max_fifo_queue_size, iec_call_exit_handler);
+		ORTEInit();
+		ORTEDomainPropDefaultGet(&dp);
+		NTPTIME_BUILD(minimumSeparation,0); 
+		NTPTIME_BUILD(delay,1); //1s
+
+		//initiate event system
+		ORTEDomainInitEvents(&events);
+
+		events.onRegFail = onRegFail;
+
+		//Create application     
+		domain = ORTEDomainAppCreate(ORTE_DEFAULT_DOMAIN,&dp,&events,ORTE_FALSE);
+
+		iec_item_type_type_register(domain);
+
+		//Create publisher
+		NTPTIME_BUILD(persistence,5);
+		
+		publisher = ORTEPublicationCreate(
+		domain,
+		fifo_control_name,
+		"iec_item_type",
+		&instanceSend,
+		&persistence,
+		strength,
+		NULL,
+		NULL,
+		NULL);
+		
+		char fifo_monitor_name[150];
+		itoa(instance_id + 1, str_instance_id, 10);
+		strcpy(fifo_monitor_name,"fifo_monitor_direction");
+        strcat(fifo_monitor_name, str_instance_id);
+        strcat(fifo_monitor_name, "da");
+
+		//Create subscriber
+		NTPTIME_BUILD(deadline,3);
+
+		subscriber = ORTESubscriptionCreate(
+		domain,
+		IMMEDIATE,
+		BEST_EFFORTS,
+		fifo_monitor_name,
+		"iec_item_type",
+		&instanceRecv,
+		&deadline,
+		&minimumSeparation,
+		recvCallBack,
+		this,
+		smIPAddress);
+		///////////////////////////////////Middleware//////////////////////////////////////////////////
 	};
 
 	~Opc_client_da_Instance()
@@ -123,6 +179,9 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 			delete[] Values;
 			Values = NULL;
 		}
+
+		ORTEDomainAppDestroy(domain);
+        domain=NULL;
 	};
 	//
 	void Fail(const QString &s)
@@ -134,7 +193,14 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 	InstanceCfg Cfg; // the cacheable stuff
 	Driver* ParentDriver;
 	QString unit_name;
-	int instanceID;
+	int instanceID; //Equals to "line concept" of a SCADA driver
+	//////Middleware/////////////
+    ORTEDomain *domain;
+	ORTEPublication *publisher;
+	ORTESubscription *subscriber;
+	iec_item_type    instanceSend;
+	iec_item_type    instanceRecv;
+	/////////////////////////////
 	
 	void driverEvent(DriverEvent *); // message from thread to parent
 	bool event(QEvent *e);
@@ -143,8 +209,10 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 	bool DoExec(SendRecePacket *t);
 	bool expect(unsigned int cmd);
 	void removeTransaction();
-
-
+	//////Middleware//////////////////////////////////////
+	void get_utc_host_time(struct cp56time2a* time);
+	void get_items(struct iec_item* p_item);
+	////////////////////////////////////////////////
 	//
 	public slots:
 	//
