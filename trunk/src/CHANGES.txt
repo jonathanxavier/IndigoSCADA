@@ -97,4 +97,9 @@ Added Real Time Publisher Subscriber (RTPS) as middleware protocol for inter pro
 -------------------------------------------------------------------------------------------------------
 05-May-2012
 Added protocol configurator, based on SQLite 3 database files
+-------------------------------------------------------------------------------------------------------
+30-05-2012
+Integration of the middleware (RTPS) with protocol processes
+Implemented configurator for opc_client_da.exe and opc_client_ae.exe
+-------------------------------------------------------------------------------------------------------
 
