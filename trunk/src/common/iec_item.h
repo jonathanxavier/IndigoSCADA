@@ -71,24 +71,15 @@ struct iec_object {
 	} o;	
 };
 
-#define ITEMID_LENGTH 99
-
 //Record format of configuration database
 struct iec_item {
-
-	char opc_server_item_id[ITEMID_LENGTH]; //Item ID of opc server
     u_char iec_type;
 	struct iec_object iec_obj;
-	DWORD hClient; //Index inside table is equal to hClient of table struct structItem<--------------INDEX, starting from 1
 	unsigned char cause; //spontaneous or general interrogation cause
 	u_int   msg_id; //ID of the message
 	unsigned int ioa_control_center; //unstructured
-	u_short casdu; //IEC 104 CASDU where this record is allocated
+	u_short casdu; //IEC 104 CASDU where this record is allocated, it is unstructured
     u_char	is_neg; //positive == 0 or negative == 1
-	union {
-		double	commandValue;
-		char command_string[13];
-	};
 	u_char	checksum; //Checksum of the message, must be the last if filled with CRC 8
 };
 

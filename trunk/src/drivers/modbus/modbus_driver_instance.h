@@ -15,13 +15,9 @@
 
 #include "modbus_driver.h"
 #include "IndentedTrace.h"
-#include "fifo.h"
-#include "fifoc.h"
 #include "clear_crc_eight.h"
 
 class Modbus_DriverThread;
-
-void iec_call_exit_handler(int line, char* file, char* reason);
 
 #define MAX_FIFO_SIZE 65535
 
@@ -85,9 +81,7 @@ class MODBUS_DRIVERDRV Modbus_driver_Instance : public DriverInstance
 
 	public:
 	Modbus_DriverThread *pConnect;
-	fifo_h fifo_control_direction;
 	unsigned int msg_sent_in_control_direction;
-	fifo_h fifo_monitor_direction;
 	//
 	Modbus_driver_Instance(Driver *parent, const QString &name, int instance_id) : 
 	DriverInstance(parent,name),fFail(0), Countdown(1),
@@ -120,8 +114,8 @@ class MODBUS_DRIVERDRV Modbus_driver_Instance : public DriverInstance
         strcat(fifo_ctr_name, "modbus");
         strcat(fifo_mon_name, "modbus");
  
-		fifo_control_direction = fifo_open(fifo_ctr_name, max_fifo_queue_size, iec_call_exit_handler);
-		fifo_monitor_direction = fifo_open(fifo_mon_name, max_fifo_queue_size, iec_call_exit_handler);
+//		fifo_control_direction = fifo_open(fifo_ctr_name, max_fifo_queue_size, iec_call_exit_handler);
+//		fifo_monitor_direction = fifo_open(fifo_mon_name, max_fifo_queue_size, iec_call_exit_handler);
         /////////////////////////////////////////////////////////////////////////////
 	};
 

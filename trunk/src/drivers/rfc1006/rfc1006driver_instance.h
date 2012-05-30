@@ -15,13 +15,9 @@
 
 #include "rfc1006driver.h"
 #include "IndentedTrace.h"
-#include "fifo.h"
-#include "fifoc.h"
 #include "clear_crc_eight.h"
 
 class Rfc1006DriverThread;
-
-void iec_call_exit_handler(int line, char* file, char* reason);
 
 #define MAX_FIFO_SIZE 65535
 
@@ -84,9 +80,7 @@ class RFC1006DRIVERDRV Rfc1006driver_Instance : public DriverInstance
 
 	public:
 	Rfc1006DriverThread *pConnect;
-	fifo_h fifo_control_direction;
 	unsigned int msg_sent_in_control_direction;
-	fifo_h fifo_monitor_direction;
 	//
 	Rfc1006driver_Instance(Driver *parent, const QString &name, int instance_id) : 
 	DriverInstance(parent,name),fFail(0), Countdown(1),
@@ -119,8 +113,8 @@ class RFC1006DRIVERDRV Rfc1006driver_Instance : public DriverInstance
         strcat(fifo_ctr_name, "rfc1006");
         strcat(fifo_mon_name, "rfc1006");
  
-		fifo_control_direction = fifo_open(fifo_ctr_name, max_fifo_queue_size, iec_call_exit_handler);
-		fifo_monitor_direction = fifo_open(fifo_mon_name, max_fifo_queue_size, iec_call_exit_handler);
+//		fifo_control_direction = fifo_open(fifo_ctr_name, max_fifo_queue_size, iec_call_exit_handler);
+//		fifo_monitor_direction = fifo_open(fifo_mon_name, max_fifo_queue_size, iec_call_exit_handler);
         /////////////////////////////////////////////////////////////////////////////
 	};
 

@@ -386,6 +386,7 @@ void Iec101driver_Instance::Tick()
 		p_item = (struct iec_item*)buf;
 			
 		//printf("Receiving %d th message \n", p_item->msg_id);
+		printf("Receiving %d th iec101 message for line = %d\n", p_item->msg_id, instanceID + 1);
 
 		//for (int j = 0; j < len; j++) 
 		//{ 

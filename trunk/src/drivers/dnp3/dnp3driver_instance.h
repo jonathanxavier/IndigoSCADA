@@ -15,13 +15,17 @@
 
 #include "dnp3driver.h"
 #include "IndentedTrace.h"
-#include "fifo.h"
-#include "fifoc.h"
 #include "clear_crc_eight.h"
+#include "iec104types.h"
+#include "iec_item.h"
+////////////////////////////Middleware/////////////////////////////////////////////////////////////
+#include "iec_item_type.h"
+extern void onRegFail(void *param);
+extern Boolean  quite;
+extern void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackParam); 
+/////////////////////////////////////////////////////////////////////////////////////////////
 
 class Dnp3DriverThread;
-
-void iec_call_exit_handler(int line, char* file, char* reason);
 
 #define MAX_FIFO_SIZE 65535
 
@@ -85,9 +89,7 @@ class DNP_3_DRIVERDRV Dnp3driver_Instance : public DriverInstance
 
 	public:
 	Dnp3DriverThread *pConnect;
-	fifo_h fifo_control_direction;
 	unsigned int msg_sent_in_control_direction;
-	fifo_h fifo_monitor_direction;
 	//
 	Dnp3driver_Instance(Driver *parent, const QString &name, int instance_id) : 
 	DriverInstance(parent,name),fFail(0), Countdown(1),
@@ -104,25 +106,74 @@ class DNP_3_DRIVERDRV Dnp3driver_Instance : public DriverInstance
 		connect(pTimer,SIGNAL(timeout()),this,SLOT(Tick()));
 		pTimer->start(1000); // start with a 1 second timer
 
-		/////////////////////////////////////////////////////////////////////////////
-		const size_t max_fifo_queue_size = MAX_FIFO_SIZE;
-		//Init thread shared fifos
-        char fifo_ctr_name[150];
-        char fifo_mon_name[150];
+		/////////////////////Middleware/////////////////////////////////////////////////////////////////
+        char fifo_control_name[150];
+        char fifo_monitor_name[150];
 
         char str_instance_id[20];
         itoa(instance_id + 1, str_instance_id, 10);
  
-        strcpy(fifo_ctr_name,"fifo_control_direction");
-        strcpy(fifo_mon_name,"fifo_monitor_direction");
-        strcat(fifo_ctr_name, str_instance_id);
-        strcat(fifo_mon_name, str_instance_id);
-        strcat(fifo_ctr_name, "dnp3");
-        strcat(fifo_mon_name, "dnp3");
- 
-		fifo_control_direction = fifo_open(fifo_ctr_name, max_fifo_queue_size, iec_call_exit_handler);
-		fifo_monitor_direction = fifo_open(fifo_mon_name, max_fifo_queue_size, iec_call_exit_handler);
-        /////////////////////////////////////////////////////////////////////////////
+        strcpy(fifo_control_name,"fifo_control_direction");
+        strcpy(fifo_monitor_name,"fifo_monitor_direction");
+        strcat(fifo_control_name, str_instance_id);
+        strcat(fifo_monitor_name, str_instance_id);
+        strcat(fifo_control_name, "dnp3");
+        strcat(fifo_monitor_name, "dnp3");
+
+		ORTEDomainProp          dp; 
+		ORTESubscription        *s = NULL;
+		int32_t                 strength=1;
+		NtpTime                 persistence,deadline,minimumSeparation,delay;
+		Boolean                 havePublisher = ORTE_FALSE;
+		Boolean                 haveSubscriber = ORTE_FALSE;
+		IPAddress				smIPAddress = IPADDRESS_INVALID;
+		ORTEDomainAppEvents     events;
+
+		ORTEInit();
+		ORTEDomainPropDefaultGet(&dp);
+		NTPTIME_BUILD(minimumSeparation,0); 
+		NTPTIME_BUILD(delay,1); //1s
+
+		//initiate event system
+		ORTEDomainInitEvents(&events);
+
+		events.onRegFail = onRegFail;
+
+		//Create application     
+		domain = ORTEDomainAppCreate(ORTE_DEFAULT_DOMAIN,&dp,&events,ORTE_FALSE);
+
+		iec_item_type_type_register(domain);
+
+		//Create publisher
+		NTPTIME_BUILD(persistence,5);
+		
+		publisher = ORTEPublicationCreate(
+		domain,
+		fifo_control_name,
+		"iec_item_type",
+		&instanceSend,
+		&persistence,
+		strength,
+		NULL,
+		NULL,
+		NULL);
+
+		//Create subscriber
+		NTPTIME_BUILD(deadline,3);
+
+		subscriber = ORTESubscriptionCreate(
+		domain,
+		IMMEDIATE,
+		BEST_EFFORTS,
+		fifo_monitor_name,
+		"iec_item_type",
+		&instanceRecv,
+		&deadline,
+		&minimumSeparation,
+		recvCallBack,
+		this,
+		smIPAddress);
+		///////////////////////////////////Middleware//////////////////////////////////////////////////
 	};
 
 	~Dnp3driver_Instance()
@@ -146,6 +197,13 @@ class DNP_3_DRIVERDRV Dnp3driver_Instance : public DriverInstance
 	Driver* ParentDriver;
 	QString unit_name;
     int instanceID; //Equals to "line concept" of a SCADA driver
+	//////Middleware/////////////
+    ORTEDomain *domain;
+	ORTEPublication *publisher;
+	ORTESubscription *subscriber;
+	iec_item_type    instanceSend;
+	iec_item_type    instanceRecv;
+	/////////////////////////////
 	
 	void driverEvent(DriverEvent *); // message from thread to parent
 	bool event(QEvent *e);
@@ -154,6 +212,10 @@ class DNP_3_DRIVERDRV Dnp3driver_Instance : public DriverInstance
 	bool DoExec(SendRecePacket *t);
 	bool expect(unsigned int cmd);
 	void removeTransaction();
+	//////Middleware//////////////////////////////////////
+	void get_utc_host_time(struct cp56time2a* time);
+	void get_items(struct iec_item* p_item);
+	////////////////////////////////////////////////
     //
 	public slots:
 	//
