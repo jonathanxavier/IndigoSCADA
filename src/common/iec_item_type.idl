@@ -1,12 +1,22 @@
 /*
+ *                         IndigoSCADA
+ *
+ *   This software and documentation are Copyright 2002 to 2012 Enscada 
+ *   Limited and its licensees. All rights reserved. See file:
+ *
+ *                     $HOME/LICENSE 
+ *
+ *   for full copyright notice and license terms. 
+ *
+ */
+/*
 IDL file to be used with orte-idl.exe compiler inside the MINGW32 shell
 usage: orte-idl.exe iec_item_type.idl 
 Actual length of struct iec_object is 20 bytes
 */
 
 struct iec_item_type {
-    octet iec_type;
-//	string<25> iec_obj;
+	octet iec_type;
 	octet iec_obj;
 	octet iec_obj_byte2;
 	octet iec_obj_byte3;

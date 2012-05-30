@@ -248,6 +248,8 @@ int main( int argc, char **argv )
 	}
 	#endif
 
+	//TODO:  Sobstitute the following code with the class rfc1006_imp
+
 	///////////////////////////////////Start RFC1006 client protocol//////////////////////////////////
 
 	int res, useProtocol, useSlot, rfc1006port, plc_addr;

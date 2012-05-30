@@ -214,6 +214,8 @@ int main( int argc, char **argv )
 	}
 	#endif
 
+//TODO:  Sobstitute the following code with the class modbus_imp
+
 	////////////////////////////////Start protocol implementation///////////////////////////////////
 	uint8_t *tab_rp_bits;
     uint16_t *tab_rp_registers;
