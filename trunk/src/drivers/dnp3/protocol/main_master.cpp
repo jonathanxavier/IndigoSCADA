@@ -57,7 +57,8 @@ int gl_timeout_connection_with_parent;
 
 void PipeWorker(void* pParam);
 
-#define RUNTIME_USAGE "Run time usage: %s -a server IP address -p server TCP port -l line number -t polling time\n"
+#define RUNTIME_USAGE "Run time usage: %s -a server IP address -p server TCP port -l\
+ line number -t polling time\n"
 
 void usage(char** argv)
 {

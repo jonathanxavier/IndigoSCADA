@@ -44,6 +44,8 @@ struct structItem
 	DWORD hServer; //index of each item inside the opc server
 	unsigned int ioa_control_center;//unique inside CASDU
 	unsigned int io_list_iec_type; //IEC 104 type
+	int readable;
+	int writeable;
 	float min_measure;
 	float max_measure;
 };
@@ -245,6 +247,7 @@ class Opc_client_da_imp
 	 int check_connection_to_server(void);
 	 static short rescale_value(double V, double Vmin, double Vmax, int* error);
 	 double rescale_value_inv(double A, double Vmin, double Vmax, int* error);
+	 void CreateSqlConfigurationFile(char* sql_file_name, char* opc_path);
 	 ////////////////////Middleware////////////////////////////////////////////////////
 	 void check_for_commands(struct iec_item *item);
 	 void alloc_command_resources(void);
