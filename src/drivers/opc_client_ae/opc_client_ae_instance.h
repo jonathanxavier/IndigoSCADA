@@ -25,8 +25,6 @@ extern Boolean  quite;
 extern void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackParam); 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-void iec_call_exit_handler(int line, char* file, char* reason);
-
 class Opc_client_ae_DriverThread;
 
 class OPC_CLIENT_AEDRV Opc_client_ae_Instance : public DriverInstance 

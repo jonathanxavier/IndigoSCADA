@@ -113,8 +113,6 @@ class RFC1006DRIVERDRV Rfc1006driver_Instance : public DriverInstance
         strcat(fifo_ctr_name, "rfc1006");
         strcat(fifo_mon_name, "rfc1006");
  
-//		fifo_control_direction = fifo_open(fifo_ctr_name, max_fifo_queue_size, iec_call_exit_handler);
-//		fifo_monitor_direction = fifo_open(fifo_mon_name, max_fifo_queue_size, iec_call_exit_handler);
         /////////////////////////////////////////////////////////////////////////////
 	};
 

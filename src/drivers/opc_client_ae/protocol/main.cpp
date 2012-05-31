@@ -85,6 +85,7 @@ int main(int argc, char **argv)
 	NewConsoleTitle[0] = '\0';
 	OpcServerProgID[0] = '\0';
 	OpcclassId[0] = '\0';
+	line_number[0] = '\0';
 
 	while( ( c = getopt ( argc, argv, "a:p:q:l:t:?" )) != EOF ) {
 		switch ( c ) {

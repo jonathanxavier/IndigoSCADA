@@ -45,35 +45,21 @@ static int db_callback(void *NotUsed, int argc, char **argv, char **azColName)
 			case 0:
 			{
 				//column 1 in table opc_client_da_table
-				//IOA Unstructured
-				gl_Config_db[gl_row_counter].ioa_control_center = atoi(argv[i]);
+				//opc_server_item_id
+				strcpy(gl_Config_db[gl_row_counter].spname, argv[i]);
 			}
 			break;
 			case 1:
 			{
 				//column 2 in table opc_client_da_table
-				//ItemID name
-				strcpy(gl_Config_db[gl_row_counter].spname, argv[i]);
+				//ioa_control_center Unstructured
+				gl_Config_db[gl_row_counter].ioa_control_center = atoi(argv[i]);
 			}
 			break;
 			case 2:
 			{
 				//column 3 in table opc_client_da_table
-				//Engineering value min
-				gl_Config_db[gl_row_counter].min_measure = (float)atof(argv[i]);
-			}
-			break;
-			case 3:
-			{
-				//column 4 in table opc_client_da_table
-				//Engineering value max
-				gl_Config_db[gl_row_counter].max_measure = (float)atof(argv[i]);
-			}
-			break;
-			case 4:
-			{
-				//column 5 in table opc_client_da_table
-				//Signal Type
+				//iec_type
 				if(strcmp(argv[i], "M_ME_TF_1") == 0)
 				{
 					gl_Config_db[gl_row_counter].io_list_iec_type = M_ME_TF_1;
@@ -105,6 +91,34 @@ static int db_callback(void *NotUsed, int argc, char **argv, char **azColName)
 					ExitProcess(0);
 				}
 			}	
+			break;
+			case 3:
+			{
+				//column 4 in table opc_client_da_table
+				//readable
+				gl_Config_db[gl_row_counter].readable = atoi(argv[i]);
+			}
+			break;
+			case 4:
+			{
+				//column 5 in table opc_client_da_table
+				//writeable
+				gl_Config_db[gl_row_counter].writeable = atoi(argv[i]);
+			}
+			break;
+			case 5:
+			{
+				//column 6 in table opc_client_da_table
+				//HiHiLimit
+				gl_Config_db[gl_row_counter].max_measure = (float)atof(argv[i]);
+			}
+			break;
+			case 6:
+			{
+				//column 7 in table opc_client_da_table
+				//LoLoLimit
+				gl_Config_db[gl_row_counter].min_measure = (float)atof(argv[i]);				
+			}
 			break;
 			default:
 			break;
@@ -194,7 +208,7 @@ int Opc_client_da_imp::AddItems()
 	//fclose(fp);
 	///////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	///Loading items into DA server
+	///Loading items from DA server
 	
 	//fp = fopen("C:\\scada\\logs\\opc_itemid_loaded.txt", "w"); // only for test
 
@@ -253,7 +267,6 @@ int Opc_client_da_imp::AddItems()
 		wcscpy(Item[nTestItem].wszName, customA2W(buf));
 		
 		//set VT_EMPTY and the server will select the right type////
-		//strcpy(sz2,"VT_EMPTY");
 		Item[nTestItem].vt = VT_EMPTY;
 					
 		OPCITEMRESULT *pItemResult = NULL;
@@ -349,4 +362,466 @@ int Opc_client_da_imp::AddItems()
 
 	IT_EXIT;
 	return(0);
+}
+
+void Opc_client_da_imp::CreateSqlConfigurationFile(char* sql_file_name, char* opc_path)
+{
+	//Make browsing of OPC DA server for available ItemID's
+	/*
+
+	TODO: implementing the browsing along OPC directories
+
+	HRESULT hr = 0;
+	FILE *dump = NULL;
+	//OPCNAMESPACETYPE nameSpaceType;
+	char program_path[_MAX_PATH];
+
+	program_path[0] = '\0';
+
+	if(GetModuleFileName(NULL, program_path, _MAX_PATH))
+	{
+		*(strrchr(program_path, '\\')) = '\0';        // Strip \\filename.exe off path
+		*(strrchr(program_path, '\\')) = '\0';        // Strip \\bin off path
+    }
+
+	//hr = g_pIOPCBrowse->QueryOrganization(&nameSpaceType);
+
+	if(FAILED(hr))
+	{
+		LogMessage(hr, _T("QueryOrganization()"));
+		IT_EXIT;
+		return;
+	}
+	
+	IEnumString* pEnumStringLevel = NULL;
+	
+	USES_CONVERSION;
+							
+	if(dump == NULL)
+	{
+		fprintf(stderr,"Error opening file: %s\n", sql_file_path);
+		fflush(stderr);
+		IT_EXIT;
+		return;
+	}
+
+	if(strlen(opc_path) > 0)
+	{
+		WCHAR structure_level[MAX_PATH];
+
+		wcscpy(structure_level, T2W(opc_path));
+
+		hr = g_pIOPCBrowse->ChangeBrowsePosition(OPC_BROWSE_TO, structure_level);
+
+		if(FAILED(hr))
+		{
+			LogMessage(hr, _T("ChangeBrowsePosition()"));
+			fprintf(stderr,"Error ChangeBrowsePosition to %s\n", opc_path);
+			fflush(stderr);
+			IT_EXIT;
+			return;
+		}
+	}
+	
+	hr = g_pIOPCBrowse->BrowseOPCItemIDs(OPC_FLAT, L"", VT_EMPTY, 0, &pEnumStringLevel);
+	
+	if(FAILED(hr))
+	{
+		LogMessage(hr, _T("BrowseOPCItemIDs()"));
+		IT_EXIT;
+		return;
+	}
+
+	*/
+	
+	HRESULT hr = 0;
+	FILE *dump = NULL;
+	char iec_type[20];
+	char program_path[_MAX_PATH];
+	double max = 0.0;
+	double min = 0.0;
+	
+	iec_type[0] = '\0';
+	program_path[0] = '\0';
+
+	if(GetModuleFileName(NULL, program_path, _MAX_PATH))
+	{
+		*(strrchr(program_path, '\\')) = '\0';        // Strip \\filename.exe off path
+		*(strrchr(program_path, '\\')) = '\0';        // Strip \\bin off path
+    }
+
+	char sql_file_path[MAX_PATH];
+
+	strcpy(sql_file_path, program_path);
+
+	//TODO: "\\bin\\" will be changed to "\\cfg\\"
+	strcat(sql_file_path, "\\bin\\"); 
+
+	strcat(sql_file_path, sql_file_name);
+	
+	dump = fopen(sql_file_path, "w");
+
+	fprintf(dump, "create table opc_client_da_table(opc_server_item_id varchar(150), ioa_control_center varchar(150), iec_type varchar(150), readable varchar(150), writeable varchar(150), HiHiLimit varchar(150), LoLoLimit varchar(150));\n");
+	fflush(dump);
+							
+	if(dump == NULL)
+	{
+		fprintf(stderr,"Error opening file: %s\n", sql_file_path);
+		fflush(stderr);
+		IT_EXIT;
+		return;
+	}
+
+	IEnumString* pEnumString = NULL;
+
+	USES_CONVERSION;
+
+	hr = g_pIOPCBrowse->BrowseOPCItemIDs(OPC_FLAT, L""/*NULL*/, VT_EMPTY, 0, &pEnumString);
+
+	if(FAILED(hr))
+	{
+		LogMessage(hr, _T("BrowseOPCItemIDs()"));
+		IT_EXIT;
+		return;
+	}
+
+	if(hr == S_OK)
+	{
+		LPOLESTR pszName = NULL;
+		ULONG count = 0;
+		char buf[256];
+		ULONG nCount = 0;
+
+		while((hr = pEnumString->Next(1, &pszName, &count)) == S_OK)
+		{
+			nCount++;
+			::CoTaskMemFree(pszName);
+		}
+
+		g_dwNumItems = nCount;
+
+		printf(_T("OPC items: %d\n"), nCount);
+
+		Item = (struct structItem*)calloc(1, g_dwNumItems*sizeof(struct structItem));
+
+		pEnumString->Release();
+
+		hr = g_pIOPCBrowse->BrowseOPCItemIDs(OPC_FLAT, L""/*NULL*/, VT_EMPTY, 0, &pEnumString);
+
+		if(FAILED(hr))
+		{
+			LogMessage(hr, _T("BrowseOPCItemIDs()"));
+			IT_EXIT;
+			return;
+		}
+								
+		for(int nTestItem = 0; (hr = pEnumString->Next(1, &pszName, &count)) == S_OK; )
+		{
+			//printf(_T("%s\n"), OLE2T(pszName));
+			//strcpy(buf, OLE2T(pszName)); Do NOT use OLE2T
+
+			sprintf(buf, "%ls", pszName);
+
+			strcpy(Item[nTestItem].spname, buf);
+
+			wcscpy(Item[nTestItem].wszName, T2W(buf));
+			
+			//set VT_EMPTY and the server will select the right type////
+			Item[nTestItem].vt = VT_EMPTY;
+						
+			OPCITEMRESULT *pItemResult = NULL;
+			HRESULT *pErrors = NULL;
+			OPCITEMDEF ItemDef;
+			ItemDef.szAccessPath = L"";
+			ItemDef.szItemID = Item[nTestItem].wszName;
+			ItemDef.bActive = TRUE;
+			ItemDef.hClient = g_dwClientHandle++; //starts at 1
+			ItemDef.dwBlobSize = 0;
+			ItemDef.pBlob = NULL;
+			ItemDef.vtRequestedDataType = Item[nTestItem].vt;
+			Item[nTestItem].hClient = ItemDef.hClient;
+
+			hr = g_pIOPCItemMgt->AddItems(1, &ItemDef, &pItemResult, &pErrors);
+
+			if(FAILED(hr))
+			{
+				LogMessage(hr,"AddItems()");
+				IT_EXIT;
+				return;
+			}
+
+			hr = S_OK;
+
+			if(FAILED(pErrors[0]))
+			{
+				LogMessage(pErrors[0],"AddItems() item");
+				IT_EXIT;
+				return;
+			}
+
+			// record unique handle for this item
+			Item[nTestItem].hServer = pItemResult->hServer;
+			Item[nTestItem].vt = pItemResult->vtCanonicalDataType;
+			Item[nTestItem].dwAccessRights = pItemResult->dwAccessRights;
+							
+			//NOTE: please keep aligned this switch with the one in SendEvent2
+
+			switch(Item[nTestItem].vt)
+			{
+				case VT_I1:
+				{
+					strcpy(iec_type, "M_IT_TB_1");
+				}
+				break;
+				case VT_UI1:
+				{
+					strcpy(iec_type, "M_IT_TB_1");
+				}
+				break;
+				case VT_I2:
+				{
+					strcpy(iec_type, "M_IT_TB_1");
+				}
+				break;
+				case VT_UI2:
+				{
+					strcpy(iec_type, "M_IT_TB_1");
+				}
+				break;
+				case VT_I4:
+				{
+					strcpy(iec_type, "M_IT_TB_1");
+				}
+				break;
+				case VT_UI4:
+				{
+					strcpy(iec_type, "M_IT_TB_1");
+				}
+				break;
+				case VT_R4:
+				{
+					strcpy(iec_type, "M_ME_TF_1");
+				}
+				break;
+				case VT_R8:
+				{
+					strcpy(iec_type, "M_ME_TF_1");
+				}
+				break;
+				case VT_BOOL:
+				{
+					strcpy(iec_type, "M_SP_TB_1");
+				}
+				break;
+				case VT_DATE:
+				{
+					strcpy(iec_type, "M_SP_TB_1");
+				}
+				break;
+				case VT_BSTR:
+				{
+					strcpy(iec_type, "M_ME_TF_1");
+				}
+				break;
+				default:
+				{
+					//IEC type NOT suported
+				}
+				break;
+			}
+
+			//#define GET_PROPERTIES
+
+			#ifdef GET_PROPERTIES
+			//////get properties of the item////////////////////////////////////////////////////////////
+			DWORD noProperties = 0;
+			DWORD *pPropertyIDs = NULL;
+			LPWSTR *pDescriptions = NULL;
+			VARTYPE *pvtDataTypes = NULL;
+			HRESULT *pErrorsProps = NULL;
+			
+			hr = g_iOpcProperties->QueryAvailableProperties(pszName, &noProperties, &pPropertyIDs, &pDescriptions, &pvtDataTypes);
+
+			if(FAILED(hr))
+			{
+				LogMessage(hr, "Failed to restrieve properties");
+			}
+				
+			VARIANT *pValues = NULL;
+			
+			hr = g_iOpcProperties->GetItemProperties(pszName, noProperties, pPropertyIDs, &pValues, &pErrorsProps);
+
+			if(FAILED(hr))
+			{
+				LogMessage(hr, "Failed to restrieve property values");
+			}
+
+			for(unsigned i = 0; i < noProperties; i++)
+			{
+				//printf("PropertyID = %d, Description = %ls, DataType = %d ", pPropertyIDs[i], pDescriptions[i], pvtDataTypes[i]);
+
+				max = 0.0;
+				min = 0.0;
+
+				if (!FAILED(pErrorsProps[i]))
+				{
+					if(pPropertyIDs[i] == 307  ||
+					   pPropertyIDs[i] == 308  ||
+					   pPropertyIDs[i] == 309  ||
+					   pPropertyIDs[i] == 310)
+					{
+						switch(V_VT(&pValues[i]))
+						{
+							case VT_BOOL:
+							{
+								//printf("Value = %x\n", V_BOOL(&pValues[i]));
+
+								if(pPropertyIDs[i] == 307)
+								{
+									max = V_BOOL(&pValues[i]);
+								}
+								else if(pPropertyIDs[i] == 310)
+								{
+									min = V_BOOL(&pValues[i]);
+								}
+							}
+							break;
+							case VT_I2:
+							{
+								//printf("Value = %d\n", V_I2(&pValues[i]));
+
+								if(pPropertyIDs[i] == 307)
+								{
+									max = V_I2(&pValues[i]);
+								}
+								else if(pPropertyIDs[i] == 310)
+								{
+									min = V_I2(&pValues[i]);
+								}
+							}
+							break;
+							case VT_I4:
+							{
+								//printf("Value = %ld\n", V_I4(&pValues[i]));
+
+								if(pPropertyIDs[i] == 307)
+								{
+									max = V_I4(&pValues[i]);
+								}
+								else if(pPropertyIDs[i] == 310)
+								{
+									min = V_I4(&pValues[i]);
+								}
+							}
+							break;
+							case VT_R4:
+							{
+								//printf("Value = %f\n", V_R4(&pValues[i]));
+
+								if(pPropertyIDs[i] == 307)
+								{
+									max = V_R4(&pValues[i]);
+								}
+								else if(pPropertyIDs[i] == 310)
+								{
+									min = V_R4(&pValues[i]);
+								}
+							}
+							break;
+							case VT_R8:
+							{
+								//printf("Value = %lf\n", V_R8(&pValues[i]));
+
+								if(pPropertyIDs[i] == 307)
+								{
+									max = V_R8(&pValues[i]);
+								}
+								else if(pPropertyIDs[i] == 310)
+								{
+									min = V_R8(&pValues[i]);
+								}
+							}
+							break;
+							case VT_BSTR:
+							{
+								//printf("Value = %ls\n", V_BSTR(&pValues[i]));
+							}
+							break;
+							case VT_DATE:
+							{
+								DATE d; //same as R8
+								d = V_DATE(&pValues[i]);
+
+								//printf("Value = %lf\n", d);
+							}
+							break;
+							default:
+							{
+								printf("Property type not supported\n");
+							}
+							break;
+						}
+
+						if(pPropertyIDs[i] != 310)
+						{
+							//fprintf(dump, ";");
+							//fflush(dump);
+						}
+					}
+				}
+			}
+
+			::CoTaskMemFree(pPropertyIDs);
+			::CoTaskMemFree(pErrorsProps);
+			::CoTaskMemFree(pDescriptions);
+
+			for (i = 0; i < noProperties; i++)
+			{
+				VariantClear(&(pValues[i]));	
+			}
+
+			::CoTaskMemFree(pValues);
+			::CoTaskMemFree(pvtDataTypes);
+			////////////////end get properties/////////////////////////////////////////
+			#endif //GET_PROPERTIES
+
+			//opc_server_item_id varchar(150), ioa_control_center varchar(150), iec_type varchar(150), readable varchar(150), writeable varchar(150), HiHiLimit varchar(150), LoLoLimit varchar(150)
+
+			int readable = ((Item[nTestItem].dwAccessRights | OPC_READABLE) ? 1: 0);
+			int writeable = ((Item[nTestItem].dwAccessRights | OPC_WRITEABLE) ? 1 : 0);
+
+			fprintf(dump, "insert into opc_client_da_table values('%s', '%d', '%s', '%d', '%d', '%lf', '%lf');\n", 
+			Item[nTestItem].spname, nTestItem + 1, iec_type, readable,	writeable,	max, min);
+			fflush(dump);
+			
+			////////////////////////////end dumping one record/////////////////////////////////////////////
+
+			nTestItem++;
+			
+			::CoTaskMemFree(pItemResult);
+			::CoTaskMemFree(pErrors);
+			::CoTaskMemFree(pszName);
+
+			if(nTestItem >= MAX_CONFIGURABLE_OPC_ITEMIDS)
+			{ 
+				printf("Warning! Increase ""MAX_CONFIGURABLE_OPC_ITEMIDS"" items\n");
+				break;
+			}
+		}
+
+		pEnumString->Release();
+
+		OpcStop();
+
+		if(dump)
+		{
+			fclose(dump);
+			dump = NULL;
+		}
+
+		fprintf(stderr,"Server browsing is complete!\n");
+		fflush(stderr);
+	}
+	
+	IT_EXIT;
 }

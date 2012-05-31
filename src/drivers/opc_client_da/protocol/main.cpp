@@ -54,7 +54,7 @@ int IsSingleInstance(char *name)
 char *optarg;
 
 #define RUNTIME_USAGE "Run time usage: %s -a server_IP_address -d percent_dead_band\
- -p OPCServerProgID -q CLSID -l line_number -t polling_time_in_ms\n"
+ -p OPCServerProgID -q CLSID -l line_number -t polling_time_in_ms -e config_itemids.sql\n"
 
 void usage(char** argv)
 {
@@ -76,6 +76,8 @@ int main(int argc, char **argv)
 	char OldConsoleTitle[500];
 	char NewConsoleTitle[500];
 	char line_number[80];
+	char sqlFileName[80];
+	char structurePath[MAX_PATH];
 		
 	IT_IT("main OPC CLIENT DA");
 
@@ -93,8 +95,11 @@ int main(int argc, char **argv)
 	OpcclassId[0] = '\0';
 	OldConsoleTitle[0] = '\0';
 	NewConsoleTitle[0] = '\0';
+	sqlFileName[0] = '\0';
+	structurePath[0] = '\0';
+	line_number[0] = '\0';
 
-	while( ( c = getopt ( argc, argv, "a:d:p:q:l:t:?" )) != EOF ) {
+	while( ( c = getopt ( argc, argv, "a:d:e:p:q:l:t:s:?" )) != EOF ) {
 		switch ( c ) {
 			case 'a' :
 				strcpy(OPCServerAddress, optarg);
@@ -126,6 +131,12 @@ int main(int argc, char **argv)
 				strcat(NewConsoleTitle, optarg);
 				strcat(NewConsoleTitle, "   ");
 			break;
+			case 'e' :
+				strcpy(sqlFileName, optarg);
+			break;
+			case 's' :
+				strcpy(structurePath, optarg);
+			break;
 			case '?' :
 				fprintf(stderr, RUNTIME_USAGE, argv[0]);
 				fflush(stderr);
@@ -154,12 +165,15 @@ int main(int argc, char **argv)
 		SetConsoleTitle(NewConsoleTitle);
 	}
 
-	if(!IsSingleInstance(line_number))
+	if(strlen(line_number) > 0)
 	{
-		fprintf(stderr,"Another instance is already running\n");
-		fflush(stderr);
-		IT_EXIT;
-		return EXIT_FAILURE;
+		if(!IsSingleInstance(line_number))
+		{
+			fprintf(stderr,"Another instance is already running\n");
+			fflush(stderr);
+			IT_EXIT;
+			return EXIT_FAILURE;
+		}
 	}
 	
 	//Alloc OPC class and start
@@ -173,6 +187,13 @@ int main(int argc, char **argv)
 		po->OpcStop();
 		IT_EXIT;
 		return EXIT_FAILURE;
+	}
+
+	if(strlen(sqlFileName) > 0)
+	{
+		po->CreateSqlConfigurationFile(sqlFileName, structurePath);
+		IT_EXIT;
+		return EXIT_SUCCESS;
 	}
 
 	nRet = po->AddItems();

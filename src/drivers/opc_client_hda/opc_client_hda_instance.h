@@ -104,9 +104,6 @@ class OPC_CLIENT_HDADRV Opc_client_hda_Instance : public DriverInstance
         strcat(fifo_ctr_name, str_instance_id);
         strcat(fifo_ctr_name, "hda");
 
-//		const size_t max_fifo_queue_size = 4*65536;
-		//Init thread shared fifos
-//		fifo_control_direction = fifo_open("fifo_opc_command", max_fifo_queue_size, iec_call_exit_handler);
 	};
 
 	~Opc_client_hda_Instance()

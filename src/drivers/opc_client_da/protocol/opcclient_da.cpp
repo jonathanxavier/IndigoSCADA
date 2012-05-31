@@ -1242,30 +1242,120 @@ void Opc_client_da_imp::SendEvent2(VARIANT *pValue, const FILETIME* ft, DWORD pw
 		//break;
 		case VT_I1:
 		{
-			item_to_send.iec_type = M_ME_TE_1;
-			epoch_to_cp56time2a(&time, epoch_in_millisec);
-			item_to_send.iec_obj.o.type35.mv = V_I1(pValue);
-			item_to_send.iec_obj.o.type35.time = time;
-			
-			
-			if(pwQualities != OPC_QUALITY_GOOD)
-				item_to_send.iec_obj.o.type35.iv = 1;
+			switch(Item[phClientItem - 1].io_list_iec_type)
+			{
+				case M_IT_TB_1:
+				{
+					item_to_send.iec_type = M_IT_TB_1;
+					epoch_to_cp56time2a(&time, epoch_in_millisec);
+					item_to_send.iec_obj.o.type37.counter = V_I1(pValue);
+					item_to_send.iec_obj.o.type37.time = time;
+						
+					if(pwQualities != OPC_QUALITY_GOOD)
+						item_to_send.iec_obj.o.type37.iv = 1;
 
-			IT_COMMENT1("Value = %d", V_I1(pValue));
+					IT_COMMENT1("Value = %d", V_I1(pValue));
+				}
+				break;
+				case M_ME_TE_1:
+				{
+					/*
+					item_to_send.iec_type = M_ME_TE_1;
+					epoch_to_cp56time2a(&time, epoch_in_millisec);
+					item_to_send.iec_obj.o.type35.mv = V_I1(pValue);
+					item_to_send.iec_obj.o.type35.time = time;
+
+					if(pwQualities != OPC_QUALITY_GOOD)
+						item_to_send.iec_obj.o.type35.iv = 1;
+
+					IT_COMMENT1("Value = %d", V_I1(pValue));
+					*/
+					int error = 0;
+
+					item_to_send.iec_type = M_ME_TE_1;
+					epoch_to_cp56time2a(&time, epoch_in_millisec);
+					item_to_send.iec_obj.o.type35.mv = rescale_value(V_I1(pValue),
+					Item[phClientItem - 1].min_measure, 
+					Item[phClientItem - 1].max_measure, &error);
+					
+					if(pwQualities != OPC_QUALITY_GOOD)
+						item_to_send.iec_obj.o.type35.iv = 1;
+
+					IT_COMMENT1("Value = %d", V_I1(pValue));
+				}
+				break;
+				case C_DC_NA_1:
+				{
+					fprintf(stderr,"IEC type %d is NOT sent in monitoring direction\n", Item[phClientItem - 1].io_list_iec_type);
+					fflush(stderr);
+				}
+				break;
+				default:
+				{
+				  fprintf(stderr,"IEC type %d is NOT supported for VT_I1\n", Item[phClientItem - 1].io_list_iec_type);
+				  fflush(stderr);
+				}
+				break;
+			}
 		}
 		break;
 		case VT_UI1:
 		{
-				item_to_send.iec_type = M_ME_TE_1;
-				epoch_to_cp56time2a(&time, epoch_in_millisec);
-				item_to_send.iec_obj.o.type35.mv = V_UI1(pValue);
-				item_to_send.iec_obj.o.type35.time = time;
-				
-				if(pwQualities != OPC_QUALITY_GOOD)
-					item_to_send.iec_obj.o.type35.iv = 1;
-				
-												
-				IT_COMMENT1("Value = %d", V_UI1(pValue));
+			switch(Item[phClientItem - 1].io_list_iec_type)
+			{
+				case M_IT_TB_1:
+				{
+					item_to_send.iec_type = M_IT_TB_1;
+					epoch_to_cp56time2a(&time, epoch_in_millisec);
+					item_to_send.iec_obj.o.type37.counter = V_UI1(pValue);
+					item_to_send.iec_obj.o.type37.time = time;
+						
+					if(pwQualities != OPC_QUALITY_GOOD)
+						item_to_send.iec_obj.o.type37.iv = 1;
+
+					IT_COMMENT1("Value = %d", V_UI1(pValue));
+				}
+				break;
+				case M_ME_TE_1:
+				{
+					/*
+					item_to_send.iec_type = M_ME_TE_1;
+					epoch_to_cp56time2a(&time, epoch_in_millisec);
+					item_to_send.iec_obj.o.type35.mv = V_UI1(pValue);
+					item_to_send.iec_obj.o.type35.time = time;
+
+					if(pwQualities != OPC_QUALITY_GOOD)
+						item_to_send.iec_obj.o.type35.iv = 1;
+
+					IT_COMMENT1("Value = %d", V_UI1(pValue));
+					*/
+					int error = 0;
+
+					item_to_send.iec_type = M_ME_TE_1;
+					epoch_to_cp56time2a(&time, epoch_in_millisec);
+					item_to_send.iec_obj.o.type35.mv = rescale_value(V_UI1(pValue),
+					Item[phClientItem - 1].min_measure, 
+					Item[phClientItem - 1].max_measure, &error);
+					
+					if(pwQualities != OPC_QUALITY_GOOD)
+						item_to_send.iec_obj.o.type35.iv = 1;
+
+					IT_COMMENT1("Value = %d", V_UI1(pValue));
+				}
+				break;
+				case C_DC_NA_1:
+				{
+					fprintf(stderr,"IEC type %d is NOT sent in monitoring direction\n", Item[phClientItem - 1].io_list_iec_type);
+					fflush(stderr);
+				}
+				break;
+				default:
+				{
+				  fprintf(stderr,"IEC type %d is NOT supported for VT_UI1\n", Item[phClientItem - 1].io_list_iec_type);
+				  fflush(stderr);
+				}
+				break;
+			}
 		}
 		break;
 		case VT_I2:

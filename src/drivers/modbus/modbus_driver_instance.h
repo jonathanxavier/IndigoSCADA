@@ -114,8 +114,6 @@ class MODBUS_DRIVERDRV Modbus_driver_Instance : public DriverInstance
         strcat(fifo_ctr_name, "modbus");
         strcat(fifo_mon_name, "modbus");
  
-//		fifo_control_direction = fifo_open(fifo_ctr_name, max_fifo_queue_size, iec_call_exit_handler);
-//		fifo_monitor_direction = fifo_open(fifo_mon_name, max_fifo_queue_size, iec_call_exit_handler);
         /////////////////////////////////////////////////////////////////////////////
 	};
 

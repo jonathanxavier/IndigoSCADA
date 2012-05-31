@@ -91,6 +91,7 @@ int main(int argc, char **argv)
 	OpcclassId[0] = '\0';
 	OldConsoleTitle[0] = '\0';
 	NewConsoleTitle[0] = '\0';
+	line_number[0] = '\0';
 
 	while( ( c = getopt ( argc, argv, "a:p:q:l:t:?" )) != EOF ) {
 		switch ( c ) {
@@ -183,7 +184,10 @@ int main(int argc, char **argv)
 
 	p->OpcStop();
 
-	delete p;
+	if(p)
+	{
+		delete p;
+	}
 
 	IT_EXIT;
 	return EXIT_SUCCESS;
