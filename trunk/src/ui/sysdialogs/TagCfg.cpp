@@ -220,7 +220,7 @@ void TagCfg::QueryResponse (QObject *p, const QString &c, int State, QObject*cal
 				UWEnabled->setChecked (0);
 				UAEnabled->setChecked (0);
 				//
-				QString cmd = "insert into TAGS values ('"+SPName+"','"+Name->currentText()+"'"TAG_VALS"'"+ReceipeName+"',1,'','');";
+				QString cmd = "insert into TAGS values ('"+SPName+"','"+Name->currentText()+"'"TAG_VALS"'"+ReceipeName+"',1,0,'','');";
 				GetConfigureDb()->DoExec(0,cmd,0);
 				//
 				// create the entry in the current values database

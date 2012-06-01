@@ -279,9 +279,7 @@ void Modbus_driver::QueryResponse (QObject *p, const QString &, int id, QObject*
 
 					CreateSamplePoint(spname, l, m);
 
-					////////////Modbus specific//////////////////////////////////////////
-					// update the tags
-					cmd = QString("update TAGS set PARAMS='");
+					cmd = QString("update TAGS set IOA='");
 					cmd += m;
 					cmd += "' where NAME='" + spname + "';";
 
@@ -292,8 +290,7 @@ void Modbus_driver::QueryResponse (QObject *p, const QString &, int id, QObject*
 					cmd += "' where NAME='" + spname + "';";
 
 					GetConfigureDb()->DoExec(0,cmd ,0);
-					//////////////////////////////////////////////////////////////////////
-				};
+				}
 			}
 		}
 		break;

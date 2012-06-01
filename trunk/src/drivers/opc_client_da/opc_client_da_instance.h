@@ -181,7 +181,9 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 		}
 
 		ORTEDomainAppDestroy(domain);
-        domain=NULL;
+        domain = NULL;
+
+		is_updated_central_database = false;
 	};
 	//
 	void Fail(const QString &s)
@@ -194,6 +196,7 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 	Driver* ParentDriver;
 	QString unit_name;
 	int instanceID; //Equals to "line concept" of a SCADA driver
+	bool is_updated_central_database;
 	//////Middleware/////////////
     ORTEDomain *domain;
 	ORTEPublication *publisher;

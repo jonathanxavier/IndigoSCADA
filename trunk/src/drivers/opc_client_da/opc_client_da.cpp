@@ -265,8 +265,23 @@ void Opc_client_da::QueryResponse (QObject *p, const QString &, int id, QObject*
 					QStringList l;
 					GetTagList(TYPE_M_ME_TC_1,l,"",""); 
 
-					CreateSamplePoint(spname, l,"00:01:00 4 20 0");
-				};
+					QString m;
+					m.sprintf("%d",i);
+
+					CreateSamplePoint(spname, l, m);
+
+					cmd = QString("update TAGS set IOA='");
+					cmd += m;
+					cmd += "' where NAME='" + spname + "';";
+
+					GetConfigureDb()->DoExec(0,cmd ,0);
+
+					cmd = QString("update TAGS set UNIT='");
+					cmd += opc_unit_name;
+					cmd += "' where NAME='" + spname + "';";
+
+					GetConfigureDb()->DoExec(0,cmd ,0);
+				}
 			}
 		}
 		break;
