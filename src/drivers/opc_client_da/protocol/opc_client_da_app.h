@@ -48,6 +48,7 @@ struct structItem
 	int writeable;
 	float min_measure;
 	float max_measure;
+	char opc_type[30];
 };
 
 enum opc_client_states {

@@ -279,9 +279,7 @@ void Dnp3driver::QueryResponse (QObject *p, const QString &, int id, QObject*cal
 
 					CreateSamplePoint(spname, l, m);
 
-					////////////DNP3 specific//////////////////////////////////////////
-					////PARAMS column contains IOA
-					cmd = QString("update TAGS set PARAMS='");
+					cmd = QString("update TAGS set IOA='");
 					cmd += m;
 					cmd += "' where NAME='" + spname + "';";
 
@@ -292,8 +290,7 @@ void Dnp3driver::QueryResponse (QObject *p, const QString &, int id, QObject*cal
 					cmd += "' where NAME='" + spname + "';";
 
 					GetConfigureDb()->DoExec(0,cmd ,0);
-					//////////////////////////////////////////////////////////////////////
-				};
+				}
 			}
 		}
 		break;

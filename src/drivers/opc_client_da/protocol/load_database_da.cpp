@@ -120,6 +120,13 @@ static int db_callback(void *NotUsed, int argc, char **argv, char **azColName)
 				gl_Config_db[gl_row_counter].min_measure = (float)atof(argv[i]);				
 			}
 			break;
+			case 7:
+			{
+				//column 8 in table opc_client_da_table
+				//opc_type in OPC format 
+				strcpy(gl_Config_db[gl_row_counter].opc_type, argv[i]);
+			}
+			break;
 			default:
 			break;
 		}

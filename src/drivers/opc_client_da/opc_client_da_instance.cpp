@@ -374,6 +374,136 @@ void strip_white_space(char *dst, const char *src, int len)
 	}
 }
 
+#include <sqlite3.h>
+
+struct local_structItem
+{
+	CHAR spname[200]; //Item ID of opc server, i.e. Simulated Card.Simulated Node.Random.R8 as C string
+	char opc_type[30];
+	unsigned int ioa_control_center;//unique inside CASDU
+	unsigned int io_list_iec_type; //IEC 104 type
+	int readable;
+	int writeable;
+	float min_measure;
+	float max_measure;
+};
+
+static gl_row_counter = 0;
+static gl_column_counter = 0;
+static struct local_structItem* gl_Config_db = 0;
+
+static int db_callback(void *NotUsed, int argc, char **argv, char **azColName)
+{
+	int i;
+
+	gl_column_counter = argc;
+	
+	for(i = 0; i < argc; i++)
+	{
+		fprintf(stderr, "%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
+		fflush(stderr);
+
+		switch(i)
+		{
+			case 0:
+			{
+				//column 1 in table opc_client_da_table
+				//opc_server_item_id
+				strcpy(gl_Config_db[gl_row_counter].spname, argv[i]);
+			}
+			break;
+			case 1:
+			{
+				//column 2 in table opc_client_da_table
+				//ioa_control_center Unstructured
+				gl_Config_db[gl_row_counter].ioa_control_center = atoi(argv[i]);
+			}
+			break;
+			case 2:
+			{
+				//column 3 in table opc_client_da_table
+				//iec_type
+
+				if(strcmp(argv[i], "M_ME_TF_1") == 0)
+				{
+					gl_Config_db[gl_row_counter].io_list_iec_type = M_ME_TF_1;
+				}
+				else if(strcmp(argv[i], "M_SP_TB_1") == 0)
+				{
+					gl_Config_db[gl_row_counter].io_list_iec_type = M_SP_TB_1;
+				}
+				else if(strcmp(argv[i], "M_DP_TB_1") == 0)
+				{
+					gl_Config_db[gl_row_counter].io_list_iec_type = M_DP_TB_1;
+				}
+				else if(strcmp(argv[i], "C_DC_NA_1") == 0)
+				{
+					gl_Config_db[gl_row_counter].io_list_iec_type = C_DC_NA_1;
+				}
+				else if(strcmp(argv[i], "C_SC_NA_1") == 0)
+				{
+					gl_Config_db[gl_row_counter].io_list_iec_type = C_SC_NA_1;
+				}
+				else if(strcmp(argv[i], "M_IT_TB_1") == 0)
+				{
+					gl_Config_db[gl_row_counter].io_list_iec_type = M_IT_TB_1;
+				}
+				else
+				{
+					fprintf(stderr,"IEC type %s from I/O list NOT supported\n", argv[i]);
+					fflush(stderr);
+					ExitProcess(0);
+				}
+			}	
+			break;
+			case 3:
+			{
+				//column 4 in table opc_client_da_table
+				//readable
+				gl_Config_db[gl_row_counter].readable = atoi(argv[i]);
+			}
+			break;
+			case 4:
+			{
+				//column 5 in table opc_client_da_table
+				//writeable
+				gl_Config_db[gl_row_counter].writeable = atoi(argv[i]);
+			}
+			break;
+			case 5:
+			{
+				//column 6 in table opc_client_da_table
+				//HiHiLimit
+				gl_Config_db[gl_row_counter].max_measure = (float)atof(argv[i]);
+			}
+			break;
+			case 6:
+			{
+				//column 7 in table opc_client_da_table
+				//LoLoLimit
+				gl_Config_db[gl_row_counter].min_measure = (float)atof(argv[i]);				
+			}
+			break;
+			case 7:
+			{
+				//column 8 in table opc_client_da_table
+				//opc_type in OPC format 
+				strcpy(gl_Config_db[gl_row_counter].opc_type, argv[i]);
+			}
+			break;
+			default:
+			break;
+		}
+	}
+
+	//ended to read a record
+	gl_row_counter++;
+
+	fprintf(stderr, "\n");
+	fflush(stderr);
+	return 0;
+}
+
 /*
 *Function: Tick
 *checks for triggered events - run every second or so
@@ -440,218 +570,109 @@ void Opc_client_da_Instance::Tick()
 				*/
 				//END TEST
 
-				/*
-				//if(pConnect->mandare_eventi == false)
+/*
+
+--tag configuration
+create table TAGS
+(
+NAME string,
+TAG string,
+UPPERALARM real8,
+UPPERWARN real8,
+LOWERWARN real8,
+LOWERALARM real8,
+UAENABLE int4,
+UWENABLE int4,
+LWENABLE int4,
+LAENABLE int4,
+RECEIPE string,
+ENABLED int4,
+IOA int 4, <----------------------------- TO ADD
+PARAMS string,
+UNIT string
+);
+
+*/
+
+				if(is_updated_central_database)
 				{
+					sqlite3 *db;
+					char *zErrMsg = 0;
+					int rc;
+					int n_rows = 0;
+					int m_columns = 0;
+					//FILE* fp = NULL;
 
-					USES_CONVERSION;
+					rc = sqlite3_open("C:\\scada\\bin\\ProtocolDatabase.db", &db);
 
-					for(unsigned i = 0; i < pConnect->g_dwNumItems; i ++)
+					if(rc)
 					{
-						if(pConnect->Item)
+					  fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+					  fflush(stderr);
+					  sqlite3_close(db);
+					  //IT_EXIT;
+					  //return;
+					  //error
+					}
+
+					gl_Config_db = (struct local_structItem*)calloc(1, 30000*sizeof(struct local_structItem));
+
+					gl_row_counter = 0;
+
+					rc = sqlite3_exec(db, "select * from opc_client_da_table;", db_callback, 0, &zErrMsg);
+
+					if(rc != SQLITE_OK)
+					{
+					  fprintf(stderr, "SQL error: %s\n", zErrMsg);
+					  fflush(stderr);
+					  sqlite3_free(zErrMsg);
+					}
+
+					sqlite3_close(db);
+
+					n_rows = gl_row_counter;
+					m_columns = gl_column_counter;
+
+					if(n_rows > OpcItems)
+					{
+						//error to user
+					}
+
+					struct local_structItem* gl_Config_db = (struct local_structItem*)malloc(n_rows) ;
+
+					for(unsigned i = 0; i < n_rows; i ++)
+					{
+						if(gl_Config_db)
 						{
-							DWORD dwAccessRights = pConnect->Item[i].dwAccessRights;
-
-							dwAccessRights = dwAccessRights & OPC_WRITEABLE;
-
-							int writable = 0;
-		
-							if(dwAccessRights == OPC_WRITEABLE)
-							{
-								writable = 1;
-							}
-
 							QString opcType;
-
-							switch(pConnect->Item[i].vt)
-							{
-								case VT_EMPTY:
-								{
-									opcType.sprintf("%s", "VT_EMPTY");
-								}
-								break;
-								case VT_I1:
-								{
-									opcType.sprintf("%s", "VT_I1");
-								}
-								break;
-								case VT_UI1:
-								{
-									opcType.sprintf("%s", "VT_UI1");
-								}
-								break;
-								case VT_I2:
-								{
-									opcType.sprintf("%s", "VT_I2");
-								}
-								break;
-								case VT_UI2:
-								{
-									opcType.sprintf("%s", "VT_UI2");
-								}
-								break;
-								case VT_I4:
-								{
-									opcType.sprintf("%s", "VT_I4");
-								}
-								break;
-								case VT_UI4:
-								{
-									opcType.sprintf("%s", "VT_UI4");
-								}
-								break;
-								case VT_I8:
-								{
-									opcType.sprintf("%s", "VT_I8");
-								}
-								break;
-								case VT_UI8:
-								{
-									opcType.sprintf("%s", "VT_UI8");
-								}
-								break;
-								case VT_R4:
-								{
-									opcType.sprintf("%s", "VT_R4");
-								}
-								break;
-								case VT_R8:
-								{
-									opcType.sprintf("%s", "VT_R8");
-								}
-								break;
-								case VT_CY:
-								{
-									opcType.sprintf("%s", "VT_CY");
-								}
-								break;
-								case VT_BOOL:
-								{
-									opcType.sprintf("%s", "VT_BOOL");
-								}
-								break;
-								case VT_DATE:
-								{
-									opcType.sprintf("%s", "VT_DATE");
-								}
-								break;
-								case VT_BSTR:
-								{
-									opcType.sprintf("%s", "VT_BSTR");
-								}
-								break;
-								case VT_VARIANT:
-								{
-									opcType.sprintf("%s", "VT_VARIANT");
-								}
-								break;
-								case VT_ARRAY | VT_I1:
-								{
-									opcType.sprintf("%s", "VT_ARRAY|VT_I1");
-								}
-								break;
-								case VT_ARRAY | VT_UI1:
-								{
-									opcType.sprintf("%s", "VT_ARRAY|VT_UI1");
-								}
-								break;
-								case VT_ARRAY | VT_I2:
-								{
-									opcType.sprintf("%s", "VT_ARRAY|VT_I2");
-								}
-								break;
-								case VT_ARRAY | VT_UI2:
-								{
-									opcType.sprintf("%s", "VT_ARRAY|VT_UI2");
-								}
-								break;
-								case VT_ARRAY | VT_I4:
-								{
-									opcType.sprintf("%s", "VT_ARRAY|VT_I4");
-								}
-								break;
-								case VT_ARRAY | VT_UI4:
-								{
-									opcType.sprintf("%s", "VT_ARRAY|VT_UI4");
-								}
-								break;
-								case VT_ARRAY | VT_I8:
-								{
-									opcType.sprintf("%s", "VT_ARRAY|VT_I8");
-								}
-								break;
-								case VT_ARRAY | VT_UI8:
-								{
-									opcType.sprintf("%s", "VT_ARRAY|VT_UI8");
-								}
-								break;
-								case VT_ARRAY | VT_R4:
-								{
-									opcType.sprintf("%s", "VT_ARRAY|VT_R4");
-								}
-								break;
-								case VT_ARRAY | VT_R8:
-								{
-									opcType.sprintf("%s", "VT_ARRAY|VT_R8");
-								}
-								break;
-								case VT_ARRAY | VT_CY:
-								{
-									opcType.sprintf("%s", "VT_ARRAY|VT_CY");
-								}
-								break;
-								case VT_ARRAY | VT_BOOL:
-								{
-									opcType.sprintf("%s", "VT_ARRAY|VT_BOOL");
-								}
-								break;
-								case VT_ARRAY | VT_DATE:
-								{
-									opcType.sprintf("%s", "VT_ARRAY|VT_DATE");
-								}
-								break;
-								case VT_ARRAY | VT_BSTR:
-								{
-									opcType.sprintf("%s", "VT_ARRAY|VT_BSTR");
-								}
-								break;
-								case VT_ARRAY | VT_VARIANT:
-								{
-									opcType.sprintf("%s", "VT_ARRAY|VT_VARIANT");
-								}
-								break;
-								default:
-								{
-									opcType.sprintf("%s", "Illegal");
-								}
-								break;
-							}
 
 							char str[10];
 							// update the tags
 							QString cmd;
 							
 							cmd = QString("update TAGS set PARAMS='");
-							//const char* a = W2T(pConnect->Item[i].wszName);
-							char src[150];
-							strcpy(src, W2T(pConnect->Item[i].wszName));
+							
 							char dst[150];
-							strip_white_space(dst, src, 150);
+							strip_white_space(dst, gl_Config_db[i].spname, 150);
 							
 							cmd += QString(dst);
 							cmd += QString(" ");
-							cmd += opcType;
+							cmd += QString(gl_Config_db[i].opc_type);
 							cmd += QString(" ");
-							cmd += QString(itoa(writable,str,10));
-							cmd += "' where NAME='" + QString(pConnect->Item[i].spname) + "';";
+							cmd += QString(itoa(gl_Config_db[i].writeable, str, 10));
+							cmd += "' where IOA=" + QString(itoa(gl_Config_db[i].ioa_control_center, str, 10)) + ";";
 
 							GetConfigureDb()->DoExec(0,cmd ,0);
 						}
 					}
+
+					if(gl_Config_db)
+					{
+						free(gl_Config_db);
+					}
 				}
 
-				//pConnect->mandare_eventi = true;
-				*/
+				is_updated_central_database = true;
 			}
 		};
 		break;

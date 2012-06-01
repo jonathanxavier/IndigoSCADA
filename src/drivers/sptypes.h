@@ -97,7 +97,7 @@
 #define MAX_TAG "MAXIMUM"
 #define STATUS_TAG "STATUS"
 //
-#define DEFAULT_TAG_VALS ",0,0,0,0,0,0,0,0,'(default)',1,'',''"
+#define DEFAULT_TAG_VALS ",0,0,0,0,0,0,0,0,'(default)',1,0,'',''"
 #define TAG_VALS ",0,0,0,0,0,0,0,0,"
 
 #endif
