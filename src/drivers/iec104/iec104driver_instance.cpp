@@ -582,7 +582,7 @@ void Iec104driver_Instance::Tick()
 
 				#else
 
-				value.sprintf("%d", p_item->iec_obj.o.type36.mv);
+				value.sprintf("%f", p_item->iec_obj.o.type36.mv);
 
 				#endif
 			}

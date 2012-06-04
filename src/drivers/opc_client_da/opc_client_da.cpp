@@ -270,9 +270,9 @@ void Opc_client_da::QueryResponse (QObject *p, const QString &, int id, QObject*
 
 					CreateSamplePoint(spname, l, m);
 
-					cmd = QString("update TAGS set IOA='");
+					cmd = QString("update TAGS set IOA=");
 					cmd += m;
-					cmd += "' where NAME='" + spname + "';";
+					cmd += " where NAME='" + spname + "';";
 
 					GetConfigureDb()->DoExec(0,cmd ,0);
 

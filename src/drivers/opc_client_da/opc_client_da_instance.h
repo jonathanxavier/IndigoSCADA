@@ -25,6 +25,9 @@ extern Boolean  quite;
 extern void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackParam); 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
+extern void iec_call_exit_handler(int line, char* file, char* reason);
+#include "fifoc.h"
+
 class Opc_client_da_DriverThread;
 
 class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance 
@@ -35,7 +38,7 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 	enum
 	{
 		tUnitProperties = 1,tList, tSamplePointProperties, tListUnits,
-		tGetSamplePointNamefromIOA, tGetIOAfromSamplePointName
+		tGetSamplePointNamefromIOA, tGetIOAfromSamplePointName, tSetTAgsParams
 	};
 	//
 	//
@@ -89,7 +92,8 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 	Opc_client_da_Instance(Driver *parent, const QString &name, int instance_id) : 
 	DriverInstance(parent,name),fFail(0), Countdown(1), pConnect(NULL),
 	State(STATE_RESET),InTick(0),Retry(0),Sp(0),OpcItems(1), Values(NULL),
-	ParentDriver(parent),msg_sent_in_control_direction(0), instanceID(instance_id)
+	ParentDriver(parent),msg_sent_in_control_direction(0), instanceID(instance_id), 
+	is_updated_central_database(false)
 	{
 		IT_IT("Opc_client_da_Instance::Opc_client_da_Instance");
 		connect (GetConfigureDb (),
@@ -168,6 +172,12 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 		this,
 		smIPAddress);
 		///////////////////////////////////Middleware//////////////////////////////////////////////////
+
+		const size_t max_fifo_queue_size = 65535;
+		
+		strcat(fifo_monitor_name, "_fifo_");
+
+		fifo_monitor_direction = fifo_open(fifo_monitor_name, max_fifo_queue_size, iec_call_exit_handler);
 	};
 
 	~Opc_client_da_Instance()
@@ -182,8 +192,6 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 
 		ORTEDomainAppDestroy(domain);
         domain = NULL;
-
-		is_updated_central_database = false;
 	};
 	//
 	void Fail(const QString &s)
@@ -204,6 +212,7 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 	iec_item_type    instanceSend;
 	iec_item_type    instanceRecv;
 	/////////////////////////////
+	fifo_h fifo_monitor_direction;
 	
 	void driverEvent(DriverEvent *); // message from thread to parent
 	bool event(QEvent *e);

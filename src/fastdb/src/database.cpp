@@ -2338,6 +2338,7 @@ bool dbDatabase::open(char_t const* dbName, char_t const* fiName,
             TRACE_MSG(("File open error: %s\n", msgbuf));
             handleError(DatabaseOpenError, "Failed to create database file");
             cleanup(status, 8);
+			ExitProcess(1); //apa+++ 03-06-2012
             return false;
         }
         baseAddr = (byte*)file.getAddr();
@@ -7031,6 +7032,7 @@ bool dbReplicatedDatabase::open(char const* dbName, char const* fiName,
     {
         handleError(DatabaseOpenError, "Failed to create database file");
         cleanup(status, 8);
+		ExitProcess(1); //apa+++ 03-06-2012
         return false;
     }
     baseAddr = (byte*)file.getAddr();

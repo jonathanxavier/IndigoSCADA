@@ -884,6 +884,8 @@ void Monitor::ConfigQueryResponse (QObject *p,const QString &c, int id, QObject*
 
 							IT_COMMENT1("Tag = %s", (const char *)CfgDb->GetString("TAG"));
 
+							//printf("Tag = %s", (const char *)CfgDb->GetString("TAG"));
+
 							(*j).second.Tags.insert(pr);
 
 							k = (*j).second.Tags.find(CfgDb->GetString("TAG"));
