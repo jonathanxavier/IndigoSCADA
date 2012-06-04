@@ -271,8 +271,7 @@ void Opc_client_da_Instance::QueryResponse(QObject *p, const QString &c, int id,
 		break;
 		case tSetTAgsParams:
 		{
-			int a;
-			a = 1;
+
 		}
 		break;
 		default:
@@ -598,7 +597,7 @@ LWENABLE int4,
 LAENABLE int4,
 RECEIPE string,
 ENABLED int4,
-IOA int 4, <----------------------------- TO ADD
+IOA int4, <----------------------------- TO ADD
 PARAMS string,
 UNIT string
 );
@@ -614,7 +613,15 @@ UNIT string
 					int m_columns = 0;
 					//FILE* fp = NULL;
 
-					rc = sqlite3_open("C:\\scada\\bin\\ProtocolDatabase.db", &db);
+					char db_name[100];
+					strcpy(db_name, "C:\\scada\\bin\\");
+					strcat(db_name, Cfg.OpcServerProgID);
+					strcat(db_name, ".db");
+
+					//fprintf(stderr, "db_name = %s\n", db_name);
+					//fflush(stderr);
+
+					rc = sqlite3_open(db_name, &db);
 
 					if(rc)
 					{
@@ -667,7 +674,7 @@ UNIT string
 							cmd += QString(gl_Config_db[i].opc_type);
 							cmd += QString(" ");
 							cmd += QString(itoa(gl_Config_db[i].writeable, str, 10));
-							cmd += "' where IOA=" + QString(itoa(gl_Config_db[i].ioa_control_center, str, 10)) + ";";
+							cmd += "' where IOA=" + QString(itoa(gl_Config_db[i].ioa_control_center, str, 10)) + " and UNIT='"+ Name + "';";
 
 							GetConfigureDb()->DoExec(this, cmd , tSetTAgsParams);
 
@@ -934,10 +941,23 @@ UNIT string
 				#endif
 			}
 			break;
-			//case M_IT_TB_1:
-			//{
-			//}
-			//break;
+			case M_IT_TB_1:
+			{
+				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+				iec_type37 var = p_item->iec_obj.o.type37;
+				
+				SpValue v(VALUE_TAG, &var, M_ME_TN_1);
+				TODO:05-07-2011 Get name here
+				post_val(v, name);
+
+				#else
+
+				value.sprintf("%d", p_item->iec_obj.o.type37.counter);
+
+				#endif
+			}
+			break;
             case C_EX_IT_1:
 			{
                 printf("Child process exiting...\n");
@@ -1430,10 +1450,23 @@ void Opc_client_da_Instance::get_items(struct iec_item* p_item)
 			#endif
 		}
 		break;
-		//case M_IT_TB_1:
-		//{
-		//}
-		//break;
+		case M_IT_TB_1:
+		{
+			#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+			iec_type37 var = p_item->iec_obj.o.type37;
+			
+			SpValue v(VALUE_TAG, &var, M_ME_TN_1);
+			TODO:05-07-2011 Get name here
+			post_val(v, name);
+
+			#else
+
+			value.sprintf("%d", p_item->iec_obj.o.type37.counter);
+
+			#endif
+		}
+		break;
         case C_EX_IT_1:
 		{
             printf("Child process exiting...\n");

@@ -201,6 +201,8 @@ int Opc_client_hda_imp::OpcStart(char* OpcServerProgID, char* OpcclassId, char* 
 		return 1;
 	}
 	
+
+	strcpy(opc_server_prog_id, OpcServerProgID);
 	//Get CLSID From RemoteRegistry
 	
 	char keyName[100];

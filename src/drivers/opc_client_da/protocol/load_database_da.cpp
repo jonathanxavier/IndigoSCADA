@@ -157,7 +157,13 @@ int Opc_client_da_imp::AddItems()
 	int m_columns = 0;
 	//FILE* fp = NULL;
 
-	rc = sqlite3_open("C:\\scada\\bin\\ProtocolDatabase.db", &db);
+	char db_name[100];
+	strcpy(db_name, "C:\\scada\\bin\\");
+	strcat(db_name, opc_server_prog_id);
+	strcat(db_name, ".db");
+
+	rc = sqlite3_open(db_name, &db);
+
 
 	if(rc)
 	{

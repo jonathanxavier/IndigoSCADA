@@ -59,6 +59,8 @@ double get_value_sp_value(SpValue &v)
 		return (double)(v.v35_q.mv);
 		case M_ME_TF_1:
 		return (double)(v.v36_q.mv);
+		case M_IT_TB_1:
+		return (double)(v.v37_q.counter);
 		case M_ME_TN_1:
 		return (double)(v.v150_q.mv);
 		case M_ME_TO_1:
@@ -110,6 +112,8 @@ struct cp56time2a get_time_of_sp_value(SpValue &v)
 		return v.v35_q.time;
 		case M_ME_TF_1:
 		return v.v36_q.time;
+		case M_IT_TB_1:
+		return v.v37_q.time;
 		case M_ME_TN_1:
 		return v.v150_q.time;
 		case M_ME_TO_1:
@@ -170,6 +174,9 @@ int get_quality_of_sp_value(SpValue &v)
 		break;
 		case M_ME_TF_1:
 		quality =v.v36_q.iv;
+		break;
+		case M_IT_TB_1:
+		quality =v.v37_q.iv;
 		break;
 		case M_ME_TN_1:
 		quality =v.v150_q.iv;
@@ -240,6 +247,9 @@ void set_value_sp_value(SpValue &v, double val)
 		break;
 		case M_ME_TF_1:
 		v.v36_q.mv = val;
+		break;
+		case M_IT_TB_1:
+		v.v37_q.counter = val;
 		break;
 		case M_ME_TN_1:
 		v.v150_q.mv = val;

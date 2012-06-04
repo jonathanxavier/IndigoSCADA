@@ -83,6 +83,7 @@ struct SpValue // a measured result
 		iec_type34 v34_q;
 		iec_type35 v35_q;
 		iec_type36 v36_q;
+		iec_type37 v37_q;
 		is_type150 v150_q;
 		is_type151 v151_q;
 		is_type152 v152_q;
@@ -170,6 +171,9 @@ struct SpValue // a measured result
 			case M_ME_TF_1:
 			v36_q =  *(iec_type36*)v;
 			break;
+			case M_IT_TB_1:
+			v37_q =  *(iec_type37*)v;
+			break;
 			case M_ME_TN_1:
 			v150_q =  *(is_type150*)v;
 			break;
@@ -219,6 +223,9 @@ struct SpValue // a measured result
 			break;
 			case M_ME_TF_1:
 			v36_q = s.v36_q;
+			break;
+			case M_IT_TB_1:
+			v37_q = s.v37_q;
 			break;
 			case M_ME_TN_1:
 			v150_q = s.v150_q;

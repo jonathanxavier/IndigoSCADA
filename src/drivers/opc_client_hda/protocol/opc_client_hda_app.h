@@ -88,6 +88,8 @@ class Opc_client_hda_imp
 		g_dwUpdateRate = 60000; //in milliseconds
 		nThreads = 1;
 
+		opc_server_prog_id[0] = '\0';
+
 		IT_EXIT;
 	};
 		
@@ -130,6 +132,8 @@ class Opc_client_hda_imp
 	 IOPCBrowseServerAddressSpace *g_pIOPCBrowse;
 	 IOPCServerList *g_iCatInfo;
 	 IOPCItemProperties *g_iOpcProperties;
+
+		char opc_server_prog_id[100];
 	 
 	 struct structHdaItem* Config_db;
 	 int local_server;
