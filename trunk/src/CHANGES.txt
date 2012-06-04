@@ -102,4 +102,7 @@ Added protocol configurator, based on SQLite 3 database files
 Integration of the middleware (RTPS) with protocol processes
 Implemented configurator for opc_client_da.exe and opc_client_ae.exe
 -------------------------------------------------------------------------------------------------------
+04-06-2012
+OPC client DA working with multiple dedicated lines
+
 

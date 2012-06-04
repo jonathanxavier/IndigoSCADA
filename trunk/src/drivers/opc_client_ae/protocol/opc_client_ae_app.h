@@ -98,6 +98,8 @@ class Opc_client_ae_imp
 
 		strcpy(ServerIPAddress, opc_server_address);
 
+		opc_server_prog_id[0] = '\0';
+
 		/////////////////////Middleware/////////////////////////////////////////////////////////////////
 		received_command_callback = 0;
 
@@ -195,6 +197,7 @@ class Opc_client_ae_imp
 	 DWORD m_dwCookie, m_dwShutdownCookie;
 	 IOPCEventSubscriptionMgt* m_ISubMgt;
 	 IOPCEventSubscriptionMgt2* m_ISubMgt2;
+	 char opc_server_prog_id[100];
 
  	 /////////////////////Middleware/////////////////////////////////////////////////////////////////
 	 int received_command_callback;

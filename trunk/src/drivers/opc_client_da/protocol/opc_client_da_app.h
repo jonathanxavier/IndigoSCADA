@@ -102,6 +102,8 @@ class Opc_client_da_imp
 		nThreads = 1;
 		hServerRead = NULL;
 		id_of_ItemToWrite = 0;
+
+		opc_server_prog_id[0] = '\0';
 				
 		/////////////////////Middleware/////////////////////////////////////////////////////////////////
 		received_command_callback = 0;
@@ -222,6 +224,7 @@ class Opc_client_da_imp
 	 static struct structItem* Item; //OPC client items vector, indexed from 0
 	 struct structItem* Config_db;
 	 int local_server;
+	 char opc_server_prog_id[100];
 	 /////////////////////Middleware/////////////////////////////////////////////////////////////////
 	 int received_command_callback;
 	 ORTEDomain              *domain;

@@ -96,7 +96,12 @@ int Opc_client_hda_imp::load_database(void)
 	char *zErrMsg = 0;
 	int rc, n_rows, m_columns;
 
-	rc = sqlite3_open("C:\\scada\\bin\\ProtocolDatabase.db", &db);
+	char db_name[100];
+	strcpy(db_name, "C:\\scada\\bin\\");
+	strcat(db_name, opc_server_prog_id);
+	strcat(db_name, ".db");
+
+	rc = sqlite3_open(db_name, &db);
 
 	if(rc)
 	{

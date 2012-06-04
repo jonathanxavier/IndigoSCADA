@@ -805,10 +805,23 @@ void Dnp3driver_Instance::get_items(struct iec_item* p_item)
 			#endif
 		}
 		break;
-		//case M_IT_TB_1:
-		//{
-		//}
-		//break;
+		case M_IT_TB_1:
+		{
+			#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+			iec_type37 var = p_item->iec_obj.o.type37;
+			
+			SpValue v(VALUE_TAG, &var, M_ME_TN_1);
+			TODO:05-07-2011 Get name here
+			post_val(v, name);
+
+			#else
+
+			value.sprintf("%d", p_item->iec_obj.o.type37.counter);
+
+			#endif
+		}
+		break;
         case C_EX_IT_1:
 		{
             printf("Child process exiting...\n");

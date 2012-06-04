@@ -302,12 +302,10 @@ int Opc_client_da_imp::OpcStart(char* OpcServerProgID, char* OpcclassId, char* O
 		HRESULT hr;
 
 		USES_CONVERSION;
-
-		TCHAR serv[100];
 		
-		strcpy(serv, OpcServerProgID);
+		strcpy(opc_server_prog_id, OpcServerProgID);
 
-		wcscpy(wszServerName, T2W(serv));
+		wcscpy(wszServerName, T2W(opc_server_prog_id));
 
 		CLSID clsid;
 			
