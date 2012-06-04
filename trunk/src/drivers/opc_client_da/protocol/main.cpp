@@ -51,6 +51,17 @@ int IsSingleInstance(char *name)
    return 1;
 }
 
+///////////////////////////////////////////////
+#include "process.h"
+struct args{
+	char line_number[80];
+};
+
+int gl_timeout_connection_with_parent;
+
+void PipeWorker(void* pParam);
+///////////////////////////////////////////////
+
 char *optarg;
 
 #define RUNTIME_USAGE "Run time usage: %s -a server_IP_address -d percent_dead_band\
@@ -175,6 +186,21 @@ int main(int argc, char **argv)
 			return EXIT_FAILURE;
 		}
 	}
+
+	/////////////////keep alive////////////////////////////////////////////////////
+    struct args arg;
+    strcpy(arg.line_number, line_number);
+
+	if(_beginthread(PipeWorker, 0, (void*)&arg) == -1)
+	{
+		long nError = GetLastError();
+
+		fprintf(stderr,"PipeWorker _beginthread failed, error code = %d", nError);
+		fflush(stderr);
+		return EXIT_FAILURE;	
+	}
+	/////////////////end keep alive////////////////////////////////////////////////
+
 	
 	//Alloc OPC class and start
 	Opc_client_da_imp* po = new Opc_client_da_imp(OPCServerAddress, line_number);
@@ -227,3 +253,149 @@ int main(int argc, char **argv)
 	return EXIT_SUCCESS;
 }
 
+///////////////////////////////////Keep alive pipe management/////////////////////////////////////////////////////
+
+#define BUF_SIZE 200
+#define N_PIPES 3
+
+void PipeWorker(void* pParam)
+{
+	HANDLE pipeHnds[N_PIPES];
+	char in_buffer[N_PIPES][BUF_SIZE];
+	OVERLAPPED ovrp[N_PIPES];
+	HANDLE evnt[N_PIPES];
+	DWORD rc, len, pipe_id;
+    unsigned char buf[sizeof(struct iec_item)];
+    struct iec_item* p_item;
+	char pipe_name[150];
+    int i;
+
+    struct args* arg = (struct args*)pParam;
+
+	strcpy(pipe_name, "\\\\.\\pipe\\opc_client_da_namedpipe");
+    strcat(pipe_name, arg->line_number);
+
+	for(i = 0; i < N_PIPES; i++)
+	{
+		if ((pipeHnds[i] = CreateNamedPipe(
+			pipe_name,
+			PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,
+			PIPE_TYPE_BYTE | PIPE_READMODE_BYTE, N_PIPES,
+			0, 
+			0, 
+			1000, 
+			NULL)) == INVALID_HANDLE_VALUE)
+		{
+			fprintf(stderr,"CreateNamedPipe for pipe %d failed with error %d\n", i, GetLastError());
+			fflush(stderr);
+			ExitProcess(0);
+		}
+
+		if ((evnt[i] = CreateEvent(NULL, TRUE, FALSE, NULL)) == NULL)
+		{
+			fprintf(stderr,"CreateEvent for pipe %d failed with error %d\n",	i, GetLastError());
+			fflush(stderr);
+			ExitProcess(0);
+		}
+
+		ZeroMemory(&ovrp[i], sizeof(OVERLAPPED));
+
+		ovrp[i].hEvent = evnt[i];
+
+		if (ConnectNamedPipe(pipeHnds[i], &ovrp[i]) == 0)
+		{
+			if (GetLastError() != ERROR_IO_PENDING)
+			{
+				fprintf(stderr,"ConnectNamedPipe for pipe %d failed with error %d\n", i, GetLastError());
+				fflush(stderr);
+				
+				CloseHandle(pipeHnds[i]);
+				ExitProcess(0);
+			}
+		}
+	}
+
+	while(1)
+	{
+		if((rc = WaitForMultipleObjects(N_PIPES, evnt, FALSE, INFINITE)) == WAIT_FAILED)
+		{
+			fprintf(stderr,"WaitForMultipleObjects failed with error %d\n", GetLastError());
+			fflush(stderr);
+			ExitProcess(0);
+		}
+
+		pipe_id = rc - WAIT_OBJECT_0;
+
+		ResetEvent(evnt[pipe_id]);
+
+		if(GetOverlappedResult(pipeHnds[pipe_id], &ovrp[pipe_id], &len, TRUE) == 0)
+		{
+			fprintf(stderr,"GetOverlapped result failed %d start over\n", GetLastError());
+			fflush(stderr);
+		
+			if(DisconnectNamedPipe(pipeHnds[pipe_id]) == 0)
+			{
+				fprintf(stderr,"DisconnectNamedPipe failed with error %d\n", GetLastError());
+				fflush(stderr);
+				ExitProcess(0);
+			}
+
+			if(ConnectNamedPipe(pipeHnds[pipe_id],	&ovrp[pipe_id]) == 0)
+			{
+				if(GetLastError() != ERROR_IO_PENDING)
+				{
+					fprintf(stderr,"ConnectNamedPipe for pipe %d failed with error %d\n", i, GetLastError());
+					fflush(stderr);
+					CloseHandle(pipeHnds[pipe_id]);
+				}
+			}
+		}
+		else
+		{
+			ZeroMemory(&ovrp[pipe_id], sizeof(OVERLAPPED));
+
+			ovrp[pipe_id].hEvent = evnt[pipe_id];
+
+			if((rc = ReadFile(pipeHnds[pipe_id], in_buffer[pipe_id], sizeof(struct iec_item), NULL, &ovrp[pipe_id])) == 0)
+			{
+				if(GetLastError() != ERROR_IO_PENDING)
+				{
+					fprintf(stderr,"ReadFile failed with error %d\n", GetLastError());
+					fflush(stderr);
+				}
+			}
+			
+			memcpy(buf, in_buffer[pipe_id], sizeof(struct iec_item));
+			
+			if(len)
+			{
+				p_item = (struct iec_item*)buf;
+
+				//fprintf(stderr, "Receiving from pipe %d th message\n", p_item->msg_id);
+				//fflush(stderr);
+											
+				//for (j = 0; j < len; j++) 
+				//{ 
+					//unsigned char c = *((unsigned char*)buf + j);
+					//fprintf(stderr, "rx pipe <--- 0x%02x-", c);
+					//fflush(stderr);
+					//
+				//}
+				
+				rc = clearCrc((unsigned char *)buf, sizeof(struct iec_item));
+				if(rc != 0)
+				{
+					ExitProcess(0);
+				}
+
+				if(p_item->iec_obj.ioa == 4004)
+				{ 
+					gl_timeout_connection_with_parent = 0;
+					//fprintf(stderr, "Receive keep alive # %d from front end\n", p_item->msg_id);
+                    fprintf(stderr, "wdg %d\r", p_item->msg_id);
+				    fflush(stderr);
+				}
+			}
+		}
+	}
+}

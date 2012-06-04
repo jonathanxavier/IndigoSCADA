@@ -84,11 +84,15 @@ static int db_callback(void *NotUsed, int argc, char **argv, char **azColName)
 				{
 					gl_Config_db[gl_row_counter].io_list_iec_type = M_IT_TB_1;
 				}
+				if(strcmp(argv[i], "M_ME_TN_1") == 0)
+				{
+					gl_Config_db[gl_row_counter].io_list_iec_type = M_ME_TN_1;
+				}
 				else
 				{
 					fprintf(stderr,"IEC type %s from I/O list NOT supported\n", argv[i]);
 					fflush(stderr);
-					ExitProcess(0);
+					//ExitProcess(0);
 				}
 			}	
 			break;
@@ -443,12 +447,14 @@ void Opc_client_da_imp::CreateSqlConfigurationFile(char* sql_file_name, char* op
 	
 	HRESULT hr = 0;
 	FILE *dump = NULL;
-	char iec_type[20];
+	char iec_type[100];
+	char opc_type[100];
 	char program_path[_MAX_PATH];
 	double max = 0.0;
 	double min = 0.0;
 	
 	iec_type[0] = '\0';
+	opc_type[0] = '\0';
 	program_path[0] = '\0';
 
 	if(GetModuleFileName(NULL, program_path, _MAX_PATH))
@@ -468,7 +474,7 @@ void Opc_client_da_imp::CreateSqlConfigurationFile(char* sql_file_name, char* op
 	
 	dump = fopen(sql_file_path, "w");
 
-	fprintf(dump, "create table opc_client_da_table(opc_server_item_id varchar(150), ioa_control_center varchar(150), iec_type varchar(150), readable varchar(150), writeable varchar(150), HiHiLimit varchar(150), LoLoLimit varchar(150));\n");
+	fprintf(dump, "create table opc_client_da_table(opc_server_item_id varchar(150), ioa_control_center varchar(150), iec_type varchar(150), readable varchar(150), writeable varchar(150), HiHiLimit varchar(150), LoLoLimit varchar(150), opc_type varchar(150));\n");
 	fflush(dump);
 							
 	if(dump == NULL)
@@ -575,64 +581,196 @@ void Opc_client_da_imp::CreateSqlConfigurationFile(char* sql_file_name, char* op
 
 			switch(Item[nTestItem].vt)
 			{
+				case VT_EMPTY:
+				{
+					strcpy(iec_type, "not_supported");
+					strcpy(opc_type, "VT_EMPTY");
+				}
+				break;
 				case VT_I1:
 				{
 					strcpy(iec_type, "M_IT_TB_1");
+					strcpy(opc_type, "VT_I1");
 				}
 				break;
 				case VT_UI1:
 				{
 					strcpy(iec_type, "M_IT_TB_1");
+					strcpy(opc_type, "VT_UI1");
 				}
 				break;
 				case VT_I2:
 				{
 					strcpy(iec_type, "M_IT_TB_1");
+					strcpy(opc_type, "VT_I2");
 				}
 				break;
 				case VT_UI2:
 				{
 					strcpy(iec_type, "M_IT_TB_1");
+					strcpy(opc_type, "VT_UI2");
 				}
 				break;
 				case VT_I4:
 				{
 					strcpy(iec_type, "M_IT_TB_1");
+					strcpy(opc_type, "VT_I4");
 				}
 				break;
 				case VT_UI4:
 				{
 					strcpy(iec_type, "M_IT_TB_1");
+					strcpy(opc_type, "VT_UI4");
+				}
+				break;
+				case VT_I8:
+				{
+					strcpy(iec_type, "not_supported");
+					strcpy(opc_type, "VT_I8");
+				}
+				break;
+				case VT_UI8:
+				{
+					strcpy(iec_type, "not_supported");
+					strcpy(opc_type, "VT_UI8");
 				}
 				break;
 				case VT_R4:
 				{
 					strcpy(iec_type, "M_ME_TF_1");
+					strcpy(opc_type, "VT_R4");
 				}
 				break;
 				case VT_R8:
 				{
-					strcpy(iec_type, "M_ME_TF_1");
+					//strcpy(iec_type, "M_ME_TF_1");
+					strcpy(iec_type, "M_ME_TN_1");
+					strcpy(opc_type, "VT_R8");
+				}
+				break;
+				case VT_CY:
+				{
+					strcpy(iec_type, "not_supported");
+					strcpy(opc_type, "VT_CY");
 				}
 				break;
 				case VT_BOOL:
 				{
 					strcpy(iec_type, "M_SP_TB_1");
+					strcpy(opc_type, "VT_BOOL");
 				}
 				break;
 				case VT_DATE:
 				{
 					strcpy(iec_type, "M_SP_TB_1");
+					strcpy(opc_type, "VT_DATE");
 				}
 				break;
 				case VT_BSTR:
 				{
 					strcpy(iec_type, "M_ME_TF_1");
+					strcpy(opc_type, "VT_BSTR");
+				}
+				break;
+				case VT_VARIANT:
+				{
+					strcpy(iec_type, "not_supported");
+					strcpy(opc_type, "VT_VARIANT");
+				}
+				break;
+				case VT_ARRAY | VT_I1:
+				{
+					strcpy(iec_type, "not_supported");
+					strcpy(opc_type, "VT_ARRAY | VT_I1");
+				}
+				break;
+				case VT_ARRAY | VT_UI1:
+				{
+					strcpy(iec_type, "not_supported");
+					strcpy(opc_type, "VT_ARRAY | VT_UI1");
+				}
+				break;
+				case VT_ARRAY | VT_I2:
+				{
+					strcpy(iec_type, "not_supported");
+					strcpy(opc_type, "VT_ARRAY | VT_I2");
+				}
+				break;
+				case VT_ARRAY | VT_UI2:
+				{	
+					strcpy(iec_type, "not_supported");
+					strcpy(opc_type, "VT_ARRAY | VT_UI2");
+				}
+				break;
+				case VT_ARRAY | VT_I4:
+				{
+					strcpy(iec_type, "not_supported");
+					strcpy(opc_type, "VT_ARRAY | VT_I4");
+				}
+				break;
+				case VT_ARRAY | VT_UI4:
+				{
+					strcpy(iec_type, "not_supported");
+					strcpy(opc_type, "VT_ARRAY | VT_UI4");
+				}
+				break;
+				case VT_ARRAY | VT_I8:
+				{
+					strcpy(iec_type, "not_supported");
+					strcpy(opc_type, "VT_ARRAY | VT_I8");
+				}
+				break;
+				case VT_ARRAY | VT_UI8:
+				{
+					strcpy(iec_type, "not_supported");
+					strcpy(opc_type, "VT_ARRAY | VT_UI8");
+				}
+				break;
+				case VT_ARRAY | VT_R4:
+				{
+					strcpy(iec_type, "not_supported");
+					strcpy(opc_type, "VT_ARRAY | VT_R4");
+				}
+				break;
+				case VT_ARRAY | VT_R8:
+				{
+					strcpy(iec_type, "not_supported");
+					strcpy(opc_type, "VT_ARRAY | VT_R8");
+				}
+				break;
+				case VT_ARRAY | VT_CY:
+				{
+					strcpy(iec_type, "not_supported");
+					strcpy(opc_type, "VT_ARRAY | VT_CY");
+				}
+				break;
+				case VT_ARRAY | VT_BOOL:
+				{
+					strcpy(iec_type, "not_supported");
+					strcpy(opc_type, "VT_ARRAY | VT_BOOL");
+				}
+				break;
+				case VT_ARRAY | VT_DATE:
+				{
+					strcpy(iec_type, "not_supported");
+					strcpy(opc_type, "VT_ARRAY | VT_DATE");
+				}
+				break;
+				case VT_ARRAY | VT_BSTR:
+				{
+					strcpy(iec_type, "not_supported");
+					strcpy(opc_type, "VT_ARRAY | VT_BSTR");
+				}
+				break;
+				case VT_ARRAY | VT_VARIANT:
+				{
+					strcpy(iec_type, "not_supported");
+					strcpy(opc_type, "VT_ARRAY | VT_VARIANT");
 				}
 				break;
 				default:
 				{
-					//IEC type NOT suported
+					//OPC type NOT suported
 				}
 				break;
 			}
@@ -797,8 +935,8 @@ void Opc_client_da_imp::CreateSqlConfigurationFile(char* sql_file_name, char* op
 			int readable = ((Item[nTestItem].dwAccessRights | OPC_READABLE) ? 1: 0);
 			int writeable = ((Item[nTestItem].dwAccessRights | OPC_WRITEABLE) ? 1 : 0);
 
-			fprintf(dump, "insert into opc_client_da_table values('%s', '%d', '%s', '%d', '%d', '%lf', '%lf');\n", 
-			Item[nTestItem].spname, nTestItem + 1, iec_type, readable,	writeable,	max, min);
+			fprintf(dump, "insert into opc_client_da_table values('%s', '%d', '%s', '%d', '%d', '%lf', '%lf', '%s');\n", 
+			Item[nTestItem].spname, nTestItem + 1, iec_type, readable,	writeable,	max, min, opc_type);
 			fflush(dump);
 			
 			////////////////////////////end dumping one record/////////////////////////////////////////////

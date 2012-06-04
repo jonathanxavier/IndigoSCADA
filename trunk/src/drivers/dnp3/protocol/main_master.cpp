@@ -49,6 +49,7 @@ int IsSingleInstance(const char* name)
 
 #include "getopt.h"
 
+///////////////////////////////////////////////
 struct args{
 	char line_number[80];
 };
@@ -56,6 +57,7 @@ struct args{
 int gl_timeout_connection_with_parent;
 
 void PipeWorker(void* pParam);
+///////////////////////////////////////////////
 
 #define RUNTIME_USAGE "Run time usage: %s -a server IP address -p server TCP port -l\
  line number -t polling time\n"

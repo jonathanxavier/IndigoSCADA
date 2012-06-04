@@ -27,6 +27,8 @@ static DWORD g_dwSleepInLoop = 1000;
 
 #include "opcda_2_0_classes.h"
 
+extern int gl_timeout_connection_with_parent;
+
 /////////////////////////////////////Middleware///////////////////////////////////////////
 Boolean  quite = ORTE_FALSE;
 int	regfail=0;
@@ -54,7 +56,7 @@ void rebuild_iec_item_message(struct iec_item *item2, iec_item_type *item1)
 	///////and check the 1 byte checksum////////////////////////////////////
 	checksum = clearCrc((unsigned char *)item2, sizeof(struct iec_item));
 
-	fprintf(stderr,"new checksum = %u\n", checksum);
+//	fprintf(stderr,"new checksum = %u\n", checksum);
 
 	//if checksum is 0 then there are no errors
 	if(checksum != 0)
@@ -208,6 +210,13 @@ int Opc_client_da_imp::Async2Update()
 			//g_pIOPCAsyncIO2->SetEnable(FALSE); // turn off update callbacks
 			IT_COMMENT("Terminate opc loop!");
 			break;
+		}
+
+		gl_timeout_connection_with_parent++;
+
+		if(gl_timeout_connection_with_parent > 1000*20/(int)g_dwSleepInLoop)
+		{
+			break; //exit loop for timeout of connection with parent
 		}
 				
 		::Sleep(g_dwSleepInLoop);
@@ -1629,6 +1638,7 @@ void Opc_client_da_imp::SendEvent2(VARIANT *pValue, const FILETIME* ft, DWORD pw
 		break;
 		case VT_R8:
 		{
+			/*
 			item_to_send.iec_type = M_ME_TF_1;
 			epoch_to_cp56time2a(&time, epoch_in_millisec);
 			item_to_send.iec_obj.o.type36.mv = (float)V_R8(pValue);
@@ -1636,6 +1646,17 @@ void Opc_client_da_imp::SendEvent2(VARIANT *pValue, const FILETIME* ft, DWORD pw
 
 			if(pwQualities != OPC_QUALITY_GOOD)
 				item_to_send.iec_obj.o.type36.iv = 1;
+			
+			IT_COMMENT1("Value = %lf", V_R8(pValue));
+			*/
+
+			item_to_send.iec_type = M_ME_TN_1;
+			epoch_to_cp56time2a(&time, epoch_in_millisec);
+			item_to_send.iec_obj.o.type150.mv = V_R8(pValue);
+			item_to_send.iec_obj.o.type150.time = time;
+
+			if(pwQualities != OPC_QUALITY_GOOD)
+				item_to_send.iec_obj.o.type150.iv = 1;
 			
 			IT_COMMENT1("Value = %lf", V_R8(pValue));
 

@@ -549,7 +549,7 @@ void rebuild_iec_item_message(struct iec_item *item2, iec_item_type *item1)
 	///////and check the 1 byte checksum////////////////////////////////////
 	checksum = clearCrc((unsigned char *)item2, sizeof(struct iec_item));
 
-	fprintf(stderr,"new checksum = %u\n", checksum);
+//	fprintf(stderr,"new checksum = %u\n", checksum);
 
 	//if checksum is 0 then there are no errors
 	if(checksum != 0)
@@ -800,7 +800,7 @@ void Dnp3driver_Instance::get_items(struct iec_item* p_item)
 
 			#else
 
-			value.sprintf("%d", p_item->iec_obj.o.type36.mv);
+			value.sprintf("%f", p_item->iec_obj.o.type36.mv);
 
 			#endif
 		}

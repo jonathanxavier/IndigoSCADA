@@ -208,10 +208,11 @@ void Opc_client_da_Instance::QueryResponse(QObject *p, const QString &c, int id,
 				if(strlen((const char*)t.Data1) > 0)
 				{
 					v = atof((const char*)t.Data1);
-					PostValue(SamplePointName, "BIT", v); //Post the value directly in memory database
-				}
 
-				printf("SamplePointName = %s, IOA = %s, value = %lf\n", (const char*)SamplePointName, (const char*)t.Data2, v);
+					//printf("SamplePointName = %s, IOA = %s, value = %lf\n", (const char*)SamplePointName, (const char*)t.Data2, v);
+					//PostValue(SamplePointName, "BIT", v); //Post the value directly in memory database
+					PostValue(SamplePointName, "VALUE", v); //Post the value directly in memory database apa+++ 02-06-2012
+				}
 			}
 		}
 		break;
@@ -266,6 +267,12 @@ void Opc_client_da_Instance::QueryResponse(QObject *p, const QString &c, int id,
 				ORTEPublicationSend(publisher);
 				//////////////////////////Middleware/////////////////////////////////////////
 			}
+		}
+		break;
+		case tSetTAgsParams:
+		{
+			int a;
+			a = 1;
 		}
 		break;
 		default:
@@ -379,7 +386,7 @@ void strip_white_space(char *dst, const char *src, int len)
 struct local_structItem
 {
 	CHAR spname[200]; //Item ID of opc server, i.e. Simulated Card.Simulated Node.Random.R8 as C string
-	char opc_type[30];
+	char opc_type[100];
 	unsigned int ioa_control_center;//unique inside CASDU
 	unsigned int io_list_iec_type; //IEC 104 type
 	int readable;
@@ -448,11 +455,15 @@ static int db_callback(void *NotUsed, int argc, char **argv, char **azColName)
 				{
 					gl_Config_db[gl_row_counter].io_list_iec_type = M_IT_TB_1;
 				}
+				if(strcmp(argv[i], "M_ME_TN_1") == 0)
+				{
+					gl_Config_db[gl_row_counter].io_list_iec_type = M_ME_TN_1;
+				}
 				else
 				{
 					fprintf(stderr,"IEC type %s from I/O list NOT supported\n", argv[i]);
 					fflush(stderr);
-					ExitProcess(0);
+					//ExitProcess(0);
 				}
 			}	
 			break;
@@ -594,7 +605,7 @@ UNIT string
 
 */
 
-				if(is_updated_central_database)
+				if(!is_updated_central_database)
 				{
 					sqlite3 *db;
 					char *zErrMsg = 0;
@@ -638,14 +649,10 @@ UNIT string
 						//error to user
 					}
 
-					struct local_structItem* gl_Config_db = (struct local_structItem*)malloc(n_rows) ;
-
-					for(unsigned i = 0; i < n_rows; i ++)
+					for(int i = 0; i < n_rows; i ++)
 					{
 						if(gl_Config_db)
 						{
-							QString opcType;
-
 							char str[10];
 							// update the tags
 							QString cmd;
@@ -662,7 +669,9 @@ UNIT string
 							cmd += QString(itoa(gl_Config_db[i].writeable, str, 10));
 							cmd += "' where IOA=" + QString(itoa(gl_Config_db[i].ioa_control_center, str, 10)) + ";";
 
-							GetConfigureDb()->DoExec(0,cmd ,0);
+							GetConfigureDb()->DoExec(this, cmd , tSetTAgsParams);
+
+							printf("%s\n", (const char*)cmd);
 						}
 					}
 
@@ -670,9 +679,9 @@ UNIT string
 					{
 						free(gl_Config_db);
 					}
-				}
 
-				is_updated_central_database = true;
+					is_updated_central_database = true;
+				}
 			}
 		};
 		break;
@@ -686,7 +695,281 @@ UNIT string
 		default:
 		break;
 	};
-};
+
+//This code runs inside main monitor.exe thread
+
+	//cp56time2a time;
+	//signed __int64 epoch_in_millisec;
+
+	unsigned char buf[sizeof(struct iec_item)];
+	int len;
+	const unsigned wait_limit_ms = 1;
+	struct iec_item* p_item;
+
+	for(int i = 0; (len = fifo_get(fifo_monitor_direction, (char*)buf, sizeof(struct iec_item), wait_limit_ms)) >= 0; i += 1)	
+	{ 
+		p_item = (struct iec_item*)buf;
+			
+		//printf("Receiving %d th message \n", p_item->msg_id);
+		printf("Receiving %d th message for line = %d\n", p_item->msg_id, instanceID + 1);
+
+		//for (int j = 0; j < len; j++) 
+		//{ 
+			//assert((unsigned char)buf[i] == len);
+			//unsigned char c = *((unsigned char*)buf + j);
+			//printf("rx <--- 0x%02x-\n", c);
+			//fprintf(fp,"rx <--- 0x%02x-\n", c);
+			//fflush(fp);
+
+			//IT_COMMENT1("rx <--- 0x%02x-\n", c);
+		//}
+
+		//printf("---------------\n");
+
+		unsigned char rc = clearCrc((unsigned char *)buf, sizeof(struct iec_item));
+		if(rc != 0)
+		{
+			ExitProcess(1);
+		}
+
+		QString value;
+
+		switch(p_item->iec_type)
+		{
+			case M_SP_NA_1:
+			{
+				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+				iec_type1 var = p_item->iec_obj.o.type1;
+				
+				SpValue v(VALUE_TAG, &var, M_SP_NA_1);
+				TODO:05-07-2011 Get name here
+				post_val(v, name);
+
+				#else
+
+				value.sprintf("%d", p_item->iec_obj.o.type1.sp);
+
+				#endif
+				
+			}
+			break;
+			case M_DP_NA_1:
+			{
+				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+				iec_type3 var = p_item->iec_obj.o.type3;
+				
+				SpValue v(VALUE_TAG, &var, M_DP_NA_1);
+				TODO:05-07-2011 Get name here
+				post_val(v, name);
+
+				#else
+
+				value.sprintf("%d", p_item->iec_obj.o.type3.dp);
+
+				#endif
+			}
+			break;
+			//case M_BO_NA_1:
+			//{
+			//}
+			//break;
+			case M_ME_NA_1:
+			{
+				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+				iec_type9 var = p_item->iec_obj.o.type9;
+				
+				SpValue v(VALUE_TAG, &var, M_ME_NA_1);
+				TODO:05-07-2011 Get name here
+				post_val(v, name);
+
+				#else
+
+				value.sprintf("%d", p_item->iec_obj.o.type9.mv);
+
+				#endif
+			}
+			break;
+			case M_ME_NB_1:
+			{
+				
+				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+				iec_type11 var = p_item->iec_obj.o.type11;
+				
+				SpValue v(VALUE_TAG, &var, M_ME_NB_1);
+				TODO:05-07-2011 Get name here
+				post_val(v, name);
+
+				#else
+
+				value.sprintf("%d", p_item->iec_obj.o.type11.mv);
+
+				#endif
+			}
+			break;
+			case M_ME_NC_1:
+			{
+				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+				iec_type13 var = p_item->iec_obj.o.type13;
+				
+				SpValue v(VALUE_TAG, &var, M_ME_NC_1);
+				TODO:05-07-2011 Get name here
+				post_val(v, name);
+
+				#else
+
+				value.sprintf("%d", p_item->iec_obj.o.type13.mv);
+
+				#endif
+			}
+			break;
+			case M_SP_TB_1:
+			{
+				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+				iec_type30 var = p_item->iec_obj.o.type30;
+				
+				SpValue v(VALUE_TAG, &var, M_SP_TB_1);
+				TODO:05-07-2011 Get name here
+				post_val(v, name);
+
+				#else
+
+				value.sprintf("%d", p_item->iec_obj.o.type30.sp);
+
+				#endif
+			}
+			break;
+			case M_DP_TB_1:
+			{
+				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+				iec_type31 var = p_item->iec_obj.o.type31;
+				
+				SpValue v(VALUE_TAG, &var, M_DP_TB_1);
+				TODO:05-07-2011 Get name here
+				post_val(v, name);
+
+				#else
+
+				value.sprintf("%d", p_item->iec_obj.o.type31.dp);
+
+				#endif
+			}
+			break;
+			case M_BO_TB_1:
+			{
+				//value.sprintf("%d", p_item->iec_obj.o.type33.stcd);
+			}
+			break;
+			case M_ME_TD_1:
+			{
+				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+				iec_type34 var = p_item->iec_obj.o.type34;
+				
+				SpValue v(VALUE_TAG, &var, M_ME_TD_1);
+				TODO:05-07-2011 Get name here
+				post_val(v, name);
+
+				#else
+
+				value.sprintf("%d", p_item->iec_obj.o.type34.mv);
+
+				#endif
+			}
+			break;
+			case M_ME_TE_1:
+			{
+				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+				iec_type35 var = p_item->iec_obj.o.type35;
+				
+				SpValue v(VALUE_TAG, &var, M_ME_TE_1);
+				TODO:05-07-2011 Get name here
+				post_val(v, name);
+
+				#else
+
+				value.sprintf("%d", p_item->iec_obj.o.type35.mv);
+
+				#endif
+			}
+			break;
+			case M_ME_TF_1:
+			{
+				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+				iec_type36 var = p_item->iec_obj.o.type36;
+				
+				SpValue v(VALUE_TAG, &var, M_ME_TF_1);
+				TODO:05-07-2011 Get name here
+				post_val(v, name);
+
+				#else
+
+				value.sprintf("%f", p_item->iec_obj.o.type36.mv);
+
+				#endif
+			}
+			break;
+			case M_ME_TN_1:
+			{
+				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+				iec_type150 var = p_item->iec_obj.o.type150;
+				
+				SpValue v(VALUE_TAG, &var, M_ME_TN_1);
+				TODO:05-07-2011 Get name here
+				post_val(v, name);
+
+				#else
+
+				value.sprintf("%lf", p_item->iec_obj.o.type150.mv);
+
+				#endif
+			}
+			break;
+			//case M_IT_TB_1:
+			//{
+			//}
+			//break;
+            case C_EX_IT_1:
+			{
+                printf("Child process exiting...\n");
+			}
+			break;
+			default:
+			{
+				printf("Not supported type\n");
+				value.sprintf("%d", 0);
+			}
+			break;
+		}
+		
+		QString ioa;
+		ioa.sprintf("%d", p_item->iec_obj.ioa);
+
+        #ifdef DEPRECATED_IEC101_CONFIG
+		QString cmd = "select IKEY from PROPS where DVAL='"+ ioa + "' and SKEY='SAMPLEPROPS';";
+		#else
+		QString cmd = "select NAME from TAGS where IOA="+ ioa + " and UNIT='"+ Name + "';";
+		#endif
+		
+		GetConfigureDb()->DoExec(this, cmd, tGetSamplePointNamefromIOA, value, ioa);
+
+		//printf("ioa %s, value %s\n", (const char*)ioa, (const char*)value);
+
+		if(i > 50)
+		{
+			break;
+		}
+	}
+}
 
 /*
 *Function:event
@@ -873,7 +1156,7 @@ void rebuild_iec_item_message(struct iec_item *item2, iec_item_type *item1)
 	///////and check the 1 byte checksum////////////////////////////////////
 	checksum = clearCrc((unsigned char *)item2, sizeof(struct iec_item));
 
-	fprintf(stderr,"new checksum = %u\n", checksum);
+	//fprintf(stderr,"new checksum = %u\n", checksum);
 
 	//if checksum is 0 then there are no errors
 	if(checksum != 0)
@@ -908,7 +1191,8 @@ void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackPa
 			  struct iec_item item2;
 			  rebuild_iec_item_message(&item2, item1);
 			  //TODO: detect losts messages when item2.msg_id are NOT consecutive
-			  cl->get_items(&item2);
+			  //cl->get_items(&item2);
+			  fifo_put(cl->fifo_monitor_direction, (char *)&item2, sizeof(struct iec_item));
 		  }
 		}
 		break;
@@ -1124,7 +1408,24 @@ void Opc_client_da_Instance::get_items(struct iec_item* p_item)
 
 			#else
 
-			value.sprintf("%d", p_item->iec_obj.o.type36.mv);
+			value.sprintf("%f", p_item->iec_obj.o.type36.mv);
+
+			#endif
+		}
+		break;
+		case M_ME_TN_1:
+		{
+			#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+			iec_type150 var = p_item->iec_obj.o.type150;
+			
+			SpValue v(VALUE_TAG, &var, M_ME_TN_1);
+			TODO:05-07-2011 Get name here
+			post_val(v, name);
+
+			#else
+
+			value.sprintf("%lf", p_item->iec_obj.o.type150.mv);
 
 			#endif
 		}
@@ -1152,7 +1453,8 @@ void Opc_client_da_Instance::get_items(struct iec_item* p_item)
 	#ifdef DEPRECATED_OPC_CLIENT_DA_CONFIG
 	QString cmd = "select IKEY from PROPS where DVAL='"+ ioa + "' and SKEY='SAMPLEPROPS';";
 	#else
-	QString cmd = "select NAME from TAGS where PARAMS='"+ ioa + "' and UNIT='"+ Name + "';";
+	//QString cmd = "select NAME from TAGS where PARAMS='"+ ioa + "' and UNIT='"+ Name + "';";
+	QString cmd = "select NAME from TAGS where IOA="+ ioa + " and UNIT='"+ Name + "';";
 	#endif
 
 	GetConfigureDb()->DoExec(this, cmd, tGetSamplePointNamefromIOA, value, ioa);
@@ -1187,3 +1489,75 @@ void Opc_client_da_Instance::get_utc_host_time(struct cp56time2a* time)
     return;
 }
 /////////////////////////////////////Middleware/////////////////////////////////////////////
+
+
+#include <signal.h>
+
+char* get_date_time()
+{
+	static char sz[128];
+	time_t t = time(NULL);
+	struct tm *ptm = localtime(&t);
+	
+	strftime(sz, sizeof(sz)-2, "%m/%d/%y %H:%M:%S", ptm);
+
+	strcat(sz, "|");
+	return sz;
+}
+
+void iec_call_exit_handler(int line, char* file, char* reason)
+{
+	FILE* fp;
+	char program_path[_MAX_PATH];
+	char log_file[_MAX_FNAME+_MAX_PATH];
+	IT_IT("iec_call_exit_handler");
+
+	program_path[0] = '\0';
+#ifdef WIN32
+	if(GetModuleFileName(NULL, program_path, _MAX_PATH))
+	{
+		*(strrchr(program_path, '\\')) = '\0';        // Strip \\filename.exe off path
+		*(strrchr(program_path, '\\')) = '\0';        // Strip \\bin off path
+    }
+#elif __unix__
+	if(getcwd(program_path, _MAX_PATH))
+	{
+		*(strrchr(program_path, '/')) = '\0';        // Strip \\filename.exe off path
+		*(strrchr(program_path, '/')) = '\0';        // Strip \\bin off path
+    }
+#endif
+
+	strcpy(log_file, program_path);
+
+#ifdef WIN32
+	strcat(log_file, "\\logs\\fifo.log");
+#elif __unix__
+	strcat(log_file, "/logs/fifo.log");	
+#endif
+
+	fp = fopen(log_file, "a");
+
+	if(fp)
+	{
+		if(line && file && reason)
+		{
+			fprintf(fp, "PID:%d time:%s exit process at line: %d, file %s, reason:%s\n", GetCurrentProcessId, get_date_time(), line, file, reason);
+		}
+		else if(line && file)
+		{
+			fprintf(fp, "PID:%d time:%s exit process at line: %d, file %s\n", GetCurrentProcessId, get_date_time(), line, file);
+		}
+		else if(reason)
+		{
+			fprintf(fp, "PID:%d time:%s exit process for reason %s\n", GetCurrentProcessId, get_date_time(), reason);
+		}
+
+		fflush(fp);
+		fclose(fp);
+	}
+
+	//raise(SIGABRT);   //raise abort signal which in turn starts automatically a separete thread and call exit SignalHandler
+	ExitProcess(0);
+
+	IT_EXIT;
+}
