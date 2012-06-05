@@ -722,7 +722,7 @@ void InspectMenu(QWidget *parent, const QString &name, bool AckState)
 			//in C:\scada\Drivers 
 
 			QString unit_type; // the current unit type
-			unit_type = "opc_client_da"; 
+			unit_type = "opc_client_da_driver"; 
 			Driver *dp = FindDriver(unit_type);
 
 			if(dp)
