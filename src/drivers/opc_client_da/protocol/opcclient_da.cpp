@@ -250,9 +250,6 @@ int Opc_client_da_imp::OpcStart(char* OpcServerProgID, char* OpcclassId, char* O
 	sprintf(show_msg, " IndigoSCADA OPC DA Client Start\n");
 	LogMessage(NULL, show_msg);
 
-	char pInitFile[500 + 1];
-	char pItem[500+1];
-	int ret;
 	float fTemp = 0.0f;
 
 	if(strlen(OpcUpdateRate) > 0)
@@ -269,6 +266,8 @@ int Opc_client_da_imp::OpcStart(char* OpcServerProgID, char* OpcclassId, char* O
 	{
 		local_server = 1;
 	}
+
+	strcpy(opc_server_prog_id, OpcServerProgID);
 	
 	if(local_server)
 	{
@@ -303,8 +302,6 @@ int Opc_client_da_imp::OpcStart(char* OpcServerProgID, char* OpcclassId, char* O
 
 		USES_CONVERSION;
 		
-		strcpy(opc_server_prog_id, OpcServerProgID);
-
 		wcscpy(wszServerName, T2W(opc_server_prog_id));
 
 		CLSID clsid;
@@ -676,9 +673,7 @@ int Opc_client_da_imp::OpcStart(char* OpcServerProgID, char* OpcclassId, char* O
 
 			LocalFree(lpMsgBuf);
 
-			ret = GetPrivateProfileString(pItem,"OPCDAclassId","",OpcclassId,79,pInitFile);
-
-			if(ret != 0)
+			if(strlen(OpcclassId) > 0)
 			{
 				//If this process is started by a service which runs as Local Account, then you need to set
 				//the remote classId string (CLSID)
@@ -698,13 +693,6 @@ int Opc_client_da_imp::OpcStart(char* OpcServerProgID, char* OpcclassId, char* O
 					LogMessage(hr,"CLSIDFromString failed");
 					return 1;
 				}
-			}
-			else
-			{
-				//fprintf(stderr,"%s\n", show_msg);
-				//fflush(stderr);
-  			    LogMessage(hr, show_msg);
-				return 1;
 			}
 		}
 		else
@@ -746,6 +734,7 @@ int Opc_client_da_imp::OpcStart(char* OpcServerProgID, char* OpcclassId, char* O
 		   else
 		   {
 				LogMessage(hr,"RegOpenKeyEx failed");
+				return 1;
 		   }
 
 		   RegCloseKey(keyHandle);
