@@ -84,7 +84,7 @@ static int db_callback(void *NotUsed, int argc, char **argv, char **azColName)
 				{
 					gl_Config_db[gl_row_counter].io_list_iec_type = M_IT_TB_1;
 				}
-				if(strcmp(argv[i], "M_ME_TN_1") == 0)
+				else if(strcmp(argv[i], "M_ME_TN_1") == 0)
 				{
 					gl_Config_db[gl_row_counter].io_list_iec_type = M_ME_TN_1;
 				}
