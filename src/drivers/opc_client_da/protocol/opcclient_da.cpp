@@ -1110,9 +1110,31 @@ bool Opc_client_da_imp::Version2()
 	return true;
 }
 
+struct log_message{
+
+	int ioa;
+	char message[150];
+};
+
 void Opc_client_da_imp::LogMessage(HRESULT hr, LPCSTR pszError, const char* name)
 {
-	//TODO: send message to monitor.exe
+	//TODO: send message to monitor.exe as a single point
+
+	/*
+	struct iec_item item_to_send;
+	struct cp56time2a actual_time;
+	get_utc_host_time(&actual_time);
+
+	memset(&item_to_send,0x00, sizeof(struct iec_item));
+
+	//item_to_send.iec_obj.ioa =  Find ioa given the message in a vector of log_message
+
+	item_to_send.cause = 0x03;
+	item_to_send.iec_type = M_SP_TB_1;
+	item_to_send.iec_obj.o.type30.sp = 0;
+	item_to_send.iec_obj.o.type30.time = actual_time;
+	item_to_send.iec_obj.o.type30.iv = 0;
+	*/
 }
 
 #include <time.h>
@@ -1214,6 +1236,12 @@ void Opc_client_da_imp::SendEvent2(VARIANT *pValue, const FILETIME* ft, DWORD pw
 
 	IT_COMMENT1("pwQualities = %d", pwQualities);
 	IT_COMMENT1("phClientItem = %d", phClientItem);
+
+	if(Item == NULL)
+	{
+		//print error message
+		return;
+	}
     	
 	memset(&item_to_send,0x00, sizeof(struct iec_item));
 		
@@ -1739,7 +1767,7 @@ void Opc_client_da_imp::SendEvent2(VARIANT *pValue, const FILETIME* ft, DWORD pw
 				item_to_send.iec_type = M_ME_TF_1;
 				epoch_to_cp56time2a(&time, epoch_in_millisec);
 							
-				//item_to_send.iec_obj.o.type36.mv = (float)atof(str);
+				item_to_send.iec_obj.o.type36.mv = (float)atof(str);
 				item_to_send.iec_obj.o.type36.time = time;
 
 				if(pwQualities != OPC_QUALITY_GOOD)
@@ -2110,7 +2138,7 @@ void Opc_client_da_imp::check_for_commands(struct iec_item *queued_item)
 				return;
 			}
 			/////////////////////////////////////////////////////////////////////
-
+			#ifdef CHECK_TYPE
 			//check iec type of command
 			if(Item[hClient - 1].io_list_iec_type != queued_item->iec_type)
 			{
@@ -2121,6 +2149,7 @@ void Opc_client_da_imp::check_for_commands(struct iec_item *queued_item)
 				fflush(stderr);
 				return;
 			}
+			#endif
 
 			//Receive a write command
 								

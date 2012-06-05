@@ -226,31 +226,28 @@ void Opc_client_da_Instance::QueryResponse(QObject *p, const QString &c, int id,
 				#ifdef DEPRECATED_OPC_CLIENT_DA_CONFIG
 				QString IOACommand = UndoEscapeSQLText(GetConfigureDb()->GetString("DVAL"));
 				#else
-				QString IOACommand = UndoEscapeSQLText(GetConfigureDb()->GetString("PARAMS"));
+				int IOACommand = GetConfigureDb()->GetInt("IOA");
 				#endif
 				
-				int command_value = 0;
-				int ioa_command = 0;
-
-				ioa_command = atoi((const char*)IOACommand);
+				double command_value = 0.0;
 
 				if(strlen((const char*)t.Data1) > 0)
 				{
-					command_value = atoi((const char*)t.Data1);
+					command_value = atof((const char*)t.Data1);
 				}
 
-				printf("Command from %s, IOA = %d, value = %d\n", (const char*)t.Data2, ioa_command, command_value);
+				printf("Command from %s, IOA = %d, value = %d\n", (const char*)t.Data2, IOACommand, command_value);
 
-				//Send C_SC_NA_1//////////////////////////////////////////////////////////////////////////
+				//Send C_SE_TC_1//////////////////////////////////////////////////////////////////////////
 				struct iec_item item_to_send;
 				memset(&item_to_send,0x00, sizeof(struct iec_item));
-				item_to_send.iec_type = C_SC_NA_1;
-				item_to_send.iec_obj.ioa = ioa_command;
-				item_to_send.iec_obj.o.type45.scs = command_value;
+				item_to_send.iec_type = C_SE_TC_1;
+				item_to_send.iec_obj.ioa = IOACommand;
+				item_to_send.iec_obj.o.type63.sv = (float)command_value;
 
 				struct cp56time2a actual_time;
 				get_utc_host_time(&actual_time);
-				item_to_send.iec_obj.o.type58.time = actual_time;
+				item_to_send.iec_obj.o.type63.time = actual_time;
 
 				item_to_send.msg_id = msg_sent_in_control_direction++;
 				item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));

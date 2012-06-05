@@ -224,26 +224,23 @@ void Modbus_driver_Instance::QueryResponse(QObject *p, const QString &c, int id,
 				#ifdef DEPRECATED_MODBUS_CONFIG
 				QString IOACommand = UndoEscapeSQLText(GetConfigureDb()->GetString("DVAL"));
 				#else
-				QString IOACommand = UndoEscapeSQLText(GetConfigureDb()->GetString("PARAMS"));
+				int IOACommand = GetConfigureDb()->GetInt("IOA");
 				#endif
 				
 				int command_value = 0;
-				int ioa_command = 0;
-
-				ioa_command = atoi((const char*)IOACommand);
 
 				if(strlen((const char*)t.Data1) > 0)
 				{
 					command_value = atoi((const char*)t.Data1);
 				}
 
-				printf("IOA command = %d, value = %d\n", ioa_command, command_value);
+				printf("IOA command = %d, value = %d\n", IOACommand, command_value);
 
 				//Send C_SC_NA_1//////////////////////////////////////////////////////////////////////////
 				struct iec_item item_to_send;
 				memset(&item_to_send,0x00, sizeof(struct iec_item));
 				item_to_send.iec_type = C_SC_NA_1;
-				item_to_send.iec_obj.ioa = ioa_command;
+				item_to_send.iec_obj.ioa = IOACommand;
 				item_to_send.iec_obj.o.type45.scs = command_value;
 				item_to_send.msg_id = msg_sent_in_control_direction++;
 				item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));

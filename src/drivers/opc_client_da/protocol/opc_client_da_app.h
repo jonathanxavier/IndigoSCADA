@@ -245,7 +245,7 @@ class Opc_client_da_imp
 	 int Async2Update();
 	 static void SendEvent2(VARIANT *pValue, const FILETIME* ft, DWORD pwQualities, OPCHANDLE phClientItem, unsigned char cot);
 	 static signed __int64 epoch_from_FILETIME(const FILETIME *fileTime);
-	 void get_utc_host_time(struct cp56time2a* time);
+	 static void get_utc_host_time(struct cp56time2a* time);
 	 time_t epoch_from_cp56time2a(const struct cp56time2a* time);
 	 static void epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch_in_millisec);
 	 int check_connection_to_server(void);
