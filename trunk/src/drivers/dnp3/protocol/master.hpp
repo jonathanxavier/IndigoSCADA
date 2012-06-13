@@ -36,6 +36,8 @@
 #include "object.hpp"
 #include "security.hpp"
 
+#pragma warning (disable : 4786) //apa+++ 12-06-2012
+
 // public methods can be called by the owner of the object
 // in any order
 // none of the states or methods are timing dependent to facilitate

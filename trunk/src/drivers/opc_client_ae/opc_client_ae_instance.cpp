@@ -208,7 +208,7 @@ void Opc_client_ae_Instance::QueryResponse(QObject *p, const QString &c, int id,
 				if(strlen((const char*)t.Data1) > 0)
 				{
 					v = atof((const char*)t.Data1);
-					PostValue(SamplePointName, "BIT", v); //Post the value directly in memory database
+					PostValue(SamplePointName, "VALUE", v); //Post the value directly in memory database
 				}
 
 				printf("SamplePointName = %s, IOA = %s, value = %lf\n", (const char*)SamplePointName, (const char*)t.Data2, v);
@@ -641,7 +641,9 @@ void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackPa
 			  struct iec_item item2;
 			  rebuild_iec_item_message(&item2, item1);
 			  //TODO: detect losts messages when item2.msg_id are NOT consecutive
-			  cl->get_items(&item2);
+//			  cl->get_items(&item2);
+			  //TODO: remove comment of the next statement
+			  // fifo_put(cl->fifo_monitor_direction, (char *)&item2, sizeof(struct iec_item));
 		  }
 		}
 		break;
@@ -898,7 +900,7 @@ void Opc_client_ae_Instance::get_items(struct iec_item* p_item)
 	#ifdef DEPRECATED_OPC_CLIENT_DA_CONFIG
 	QString cmd = "select IKEY from PROPS where DVAL='"+ ioa + "' and SKEY='SAMPLEPROPS';";
 	#else
-	QString cmd = "select NAME from TAGS where PARAMS='"+ ioa + "' and UNIT='"+ Name + "';";
+	QString cmd = "select NAME from TAGS where IOA="+ ioa + " and UNIT='"+ Name + "';";
 	#endif
 
 	GetConfigureDb()->DoExec(this, cmd, tGetSamplePointNamefromIOA, value, ioa);

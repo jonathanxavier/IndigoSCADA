@@ -25,6 +25,11 @@ extern Boolean  quite;
 extern void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackParam); 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
+///////////////////////fifo//////////////////////////////////////////////
+extern void iec_call_exit_handler(int line, char* file, char* reason);
+#include "fifoc.h"
+/////////////////////////////////////////////////////////////////////////
+
 class Dnp3DriverThread;
 
 #define MAX_FIFO_SIZE 65535
@@ -174,6 +179,14 @@ class DNP_3_DRIVERDRV Dnp3driver_Instance : public DriverInstance
 		this,
 		smIPAddress);
 		///////////////////////////////////Middleware//////////////////////////////////////////////////
+
+		/////////////////////////////////////fifo//////////////////////////////////////////////////////////
+		const size_t max_fifo_queue_size = 65535;
+		
+		strcat(fifo_monitor_name, "_fifo_");
+
+		fifo_monitor_direction = fifo_open(fifo_monitor_name, max_fifo_queue_size, iec_call_exit_handler);
+		///////////////////////////////////////////////////////////////////////////////////////////////////
 	};
 
 	~Dnp3driver_Instance()
@@ -204,6 +217,9 @@ class DNP_3_DRIVERDRV Dnp3driver_Instance : public DriverInstance
 	iec_item_type    instanceSend;
 	iec_item_type    instanceRecv;
 	/////////////////////////////
+	////////////////fifo///////////
+	fifo_h fifo_monitor_direction;
+	///////////////////////////////
 	
 	void driverEvent(DriverEvent *); // message from thread to parent
 	bool event(QEvent *e);

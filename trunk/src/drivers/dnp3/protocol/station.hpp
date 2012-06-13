@@ -36,6 +36,8 @@
 #include "security.hpp"
 #include "transport.hpp"
 
+#pragma warning (disable : 4786) //apa+++ 12-06-2012
+
 class Master;
 
 class Station
