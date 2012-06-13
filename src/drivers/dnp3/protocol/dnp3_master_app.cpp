@@ -105,108 +105,118 @@ void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackPa
 iec_item_type DNP3MasterApp::instanceSend;
 ORTEPublication* DNP3MasterApp::publisher = NULL;
 ////////////////////////////////Middleware/////////////////
+
+//Global to remove ASAP///////////////////////
+iec_item_type* global_instanceSend;
+ORTEPublication* global_publisher;
+//////////////////////////////////////////////
+
 //   
 //  Class constructor.   
 //   
-DNP3MasterApp::DNP3MasterApp(char* dnp3server_address, char*dnp3server_port, char* line_number, int polling_time)
+DNP3MasterApp::DNP3MasterApp(char* dnp3server_address, char*dnp3server_port, char* line_number, int polling_time):
+Connected(false), tx_var(NULL), master_p(NULL), fExit(false),pollingTime(polling_time)
 {   
-    this->Connected = false;
-	debugLevel = 1;
-	integrityPollInterval = 10;
-	masterConfig.addr = 1;
-	masterConfig.consecutiveTimeoutsForCommsFail = 3;
-	masterConfig.integrityPollInterval_p = &integrityPollInterval;
-	masterConfig.debugLevel_p = &debugLevel;
-
-	stationConfig.addr = 1;
-	stationConfig.debugLevel_p = &debugLevel;
-
-	datalinkConfig.addr                  = masterConfig.addr;
-	datalinkConfig.isMaster              = 1;
-	datalinkConfig.keepAliveInterval_ms  = 10000;
-
-	tx_var = new CustomInter(&debugLevel, 'M', 'S', getSocket());
-
-	datalinkConfig.tx_p                  = tx_var;
-	datalinkConfig.debugLevel_p          = &debugLevel;
-
-	master_p = new Master(masterConfig, datalinkConfig, &stationConfig, 1, &db, &timer);
-
-	fExit = false;
-
 	strcpy(dnp3ServerAddress, dnp3server_address);
 	strcpy(dnp3ServerPort, dnp3server_port);
 
-	pollingTime = polling_time;
+	if(!OpenLink(dnp3ServerAddress, atoi(dnp3ServerPort)))
+	{
+		/////////////////////Middleware/////////////////////////////////////////////////////////////////
+		received_command_callback = 0;
 
-	/////////////////////Middleware/////////////////////////////////////////////////////////////////
-	received_command_callback = 0;
+		int32_t                 strength = 1;
+		NtpTime                 persistence, deadline, minimumSeparation, delay;
+		IPAddress				smIPAddress = IPADDRESS_INVALID;
+		
+		subscriber = NULL;
 
-	int32_t                 strength = 1;
-	NtpTime                 persistence, deadline, minimumSeparation, delay;
-	IPAddress				smIPAddress = IPADDRESS_INVALID;
-	
-	subscriber = NULL;
+		ORTEInit();
+		ORTEDomainPropDefaultGet(&dp);
+		NTPTIME_BUILD(minimumSeparation,0); 
+		NTPTIME_BUILD(delay,1); //1s
 
-	ORTEInit();
-	ORTEDomainPropDefaultGet(&dp);
-	NTPTIME_BUILD(minimumSeparation,0); 
-	NTPTIME_BUILD(delay,1); //1s
+		//initiate event system
+		ORTEDomainInitEvents(&events);
 
-	//initiate event system
-	ORTEDomainInitEvents(&events);
+		events.onRegFail = onRegFail;
 
-	events.onRegFail = onRegFail;
+		//Create application     
+		domain = ORTEDomainAppCreate(ORTE_DEFAULT_DOMAIN,&dp,&events,ORTE_FALSE);
 
-	//Create application     
-	domain = ORTEDomainAppCreate(ORTE_DEFAULT_DOMAIN,&dp,&events,ORTE_FALSE);
+		iec_item_type_type_register(domain);
 
-	iec_item_type_type_register(domain);
+		//Create publisher
+		NTPTIME_BUILD(persistence,5);
 
-	//Create publisher
-	NTPTIME_BUILD(persistence,5);
+		char fifo_monitor_name[150];
+		strcpy(fifo_monitor_name,"fifo_monitor_direction");
+		strcat(fifo_monitor_name, line_number);
+		strcat(fifo_monitor_name, "dnp3");
 
-	char fifo_monitor_name[150];
-	strcpy(fifo_monitor_name,"fifo_monitor_direction");
-	strcat(fifo_monitor_name, line_number);
-	strcat(fifo_monitor_name, "da");
+		publisher = ORTEPublicationCreate(
+		domain,
+		fifo_monitor_name,
+		"iec_item_type",
+		&instanceSend,
+		&persistence,
+		strength,
+		NULL,
+		NULL,
+		NULL);
 
-	publisher = ORTEPublicationCreate(
-	domain,
-	fifo_monitor_name,
-	"iec_item_type",
-	&instanceSend,
-	&persistence,
-	strength,
-	NULL,
-	NULL,
-	NULL);
+		//if(publisher == NULL){} //check this error
+		
+		char fifo_control_name[150];
+		strcpy(fifo_control_name,"fifo_control_direction");
+		strcat(fifo_control_name, line_number);
+		strcat(fifo_control_name, "dnp3");
 
-	//if(publisher == NULL){} //check this error
-	
-	char fifo_control_name[150];
-	strcpy(fifo_control_name,"fifo_control_direction");
-	strcat(fifo_control_name, line_number);
-	strcat(fifo_control_name, "da");
+		//Create subscriber
+		NTPTIME_BUILD(deadline,3);
 
-	//Create subscriber
-	NTPTIME_BUILD(deadline,3);
+		subscriber = ORTESubscriptionCreate(
+		domain,
+		IMMEDIATE,
+		BEST_EFFORTS,
+		fifo_control_name,
+		"iec_item_type",
+		&instanceRecv,
+		&deadline,
+		&minimumSeparation,
+		recvCallBack,
+		this,
+		smIPAddress);
+		///////////////////////////////////Middleware//////////////////////////////////////////////////
 
-	subscriber = ORTESubscriptionCreate(
-	domain,
-	IMMEDIATE,
-	BEST_EFFORTS,
-	fifo_control_name,
-	"iec_item_type",
-	&instanceRecv,
-	&deadline,
-	&minimumSeparation,
-	recvCallBack,
-	this,
-	smIPAddress);
-	///////////////////////////////////Middleware//////////////////////////////////////////////////
+		debugLevel = 1;
+		integrityPollInterval = 10;
+		masterConfig.addr = 1;
+		masterConfig.consecutiveTimeoutsForCommsFail = 3;
+		masterConfig.integrityPollInterval_p = &integrityPollInterval;
+		masterConfig.debugLevel_p = &debugLevel;
 
-    return;   
+		stationConfig.addr = 1;
+		stationConfig.debugLevel_p = &debugLevel;
+
+		datalinkConfig.addr                  = masterConfig.addr;
+		datalinkConfig.isMaster              = 1;
+		datalinkConfig.keepAliveInterval_ms  = 10000;
+
+		tx_var = new CustomInter(&debugLevel, 'M', 'S', getSocket());
+
+		datalinkConfig.tx_p                  = tx_var;
+		datalinkConfig.debugLevel_p          = &debugLevel;
+
+		////////////remove ASAP/////////////////////////
+		//Pass instanceSend and publisher as parameters to Factory calls through Master class
+		global_instanceSend = &instanceSend;
+		global_publisher = publisher;
+		////////////////////////////////////////////////
+
+		master_p = new Master(masterConfig, datalinkConfig, &stationConfig, 1, &db, &timer);
+
+	}
 }   
 //   
 //  Class destructor.   
@@ -243,7 +253,7 @@ int DNP3MasterApp::OpenLink(char *serverIP, int port)
     int wsaerr;   
    
     // connected ?   
-    if(GetSockConnectStatus())   
+    if(GetSockConnectStatus())
     {   
 		// report warning   
 		sprintf(LastError, "Socket is connected!\n");   
@@ -426,7 +436,7 @@ void DNP3MasterApp::free_command_resources(void)
 
 int DNP3MasterApp::run(void)
 {
-	if(!OpenLink(dnp3ServerAddress, atoi(dnp3ServerPort)))
+	if(GetSockConnectStatus())
 	{  
 		//Write
 		master_p->poll(Master::INTEGRITY);
@@ -468,16 +478,19 @@ int DNP3MasterApp::run(void)
 				break; //exit loop
 			}
 
+			//#define USE_KEEP_ALIVE_WATCH_DOG
+
+			#ifdef USE_KEEP_ALIVE_WATCH_DOG
 			gl_timeout_connection_with_parent++;
 
 			if(gl_timeout_connection_with_parent > 1000*20/pollingTime)
 			{
 				break; //exit loop for timeout of connection with parent
 			}
+			#endif
 
 			Sleep((unsigned long)pollingTime);
 		}   
-
 
 		Sleep(1000);   
 		//CloseLink();   
@@ -485,9 +498,6 @@ int DNP3MasterApp::run(void)
 	}   
 	else   
 	{   
-		bool t = GetSockConnectStatus();   
-		Sleep(30000);   
-		//CloseLink();
 		fExit = true;
 	}
 

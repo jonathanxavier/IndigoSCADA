@@ -594,7 +594,7 @@ LWENABLE int4,
 LAENABLE int4,
 RECEIPE string,
 ENABLED int4,
-IOA int4, <----------------------------- TO ADD
+IOA int4, <----------------------------- ADDED
 PARAMS string,
 UNIT string
 );
@@ -715,7 +715,7 @@ UNIT string
 		p_item = (struct iec_item*)buf;
 			
 		//printf("Receiving %d th message \n", p_item->msg_id);
-		printf("Receiving %d th message for line = %d\n", p_item->msg_id, instanceID + 1);
+		printf("Receiving %d th opc da message for line = %d\n", p_item->msg_id, instanceID + 1);
 
 		//for (int j = 0; j < len; j++) 
 		//{ 
@@ -1483,7 +1483,6 @@ void Opc_client_da_Instance::get_items(struct iec_item* p_item)
 	#ifdef DEPRECATED_OPC_CLIENT_DA_CONFIG
 	QString cmd = "select IKEY from PROPS where DVAL='"+ ioa + "' and SKEY='SAMPLEPROPS';";
 	#else
-	//QString cmd = "select NAME from TAGS where PARAMS='"+ ioa + "' and UNIT='"+ Name + "';";
 	QString cmd = "select NAME from TAGS where IOA="+ ioa + " and UNIT='"+ Name + "';";
 	#endif
 

@@ -9,6 +9,7 @@
  *   for full copyright notice and license terms. 
  *
  */
+#include "iec_item_type.h" //Middleware
 #include <time.h>
 #include <stdio.h>
 #include <string.h>
@@ -17,6 +18,11 @@
 #include "station.hpp"
 #include "outstation.hpp"
 #include "datalink.hpp"
+
+//Global to remove ASAP///////////////////////
+iec_item_type* global_instanceSend;
+ORTEPublication* global_publisher;
+//////////////////////////////////////////////
 
 int main( int argc, char **argv )
 {

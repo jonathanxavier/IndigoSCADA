@@ -103,6 +103,30 @@ Integration of the middleware (RTPS) with protocol processes
 Implemented configurator for opc_client_da.exe and opc_client_ae.exe
 -------------------------------------------------------------------------------------------------------
 04-06-2012
-OPC client DA working with multiple dedicated lines
 
+--tag configuration
+create table TAGS
+(
+NAME string,
+TAG string,
+UPPERALARM real8,
+UPPERWARN real8,
+LOWERWARN real8,
+LOWERALARM real8,
+UAENABLE int4,
+UWENABLE int4,
+LWENABLE int4,
+LAENABLE int4,
+RECEIPE string,
+ENABLED int4,
+IOA int4, <----------------------------- ADDED
+PARAMS string,
+UNIT string
+);
+
+OPC client DA now is working with multiple dedicated lines
+-------------------------------------------------------------------------------------------------------
+12-06-2012
+dnp3master.exe is now connected with dnp3driver.dll through RTPS in monitoring direction
+-------------------------------------------------------------------------------------------------------
 

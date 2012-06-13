@@ -40,7 +40,7 @@ void  CustomDb::registerName( DnpAddr_t      addr,
 			     char*          name,
 			     int            initialValue )
 {
-
+    assert(addr != 0);
 }
 
 // Transmit Interface -----------------

@@ -271,9 +271,9 @@ void Opc_client_hda::QueryResponse (QObject *p, const QString &, int id, QObject
 
 					CreateSamplePoint(spname, l,"00:01:00 4 20 0");
 
-					cmd = QString("update TAGS set IOA='");
+					cmd = QString("update TAGS set IOA=");
 					cmd += m;
-					cmd += "' where NAME='" + spname + "';";
+					cmd += " where NAME='" + spname + "';";
 
 					GetConfigureDb()->DoExec(0,cmd ,0);
 

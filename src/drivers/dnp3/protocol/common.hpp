@@ -45,7 +45,7 @@ typedef std::deque<unsigned char> Bytes;
 // use something > 4 bytes to avoid a rollover
 typedef uint64_t Uptime_t;
 
-// DNP time a six byte unsigned int representing the number of milli-seconds
+// DNP time is a six byte unsigned int representing the number of milli-seconds
 // since midnight UTC Jan 1, 1970 (does not include leap seconds)
 typedef uint64_t DnpTime_t;
 
