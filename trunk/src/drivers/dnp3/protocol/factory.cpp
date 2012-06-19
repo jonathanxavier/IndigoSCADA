@@ -24,25 +24,15 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
 // OTHER DEALINGS IN THE SOFTWARE.
 
-// Some portions are Copyright (C) 2012 Enscada Limited http://www.enscada.com
+// Modified by Enscada limited http://www.enscada.com
 
-//////////////////////////apa+++ 12-06-2012///////////
-#include "stdint.h"
-#include "iec104types.h"
-#include "iec_item.h"
-#include "clear_crc_eight.h"
-#include "iec_item_type.h" //Middleware
-#ifdef WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>  //For sleep
-#undef WIN32_LEAN_AND_MEAN
-#endif
-//////////////////////////////////////////////////////
 #include "assert.h"
 #include "stdio.h"
 #include "common.hpp"
 #include "stats.hpp"
 #include "factory.hpp"
+
+#pragma warning (disable : 4786) //apa+++ 12-06-2012
 
 const uint8_t ObjectHeader::PACKED_WITHOUT_A_PREFIX = 0;
 const uint8_t ObjectHeader::ONE_OCTET_INDEX         = 1;
@@ -299,20 +289,20 @@ DnpObject* Factory::decode(const ObjectHeader& oh, Bytes& data,
 		{
 			if (oh.indexSize == 2)
 			{
-			index = removeUINT16(data);
+				index = removeUINT16(data);
 			}
 			else if (oh.indexSize == 1)
 			{
-			index = removeUINT8(data);
+				index = removeUINT8(data);
 			}
 			else if (oh.indexSize == 0)
-			index = NO_INDEX;
+				index = NO_INDEX;
 			else
 			{
-			// something has gone wrong
-			stats.logAbnormal(0,
-					  "Rx Unsupported Index Size %d",oh.indexSize);
-			throw(__LINE__);
+				// something has gone wrong
+				stats.logAbnormal(0,
+						  "Rx Unsupported Index Size %d",oh.indexSize);
+				throw(__LINE__);
 			}
 
 			createObjects(oh.grp, oh.var, data, index, index, addr, stats);
@@ -322,22 +312,24 @@ DnpObject* Factory::decode(const ObjectHeader& oh, Bytes& data,
 	ObjectHeader::ONE_OCTET_COUNT_OF_OBJECTS_VARIABLE_FORMAT )
     {
 		uint32_t objectSize;
-		for (unsigned int i=0; i<oh.count; i++)
+
+		for(unsigned int i = 0; i < oh.count; i++)
 		{
 			// index size here is really used for the size of the object size
 			if (oh.indexSize == ObjectHeader::ONE_OCTET_SIZE)
-			objectSize = removeUINT8(data);
+				objectSize = removeUINT8(data);
 			else if (oh.indexSize == ObjectHeader::TWO_OCTET_SIZE)
-			objectSize = removeUINT16(data);
+				objectSize = removeUINT16(data);
 			else if (oh.indexSize == ObjectHeader::FOUR_OCTET_SIZE)
-			objectSize = removeUINT32(data);
+				objectSize = removeUINT32(data);
 			else
 			{
-			stats.logAbnormal(0,"Unsupported Qualifier code 0x%x",oh.qual);
-			throw(__LINE__);
+				stats.logAbnormal(0,"Unsupported Qualifier code 0x%x",oh.qual);
+				throw(__LINE__);
 			}
 
 			stats.logNormal( "Decoding: 1 object of size %d", objectSize);
+
 			createObjects(oh.grp, oh.var, data,
 				  NO_INDEX,
 				  NO_INDEX,
@@ -365,31 +357,35 @@ void Factory::createObjects(uint8_t grp, uint8_t var, Bytes& data,
     // if we do have toubl parseing with should throw an exception
 
     // Binary Input is a special case because it is packed 
-    if (grp == 1 && var == 1)
+    if(grp == 1 && var == 1)
     {
  		uint8_t bitMask = 0x01;
 		uint8_t flag;
- 		for (i=startIndex; i<stopIndex+1; i++)
+
+ 		for(i = startIndex; i < stopIndex + 1; i++)
 		{
 			BinaryInputWithStatus bi;
+
 			if (data[0] & bitMask)
-			flag = 0x81;
+				flag = 0x81;
 			else
-			flag = 0x01;
+				flag = 0x01;
 
 			bi = BinaryInputWithStatus( flag);
+
 			db_p->changePoint( addr, i,
 					   bi.pointType,
 					   bi.value,
-					   bi.timestamp);
+					   bi.timestamp,
+					   bi.flag);
 
 			if ((bitMask == 0x80) || (i == stopIndex))
-			data.pop_front();
+				data.pop_front();
 
 			if (bitMask == 0x80)
-			bitMask = 0x01;
+				bitMask = 0x01;
 			else
-			bitMask = bitMask << 1;
+				bitMask = bitMask << 1;
 		}
     }
     // Double bit Binary Input is a special case because it is packed 
@@ -398,34 +394,37 @@ void Factory::createObjects(uint8_t grp, uint8_t var, Bytes& data,
  		uint8_t bitMask = 0x03;
 		uint8_t shift   = 0x00;
 		uint8_t flag;
- 		for (i=startIndex; i<stopIndex+1; i++)
+
+ 		for(i = startIndex; i < stopIndex + 1; i++)
 		{
 			BinaryInputWithStatus bi;
+
 			if ( ((data[0] & bitMask) >> shift) == 0x02)
-			flag = 0x81;
+				flag = 0x81;
 			else
-			flag = 0x01;
+				flag = 0x01;
 
 			bi = BinaryInputWithStatus( flag);
+
 			db_p->changePoint( addr, i,
 					   bi.pointType,
 					   bi.value,
-					   bi.timestamp);
+					   bi.timestamp,
+					   bi.flag);
 
 			if ((bitMask == 0xC0) || (i == stopIndex))
-			data.pop_front();
+				data.pop_front();
 
 			if (bitMask == 0xC0)
 			{
-			bitMask = 0x03;
-			shift = 0;
+				bitMask = 0x03;
+				shift = 0;
 			}
 			else
 			{
-			bitMask = bitMask << 2;
-			shift += 2;
+				bitMask = bitMask << 2;
+				shift += 2;
 			}
-
 		}
     }
     else
@@ -438,277 +437,43 @@ void Factory::createObjects(uint8_t grp, uint8_t var, Bytes& data,
 
 		obj_p = objectMap[ key( grp, var)];
 
-		if (startIndex == NO_INDEX)
+		if(startIndex == NO_INDEX)
 		{
 			if (objectSize > 0)
 			{
-			// this is a variable sized object and the object size
-			// was specified in the header
-			obj_p->decode(data, objectSize);
+				// this is a variable sized object and the object size
+				// was specified in the header
+				obj_p->decode(data, objectSize);
 			}
 			else
 			{
-			obj_p->decode(data);    // init instance
+				obj_p->decode(data);    // init instance
 			}
 		}
 		else
 		{
-			for (i=startIndex; i<stopIndex+1; i++)
+			for(i = startIndex; i < stopIndex + 1; i++)
 			{
-			obj_p->decode(data);    // init instance
+				obj_p->decode(data);    // init instance
 
-			if ((grp == 2) && (var == 2))
-				// handle another special case
-				// we need to add the CTO to get a dnp time
-				obj_p->timestamp += cto;
-			
-			db_p->changePoint(addr, i,
-					  obj_p->pointType,
-					  obj_p->value,
-					  obj_p->timestamp);
+				if ((grp == 2) && (var == 2))
+					// handle another special case
+					// we need to add the CTO to get a dnp time
+					obj_p->timestamp += cto;
+				
+				db_p->changePoint(addr, i,
+						  obj_p->pointType,
+						  obj_p->value,
+						  obj_p->timestamp,
+						  obj_p->flag);
 			}
 		}
     }
 
     lastObjectParsed = obj_p;
-
-	sendObjectInMonitorDirection(obj_p);
 }
 
 void Factory::setCTO( DnpTime_t newCTO)
 {
     cto = newCTO;
 }
-
-////////////////////////////////////////////apa+++////////////////////////////////////////////
-#define ABS(x) ((x) >= 0 ? (x) : -(x))
-static unsigned int n_msg_sent = 0;
-
-/////////////////////////////////Globals remove ASAP/////////////
-extern iec_item_type* global_instanceSend;
-extern ORTEPublication* global_publisher;
-/////////////////////////////////////////////////////////////////
-
-#define QUALITY_GOOD 0x01
-
-void Factory::sendObjectInMonitorDirection(DnpObject* obj_p)
-{
-	cp56time2a time;
-	struct iec_item item_to_send;
-	//double delta = 0.0;
-
-	if(obj_p == NULL)
-	{
-		//print error message
-		return;
-	}
-    	
-	memset(&item_to_send,0x00, sizeof(struct iec_item));
-		
-	item_to_send.iec_obj.ioa = obj_p->index;
-
-	//TODO on 13-06-2012: Map the object to the corresponding IOA
-
-//	printf("ioa = %d\n", obj_p->index);
-
-	//item_to_send.cause = cot;
-		
-	switch(obj_p->pointType)
-	{
-		case EventInterface::AI:
-		{
-			printf("AI\n");
-
-			item_to_send.iec_type = M_ME_TE_1;
-
-			//DNP time (DnpTime_t) is a six byte unsigned int representing the number of milli-seconds
-			// since midnight UTC Jan 1, 1970 (does not include leap seconds)
-			
-			epoch_to_cp56time2a(&time, obj_p->timestamp);
-			item_to_send.iec_obj.o.type35.mv = obj_p->value;
-			item_to_send.iec_obj.o.type35.time = time;
-
-			if(obj_p->flag != QUALITY_GOOD)
-				item_to_send.iec_obj.o.type35.iv = 1;
-		}
-		break;
-		case EventInterface::BI:
-		{
-			printf("BI\n");
-
-			item_to_send.iec_type = M_SP_TB_1;
-			epoch_to_cp56time2a(&time, obj_p->timestamp);
-			item_to_send.iec_obj.o.type30.sp = obj_p->value;
-			item_to_send.iec_obj.o.type30.time = time;
-
-			if(obj_p->flag != QUALITY_GOOD)
-				item_to_send.iec_obj.o.type30.iv = 1;
-		}
-		break;
-		case EventInterface::CI:
-		{
-			item_to_send.iec_type = M_IT_TB_1;
-			epoch_to_cp56time2a(&time, obj_p->timestamp);
-			item_to_send.iec_obj.o.type37.counter = obj_p->value;
-			item_to_send.iec_obj.o.type37.time = time;
-				
-			if(obj_p->flag != QUALITY_GOOD)
-				item_to_send.iec_obj.o.type37.iv = 1;
-
-			printf("CI\n");
-		}
-		break;
-		case EventInterface::AO:
-		{
-			item_to_send.iec_type = M_ME_TE_1;
-			epoch_to_cp56time2a(&time, obj_p->timestamp);
-			item_to_send.iec_obj.o.type35.mv = obj_p->value;
-			item_to_send.iec_obj.o.type35.time = time;
-
-			if(obj_p->flag != QUALITY_GOOD)
-				item_to_send.iec_obj.o.type35.iv = 1;
-
-			printf("AO\n");
-		}
-		break;
-		case EventInterface::BO:
-		{
-			item_to_send.iec_type = M_SP_TB_1;
-			epoch_to_cp56time2a(&time, obj_p->timestamp);
-			item_to_send.iec_obj.o.type30.sp = obj_p->value;
-			item_to_send.iec_obj.o.type30.time = time;
-
-			if(obj_p->flag != QUALITY_GOOD)
-				item_to_send.iec_obj.o.type30.iv = 1;
-
-			printf("BO\n");
-		}
-		break;
-		case EventInterface::NONE:
-		{
-			printf("NONE\n");
-		}
-		break;
-		case EventInterface::ST:
-		{
-			printf("ST\n");
-		}
-		break;
-		case EventInterface::AP_AB_ST: // app abnormal stat
-		{
-			printf("AP_AB_ST\n");
-		}
-		break;
-		case EventInterface::AP_NM_ST: // app normal stat
-		{
-			printf("AP_NM_ST\n");
-		}
-		break;
-		case EventInterface::DL_AB_ST: // datalink abnormal stat
-		{
-			printf("DL_AB_ST\n");
-		}
-		break;
-		case EventInterface::DL_NM_ST: // datalink normal stat
-		{
-			printf("DL_NM_ST\n");
-		}
-		break;
-		case EventInterface::SA_AB_ST: // secure auth abnormal stat
-		{
-			printf("SA_AB_ST\n");
-		}
-		break;
-		case EventInterface::SA_NM_ST: // secure auth normal stat
-		{
-			printf("SA_NM_ST\n");
-		}
-		break;
-		case EventInterface::EP_AB_ST: // end point abnormal stat
-		{
-			printf("EP_AB_ST\n");
-		}
-		break;
-		case EventInterface::EP_NM_ST: // end point normal stat
-		{
-			printf("EP_NM_ST\n");
-		}
-		break;
-		case EventInterface::NUM_POINT_TYPES:
-		{
-			printf("NUM_POINT_TYPES\n");
-		}
-		break;
-		default:
-			printf("UNSUPPORTED TYPE\n");
-		break;
-	}
-
-	//IT_COMMENT6("at time: %d_%d_%d_%d_%d_%d", time.hour, time.min, time.msec, time.mday, time.month, time.year);
-
-	item_to_send.msg_id = n_msg_sent;
-	item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
-
-	//unsigned char buf[sizeof(struct iec_item)];
-	//int len = sizeof(struct iec_item);
-	//memcpy(buf, &item_to_send, len);
-	//	for(j = 0;j < len; j++)
-	//	{
-	//	  unsigned char c = *(buf + j);
-		//fprintf(stderr,"tx ---> 0x%02x\n", c);
-		//fflush(stderr);
-		//IT_COMMENT1("tx ---> 0x%02x\n", c);
-	//	}
-
-	Sleep(10); //Without delay there is missing of messages in the loading
-
-	//Send in monitor direction
-	fprintf(stderr,"Sending message %u th\n", n_msg_sent);
-	fflush(stderr);
-
-	//prepare published data
-	memset(global_instanceSend,0x00, sizeof(iec_item_type));
-	
-	global_instanceSend->iec_type = item_to_send.iec_type;
-	memcpy(&(global_instanceSend->iec_obj), &(item_to_send.iec_obj), sizeof(struct iec_object));
-	global_instanceSend->cause = item_to_send.cause;
-	global_instanceSend->msg_id = item_to_send.msg_id;
-	global_instanceSend->ioa_control_center = item_to_send.ioa_control_center;
-	global_instanceSend->casdu = item_to_send.casdu;
-	global_instanceSend->is_neg = item_to_send.is_neg;
-	global_instanceSend->checksum = item_to_send.checksum;
-
-	ORTEPublicationSend(global_publisher);
-
-	n_msg_sent++;
-}
-
-#include <time.h>
-#include <sys/timeb.h>
-
-void Factory::epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch_in_millisec)
-{
-	struct tm	*ptm;
-	int ms = (int)(epoch_in_millisec%1000);
-	time_t seconds;
-	
-	memset(time, 0x00,sizeof(cp56time2a));
-	seconds = (long)(epoch_in_millisec/1000);
-	ptm = localtime(&seconds);
-		
-    if(ptm)
-	{
-		time->hour = ptm->tm_hour;					//<0.23>
-		time->min = ptm->tm_min;					//<0..59>
-		time->msec = ptm->tm_sec*1000 + ms; //<0.. 59999>
-		time->mday = ptm->tm_mday; //<1..31>
-		time->wday = (ptm->tm_wday == 0) ? ptm->tm_wday + 7 : ptm->tm_wday; //<1..7>
-		time->month = ptm->tm_mon + 1; //<1..12>
-		time->year = ptm->tm_year - 100; //<0.99>
-		time->iv = 0; //<0..1> Invalid: <0> is valid, <1> is invalid
-		time->su = (u_char)ptm->tm_isdst; //<0..1> SUmmer time: <0> is standard time, <1> is summer time
-	}
-
-    return;
-}
-

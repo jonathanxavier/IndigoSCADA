@@ -102,5 +102,4 @@ int16_t removeINT16(Bytes& data) throw(int);
 // takes the first len bytes of data and adds them to the end of val
 void moveBytes(Bytes& data, Bytes& val, unsigned int len) throw(int);
 
-
 #endif //DNP_COMMON_H

@@ -54,6 +54,7 @@ DnpObject::DnpObject(int32_t                        val,
 		     DnpTime_t                      time ) :
   value(val), flag(flags), index(indx), pointType(pt), timestamp(time)
 {
+
 }
 
 void DnpObject::encode(Bytes& data) const
