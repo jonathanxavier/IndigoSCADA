@@ -35,9 +35,6 @@
 #include "event_interface.hpp"
 #include "stats.hpp"
 
-struct cp56time2a; //apa+++
-#pragma warning (disable : 4786) //apa+++ 12-06-2012
-
 class ObjectHeader
 {
 public:
@@ -144,11 +141,6 @@ private:
 		       DnpAddr_t addr,
 		       Stats& stats,
 		       uint32_t objectSize=0) throw(int);
-
-	/////////////////////////////////////apa+++/////////////////////////////////////
-	void sendObjectInMonitorDirection(DnpObject* obj_p);
-	void epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch_in_millisec);
-	////////////////////////////////////////////////////////////////////////////////
    
     EventInterface*   db_p;
     DnpObject*        lastObjectParsed;

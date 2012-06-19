@@ -66,7 +66,9 @@ class DnpObject
     // all objects to be updated by the database 
     // must have a value and flag.
 
-    int32_t                     value;
+    //int32_t                     value; //apa--- on 19-06-2012
+	float                     value; //apa+++ on 19-06-2012
+
     uint8_t                     flag;
     DnpIndex_t                  index; // not used by anyone?
     EventInterface::PointType_t pointType;

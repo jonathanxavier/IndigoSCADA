@@ -20,6 +20,8 @@
 #include <time.h>
 #include <winsock2.h>
 
+struct cp56time2a; //apa+++
+
 class CustomDb : public EventInterface
 {
 public:
@@ -27,8 +29,9 @@ public:
     virtual void changePoint(   DnpAddr_t      addr,
 				DnpIndex_t     index,
 				PointType_t    pointType,
-				int            value,
-				DnpTime_t      timestamp=0);
+				float            value,
+				DnpTime_t      timestamp=0,
+				uint8_t flag=0x01);
 
     virtual void registerName(  DnpAddr_t      addr,
 				DnpIndex_t     index,
@@ -36,7 +39,11 @@ public:
 				char*          name,
 				int            initialValue=0);
     int numInits;
-    int numChanges;
+    int n_sent_items;
+
+	/////////////////////////////////////apa+++/////////////////////////////////////
+	void epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch_in_millisec);
+	////////////////////////////////////////////////////////////////////////////////
 };
 
 class CustomInter : public TransmitInterface
