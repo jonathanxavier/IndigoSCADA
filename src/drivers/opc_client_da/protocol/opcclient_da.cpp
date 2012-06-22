@@ -113,6 +113,8 @@ iec_item_type Opc_client_da_imp::instanceSend;
 ORTEPublication* Opc_client_da_imp::publisher = NULL;
 ////////////////////////////////Middleware/////////////////
 
+static u_int n_msg_sent = 0;
+
 int Opc_client_da_imp::Async2Update()
 {
 	IT_IT("Opc_client_da_imp::Async2Update");
@@ -202,6 +204,39 @@ int Opc_client_da_imp::Async2Update()
 			//fprintf(stderr,"Opc_client_da_imp exiting...., due to lack of connection with server\n");
 			//fflush(stderr);
 			IT_COMMENT("Opc_client_da_imp exiting...., due to lack of connection with server");
+			
+			//Send LOST message to parent (monitor.exe)
+			struct iec_item item_to_send;
+			struct cp56time2a actual_time;
+			get_utc_host_time(&actual_time);
+
+			memset(&item_to_send,0x00, sizeof(struct iec_item));
+
+			item_to_send.iec_obj.ioa = 0;
+
+			item_to_send.cause = 0x03;
+			item_to_send.iec_type = C_LO_ST_1;
+			item_to_send.iec_obj.o.type30.sp = 0;
+			item_to_send.iec_obj.o.type30.time = actual_time;
+			item_to_send.iec_obj.o.type30.iv = 0;
+			item_to_send.msg_id = n_msg_sent;
+			item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
+
+			//Send in monitor direction
+			//prepare published data
+			memset(&instanceSend,0x00, sizeof(iec_item_type));
+
+			instanceSend.iec_type = item_to_send.iec_type;
+			memcpy(&(instanceSend.iec_obj), &(item_to_send.iec_obj), sizeof(struct iec_object));
+			instanceSend.cause = item_to_send.cause;
+			instanceSend.msg_id = item_to_send.msg_id;
+			instanceSend.ioa_control_center = item_to_send.ioa_control_center;
+			instanceSend.casdu = item_to_send.casdu;
+			instanceSend.is_neg = item_to_send.is_neg;
+			instanceSend.checksum = item_to_send.checksum;
+
+			ORTEPublicationSend(publisher);
+		
 			break; 
 		}
 
@@ -1209,8 +1244,7 @@ void Opc_client_da_imp::epoch_to_cp56time2a(cp56time2a *time, signed __int64 epo
     return;
 }
 
-#define ABS(x) ((x) >= 0 ? (x) : -(x))
-static u_int n_msg_sent = 0;
+//#define ABS(x) ((x) >= 0 ? (x) : -(x))
 
 void Opc_client_da_imp::SendEvent2(VARIANT *pValue, const FILETIME* ft, DWORD pwQualities, OPCHANDLE phClientItem, unsigned char cot)
 {
