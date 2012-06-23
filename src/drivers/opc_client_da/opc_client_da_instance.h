@@ -35,23 +35,18 @@ class Opc_client_da_DriverThread;
 class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance 
 {
 	Q_OBJECT
-	//
-	//
+
 	enum
 	{
 		tUnitProperties = 1,tList, tSamplePointProperties, tListUnits,
 		tGetSamplePointNamefromIOA, tGetIOAfromSamplePointName, tSetTAgsParams
 	};
-	//
-	//
 	
-//	QStringList SampleList; // list of sample points
 	bool fFail;
 	QTimer *pTimer; // timer object for driving state machine
 	int Retry; // the retry count
 	int Countdown; // the countdown track
 	int State; // the state machine's state
-	
 	//  
 	int Sp; //Current sample point index under measurement
 	bool InTick; //tick sentinal
@@ -74,17 +69,19 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 			Stats.reset();
 		}; 
 	};
-	//
+
 	Track* Values;
 
 	enum // states for the state machine
 	{
 		STATE_IDLE = 0,
-		STATE_READ,
-		STATE_WRITE,
 		STATE_RESET,
+		STATE_INIT_DB,
+		STATE_INIT_DB_DONE,
+		STATE_ASK_GENERAL_INTERROGATION,
+		STATE_GENERAL_INTERROGATION_DONE,
 		STATE_FAIL,
-		STATE_DONE
+		STATE_RUNNING
 	};
 
 	public:
@@ -94,8 +91,7 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 	Opc_client_da_Instance(Driver *parent, const QString &name, int instance_id) : 
 	DriverInstance(parent,name),fFail(0), Countdown(1), pConnect(NULL),
 	State(STATE_RESET),InTick(0),Retry(0),Sp(0),OpcItems(1), Values(NULL),
-	ParentDriver(parent),msg_sent_in_control_direction(0), instanceID(instance_id), 
-	is_updated_central_database(false)
+	ParentDriver(parent),msg_sent_in_control_direction(0), instanceID(instance_id)
 	{
 		IT_IT("Opc_client_da_Instance::Opc_client_da_Instance");
 		connect (GetConfigureDb (),
@@ -116,7 +112,7 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 		/////////////////////Middleware/////////////////////////////////////////////////////////////////
 		ORTEDomainProp          dp; 
 		ORTESubscription        *s = NULL;
-		int32_t                 strength=1;
+		int32_t                 strength = 1;
 		NtpTime                 persistence,deadline,minimumSeparation,delay;
 		Boolean                 havePublisher = ORTE_FALSE;
 		Boolean                 haveSubscriber = ORTE_FALSE;
@@ -125,8 +121,8 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 
 		ORTEInit();
 		ORTEDomainPropDefaultGet(&dp);
-		NTPTIME_BUILD(minimumSeparation,0); 
-		NTPTIME_BUILD(delay,1); //1s
+		NTPTIME_BUILD(minimumSeparation, 0); //0 s
+		NTPTIME_BUILD(delay, 1); //1 s
 
 		//initiate event system
 		ORTEDomainInitEvents(&events);
@@ -139,7 +135,7 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 		iec_item_type_type_register(domain);
 
 		//Create publisher
-		NTPTIME_BUILD(persistence,5);
+		NTPTIME_BUILD(persistence, 5); //5 s
 		
 		publisher = ORTEPublicationCreate(
 		domain,
@@ -175,7 +171,7 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 		smIPAddress);
 		///////////////////////////////////Middleware//////////////////////////////////////////////////
 
-		/////////////////////////////////////fifo//////////////////////////////////////////////////////////
+		/////////////////////////////////////local fifo//////////////////////////////////////////////////////////
 		const size_t max_fifo_queue_size = 65535;
 		
 		strcat(fifo_monitor_name, "_fifo_");
@@ -197,7 +193,7 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 		ORTEDomainAppDestroy(domain);
         domain = NULL;
 	};
-	//
+
 	void Fail(const QString &s)
 	{
 		FailUnit(s);
@@ -208,7 +204,7 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 	Driver* ParentDriver;
 	QString unit_name;
 	int instanceID; //Equals to "line concept" of a SCADA driver
-	bool is_updated_central_database;
+
 	//////Middleware/////////////
     ORTEDomain *domain;
 	ORTEPublication *publisher;
@@ -217,7 +213,7 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 	iec_item_type    instanceRecv;
 	/////////////////////////////
 
-	////////////////fifo///////////
+	////////////////local fifo///////////
 	fifo_h fifo_monitor_direction;
 	///////////////////////////////
 	
@@ -230,8 +226,9 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 	void removeTransaction();
 	//////Middleware//////////////////////////////////////
 	void get_utc_host_time(struct cp56time2a* time);
-	void get_items(struct iec_item* p_item);
+	void get_items(struct iec_item* p_item); //NOT USED
 	////////////////////////////////////////////////
+	void get_items_form_local_fifo(void);
 	//
 	public slots:
 	//
@@ -240,7 +237,6 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 	virtual void Command(const QString & name, BYTE cmd, LPVOID lpPa, DWORD pa_length, DWORD ipindex); // process a command for a named unit 
 	virtual void QueryResponse (QObject *, const QString &, int, QObject*); // handles database responses
 	virtual void Tick();
-	//
 };
 
 #endif

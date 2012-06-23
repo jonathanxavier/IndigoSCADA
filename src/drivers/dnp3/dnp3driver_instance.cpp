@@ -396,7 +396,7 @@ void Dnp3driver_Instance::Tick()
 	{ 
 		p_item = (struct iec_item*)buf;
 			
-		printf("Receiving %d dnp th message for line = %d\n", p_item->msg_id, instanceID + 1);
+		printf("Receiving %d dnp th message from line = %d\n", p_item->msg_id, instanceID + 1);
 		printf("ioa = %d\n", p_item->iec_obj.ioa);
 
 		//for (int j = 0; j < len; j++) 
@@ -880,7 +880,7 @@ void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackPa
 
 void Dnp3driver_Instance::get_items(struct iec_item* p_item)
 {
-	printf("Receiving %d th dnp message for line = %d\n", p_item->msg_id, instanceID + 1);
+	printf("Receiving %d th dnp message from line = %d\n", p_item->msg_id, instanceID + 1);
 
 	//for (int j = 0; j < len; j++) 
 	//{ 
