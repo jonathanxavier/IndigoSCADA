@@ -10,8 +10,6 @@
  *
  */
 
-
-
 #include "opc_client_da_instance.h"
 #include "opc_client_dadriverthread.h"
 
@@ -377,6 +375,10 @@ void strip_white_space(char *dst, const char *src, int len)
 	}
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define MAX_CONFIGURABLE_OPC_ITEMIDS 30000
+
 #include <sqlite3.h>
 
 struct local_structItem
@@ -451,7 +453,7 @@ static int db_callback(void *NotUsed, int argc, char **argv, char **azColName)
 				{
 					gl_Config_db[gl_row_counter].io_list_iec_type = M_IT_TB_1;
 				}
-				if(strcmp(argv[i], "M_ME_TN_1") == 0)
+				else if(strcmp(argv[i], "M_ME_TN_1") == 0)
 				{
 					gl_Config_db[gl_row_counter].io_list_iec_type = M_ME_TN_1;
 				}
@@ -518,193 +520,178 @@ static int db_callback(void *NotUsed, int argc, char **argv, char **azColName)
 *Outputs:none
 *Returns:none
 */
-//Realtime timer
+
+
 void Opc_client_da_Instance::Tick()
 {
 	IT_IT("Opc_client_da_Instance::Tick");
+
+	//This code runs inside main monitor.exe thread
 	
 	switch(State)
 	{
 		case STATE_RESET:
 		{
-			State = STATE_IDLE;
-			Countdown = 2;
+			State = STATE_INIT_DB;
 		}
 		break;
-		case STATE_IDLE:
+		case STATE_INIT_DB:
 		{
-			if(!Countdown)
+			sqlite3 *db;
+			char *zErrMsg = 0;
+			int rc;
+			int n_rows = 0;
+			int m_columns = 0;
+
+			char db_name[100];
+
+			strcpy(db_name, "C:\\scada\\bin\\");
+			strcat(db_name, Cfg.OpcServerProgID);
+			strcat(db_name, ".db");
+			
+			rc = sqlite3_open(db_name, &db);
+
+			if(rc)
 			{
-				State = STATE_DONE;
+			  fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+			  fflush(stderr);
+			  sqlite3_close(db);
+
+			  QString msg;
+			  msg.sprintf("OPC DA client on line %d failed", instanceID + 1); 
+			  FailUnit(msg);
+
+			  State = STATE_FAIL;
+			  break;
 			}
-			else
+
+			gl_Config_db = (struct local_structItem*)calloc(1, MAX_CONFIGURABLE_OPC_ITEMIDS*sizeof(struct local_structItem));
+
+			gl_row_counter = 0;
+
+			rc = sqlite3_exec(db, "select * from opc_client_da_table;", db_callback, 0, &zErrMsg);
+
+			if(rc != SQLITE_OK)
 			{
-				Countdown--;
+			  fprintf(stderr, "SQL error: %s\n", zErrMsg);
+			  fflush(stderr);
+			  sqlite3_free(zErrMsg);
+
+			  QString msg;
+			  msg.sprintf("OPC DA client on line %d failed", instanceID + 1); 
+			  FailUnit(msg);
+
+			  State = STATE_FAIL;
+			  break;
 			}
-		}
-		break;
-		//
-		case STATE_DONE:
-		{
-			if(pConnect)
+
+			sqlite3_close(db);
+
+			n_rows = gl_row_counter;
+			m_columns = gl_column_counter;
+
+			if(n_rows > OpcItems)
 			{
-				//START TEST
-				/*
-				//Send C_SC_NA_1//////////////////////////////////////////////////////////////////////////
-				struct iec_item item_to_send;
-				memset(&item_to_send,0x00, sizeof(struct iec_item));
-				item_to_send.iec_type = C_SC_NA_1;
-				item_to_send.iec_obj.ioa = 33;
-				item_to_send.iec_obj.o.type45.scs = 1;
+				QString msg;
+			    msg.sprintf("OPC DA client on line %d failed", instanceID + 1); 
+			    FailUnit(msg);
 
-				struct cp56time2a actual_time;
-				get_utc_host_time(&actual_time);
-				item_to_send.iec_obj.o.type58.time = actual_time;
-				item_to_send.msg_id = msg_sent_in_control_direction++;
-				item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
-				///////////////////////////////////////////////////////////////////////////////////////////
+				State = STATE_FAIL;
+				break;
+			}
 
-				//prepare published data
-				memset(&instanceSend,0x00, sizeof(iec_item_type));
-				instanceSend.iec_type = item_to_send.iec_type;
-				memcpy(&(instanceSend.iec_obj), &(item_to_send.iec_obj), sizeof(struct iec_object));
-				instanceSend.msg_id = item_to_send.msg_id;
-				instanceSend.checksum = item_to_send.checksum;
-
-				//printf("sizeof(struct iec_object) = %d\n", sizeof(struct iec_object));
-
-				ORTEPublicationSend(publisher);
-				*/
-				//END TEST
-
-/*
-
---tag configuration
-create table TAGS
-(
-NAME string,
-TAG string,
-UPPERALARM real8,
-UPPERWARN real8,
-LOWERWARN real8,
-LOWERALARM real8,
-UAENABLE int4,
-UWENABLE int4,
-LWENABLE int4,
-LAENABLE int4,
-RECEIPE string,
-ENABLED int4,
-IOA int4, <----------------------------- ADDED
-PARAMS string,
-UNIT string
-);
-
-*/
-
-				if(!is_updated_central_database)
+			for(int i = 0; i < n_rows; i ++)
+			{
+				if(gl_Config_db)
 				{
-					sqlite3 *db;
-					char *zErrMsg = 0;
-					int rc;
-					int n_rows = 0;
-					int m_columns = 0;
-					//FILE* fp = NULL;
+					char str[10];
+					// update the tags
+					QString cmd;
+					
+					cmd = QString("update TAGS set PARAMS='");
+					
+					char dst[150];
+					strip_white_space(dst, gl_Config_db[i].spname, 150);
+					
+					cmd += QString(dst);
+					cmd += QString(" ");
+					cmd += QString(gl_Config_db[i].opc_type);
+					cmd += QString(" ");
+					cmd += QString(itoa(gl_Config_db[i].writeable, str, 10));
+					cmd += "' where IOA=" + QString(itoa(gl_Config_db[i].ioa_control_center, str, 10)) + " and UNIT='"+ Name + "';";
 
-					char db_name[100];
-					strcpy(db_name, "C:\\scada\\bin\\");
-					strcat(db_name, Cfg.OpcServerProgID);
-					strcat(db_name, ".db");
+					GetConfigureDb()->DoExec(this, cmd , tSetTAgsParams);
 
-					//fprintf(stderr, "db_name = %s\n", db_name);
-					//fflush(stderr);
-
-					rc = sqlite3_open(db_name, &db);
-
-					if(rc)
-					{
-					  fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
-					  fflush(stderr);
-					  sqlite3_close(db);
-					  //IT_EXIT;
-					  //return;
-					  //error
-					}
-
-					gl_Config_db = (struct local_structItem*)calloc(1, 30000*sizeof(struct local_structItem));
-
-					gl_row_counter = 0;
-
-					rc = sqlite3_exec(db, "select * from opc_client_da_table;", db_callback, 0, &zErrMsg);
-
-					if(rc != SQLITE_OK)
-					{
-					  fprintf(stderr, "SQL error: %s\n", zErrMsg);
-					  fflush(stderr);
-					  sqlite3_free(zErrMsg);
-					}
-
-					sqlite3_close(db);
-
-					n_rows = gl_row_counter;
-					m_columns = gl_column_counter;
-
-					if(n_rows > OpcItems)
-					{
-						//error to user
-					}
-
-					for(int i = 0; i < n_rows; i ++)
-					{
-						if(gl_Config_db)
-						{
-							char str[10];
-							// update the tags
-							QString cmd;
-							
-							cmd = QString("update TAGS set PARAMS='");
-							
-							char dst[150];
-							strip_white_space(dst, gl_Config_db[i].spname, 150);
-							
-							cmd += QString(dst);
-							cmd += QString(" ");
-							cmd += QString(gl_Config_db[i].opc_type);
-							cmd += QString(" ");
-							cmd += QString(itoa(gl_Config_db[i].writeable, str, 10));
-							cmd += "' where IOA=" + QString(itoa(gl_Config_db[i].ioa_control_center, str, 10)) + " and UNIT='"+ Name + "';";
-
-							GetConfigureDb()->DoExec(this, cmd , tSetTAgsParams);
-
-							printf("%s\n", (const char*)cmd);
-						}
-					}
-
-					if(gl_Config_db)
-					{
-						free(gl_Config_db);
-					}
-
-					is_updated_central_database = true;
+					printf("%s\n", (const char*)cmd);
 				}
 			}
-		};
+
+			if(gl_Config_db)
+			{
+				free(gl_Config_db);
+			}
+
+			State = STATE_INIT_DB_DONE;
+		}
 		break;
-		//
+		case STATE_INIT_DB_DONE:
+		{
+			State = STATE_ASK_GENERAL_INTERROGATION;
+		}
+		break;
+		case STATE_ASK_GENERAL_INTERROGATION:
+		{
+			//Send C_IC_NA_1//////////////////////////////////////////////////////////////////////////
+			struct iec_item item_to_send;
+			memset(&item_to_send,0x00, sizeof(struct iec_item));
+			item_to_send.iec_type = C_IC_NA_1;
+			item_to_send.iec_obj.ioa = 0;
+			item_to_send.iec_obj.o.type100.qoi = 1;
+
+			//struct cp56time2a actual_time;
+			//get_utc_host_time(&actual_time);
+			//item_to_send.iec_obj.o.type58.time = actual_time;
+			item_to_send.msg_id = msg_sent_in_control_direction++;
+			item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
+			///////////////////////////////////////////////////////////////////////////////////////////
+
+			//prepare published data
+			memset(&instanceSend,0x00, sizeof(iec_item_type));
+			instanceSend.iec_type = item_to_send.iec_type;
+			memcpy(&(instanceSend.iec_obj), &(item_to_send.iec_obj), sizeof(struct iec_object));
+			instanceSend.msg_id = item_to_send.msg_id;
+			instanceSend.checksum = item_to_send.checksum;
+
+			//printf("sizeof(struct iec_object) = %d\n", sizeof(struct iec_object));
+
+			ORTEPublicationSend(publisher);
+
+			State = STATE_GENERAL_INTERROGATION_DONE;
+		}
+		break;
+		case STATE_GENERAL_INTERROGATION_DONE:
+		{
+			State = STATE_RUNNING;
+		}
+		break;
 		case STATE_FAIL:
 		{
-			//State = STATE_IDLE;
-		};
+			get_items_form_local_fifo();
+		}
 		break;
-		//
+		case STATE_RUNNING:
+		{
+			get_items_form_local_fifo();
+		}
+		break;
 		default:
 		break;
-	};
+	}
+}
 
-//This code runs inside main monitor.exe thread
 
-	//cp56time2a time;
-	//signed __int64 epoch_in_millisec;
-
+void Opc_client_da_Instance::get_items_form_local_fifo(void)
+{
 	unsigned char buf[sizeof(struct iec_item)];
 	int len;
 	const unsigned wait_limit_ms = 1;
@@ -717,13 +704,13 @@ UNIT string
 			QString msg;
 			msg.sprintf("OPC DA client on line %d is now connected to OPC DA server.", instanceID + 1); 
 			UnFailUnit(msg);
-			State = STATE_DONE;
+			State = STATE_ASK_GENERAL_INTERROGATION;
 		}
 
 		p_item = (struct iec_item*)buf;
 			
 		//printf("Receiving %d th message \n", p_item->msg_id);
-		printf("Receiving %d th opc da message for line = %d\n", p_item->msg_id, instanceID + 1);
+		printf("Receiving %d th opc da message from line = %d\n", p_item->msg_id, instanceID + 1);
 
 		//for (int j = 0; j < len; j++) 
 		//{ 
@@ -739,6 +726,7 @@ UNIT string
 		//printf("---------------\n");
 
 		unsigned char rc = clearCrc((unsigned char *)buf, sizeof(struct iec_item));
+
 		if(rc != 0)
 		{
 			ExitProcess(1);
@@ -963,14 +951,14 @@ UNIT string
 				#endif
 			}
 			break;
-            case C_EX_IT_1:
+			case C_EX_IT_1:
 			{
-                printf("Child process is exiting...\n");
+				printf("Child process is exiting...\n");
 			}
 			break;
 			case C_LO_ST_1:
 			{
-                printf("OPC DA client on line %d has lost connection with OPC DA server...\n", instanceID + 1);
+				printf("OPC DA client on line %d has lost connection with OPC DA server...\n", instanceID + 1);
 
 				QString msg;
 				msg.sprintf("OPC DA client on line %d has lost connection with OPC DA server...", instanceID + 1); 
@@ -990,7 +978,7 @@ UNIT string
 		QString ioa;
 		ioa.sprintf("%d", p_item->iec_obj.ioa);
 
-        #ifdef DEPRECATED_IEC101_CONFIG
+		#ifdef DEPRECATED_IEC101_CONFIG
 		QString cmd = "select IKEY from PROPS where DVAL='"+ ioa + "' and SKEY='SAMPLEPROPS';";
 		#else
 		QString cmd = "select NAME from TAGS where IOA="+ ioa + " and UNIT='"+ Name + "';";
@@ -1242,7 +1230,7 @@ void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackPa
 
 void Opc_client_da_Instance::get_items(struct iec_item* p_item)
 {
-	printf("Receiving %d th opc da message for line = %d\n", p_item->msg_id, instanceID + 1);
+	printf("Receiving %d th opc da message from line = %d\n", p_item->msg_id, instanceID + 1);
 
 	//for (int j = 0; j < len; j++) 
 	//{ 

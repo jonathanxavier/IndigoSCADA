@@ -317,92 +317,92 @@ typedef struct _iec_type37 {
 }iec_type37;
 
 /* C_SC_NA_1 - Single command */
-struct iec_type45 {
+typedef struct _iec_type45 {
 	u_char		scs:1;//See 7.2.6.15 Qualifier of command
 	u_char		res:1;
 	u_char		qu:5; //See 7.2.6.26 Qualifier of command
 	u_char		se:1;//See 7.2.6.26 Qualifier of command
-};
+}iec_type45;
 
 /* C_DC_NA_1 - Double command */
-struct iec_type46 {
+typedef struct _iec_type46 {
 	u_char		dcs:2;//See 7.2.6.16 Qualifier of command
 	u_char		qu:5;//See 7.2.6.26 Qualifier of command
 	u_char		se:1;//See 7.2.6.26 Qualifier of command
-};
+}iec_type46;
 
 /* C_SE_NA_1 - Set point command, normalized value */
-struct iec_type48 {
+typedef struct _iec_type48 {
 	short		sv;	/* normalized value, See 7.2.6*/
 	u_char		ql:7;//See 7.2.6.39 Qualifier of command
 	u_char		se:1;//See 7.2.6.39 Qualifier of command
-};
+}iec_type48;
 
 /* C_SE_NB_1 - Set point command, scaled value */
-struct iec_type49 {
+typedef struct _iec_type49 {
 	short		sv;	/* scaled value, See 7.2.6.7 */
 	u_char		ql:7;//See 7.2.6.39 Qualifier of command
 	u_char		se:1;//See 7.2.6.39 Qualifier of command
-};
+}iec_type49;
 
 /* C_SE_NC_1 - Set point command, short floating point number */
-struct iec_type50 {
+typedef struct _iec_type50 {
 	float		sv;	/* short floating point number, See 7.2.6.8*/
 	u_char		ql:7;//See 7.2.6.39 Qualifier of command
 	u_char		se:1;//See 7.2.6.39 Qualifier of command
-};
+}iec_type50;
 
 /* C_BO_NA_1 - Bitstring of 32 bit*/
-struct iec_type51 {
+typedef struct _iec_type51 {
 	struct iec_stcd	stcd;
-};
+}iec_type51;
 
 /* C_SC_TA_1 - Single command with time tag*/
-struct iec_type58 {
+typedef struct _iec_type58 {
 	u_char		scs:1;//See 7.2.6.15 Qualifier of command
 	u_char		res:1;
 	u_char		qu:5; //See 7.2.6.26 Qualifier of command
 	u_char		se:1; //See 7.2.6.26 Qualifier of command
 	cp56time2a	time; //contains the UTC time
-};
+}iec_type58;
 
 /* C_DC_TA_1 - Double command with time tag*/
-struct iec_type59 {
+typedef struct _iec_type59 {
 	u_char		dcs:2;//See 7.2.6.16 Qualifier of command
 	u_char		qu:5; //See 7.2.6.26 Qualifier of command
 	u_char		se:1; //See 7.2.6.26 Qualifier of command
 	cp56time2a	time; //contains the UTC time
-};
+}iec_type59;
 
 /* C_SE_TA_1 - Set point command, normalized value */
-struct iec_type61 {
+typedef struct _iec_type61 {
 	short		sv;	/* normalized value, See 7.2.6*/
 	u_char		ql:7;//See 7.2.6.39 Qualifier of command
 	u_char		se:1;//See 7.2.6.39 Qualifier of command
 	cp56time2a	time; //contains the UTC time
-};
+}iec_type61;
 
 /* C_SE_TB_1 - Set point command, scaled value */
-struct iec_type62 {
+typedef struct _iec_type62 {
 	short		sv;	/* scaled value, See 7.2.6.7 */
 	u_char		ql:7;//See 7.2.6.39 Qualifier of command
 	u_char		se:1;//See 7.2.6.39 Qualifier of command
 	cp56time2a	time; //contains the UTC time
-};
+}iec_type62;
 
 /* C_SE_TC_1 - Set point command, short floating point number */
-struct iec_type63 {
+typedef struct _iec_type63 {
 	float		sv;	/* short floating point number, See 7.2.6.8*/
 	u_char		ql:7;//See 7.2.6.39 Qualifier of command
 	u_char		se:1;//See 7.2.6.39 Qualifier of command
 	cp56time2a	time; //contains the UTC time
-};
+}iec_type63;
 
 /* C_BO_TA_1 - Bitstring of 32 bit command with time tag*/
-struct iec_type64 {
+typedef struct _iec_type64 {
 	struct iec_stcd	stcd;
 	cp56time2a	time; //contains the UTC time
-};
+}iec_type64;
 
 /* M_EI_NA_1 - End of initialization*/
 typedef struct _iec_type70 {

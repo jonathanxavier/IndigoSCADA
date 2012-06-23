@@ -657,7 +657,7 @@ void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackPa
 
 void Opc_client_ae_Instance::get_items(struct iec_item* p_item)
 {
-	printf("Receiving %d th opc da message for line = %d\n", p_item->msg_id, instanceID + 1);
+	printf("Receiving %d th opc da message from line = %d\n", p_item->msg_id, instanceID + 1);
 
 	//for (int j = 0; j < len; j++) 
 	//{ 
