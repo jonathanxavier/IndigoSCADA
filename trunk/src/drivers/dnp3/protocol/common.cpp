@@ -28,6 +28,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #ifdef USE_CRIPTO
 #include "wrap.h"
@@ -277,12 +278,35 @@ int32_t removeINT32(Bytes& data)  throw(int)
     return (int32_t) removeUINT32(data);
 }
 
+float removeFLOAT(Bytes& data)  throw(float)
+{
+    if(data.size() < 4)
+	throw(__LINE__);
+
+	union {
+		uint32_t i;
+		float f;
+	}val;
+
+    val.i = data[3] << 24;
+    val.i |= data[2] << 16;
+    val.i |= data[1] << 8;
+    val.i |= data[0];
+
+    data.pop_front();
+    data.pop_front();
+    data.pop_front();
+    data.pop_front();
+
+	printf("val.f = %f\n", val.f);
+
+    return val.f;
+}
+
 int16_t removeINT16(Bytes& data) throw(int)
 {
     return (int16_t) removeUINT16(data);
 }
-
-
 
 void moveBytes(Bytes& data, Bytes& val, unsigned int len) throw(int)
 {

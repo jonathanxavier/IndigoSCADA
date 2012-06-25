@@ -2114,6 +2114,37 @@ void Opc_client_da_imp::check_for_commands(struct iec_item *queued_item)
 	HRESULT hr = S_OK;
 	HRESULT *pErrorsWrite = NULL;
 	HRESULT *pErrorsRead = NULL;
+
+
+	struct cp56time2a actual_time;
+	get_utc_host_time(&actual_time);
+
+	time_t command_arrive_time_in_seconds = epoch_from_cp56time2a(&actual_time);
+
+	while(!g_pIOPCAsyncIO2)
+	{
+		//LogMessage(E_FAIL,"g_pIOPCAsyncIO2 == NULL");
+		//fprintf(stderr,"Exit al line %d\n", __LINE__);
+		//fflush(stderr);
+
+		Sleep(100);
+		
+		if(g_pIOPCAsyncIO2)
+		{
+			break;
+		}
+		else
+		{
+			get_utc_host_time(&actual_time);
+
+			time_t attual_time_in_seconds = epoch_from_cp56time2a(&actual_time);
+
+			if(attual_time_in_seconds - command_arrive_time_in_seconds > 10)
+			{
+				ExitProcess(0);
+			}
+		}
+	}
         
 	if(!fExit)
 	{ 

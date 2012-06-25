@@ -47,7 +47,7 @@ const uint16_t InternalIndications :: BUFFER_OVERFLOW            = 0x0800;
 const uint16_t InternalIndications :: BAD_CONFIG                 = 0x2000;
 
 
-DnpObject::DnpObject(int32_t                        val,
+DnpObject::DnpObject(float                  val,
 		     uint8_t                        flags,
 		     DnpIndex_t                     indx, 
 		     EventInterface::PointType_t    pt,
@@ -205,6 +205,7 @@ void Bit32AnalogInput::decode(Bytes& data) throw(int)
 {
     flag  = removeUINT8(data);
     value = removeINT32(data);
+	//value = removeFLOAT(data); //apa+++ 25-06-2012
 }
 
 Bit16AnalogInput::Bit16AnalogInput(int16_t v, uint8_t flag,DnpIndex_t index)
@@ -224,7 +225,7 @@ void Bit16AnalogInput::decode(Bytes& data) throw(int)
     value = removeINT16(data);
 }
 
-Bit32AnalogInputNoFlag::Bit32AnalogInputNoFlag(int32_t v, DnpIndex_t index)
+Bit32AnalogInputNoFlag::Bit32AnalogInputNoFlag(float v, DnpIndex_t index)
   :  DnpObject( v, ONLINE, index, EventInterface::AI)
 {
 }
@@ -273,7 +274,7 @@ Bit16BinaryCounter::Bit16BinaryCounter(uint16_t v,
 }
 
 Bit32BinaryCounterNoFlag::Bit32BinaryCounterNoFlag(uint32_t v,DnpIndex_t index)
-  : Bit32AnalogInputNoFlag( (int32_t)v, index)
+  : Bit32AnalogInputNoFlag( (float)v, index)
 {
     pointType = EventInterface::CI;
 }

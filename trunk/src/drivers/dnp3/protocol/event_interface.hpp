@@ -63,8 +63,10 @@ public:
 			         DnpIndex_t     index,
 			         PointType_t    pointType,
 			         float            value,
-			         DnpTime_t      timestamp=0,
-					 uint8_t flag=0x01)=0;
+			         DnpTime_t      timestamp = 0,
+					 uint8_t flag = 0x01,
+					 uint8_t grp = 0, 
+					 uint8_t var = 0)=0;
 
     // use this method if you want the name of a unique dnp point
     // to be something other than the default

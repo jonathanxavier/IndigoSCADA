@@ -377,7 +377,9 @@ void Factory::createObjects(uint8_t grp, uint8_t var, Bytes& data,
 					   bi.pointType,
 					   bi.value,
 					   bi.timestamp,
-					   bi.flag);
+					   bi.flag,
+					   grp,
+					   var);
 
 			if ((bitMask == 0x80) || (i == stopIndex))
 				data.pop_front();
@@ -410,7 +412,9 @@ void Factory::createObjects(uint8_t grp, uint8_t var, Bytes& data,
 					   bi.pointType,
 					   bi.value,
 					   bi.timestamp,
-					   bi.flag);
+					   bi.flag,
+					   grp,
+					   var);
 
 			if ((bitMask == 0xC0) || (i == stopIndex))
 				data.pop_front();
@@ -465,7 +469,9 @@ void Factory::createObjects(uint8_t grp, uint8_t var, Bytes& data,
 						  obj_p->pointType,
 						  obj_p->value,
 						  obj_p->timestamp,
-						  obj_p->flag);
+						  obj_p->flag,
+						  grp,
+						  var);
 			}
 		}
     }

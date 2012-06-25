@@ -58,7 +58,7 @@ void Rfc1006driverInput::Load(const QString &s)// load the configuration
 
 	if(GetConfigureDb()->GetNumberResults())
 	{ 
-		QString s = UndoEscapeSQLText(GetConfigureDb()->GetString("PARAMS"));
+		QString s = UndoEscapeSQLText(GetConfigureDb()->GetString("IOA"));
 		QTextIStream is (&s);
 		//
 		QString a;

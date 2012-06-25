@@ -34,7 +34,7 @@ void Dnp3driverInput::Load(const QString &s)// load the configuration
 
 	if(GetConfigureDb()->GetNumberResults())
 	{ 
-		QString s = UndoEscapeSQLText(GetConfigureDb()->GetString("DVAL"));
+		QString s = UndoEscapeSQLText(GetConfigureDb()->GetString("IOA"));
 		QTextIStream is (&s);
 		//
 		QString a;
@@ -51,7 +51,7 @@ void Dnp3driverInput::Load(const QString &s)// load the configuration
 	{
 		//Time->setText("00:01:00");
 		//Mean->setText("100");
-		IOA->setText("10");
+		IOA->setText("0");
 	};
 };
 

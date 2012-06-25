@@ -187,6 +187,8 @@ Connected(false), tx_var(NULL), master_p(NULL), fExit(false),pollingTime(polling
 		recvCallBack,
 		this,
 		smIPAddress);
+
+		//if(subscriber == NULL){} //check this error
 		///////////////////////////////////Middleware//////////////////////////////////////////////////
 
 		debugLevel = 1;
@@ -438,10 +440,8 @@ int DNP3MasterApp::run(void)
 {
 	if(GetSockConnectStatus())
 	{  
-		//Write
 		master_p->poll(Master::INTEGRITY);
 
-		//Read
 		char data_p[80];
 		int n_read;
 
@@ -459,6 +459,9 @@ int DNP3MasterApp::run(void)
 			fExit = true;
 			return 1;
 		}
+
+
+		//master_p->poll(Master::EVENT);
 
 		for(;;)   
 		{   
