@@ -1,7 +1,7 @@
 /*
  *                         IndigoSCADA
  *
- *   This software and documentation are Copyright 2002 to 2009 Enscada 
+ *   This software and documentation are Copyright 2002 to 2012 Enscada 
  *   Limited and its licensees. All rights reserved. See file:
  *
  *                     $HOME/LICENSE 
@@ -49,10 +49,12 @@ extern ORTEPublication* global_publisher;
 
 void CustomDb::changePoint(   DnpAddr_t      addr,
 			     DnpIndex_t     index,
-		             PointType_t    pointType,
-			     float            value,
+		         PointType_t    pointType,
+			     float          value,
 			     DnpTime_t      timestamp,
-				 uint8_t flag)
+				 uint8_t flag,
+				 uint8_t grp, 
+				 uint8_t var)
 {
     assert(addr != 0);
     
@@ -64,6 +66,11 @@ void CustomDb::changePoint(   DnpAddr_t      addr,
 	
 	item_to_send.iec_obj.ioa = 0;
 	//item_to_send.cause = cot;
+	
+//The elements of the arrays are labeled 0 through N - 1 where N is the number of blocks for the 
+//respective data type.
+//In DNP3 terminology, the element numbers are called the point indexes. Indexes are zero-based in DNP3, 
+//that is, the lowest element is always identified as zero.
 		
 	switch(pointType)
 	{
@@ -71,7 +78,8 @@ void CustomDb::changePoint(   DnpAddr_t      addr,
 		{
 			printf("AI\n");
 
-			item_to_send.iec_obj.ioa = index + OFFSET_AI + 1;
+			//Index on RTU starts from 0, while IOA on control center starts from 1
+			item_to_send.iec_obj.ioa = index + 1 + OFFSET_AI;
 
 			printf("ioa = %d\n", item_to_send.iec_obj.ioa);
 
@@ -83,7 +91,7 @@ void CustomDb::changePoint(   DnpAddr_t      addr,
 			epoch_to_cp56time2a(&time, timestamp);
 			item_to_send.iec_obj.o.type36.mv = value;
 
-			printf("value = %d\n", value);
+			printf("value = %f\n", value);
 			
 			item_to_send.iec_obj.o.type36.time = time;
 
@@ -95,8 +103,9 @@ void CustomDb::changePoint(   DnpAddr_t      addr,
 		{
 			printf("BI\n");
 
-			item_to_send.iec_obj.ioa = index + OFFSET_BI + 1; //Index on RTU starts from 0, while IOA on control center starts from 1
-
+			//Index on RTU starts from 0, while IOA on control center starts from 1
+			item_to_send.iec_obj.ioa = index + 1 + OFFSET_BI;
+			
 			printf("ioa = %d\n", item_to_send.iec_obj.ioa);
 
 			item_to_send.iec_type = M_SP_TB_1;
@@ -104,7 +113,7 @@ void CustomDb::changePoint(   DnpAddr_t      addr,
 			item_to_send.iec_obj.o.type30.sp = value;
 			item_to_send.iec_obj.o.type30.time = time;
 
-			printf("value = %d\n", value);
+			printf("value = %f\n", value);
 
 			if((flag & QUALITY_ONLINE) != QUALITY_ONLINE)
 				item_to_send.iec_obj.o.type30.iv = 1;
@@ -114,7 +123,8 @@ void CustomDb::changePoint(   DnpAddr_t      addr,
 		{
 			printf("CI\n");
 
-			item_to_send.iec_obj.ioa = index + OFFSET_CI + 1;
+			//Index on RTU starts from 0, while IOA on control center starts from 1
+			item_to_send.iec_obj.ioa = index + 1 + OFFSET_CI;
 
 			printf("ioa = %d\n", item_to_send.iec_obj.ioa);
 
@@ -123,7 +133,7 @@ void CustomDb::changePoint(   DnpAddr_t      addr,
 			item_to_send.iec_obj.o.type37.counter = value;
 			item_to_send.iec_obj.o.type37.time = time;
 				
-			printf("value = %d\n", value);
+			printf("value = %f\n", value);
 
 			if((flag & QUALITY_ONLINE) != QUALITY_ONLINE)
 				item_to_send.iec_obj.o.type37.iv = 1;
@@ -133,7 +143,8 @@ void CustomDb::changePoint(   DnpAddr_t      addr,
 		{
 			printf("AO\n");
 
-			item_to_send.iec_obj.ioa = index + OFFSET_AO + 1;
+			//Index on RTU starts from 0, while IOA on control center starts from 1
+			item_to_send.iec_obj.ioa = index + 1 + OFFSET_AO;
 
 			printf("ioa = %d\n", item_to_send.iec_obj.ioa);
 
@@ -142,7 +153,7 @@ void CustomDb::changePoint(   DnpAddr_t      addr,
 			item_to_send.iec_obj.o.type36.mv = value;
 			item_to_send.iec_obj.o.type36.time = time;
 
-			printf("value = %d\n", value);
+			printf("value = %f\n", value);
 
 			if((flag & QUALITY_ONLINE) != QUALITY_ONLINE)
 				item_to_send.iec_obj.o.type36.iv = 1;
@@ -152,7 +163,8 @@ void CustomDb::changePoint(   DnpAddr_t      addr,
 		{
 			printf("BO\n");
 
-			item_to_send.iec_obj.ioa = index + OFFSET_BO + 1;
+			//Index on RTU starts from 0, while IOA on control center starts from 1
+			item_to_send.iec_obj.ioa = index + 1 + OFFSET_BO;
 
 			printf("ioa = %d\n", item_to_send.iec_obj.ioa);
 
@@ -161,7 +173,7 @@ void CustomDb::changePoint(   DnpAddr_t      addr,
 			item_to_send.iec_obj.o.type30.sp = value;
 			item_to_send.iec_obj.o.type30.time = time;
 
-			printf("value = %d\n", value);
+			printf("value = %f\n", value);
 
 			if((flag & QUALITY_ONLINE) != QUALITY_ONLINE)
 				item_to_send.iec_obj.o.type30.iv = 1;

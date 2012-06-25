@@ -31,7 +31,9 @@ public:
 				PointType_t    pointType,
 				float            value,
 				DnpTime_t      timestamp=0,
-				uint8_t flag=0x01);
+				uint8_t flag=0x01,
+				uint8_t grp = 0, 
+				uint8_t var = 0);
 
     virtual void registerName(  DnpAddr_t      addr,
 				DnpIndex_t     index,

@@ -43,7 +43,7 @@ class DnpObject
     // flag octect bits common to many DNP objects
     //#define ONLINE                0x01;
 
-    DnpObject(int32_t val=0,
+    DnpObject(float val=0,
 	      uint8_t flags=0,
 	      DnpIndex_t indx=0,
 	      EventInterface::PointType_t pt = EventInterface::ST,
@@ -173,7 +173,7 @@ class Bit16AnalogInput : public DnpObject
 class Bit32AnalogInputNoFlag : public DnpObject
 {
   public:
-    Bit32AnalogInputNoFlag(int32_t v=0, DnpIndex_t index=0);
+    Bit32AnalogInputNoFlag(float v = 0.0, DnpIndex_t index=0);
     void encode(Bytes& data) const;
     void decode(Bytes& data) throw(int);
 };

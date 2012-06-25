@@ -99,6 +99,8 @@ uint8_t removeUINT8(Bytes& data) throw(int);
 int32_t removeINT32(Bytes& data) throw(int);
 int16_t removeINT16(Bytes& data) throw(int);
 
+float removeFLOAT(Bytes& data)  throw(float); //apa+++
+
 // takes the first len bytes of data and adds them to the end of val
 void moveBytes(Bytes& data, Bytes& val, unsigned int len) throw(int);
 

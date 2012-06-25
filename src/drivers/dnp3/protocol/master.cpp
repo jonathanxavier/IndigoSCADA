@@ -526,7 +526,7 @@ DnpStat_t Master::startNewTransaction()
     ii = stn_p->stats.get(Station::IIN);
     if ( ii & InternalIndications::DEVICE_RESTART)
     {
-	clearRestartBit();
+		clearRestartBit();
     }
 //     else if ( ii & InternalIndications::NEED_TIME)
 //     {
@@ -541,7 +541,7 @@ DnpStat_t Master::startNewTransaction()
 //     }
     else
     {
-	poll(AUTO);
+		poll(AUTO);
     }
 
     return stn_p->stats.get(Station::STATE);
@@ -606,34 +606,38 @@ DnpStat_t Master::poll( PollType pollType)
 
     initRequest( AppHeader::READ);
 
-    if (pollType == AUTO)
+    if(pollType == AUTO)
     {
-	// check to see if this should be an event poll or integrity
-	if ((stn_p->stats.get(Station::TX_READ_REQUEST) %
-	     *integrityPollInterval_p) == 0)
-	{
-	    // note that for other reasons (startup) this may already be 1
-	    stn_p->sendIntegrityPoll = 1;
+		// check to see if this should be an event poll or integrity
+		if ((stn_p->stats.get(Station::TX_READ_REQUEST) %
+			 *integrityPollInterval_p) == 0)
+		{
+			// note that for other reasons (startup) this may already be 1
+			stn_p->sendIntegrityPoll = 1;
+		}
 	}
-    }
-    else if (pollType == INTEGRITY)
-	stn_p->sendIntegrityPoll = 1;
-    else // (pollType == EVENT)
-	stn_p->sendIntegrityPoll = 0;
+	else if (pollType == INTEGRITY)
+		stn_p->sendIntegrityPoll = 1;
+	else // (pollType == EVENT)
+		stn_p->sendIntegrityPoll = 0;
         
-    if (stn_p->sendIntegrityPoll == 1)
-    {
-	appendIntegrityPoll();
-	stn_p->stats.increment(Station::TX_INTEGRITY_POLL);
-    }
-    else
-    {
-	appendEventPoll();
-	stn_p->stats.increment(Station::TX_EVENT_POLL);
-    }
+	if (stn_p->sendIntegrityPoll == 1)
+	{
+		appendIntegrityPoll();
+		stn_p->stats.increment(Station::TX_INTEGRITY_POLL);
+	}
+	else
+	{
+		appendEventPoll();
+		stn_p->stats.increment(Station::TX_EVENT_POLL);
+	}
+
     stn_p->stats.increment(Station::TX_READ_REQUEST);
+
     transmit();
+
     stn_p->changeState( Station::POLL_RESP);
+
     timer_p->activate(TimerInterface::RESPONSE);
 
     return stn_p->stats.get(Station::STATE);
@@ -646,7 +650,7 @@ void Master::initRequest(  AppHeader::FunctionCode fn)
     if ((fn != AppHeader::CONFIRM) &&
 	( fn != AppHeader::AUTHENTICATION_REQUEST) &&
 	( fn != AppHeader::AUTHENTICATION_REPLY) )
-	AppSeqNum::increment( stn_p->lastTxSeqNum);
+		AppSeqNum::increment( stn_p->lastTxSeqNum);
 
     // master requests will always be a single fragment and
     // we will never ask for a confrim and it won't be
