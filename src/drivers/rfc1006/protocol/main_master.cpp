@@ -57,7 +57,7 @@ void wait(void);
 
 ////////////////////////////end RFC1006 spedific ////////////////////////////////////////
 
-static int timeout_connection_with_parent = 0;
+int gl_timeout_connection_with_parent = 0;
 
 #define SUPPLIER "@ enscada.com"
 #define APPLICATION "rfc1006client.exe"
@@ -491,7 +491,7 @@ void PipeWorker(void* pParam)
 
 				if(p_item->iec_obj.ioa == 4004)
 				{ 
-					timeout_connection_with_parent = 0;
+					gl_timeout_connection_with_parent = 0;
 					//fprintf(stderr, "Receive keep alive # %d from front end\n", p_item->msg_id);
                     fprintf(stderr, "wdg %d\r", p_item->msg_id);
 				    fflush(stderr);
