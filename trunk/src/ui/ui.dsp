@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /GX /Zi /Od /I "." /I "$(QTDIR)\include" /I "$(QTDIR)\mkspecs\win32-msvc" /I "..\gigabase" /I "..\common" /I "..\database" /I ".\userdialogs" /I ".\sysdialogs" /I ".\widgets" /I ".\map" /I "..\drivers" /I "..\drivers\Simulator" /I ".\widgets\extra" /I ".\widgets\gantt" /I "..\trace" /I "..\utilities" /I "..\common\libds-2.2" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "USING_GARRET" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_H_CPP" /FD /GZ /c
+# ADD CPP /nologo /MTd /W3 /GX /Zi /Od /I "." /I "$(QTDIR)\include" /I "$(QTDIR)\mkspecs\win32-msvc" /I "..\gigabase" /I "..\common" /I "..\database" /I ".\userdialogs" /I ".\sysdialogs" /I ".\widgets" /I ".\map" /I "..\drivers" /I "..\drivers\Simulator" /I ".\widgets\extra" /I ".\widgets\gantt" /I "..\trace" /I "..\utilities" /I "..\common\libds-2.2" /I ".\qwt-4.2.0\include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "USING_GARRET" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_H_CPP" /FD /GZ /c
 # SUBTRACT CPP /u /YX /Yc /Yu
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
@@ -54,7 +54,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib WSOCK32.LIB snmpapi.lib scadad.lib utilitiesd.lib qt-mtnc$(QTVER).lib qtmain.lib /nologo /subsystem:windows /incremental:no /pdb:"Debug/ist.pdb" /debug /machine:I386 /nodefaultlib:"LIBCMT" /nodefaultlib:"MSVCRT" /out:"c:\scada\bin/ist.exe" /pdbtype:sept /libpath:"$(QTDIR)\lib" /libpath:"c:\scada\lib"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib WSOCK32.LIB snmpapi.lib scadad.lib utilitiesd.lib qt-mtnc$(QTVER).lib qtmain.lib qui.lib qwt.lib /nologo /subsystem:windows /incremental:no /pdb:"Debug/ist.pdb" /debug /machine:I386 /nodefaultlib:"LIBCMT" /nodefaultlib:"MSVCRT" /out:"c:\scada\bin/ist.exe" /pdbtype:sept /libpath:"$(QTDIR)\lib" /libpath:"c:\scada\lib"
 # SUBTRACT LINK32 /pdb:none
 
 !ELSEIF  "$(CFG)" == "ui - Win32 Release"
@@ -73,7 +73,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "." /I "$(QTDIR)\include" /I "..\gigabase" /I "..\common" /I "..\database" /I ".\userdialogs" /I ".\sysdialogs" /I ".\widgets" /I ".\map" /I "..\drivers" /I "..\drivers\Simulator" /I "..\STL" /I "..\drivers\en_base" /I ".\widgets\extra" /I ".\widgets\gantt" /I "..\trace" /I "..\utilities" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "USING_GARRET" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /FD /GZ /c
 # SUBTRACT BASE CPP /u /YX /Yc /Yu
-# ADD CPP /nologo /MT /W3 /GX /O2 /I "." /I "$(QTDIR)\include" /I "$(QTDIR)\mkspecs\win32-msvc" /I "..\gigabase" /I "..\common" /I "..\database" /I ".\userdialogs" /I ".\sysdialogs" /I ".\widgets" /I ".\map" /I "..\drivers" /I "..\drivers\Simulator" /I ".\widgets\extra" /I ".\widgets\gantt" /I "..\trace" /I "..\utilities" /I "..\common\libds-2.2" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "USING_GARRET" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_H_CPP" /FD /c
+# ADD CPP /nologo /MT /W3 /GX /O2 /I "." /I "$(QTDIR)\include" /I "$(QTDIR)\mkspecs\win32-msvc" /I "..\gigabase" /I "..\common" /I "..\database" /I ".\userdialogs" /I ".\sysdialogs" /I ".\widgets" /I ".\map" /I "..\drivers" /I "..\drivers\Simulator" /I ".\widgets\extra" /I ".\widgets\gantt" /I "..\trace" /I "..\utilities" /I "..\common\libds-2.2" /I ".\qwt-4.2.0\include" /I "..\hmi_designer\designer\shared" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "USING_GARRET" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_H_CPP" /FD /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x410 /d "_DEBUG"
@@ -84,7 +84,7 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib WSOCK32.LIB scada.lib snmpapi.lib qtdll.lib utilities.lib /nologo /subsystem:windows /debug /machine:I386 /nodefaultlib:"msvcrt.lib" /out:"c:\scada\bin/ist.exe" /pdbtype:sept /libpath:"$(QTDIR)\lib" /libpath:"c:\scada\lib"
 # SUBTRACT BASE LINK32 /pdb:none
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib snmpapi.lib wsock32.lib scada.lib utilities.lib qt-mtnc$(QTVER).lib qtmain.lib /nologo /subsystem:windows /incremental:no /pdb:"Release/ist.pdb" /debug /machine:I386 /nodefaultlib:"msvcrt.lib" /out:"c:\scada\bin/ist.exe" /libpath:"$(QTDIR)\lib" /libpath:"c:\scada\lib"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib snmpapi.lib wsock32.lib scada.lib utilities.lib qt-mtnc$(QTVER).lib qtmain.lib qwt.lib qui.lib /nologo /subsystem:windows /incremental:no /pdb:"Release/ist.pdb" /debug /machine:I386 /nodefaultlib:"msvcrt.lib" /out:"c:\scada\bin/ist.exe" /libpath:"$(QTDIR)\lib" /libpath:"c:\scada\lib"
 # SUBTRACT LINK32 /pdb:none
 
 !ENDIF 
@@ -336,6 +336,43 @@ InputName=historic_inspect
 
 "$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	%qtdir%\bin\moc.exe $(InputDir)\$(InputName).h -o $(InputDir)\moc_$(InputName).cpp
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\hmi_mng.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\hmi_mng.h
+
+!IF  "$(CFG)" == "ui - Win32 Debug"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - MOCing hmi_mng.h...
+InputDir=.
+InputPath=.\hmi_mng.h
+InputName=hmi_mng
+
+"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	"%qtdir%\bin\moc.exe" "$(InputDir)\$(InputName).h" -o "$(InputDir)\moc_$(InputName).cpp"
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "ui - Win32 Release"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - MOCing hmi_mng.h...
+InputDir=.
+InputPath=.\hmi_mng.h
+InputName=hmi_mng
+
+"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	"%qtdir%\bin\moc.exe" "$(InputDir)\$(InputName).h" -o "$(InputDir)\moc_$(InputName).cpp"
 
 # End Custom Build
 
@@ -2552,6 +2589,10 @@ SOURCE=.\moc_historic_browsedb.cpp
 # Begin Source File
 
 SOURCE=.\moc_historic_inspect.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\moc_hmi_mng.cpp
 # End Source File
 # Begin Source File
 

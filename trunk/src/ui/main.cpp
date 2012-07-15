@@ -140,8 +140,12 @@ int main(int argc, char **argv)
 		//
 		UnloadAllDlls(); // unload Dlls
 
+#ifdef WIN32
+#ifdef NDEBUG
 		if(mdiframework)
 			delete mdiframework;
+#endif
+#endif
 		
 		return stat;
 	}

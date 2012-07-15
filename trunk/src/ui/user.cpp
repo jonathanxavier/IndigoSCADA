@@ -50,6 +50,10 @@
 //****************************************************************
 #include "IndentedTrace.h"
 #include "utilities.h"
+//****************************************************************
+//designer .ui widgets
+#include <qwidgetfactory.h>
+#include "hmi_mng.h"
 
 //xpm
 #include "scada.xpm"
@@ -182,6 +186,9 @@ MaxRetryReconnectToSpareRealTimeDb(0)
 UserFrameWork::~UserFrameWork()
 {
 	IT_IT("UserFrameWork::~UserFrameWork");
+
+	delete hmi_mng;
+	delete designerHMI;
 };
 /*
 *Function:void AutoLogOut(); // automatic logout 
@@ -288,7 +295,8 @@ void UserFrameWork::Logout()
 		QSLogEvent("HMI",msg);
 	#endif
 
-	};
+	}
+
 	GetUserDetails().privs = 0;
 	GetUserDetails().Name = tr(NONE_STR);
 	menuBar()->clear(); // remove the menu
@@ -299,7 +307,7 @@ void UserFrameWork::Logout()
 	if(GetUserDetails().privs & PRIVS_CAN_EXIT)
 	{ 
 		file->insertItem(QPixmap((const char **)quit_xpm),tr("E&xit"),qApp,SLOT(quit()),CTRL+Key_X); // does the user have the priviledge to exit
-	};
+	}
 	//
 	menuBar()->insertItem(QString(tr("&File")),file);
 	//
@@ -308,13 +316,14 @@ void UserFrameWork::Logout()
 		centralWidget()->show();
 		((QTabWidget *)centralWidget())->showPage(pStatus);
 		pStatus->setFocus();
-	};
+	}
 	//
 	if(pToolBar)
 	{
 		removeToolBar(pToolBar); // clear the tool bar
 		delete pToolBar;
-	};
+	}
+
 	pToolBar = new QToolBar("UserToolBar",this,QMainWindow::Top);
 	//show only the firm logo
 	pToolBar->setGeometry(0, 0, 0, 0);
@@ -340,7 +349,7 @@ void UserFrameWork::Logout()
 	{
 		QTimer::singleShot(50,pSys,SLOT(CloseSysMgr()));
 		pSys = 0;
-	};
+	}
 	//
 	Login();
 };
@@ -351,6 +360,7 @@ void UserFrameWork::Logout()
 *Outputs:none
 *Returns:none
 */
+
 void UserFrameWork::SetTabs()
 {
 	IT_IT("UserFrameWork::SetTabs");
@@ -360,8 +370,26 @@ void UserFrameWork::SetTabs()
 	{
 		setCentralWidget(new QTabWidget(this)); // create the work area	
 		// Create the tab widgets for the map display
-		pMaps = new MapDisplay(centralWidget());
-		((QTabWidget *)centralWidget())->addTab(pMaps,tr("Ma&ps"));
+		//pMaps = new MapDisplay(centralWidget());
+		//((QTabWidget *)centralWidget())->addTab(pMaps,tr("Ma&ps"));
+
+        //Dinamic dialog loading from .ui designer file//////////////////////////////////////////
+		hmi_mng = new HMI_manager;
+
+		QWidgetFactory::loadImages("../Bitmaps");
+		designerHMI = (QDialog *)QWidgetFactory::create("../Maps/hmi.ui", hmi_mng);
+
+		if(designerHMI)
+		{
+			hmi_mng->setParent(designerHMI); 
+
+			((QTabWidget *)centralWidget())->addTab(designerHMI, tr("HMI"));
+		}
+		else
+		{
+			QSMessage(QDateTimeString(QDateTime::currentDateTime()) + ":" + QString(tr("HMI -> hmi.ui file not found in Maps folder")));
+		}
+		//////////////////////////////////////////////////////////////////////////////////////////
 
 		pAlarms = new AlarmDisplay(centralWidget());
 		((QTabWidget *)centralWidget())->addTab(pAlarms,tr("&Alarms"));
@@ -372,14 +400,7 @@ void UserFrameWork::SetTabs()
 		pMessage = new MessageDisplay(centralWidget()); // we need a trace / message window from the off
 		((QTabWidget *)centralWidget())->addTab(pMessage,tr("&Messages"));
 		//
-		//widget_tests = new tQGradTest(centralWidget());
-		//((QTabWidget *)centralWidget())->addTab(widget_tests,tr("HMI-2"));
-		//
-		//
-		//SvmToyWindow* mywidget = new SvmToyWindow();
-		//mywidget->setGeometry( 100, 100, XLEN, YLEN+25 );
-		//((QTabWidget *)centralWidget())->addTab(mywidget,tr("SvmToyWindow"));
-
+		
 		centralWidget()->show();
 		((QTabWidget *)centralWidget())->showPage(pAlarms);
 		pAlarms->setFocus();
@@ -398,6 +419,32 @@ void UserFrameWork::SetTabs()
 */
 #include "LoginDlg.h"
 #include "general_defines.h"
+
+///////start apa added on 15-07-2012///////////////////////////////////
+//
+// ***************** dialogs *************************
+// 
+#include "AlarmGroupCfg.h"
+#include "BatchCfg.h"
+#include "ReceipeCfg.h"
+#include "ReportCfg.h"
+#include "SampleCfg.h"
+#include "ScheduleCfg.h"
+#include "SerialCfg.h"
+#include "SystemCfg.h"
+#include "TagCfg.h"
+#include "UnitCfg.h"
+#include "UserCfgDlg.h"
+#include "driver.h"
+//xpm
+#include "fileopen.xpm"
+#include "filesave.xpm"
+#include "datasourcesuser.xpm"
+#include "driver.xpm"
+#include "computergreen.xpm"
+#include "column.xpm"
+#include "connecttool.xpm"
+///////end apa added on 15-07-2012///////////////////////////////////
  
 void UserFrameWork::Login()
 {
@@ -477,18 +524,32 @@ void UserFrameWork::Login()
 				(void)  new QToolButton(QPixmap((const char **)Batches),tr("Edit Batches"),0, this,SLOT(batches()),pToolBar, "Edit Batches");
 			};
 			//
-			// System Adminstration Functions
+			// System Administration Functions
 			//
 			if(GetUserDetails().privs == PRIVS_ALL)
 			{
+                // add the various configuration options
+	            QPopupMenu *configMenu = new QPopupMenu(this);
+	            configMenu->insertItem(QPixmap((const char **)computergreen_xpm),tr("&Configure System..."),this,SLOT(configureSystem()));
+	            configMenu->insertItem(QPixmap((const char **)datasourcesuser_xpm),tr("&Configure Users..."),this,SLOT(configureUser()));
+	            configMenu->insertItem(QPixmap((const char **)driver_xpm),tr("&Configure Units..."),this,SLOT(configureUnits()));
+	            configMenu->insertItem(QPixmap((const char **)column_xpm),tr("&Configure Sample Points..."),this,SLOT(configureSamplePoints()));
+	            //configMenu->insertItem(QPixmap((const char **)receipe_xpm),tr("&Configure Receipes..."),this,SLOT(configureReceipes()));
+	            configMenu->insertItem(QPixmap((const char **)eventsreport),tr("&Configure Scheduled Events..."),this,SLOT(configureSchedule()));
+	            //configMenu->insertItem(QPixmap((const char **)magick),tr("&Configure Serial Ports..."),this,SLOT(configurePorts()));
+	            configMenu->insertItem(QPixmap((const char **)alarmsreport),tr("&Configure Alarm Groups..."),this,SLOT(configureAlarmGroups()));
+	            //configMenu->insertItem(QPixmap((const char **)configreport),tr("&Configure Report..."),this,SLOT(configureReport()));
+	            menuBar()->insertItem(tr("&Configure"),configMenu);
+
 				QPopupMenu *control = new QPopupMenu(this);
-				control->insertItem(QPixmap((const char **)sysmgr), tr("&System Manager..."),this,SLOT(systemManager()));
-				control->insertSeparator();
+				//control->insertItem(QPixmap((const char **)sysmgr), tr("&System Manager..."),this,SLOT(systemManager()));
+				//control->insertSeparator();
 				control->insertItem(QPixmap((const char **)monitor),tr("&Restart Monitor..."),this,SLOT(restart()));
 				control->insertSeparator();
-				control->insertItem(QPixmap((const char **)receipe_xpm),tr("&Configure Receipes..."),this,SLOT(configureReceipes()));
-				control->insertItem(QPixmap((const char **)open_xpm),tr("&Load Receipe..."),this,SLOT(loadReceipe()));
-				control->insertSeparator();
+                //Receipes are NOT working...
+				//control->insertItem(QPixmap((const char **)receipe_xpm),tr("&Configure Receipes..."),this,SLOT(configureReceipes()));
+				//control->insertItem(QPixmap((const char **)open_xpm),tr("&Load Receipe..."),this,SLOT(loadReceipe()));
+				//control->insertSeparator();
 				//Database management...
 
 				if(GetConfigureDb()->Ok() && GetResultDb()->Ok() && GetCurrentDb()->Ok())
@@ -514,7 +575,7 @@ void UserFrameWork::Login()
 
 				control->insertSeparator();
 
-				control->insertItem(QPixmap((const char **)unlock_xpm),tr("&Clear System Manager Lock..."),this,SLOT(ClearSystemMgrLock()));
+				//control->insertItem(QPixmap((const char **)unlock_xpm),tr("&Clear System Manager Lock..."),this,SLOT(ClearSystemMgrLock()));
 				menuBar()->insertItem(tr("System C&ontrol"),control);
 			}
 			else if(GetUserDetails().privs & PRIVS_FACTORY_ADMIN)
@@ -522,10 +583,10 @@ void UserFrameWork::Login()
 				QPopupMenu *control = new QPopupMenu(this);
 				
 				control->insertItem(QPixmap((const char **)monitor),tr("&Restart Monitor..."),this,SLOT(restart()));
-				control->insertSeparator();
-				control->insertItem(QPixmap((const char **)receipe_xpm),tr("&Configure Receipes..."),this,SLOT(configureReceipes()));
-				control->insertSeparator();
-				control->insertItem(QPixmap((const char **)open_xpm),tr("&Load Receipe..."),this,SLOT(loadReceipe()));
+				//control->insertSeparator();
+				//control->insertItem(QPixmap((const char **)receipe_xpm),tr("&Configure Receipes..."),this,SLOT(configureReceipes()));
+				//control->insertSeparator();
+				//control->insertItem(QPixmap((const char **)open_xpm),tr("&Load Receipe..."),this,SLOT(loadReceipe()));
 				menuBar()->insertItem(tr("System C&ontrol"),control);
 			}
 
@@ -584,6 +645,104 @@ void UserFrameWork::Login()
 		//
 	};
 };
+
+/*
+*Function: configureSystem
+*system configuration dialog
+*Inputs:none
+*Outputs:none
+*Returns:none
+*/
+void UserFrameWork::configureSystem()
+{
+	IT_IT("SysMgrFrameWork::configureSystem");
+	
+	SystemCfg dlg(this);
+	dlg.exec();
+};
+/*
+*Function: configureUnits
+*configure units
+*Inputs:none
+*Outputs:none
+*Returns:none
+*/
+void UserFrameWork::configureUnits()
+{
+	IT_IT("SysMgrFrameWork::configureUnits");
+	
+	UnitCfg dlg(this);
+	dlg.exec();
+};
+/*
+*Function: configure sample points
+*Inputs:none
+*Outputs:none
+*Returns:none
+*/
+void UserFrameWork::configureSamplePoints()
+{
+	IT_IT("SysMgrFrameWork::configureSamplePoints");
+	
+	SampleCfg dlg(this);
+	dlg.exec();
+};
+
+/*
+*Function: configureSchedule
+*Inputs:none
+*Outputs:none
+*Returns:none
+*/
+void UserFrameWork::configureSchedule()
+{
+	IT_IT("UserFrameWork::configureSchedule");
+	
+	ScheduleCfg dlg(this);
+	dlg.exec();
+};
+/*
+*Function: configurePorts
+*Inputs:none
+*Outputs:none
+*Returns:none
+*/
+void UserFrameWork::configurePorts()
+{
+	IT_IT("UserFrameWork::configurePorts");
+	
+	SerialCfg dlg(this);
+	dlg.exec();
+};
+/*
+*Function:configureAlarmGroups
+*Inputs:none
+*Outputs:none
+*Returns:none
+*/
+void UserFrameWork::configureAlarmGroups()
+{
+	IT_IT("UserFrameWork::configureAlarmGroups");
+	
+	AlarmGroupCfg dlg(this);
+	dlg.exec();
+};
+
+/*
+*Function:configureUser
+*configure users
+*Inputs:none
+*Outputs:none
+*Returns:none
+*/
+void UserFrameWork::configureUser()
+{
+	IT_IT("UserFrameWork::configureUser");
+	
+	UserCfgDlg dlg(this);
+	dlg.exec();
+};
+
 /*
 *Function: ClearSystemMgrLock()
 *clear the system manager's lock flag
@@ -1792,7 +1951,9 @@ void UserFrameWork::About()
 								+ QString("\n")
 								+ tr("UI version: ") + QString(QT_VERSION_STR)   //Qt toolkit version
 								+ QString("\n")
-								+ tr("Database version: ") + QString::number(354.337)  //FastDB e GigaBASE versions
+								+ tr("Real time database version: ") + QString::number(354)  //FastDB version used
+								+ QString("\n")
+								+ tr("Historical database version: ") + QString::number(337)  //GigaBASE versions used
 								+ QString("\n")
 								#ifdef NDEBUG
 								+ tr("Build configuration: ") + QString("Release")
@@ -1826,34 +1987,6 @@ STATUTE, EVEN IF LICENSOR HAS BEEN ADVISED OF THE LIKELIHOOD OF SAME.\n\
 							);
 	#endif
 };
-
-
-void UserFrameWork::setUserInterfaceHardware(unsigned int data)
-{
-	//meaning of bits in data
-
-	//bit 7 on (most significant bit) = LD1 on = red light on
-	//bit 6 on = LD2 on = orange light on
-	//bit 5 on = LD3 on = green light on
-	//bit 4 on = LD4 on = syren on
-	//bit 3 on = LD5 on = free 
-	//bit 2 on = LD6 on = free 
-	//bit 1 on = LD7 on = free 
-	//bit 0 on = LD8 on = free 
-
-	#ifdef WIN32
-	if(fd != INVALID_HANDLE_VALUE)
-	{
-		unsigned long written = 0;
-		unsigned char msg[4];
-		msg[0] = '*';
-		msg[1] = '*';
-		msg[2] = data;
-		msg[3] = '#';
-		WriteFile(fd, msg, 4, &written, NULL);
-	}
-	#endif
-}
 
 void UserFrameWork::closeAll()
 {

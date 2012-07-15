@@ -170,6 +170,12 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name opc_client_hda_driver
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name designer
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name designerlib
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -188,6 +194,36 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name utilities
     End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "designer"=..\hmi_designer\designer\app\designer.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name qui
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name designerlib
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "designerlib"=..\hmi_designer\designer\designer\designerlib.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
 }}}
 
 ###############################################################################
@@ -323,6 +359,9 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name pthread
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -510,6 +549,54 @@ Package=<4>
 
 ###############################################################################
 
+Project: "pthread"="..\common\pthreads-w32-2-8-0\pthread.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "qui"=..\hmi_designer\designer\uilib\qui.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "qwt"="..\ui\qwt-4.2.0\qwt.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "qwtplugin"="..\ui\qwt-4.2.0\designer\qwtplugin.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "realtimesqlserver"=..\realtimesqlserver\realtimesqlserver.dsp - Package Owner=<4>
 
 Package=<5>
@@ -616,6 +703,15 @@ Package=<4>
 {{{
     Begin Project Dependency
     Project_Dep_Name utilities
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name qwt
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name qwtplugin
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name qui
     End Project Dependency
 }}}
 

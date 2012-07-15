@@ -119,7 +119,7 @@ void SampleCfg::ShowConfig() // create the specific config
 			#ifdef DEPRECATED_IEC104_CONFIG
 			QString cmd = "select IKEY,DVAL from PROPS where SKEY ='SAMPLEPROPS' and IKEY='"+Name->text()+"';"; //commented out on 02-12-09
 			#else
-			QString cmd = "select NAME,IOA from TAGS where NAME ='"+ Name->text() +"';";
+			QString cmd = "select NAME,IOA,PARAMS from TAGS where NAME ='"+ Name->text() +"';";
 			#endif
 			GetConfigureDb()->DoExec(this,cmd,tConfigLoad);
 			// ask for the configuration
