@@ -129,4 +129,13 @@ OPC client DA now is working with multiple dedicated lines
 12-06-2012
 dnp3master.exe is now connected with dnp3driver.dll through RTPS in monitoring direction
 -------------------------------------------------------------------------------------------------------
+15-07-2012
+Added pthreads-w32-2-8-0 (pthreads for Win32)
+
+Added qwt-4.2.0
+
+Added part of HMI designer
+
+Maps tab is no more visible, the code is still there
+-------------------------------------------------------------------------------------------------------
 

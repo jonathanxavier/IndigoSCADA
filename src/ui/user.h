@@ -28,6 +28,7 @@ class PrintReport;
 class LogReportGenerator;
 class ReportGenerator;
 class RIntro;
+class HMI_manager;
 
 class UserFrameWork : public QMainWindow
 {
@@ -39,6 +40,8 @@ class UserFrameWork : public QMainWindow
 	AlarmDisplay   *pAlarms; // the alarms window
 	StatusDisplay  *pStatus; // the status window
 	SysMgrFrameWork *pSys;   // system manager framework
+	QDialog *designerHMI;
+	HMI_manager     *hmi_mng;
 	//
 	unsigned AutoLogoffTime; // number of seconds to wait before forcing a log off
 	int AutoLogOffCount; // count down for auto log off
@@ -95,7 +98,6 @@ class UserFrameWork : public QMainWindow
 	//
 	void closeEvent(QCloseEvent *);
 	//
-	void setUserInterfaceHardware(unsigned int data);
 	//
 	// menu item handlers
 	//
@@ -109,6 +111,13 @@ class UserFrameWork : public QMainWindow
 	void eventsReport(); // generate an events report
 	void configureReport(); // report design
 	void configureReceipes(); //Receipes configure
+    void configureSystem();
+    void configureUnits();
+    void configureSamplePoints();
+    void configureSchedule();
+    void configureAlarmGroups();
+    void configurePorts();
+    void configureUser();
 	void restart(); // stop and start monitoring
 	void loadReceipe(); // stop montoring and set the receipe
 	void startTrace(); // trace on
