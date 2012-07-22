@@ -927,44 +927,6 @@ InputName=helpwindow
 # End Source File
 # Begin Source File
 
-SOURCE=..\ui\widgets\led.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\ui\widgets\led.h
-
-!IF  "$(CFG)" == "scada - Win32 Debug"
-
-# PROP Ignore_Default_Tool 1
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\scada\src\ui\widgets
-InputPath=..\ui\widgets\led.h
-InputName=led
-
-"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	%qtdir%\bin\moc.exe $(InputDir)\$(InputName).h -o $(InputDir)\moc_$(InputName).cpp
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "scada - Win32 Release"
-
-# PROP BASE Ignore_Default_Tool 1
-# PROP Ignore_Default_Tool 1
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\scada\src\ui\widgets
-InputPath=..\ui\widgets\led.h
-InputName=led
-
-"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	%qtdir%\bin\moc.exe $(InputDir)\$(InputName).h -o $(InputDir)\moc_$(InputName).cpp
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
 SOURCE=..\UI\widgets\moc_calendar.cpp
 # End Source File
 # Begin Source File
@@ -994,10 +956,6 @@ SOURCE=..\UI\widgets\moc_dclock.cpp
 # Begin Source File
 
 SOURCE=..\UI\widgets\moc_helpwindow.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\ui\widgets\moc_led.cpp
 # End Source File
 # Begin Source File
 

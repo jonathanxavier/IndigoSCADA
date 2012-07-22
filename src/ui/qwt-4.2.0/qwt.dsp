@@ -26,6 +26,7 @@ CFG=qwt - Win32 Release
 # PROP Scc_ProjName ""
 # PROP Scc_LocalPath ""
 CPP=cl.exe
+F90=df.exe
 MTL=midl.exe
 RSC=rc.exe
 
@@ -88,10 +89,6 @@ LINK32=link.exe
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
-# Begin Source File
-
-SOURCE=.\src\led.cpp
-# End Source File
 # Begin Source File
 
 SOURCE=src\qwt_analog_clock.cpp
@@ -292,43 +289,14 @@ SOURCE=src\qwt_thermo.cpp
 
 SOURCE=src\qwt_wheel.cpp
 # End Source File
+# Begin Source File
+
+SOURCE=.\src\single_point_led.cpp
+# End Source File
 # End Group
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
-# Begin Source File
-
-SOURCE=.\include\led.h
-
-!IF  "$(CFG)" == "qwt - Win32 Release"
-
-# PROP Ignore_Default_Tool 1
-# Begin Custom Build - MOCing led.h...
-InputDir=.\include
-InputPath=.\include\led.h
-InputName=led
-
-"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	"%qtdir%\bin\moc.exe" "$(InputDir)\$(InputName).h" -o "$(InputDir)\moc_$(InputName).cpp"
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "qwt - Win32 Debug"
-
-# PROP Ignore_Default_Tool 1
-# Begin Custom Build - MOCing led.h...
-InputDir=.\include
-InputPath=.\include\led.h
-InputName=led
-
-"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	"%qtdir%\bin\moc.exe" "$(InputDir)\$(InputName).h" -o "$(InputDir)\moc_$(InputName).cpp"
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
 # Begin Source File
 
 SOURCE=include\qwt.h
@@ -979,6 +947,39 @@ InputPath=include\qwt_wheel.h
 !ENDIF 
 
 # End Source File
+# Begin Source File
+
+SOURCE=.\include\single_point_led.h
+
+!IF  "$(CFG)" == "qwt - Win32 Release"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - MOCing single_point_led.h...
+InputDir=.\include
+InputPath=.\include\single_point_led.h
+InputName=single_point_led
+
+"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	"%qtdir%\bin\moc.exe" "$(InputDir)\$(InputName).h" -o "$(InputDir)\moc_$(InputName).cpp"
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "qwt - Win32 Debug"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - MOCing single_point_led.h...
+InputDir=.\include
+InputPath=.\include\single_point_led.h
+InputName=single_point_led
+
+"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	"%qtdir%\bin\moc.exe" "$(InputDir)\$(InputName).h" -o "$(InputDir)\moc_$(InputName).cpp"
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
 # End Group
 # Begin Group "Resource Files"
 
@@ -987,10 +988,6 @@ InputPath=include\qwt_wheel.h
 # Begin Group "Generated"
 
 # PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=.\include\moc_led.cpp
-# End Source File
 # Begin Source File
 
 SOURCE=src\moc\moc_qwt_analog_clock.cpp
@@ -1062,6 +1059,10 @@ SOURCE=src\moc\moc_qwt_thermo.cpp
 # Begin Source File
 
 SOURCE=src\moc\moc_qwt_wheel.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\moc_single_point_led.cpp
 # End Source File
 # End Group
 # End Target

@@ -1,7 +1,7 @@
 /*
  *                         IndigoSCADA
  *
- *   This software and documentation are Copyright 2002 to 2009 Enscada 
+ *   This software and documentation are Copyright 2002 to 2012 Enscada 
  *   Limited and its licensees. All rights reserved. See file:
  *
  *                     $HOME/LICENSE 
@@ -9,8 +9,8 @@
  *   for full copyright notice and license terms. 
  *
  */
-#ifndef __INCL_LED
-#define __INCL_LED
+#ifndef __SINGLE_POINT_LED
+#define __SINGLE_POINT_LED
 
 #include "qpixmap.h"
 #include "qframe.h"
@@ -19,6 +19,7 @@
 #include "qpainter.h"
 #include "qtimer.h"
 #include "qwt_global.h"
+/*
 #include "single0000.xpm"
 #include "single0001.xpm"
 #include "single0002.xpm"
@@ -32,19 +33,27 @@
 #define YELLOW_LED_0003 QPixmap((const char **)single0002_xpm)
 #define BLUE_LED_0004 QPixmap((const char **)single0004_xpm)
 #define WHITE_LED_0005 QPixmap((const char **)single0005_xpm)
+*/
 
-class QWT_EXPORT Led : public QFrame
+class QWT_EXPORT SinglePointLed : public QFrame
 {
   Q_OBJECT
 public:
-   Led(QWidget *parent= NULL,const char *name = NULL);
+   SinglePointLed(QWidget *parent= NULL,const char *name = NULL);
    enum State { On, Off };
    State state() const { return s; }
    void setState(State state) { s= state; repaint(); }
    void toggleState() { if (s == On) s= Off; else if (s == Off) s= On; repaint(); }
-   virtual ~Led();
+   virtual ~SinglePointLed();
    void setText(const char *s){text=s;}
    void setColor(const char *c){color=QColor(c);}
+
+   void setGreen(){color=Qt::green;}
+   void setRed(){color=Qt::red;}
+   void setYellow(){color=Qt::yellow;}
+   void setBlue(){color=Qt::blue;}
+   void setWhite(){color=Qt::white;}
+
    void startFlash();
    void stopFlash();
 
@@ -76,4 +85,4 @@ public:
    
 };
 
-#endif //__INCL_LED
+#endif //__SINGLE_POINT_LED

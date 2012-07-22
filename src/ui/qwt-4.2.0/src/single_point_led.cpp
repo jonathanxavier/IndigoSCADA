@@ -1,7 +1,7 @@
 /*
  *                         IndigoSCADA
  *
- *   This software and documentation are Copyright 2002 to 2009 Enscada 
+ *   This software and documentation are Copyright 2002 to 2012 Enscada 
  *   Limited and its licensees. All rights reserved. See file:
  *
  *                     $HOME/LICENSE 
@@ -10,9 +10,9 @@
  *
  */
 
-#include "led.h"
+#include "single_point_led.h"
 
-Led::Led(QWidget *parent, const char *name) : QFrame(parent, name),
+SinglePointLed::SinglePointLed(QWidget *parent, const char *name) : QFrame(parent, name),
   lwidth( 17 ), lheight( 10 ), dx( 4 ), timer(NULL)
 {
    s = Off;
@@ -23,7 +23,7 @@ Led::Led(QWidget *parent, const char *name) : QFrame(parent, name),
    setSizePolicy( QSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum ) );
 }
 
-void Led::drawContents(QPainter *painter)
+void SinglePointLed::drawContents(QPainter *painter)
 {
    int w,h,x,y;
    QBrush lightBrush(color);
@@ -61,7 +61,7 @@ void Led::drawContents(QPainter *painter)
    }
 }
 
-Led::~Led()
+SinglePointLed::~SinglePointLed()
 {
    if(timer)
    {
@@ -70,23 +70,23 @@ Led::~Led()
    }
 }
 
-void Led::timerSlot()
+void SinglePointLed::timerSlot()
 {
 	toggleState();
 }
 
-QSize Led::sizeHint() const
+QSize SinglePointLed::sizeHint() const
 {
     return QSize( 10 + 9 * 10 , 23 );
 }
 
-QSizePolicy Led::sizePolicy() const
+QSizePolicy SinglePointLed::sizePolicy() const
 {
     //### remove me 3.0
     return QWidget::sizePolicy();
 }
 
-void Led::startFlash()
+void SinglePointLed::startFlash()
 {
    if(timer == NULL)
    {
@@ -96,7 +96,7 @@ void Led::startFlash()
    }
 }
 
-void Led::stopFlash()
+void SinglePointLed::stopFlash()
 {
    if(timer)
    {

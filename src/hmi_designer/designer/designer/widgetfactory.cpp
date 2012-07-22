@@ -769,7 +769,7 @@ QWidget *WidgetFactory::createWidget( const QString &className, QWidget *parent,
     } else if ( className == "PixmapLabel" ) {
 	QDesignerLabel *l = new QDesignerLabel( parent, name );
 	if ( init ) {
-	    l->setPixmap( QPixmap::fromMimeSource( "qtlogo.png" ) );
+	    l->setPixmap( QPixmap::fromMimeSource( "logo.png" ) );
 	    l->setScaledContents( TRUE );
 	    MetaDataBase::addEntry( l );
 	    MetaDataBase::setPropertyChanged( l, "pixmap", TRUE );
