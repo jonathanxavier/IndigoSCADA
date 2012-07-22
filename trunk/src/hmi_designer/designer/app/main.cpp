@@ -191,7 +191,10 @@ int main( int argc, char *argv[] )
     qInitImages_designer();
 #endif
 
-//    QLabel *splash = a.showSplash();
+	#ifdef WIN32
+	QApplication::addLibraryPath("C:\\scada\\plugins");
+	#endif
+    QLabel *splash = a.showSplash();
 
     MainWindow *mw = new MainWindow( creatPid, FALSE, "/designer" );
     a.setMainWidget( mw );
@@ -213,7 +216,7 @@ int main( int argc, char *argv[] )
 #if defined(Q_WS_X11)
     qt_wait_for_window_manager( mw );
 #endif
-//    delete splash;
+    delete splash;
 
     QApplication::restoreOverrideCursor();
     for ( int i = 1; i < a.argc(); ++i ) {

@@ -138,4 +138,6 @@ Added part of HMI designer
 
 Maps tab is no more visible, the code is still there
 -------------------------------------------------------------------------------------------------------
+21-07-2012
+Added all the code of HMI_designer.exe
 

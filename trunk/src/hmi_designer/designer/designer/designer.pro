@@ -239,7 +239,7 @@ IMAGES		+= images/adjustsize.png \
 		images/timeedit.png \
 		images/dial.png \
 		images/home.png \
-		images/qtlogo.png \
+		images/logo.png \
 		images/toolbutton.png \
 		images/down.png \
 		images/hsplit.png \

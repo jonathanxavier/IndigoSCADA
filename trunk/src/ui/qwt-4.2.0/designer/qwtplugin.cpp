@@ -19,7 +19,7 @@
 #include "qwt_slider.h"
 #include "qwt_analog_clock.h"
 #include "qwt_compass.h"
-#include "led.h"
+#include "single_point_led.h"
 
 namespace
 {
@@ -79,8 +79,8 @@ QwtPlugin::QwtPlugin()
         "qwtthermo.png", "QwtThermo", "whatsthis"));
     vec.append(Entry("QwtWheel", "qwt_wheel.h",
         "qwtwheel.png", "QwtWheel", "whatsthis"));
-    vec.append(Entry("Led", "led.h",
-        "led_rg0000.png", "Led", "whatsthis"));
+    vec.append(Entry("SinglePointLed", "single_point_led.h",
+        "led_rg0000.png", "SinglePointLed", "whatsthis"));
 
 }
 
@@ -110,8 +110,8 @@ QWidget* QwtPlugin::create(const QString &key,
         return new QwtScale( QwtScale::Left, parent, name );
     else if ( key == "QwtSlider" )
         return new QwtSlider( parent, name );
-	else if ( key == "Led" )
-        return new Led(parent, name );
+	else if ( key == "SinglePointLed" )
+        return new SinglePointLed(parent, name );
 
     return 0;
 }

@@ -1,7 +1,7 @@
 #include <qt.h>
 #include "hmi_mng.h"
 #include "qwt_thermo.h"
-#include "led.h"
+#include "single_point_led.h"
 #include <qlcdnumber.h>
 #include "realtimedb.h"
 #include "dispatch.h"
@@ -71,7 +71,7 @@ void HMI_manager::setInitialValues()
 	}
 
 	{
-		QObjectList *l = p->queryList( "Led" );
+		QObjectList *l = p->queryList( "SinglePointLed" );
 
 		QObjectListIt it( *l ); // iterate over the buttons
 
@@ -84,8 +84,8 @@ void HMI_manager::setInitialValues()
 
 			QString name = obj->name();
 
-			((Led*)obj)->setColor("0,255,0");
-			((Led*)obj)->on();
+			((SinglePointLed*)obj)->setWhite();
+			((SinglePointLed*)obj)->on();
 		}
 
 		delete l; // delete the list, not the objects
@@ -133,6 +133,8 @@ void HMI_manager::setInitialValues()
 */
 }
 
+//TODO: put at startup the content of QObjectList in a Map make tree search
+
 void HMI_manager::UpdateTags()
 {
 	//IT_IT("HMI_manager::UpdateTags");
@@ -166,7 +168,9 @@ void HMI_manager::UpdateTags()
 
 					QString name = obj->name();
 
-					if(name == s + "thermo") // do we want this cell
+					// e.g. OPCPoint09thermo
+
+					if(name == s + "thermo")
 					{
 						double v = atof((const char*)(GetCurrentDb()->GetString("VAL")));
 
@@ -193,7 +197,9 @@ void HMI_manager::UpdateTags()
 
 					QString name = obj->name();
 
-					if(name == s + "lcd") // do we want this cell
+					// e.g. OPCPoint09lcd
+
+					if(name == s + "lcd")
 					{
 						double v = atof((const char*)(GetCurrentDb()->GetString("VAL")));
 
@@ -206,10 +212,91 @@ void HMI_manager::UpdateTags()
 				delete l; // delete the list, not the objects
 			}
 
+			{
+				QObjectList *l = p->queryList( "SinglePointLed" );
+
+				QObjectListIt it( *l ); // iterate over the buttons
+
+				QObject *obj;
+
+				while((obj = it.current()) != 0) 
+				{
+					// for each found object...
+					++it;
+
+					QString name = obj->name();
+
+					// e.g. OPCPoint09singlePointLed
+
+					if(name == s + "singlePointLed")
+					{
+						double v = atof((const char*)(GetCurrentDb()->GetString("VAL")));
+						
+						int i = (int)v;
+
+						switch(i)
+						{
+							case 0:
+							{
+								//Green means state off
+								((SinglePointLed*)obj)->setGreen();
+								((SinglePointLed*)obj)->on();
+							}
+							break;
+							case 1:
+							{
+								//	Red means state on
+								((SinglePointLed*)obj)->setRed();
+								((SinglePointLed*)obj)->on();
+							}
+							break;
+							case 2:
+							{
+								//Yellow is not used for Single point
+								((SinglePointLed*)obj)->setYellow();
+								((SinglePointLed*)obj)->on();
+							}
+							break;
+							case 3:
+							{
+								//Yellow is not used for Single point
+								((SinglePointLed*)obj)->setYellow();
+								((SinglePointLed*)obj)->on();
+							}
+							break;
+							/*
+							case 4:
+							{
+								//White means HMI state none or Invalid
+								((SinglePointLed*)obj)->setWhite();
+								((SinglePointLed*)obj)->on();
+							}
+							break;
+							case 5:
+							{
+								//Blue means Communication driver error state or Invalid
+								((SinglePointLed*)obj)->setBlue();
+								((SinglePointLed*)obj)->on();
+							}
+							break;
+							*/
+							default:
+								//White means HMI state none or Invalid
+								((SinglePointLed*)obj)->setWhite();
+								((SinglePointLed*)obj)->on();
+							break;
+						}
+						
+						break; // handle the next record
+					}
+				}
+
+				delete l; // delete the list, not the objects
+			}
+
 			lastName = s;
 		}
 	}
-
 };
 
 /*
@@ -221,36 +308,75 @@ void HMI_manager::UpdateTags()
 void HMI_manager::UpdateSamplePoint() // handle updated sample points
 {
 //	IT_IT("HMI_manager::UpdateSamplePoint");
+
+	//Here we have set of record from CVAL_DB
 	
 	int n = GetCurrentDb()->GetNumberResults();
 
 	GetCurrentDb()->GotoBegin();
 
+	//
+	QString lastName = "";
+
 	for(int i = 0; i < n ; i++,GetCurrentDb()->FetchNext())
 	{
-		//
-		//get the record
-		//
-		QString ns = GetCurrentDb()->GetString("NAME");
-		//
-		// Find the entry in the table
-		//
-		/*
-		for(unsigned j = 0; j < pStatus->count(); j++)
-		{
-			TableItem *st = pStatus->getCell(j);
+		QString s = GetCurrentDb()->GetString("NAME");
 
-			if(st->text() == ns)
+		if(s != lastName)
+		{
 			{
-				int s = GetCurrentDb()->GetInt("STATE");
-				st->setBackColour(GetAlarmStateBkColour(s));    
-				st->setTextColour(GetAlarmStateFgColour(s));
-				st->SetState(s);
-				st->SetFlash(GetCurrentDb()->GetInt("ACKFLAG"));
-				break;
+				QObjectList *l = p->queryList( "SinglePointLed" );
+
+				QObjectListIt it( *l ); // iterate over the buttons
+
+				QObject *obj;
+
+				while((obj = it.current()) != 0) 
+				{
+					// for each found object...
+					++it;
+
+					QString name = obj->name();
+
+					// e.g. OPCPoint09singlePointLed
+
+					if(name == s + "singlePointLed")
+					{
+						int state = GetCurrentDb()->GetInt("STATE");
+
+						int ack_flag = GetCurrentDb()->GetInt("ACKFLAG");
+
+						if(ack_flag)
+						{
+							((SinglePointLed*)obj)->startFlash();						
+						}
+						else
+						{
+							((SinglePointLed*)obj)->stopFlash();
+						}
+
+						if(state == NoLevel)
+						{
+							//White means HMI state none or NO or Invalid
+							((SinglePointLed*)obj)->setWhite();
+							((SinglePointLed*)obj)->on(); 
+						}
+
+						if(state == FailureLevel)
+						{ //Blue means Communication driver error state or Invalid
+								((SinglePointLed*)obj)->setBlue();
+								((SinglePointLed*)obj)->on(); 
+						}
+						
+						break; // handle the next record
+					}
+				}
+
+				delete l; // delete the list, not the objects
 			}
+
+			lastName = s;
 		}
-		*/
 	}
 };
 

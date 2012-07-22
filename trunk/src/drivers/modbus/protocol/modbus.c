@@ -20,6 +20,8 @@
  * http://libmodbus.org/
  */
 
+#include "modbus.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -29,7 +31,6 @@
 
 #include <config.h>
 
-#include "modbus.h"
 #include "modbus-private.h"
 
 /* Internal use */

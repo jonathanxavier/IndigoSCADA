@@ -121,7 +121,10 @@ QString *qwf_plugin_dir = 0;
 static void setupPluginDir()
 {
     if ( !qwf_plugin_dir )
-	qwf_plugin_dir = new QString( "/designer" );
+	{
+		qwf_plugin_dir = new QString( "/designer" );
+		//qwf_plugin_dir = new QString( "C:\\scada\\plugins\\designer" ); //apa+++ 21-07-2012
+	}
 }
 
 static void setupWidgetListAndMap()

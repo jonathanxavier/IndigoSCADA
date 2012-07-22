@@ -374,6 +374,7 @@ void UserFrameWork::SetTabs()
 		//((QTabWidget *)centralWidget())->addTab(pMaps,tr("Ma&ps"));
 
         //Dinamic dialog loading from .ui designer file//////////////////////////////////////////
+		QApplication::addLibraryPath("C:\\scada\\plugins"); //apa+++ 21-07-2012 So we can load qwtplugin.dll from directory C:\scada\plugins\designer
 		hmi_mng = new HMI_manager;
 
 		QWidgetFactory::loadImages("../Bitmaps");
