@@ -20,6 +20,7 @@
 #include "qwt_analog_clock.h"
 #include "qwt_compass.h"
 #include "single_point_led.h"
+#include "double_point_led.h"
 
 namespace
 {
@@ -81,6 +82,8 @@ QwtPlugin::QwtPlugin()
         "qwtwheel.png", "QwtWheel", "whatsthis"));
     vec.append(Entry("SinglePointLed", "single_point_led.h",
         "led_rg0000.png", "SinglePointLed", "whatsthis"));
+    vec.append(Entry("DoublePointLed", "double_point_led.h",
+        "led_rg0001.png", "DoublePointLed", "whatsthis"));
 
 }
 
@@ -112,6 +115,8 @@ QWidget* QwtPlugin::create(const QString &key,
         return new QwtSlider( parent, name );
 	else if ( key == "SinglePointLed" )
         return new SinglePointLed(parent, name );
+	else if ( key == "DoublePointLed" )
+        return new DoublePointLed(parent, name );
 
     return 0;
 }

@@ -2,6 +2,7 @@
 #include "hmi_mng.h"
 #include "qwt_thermo.h"
 #include "single_point_led.h"
+#include "double_point_led.h"
 #include <qlcdnumber.h>
 #include "realtimedb.h"
 #include "dispatch.h"
@@ -100,6 +101,27 @@ void HMI_manager::setInitialValues()
 
 			((SinglePointLed*)obj)->setColor(Qt::white);
 			((SinglePointLed*)obj)->on();
+		}
+
+		delete l; // delete the list, not the objects
+	}
+
+    {
+		QObjectList *l = p->queryList( "DoublePointLed" );
+
+		QObjectListIt it( *l ); // iterate over the buttons
+
+		QObject *obj;
+
+		while((obj = it.current()) != 0) 
+		{
+			// for each found object...
+			++it;
+
+			QString name = obj->name();
+
+			((DoublePointLed*)obj)->setColor(Qt::white);
+			((DoublePointLed*)obj)->on();
 		}
 
 		delete l; // delete the list, not the objects
@@ -294,6 +316,72 @@ void HMI_manager::UpdateTags()
 				delete l; // delete the list, not the objects
 			}
 
+            {
+				QObjectList *l = p->queryList( "DoublePointLed" );
+
+				QObjectListIt it( *l ); // iterate over the buttons
+
+				QObject *obj;
+
+				while((obj = it.current()) != 0) 
+				{
+					// for each found object...
+					++it;
+
+					QString name = obj->name();
+
+					// e.g. IEC104PointdoublePointLed
+
+					if(name == s + "doublePointLed")
+					{
+						double v = atof((const char*)(GetCurrentDb()->GetString("VAL")));
+						
+						int i = (int)v;
+
+						switch(i)
+						{
+							case 0:
+							{
+								//Yellow means Indeterminate or Intermediate state
+								((DoublePointLed*)obj)->setColor(Qt::yellow);
+								((DoublePointLed*)obj)->on();
+							}
+							break;
+							case 1:
+							{
+								//Green means Determinate state off
+								((DoublePointLed*)obj)->setColor(Qt::green);
+								((DoublePointLed*)obj)->on();
+							}
+							break;
+							case 2:
+							{
+								//Red means Determinate state on
+								((DoublePointLed*)obj)->setColor(Qt::red);
+								((DoublePointLed*)obj)->on();
+							}
+							break;
+							case 3:
+							{
+								//Yellow means Indeterminate state
+								((DoublePointLed*)obj)->setColor(Qt::yellow);
+								((DoublePointLed*)obj)->on();
+							}
+							break;
+							default:
+								//White means HMI state none or Invalid
+								((DoublePointLed*)obj)->setColor(Qt::white);
+								((DoublePointLed*)obj)->on();
+							break;
+						}
+						
+						break; // handle the next record
+					}
+				}
+
+				delete l; // delete the list, not the objects
+			}
+
 			lastName = s;
 		}
 	}
@@ -366,6 +454,57 @@ void HMI_manager::UpdateSamplePoint() // handle updated sample points
 						{ //Blue means Communication driver error state or Invalid
 								((SinglePointLed*)obj)->setColor(Qt::blue);
 								((SinglePointLed*)obj)->on(); 
+						}
+						
+						break; // handle the next record
+					}
+				}
+
+				delete l; // delete the list, not the objects
+			}
+
+            {
+				QObjectList *l = p->queryList( "DoublePointLed" );
+
+				QObjectListIt it( *l ); // iterate over the buttons
+
+				QObject *obj;
+
+				while((obj = it.current()) != 0) 
+				{
+					// for each found object...
+					++it;
+
+					QString name = obj->name();
+
+					// e.g. IEC104PointdoublePointLed
+
+					if(name == s + "doublePointLed")
+					{
+						int state = GetCurrentDb()->GetInt("STATE");
+
+						int ack_flag = GetCurrentDb()->GetInt("ACKFLAG");
+
+						if(ack_flag)
+						{
+							((DoublePointLed*)obj)->startFlash();
+						}
+						else
+						{
+							((DoublePointLed*)obj)->stopFlash();
+						}
+
+						if(state == NoLevel)
+						{
+							//White means HMI state none or NO or Invalid
+							((DoublePointLed*)obj)->setColor(Qt::white);
+							((DoublePointLed*)obj)->on(); 
+						}
+
+						if(state == FailureLevel)
+						{ //Blue means Communication driver error state or Invalid
+								((DoublePointLed*)obj)->setColor(Qt::blue);
+								((DoublePointLed*)obj)->on(); 
 						}
 						
 						break; // handle the next record

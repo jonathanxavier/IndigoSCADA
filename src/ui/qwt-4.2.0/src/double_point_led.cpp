@@ -10,9 +10,9 @@
  *
  */
 
-#include "single_point_led.h"
+#include "double_point_led.h"
 
-SinglePointLed::SinglePointLed(QWidget *parent, const char *name) : QFrame(parent, name),
+DoublePointLed::DoublePointLed(QWidget *parent, const char *name) : QFrame(parent, name),
   lwidth( 17 ), lheight( 10 ), dx( 4 ), timer(NULL)
 {
    s = Off;
@@ -23,7 +23,7 @@ SinglePointLed::SinglePointLed(QWidget *parent, const char *name) : QFrame(paren
    setSizePolicy( QSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum ) );
 }
 
-void SinglePointLed::drawContents(QPainter *painter)
+void DoublePointLed::drawContents(QPainter *painter)
 {
    int w,h,x,y;
    QBrush lightBrush(color);
@@ -61,7 +61,7 @@ void SinglePointLed::drawContents(QPainter *painter)
    }
 }
 
-SinglePointLed::~SinglePointLed()
+DoublePointLed::~DoublePointLed()
 {
    if(timer)
    {
@@ -70,22 +70,22 @@ SinglePointLed::~SinglePointLed()
    }
 }
 
-void SinglePointLed::timerSlot()
+void DoublePointLed::timerSlot()
 {
 	toggleState();
 }
 
-QSize SinglePointLed::sizeHint() const
+QSize DoublePointLed::sizeHint() const
 {
     return QSize( 10 + 9 * 10 , 23 );
 }
 
-QSizePolicy SinglePointLed::sizePolicy() const
+QSizePolicy DoublePointLed::sizePolicy() const
 {
     return QWidget::sizePolicy();
 }
 
-void SinglePointLed::startFlash()
+void DoublePointLed::startFlash()
 {
    if(timer == NULL)
    {
@@ -95,7 +95,7 @@ void SinglePointLed::startFlash()
    }
 }
 
-void SinglePointLed::stopFlash()
+void DoublePointLed::stopFlash()
 {
    if(timer)
    {
