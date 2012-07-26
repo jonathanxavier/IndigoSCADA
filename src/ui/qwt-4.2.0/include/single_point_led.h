@@ -46,13 +46,10 @@ public:
    void toggleState() { if (s == On) s= Off; else if (s == Off) s= On; repaint(); }
    virtual ~SinglePointLed();
    void setText(const char *s){text=s;}
-   void setColor(const char *c){color=QColor(c);}
-
-   void setGreen(){color=Qt::green;}
-   void setRed(){color=Qt::red;}
-   void setYellow(){color=Qt::yellow;}
-   void setBlue(){color=Qt::blue;}
-   void setWhite(){color=Qt::white;}
+   void setColor(QColor newColor)
+   {
+		color = newColor;
+   };
 
    void startFlash();
    void stopFlash();

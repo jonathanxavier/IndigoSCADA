@@ -19,8 +19,8 @@ public slots:
 	void UpdateTags(); // update tag values
 	void UpdateSamplePoint(); // handle updated sample points
 	void QueryResponse (QObject *, const QString &, int, QObject*); // handles database responses
-	//void DoCommand(const QString &);
 	void DoCommand();
+	void ReceivedNotify(int, const char *);
 private:
     QDialog *p;
 };

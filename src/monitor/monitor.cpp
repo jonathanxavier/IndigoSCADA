@@ -1183,7 +1183,7 @@ void Monitor::ReceivedNotify(int ntf, const char * data)
 		case NotificationEvent::CMD_MONITOR_STOP:
 		{
 			IT_COMMENT("CMD_MONITOR_STOP - monitoring stop command is received");
-			Stop(); 
+			Stop();
 		}
 		break;
 		case  NotificationEvent::CMD_SHUTDOWN_MONITOR:

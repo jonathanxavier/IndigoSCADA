@@ -5,6 +5,7 @@
 #include <qlcdnumber.h>
 #include "realtimedb.h"
 #include "dispatch.h"
+#include "helper_functions.h"
 
 void HMI_manager::setParent( QDialog *parent )
 {
@@ -15,10 +16,23 @@ void HMI_manager::setParent( QDialog *parent )
 	connect(qApp->mainWidget(),SIGNAL(UpdateTags()),this,SLOT(UpdateTags()));
 	connect(qApp->mainWidget(),SIGNAL(UpdateSamplePoint()),this,SLOT(UpdateSamplePoint()));
 
+	// connect to the database
+
 	connect (GetConfigureDb (),
 	SIGNAL (TransactionDone (QObject *, const QString &, int, QObject*)), this,
-	SLOT (QueryResponse (QObject *, const QString &, int, QObject*)));	// connect to the database
+	SLOT (QueryResponse (QObject *, const QString &, int, QObject*)));
+
+	connect (GetDispatcher (),
+	SIGNAL (ReceivedNotify(int, const char *)), this,
+	SLOT (ReceivedNotify(int, const char *)));	
+
 }
+
+//	QColor white(0xff, 0xff, 0xff);
+//	QColor red(0xff, 0x00, 0x00);
+//	QColor yellow(0xff, 0xff, 0x00);
+//	QColor green(0x00, 0xff, 0x00);
+//	QColor blue(0x00, 0x00, 0xff);
 
 void HMI_manager::setInitialValues() 
 {
@@ -84,13 +98,13 @@ void HMI_manager::setInitialValues()
 
 			QString name = obj->name();
 
-			((SinglePointLed*)obj)->setWhite();
+			((SinglePointLed*)obj)->setColor(Qt::white);
 			((SinglePointLed*)obj)->on();
 		}
 
 		delete l; // delete the list, not the objects
 	}
-/*
+
 	{
 		QObjectList *l = p->queryList( "QButton" );
 
@@ -105,12 +119,14 @@ void HMI_manager::setInitialValues()
 
 			QString name = obj->name();
 
-			//((QButton*)obj)->setEnabled( FALSE );
+			//By default commands are not enabled
+			((QButton*)obj)->setEnabled( FALSE );
+			
 		}
 
 		delete l; // delete the list, not the objects
 	}
-
+/*
 	//////////////////////////
 	{
 		QObjectList *l = p->queryList( "QRadioButton" );
@@ -133,13 +149,13 @@ void HMI_manager::setInitialValues()
 */
 }
 
-//TODO: put at startup the content of QObjectList in a Map make tree search
+//TODO: put at startup the content of QObjectList in a Map and make tree search
 
 void HMI_manager::UpdateTags()
 {
 	//IT_IT("HMI_manager::UpdateTags");
 
-	//Here we have set of record from TAGS_DB
+	//Here we have set of records from TAGS_DB
 	//
 	int n = GetCurrentDb()->GetNumberResults();
 
@@ -239,50 +255,34 @@ void HMI_manager::UpdateTags()
 							case 0:
 							{
 								//Green means state off
-								((SinglePointLed*)obj)->setGreen();
+								((SinglePointLed*)obj)->setColor(Qt::green);
 								((SinglePointLed*)obj)->on();
 							}
 							break;
 							case 1:
 							{
 								//	Red means state on
-								((SinglePointLed*)obj)->setRed();
+								((SinglePointLed*)obj)->setColor(Qt::red);
 								((SinglePointLed*)obj)->on();
 							}
 							break;
 							case 2:
 							{
 								//Yellow is not used for Single point
-								((SinglePointLed*)obj)->setYellow();
+								((SinglePointLed*)obj)->setColor(Qt::yellow);
 								((SinglePointLed*)obj)->on();
 							}
 							break;
 							case 3:
 							{
 								//Yellow is not used for Single point
-								((SinglePointLed*)obj)->setYellow();
+								((SinglePointLed*)obj)->setColor(Qt::yellow);
 								((SinglePointLed*)obj)->on();
 							}
 							break;
-							/*
-							case 4:
-							{
-								//White means HMI state none or Invalid
-								((SinglePointLed*)obj)->setWhite();
-								((SinglePointLed*)obj)->on();
-							}
-							break;
-							case 5:
-							{
-								//Blue means Communication driver error state or Invalid
-								((SinglePointLed*)obj)->setBlue();
-								((SinglePointLed*)obj)->on();
-							}
-							break;
-							*/
 							default:
 								//White means HMI state none or Invalid
-								((SinglePointLed*)obj)->setWhite();
+								((SinglePointLed*)obj)->setColor(Qt::white);
 								((SinglePointLed*)obj)->on();
 							break;
 						}
@@ -309,7 +309,7 @@ void HMI_manager::UpdateSamplePoint() // handle updated sample points
 {
 //	IT_IT("HMI_manager::UpdateSamplePoint");
 
-	//Here we have set of record from CVAL_DB
+	//Here we have a set of records from CVAL_DB
 	
 	int n = GetCurrentDb()->GetNumberResults();
 
@@ -348,7 +348,7 @@ void HMI_manager::UpdateSamplePoint() // handle updated sample points
 
 						if(ack_flag)
 						{
-							((SinglePointLed*)obj)->startFlash();						
+							((SinglePointLed*)obj)->startFlash();
 						}
 						else
 						{
@@ -358,13 +358,13 @@ void HMI_manager::UpdateSamplePoint() // handle updated sample points
 						if(state == NoLevel)
 						{
 							//White means HMI state none or NO or Invalid
-							((SinglePointLed*)obj)->setWhite();
+							((SinglePointLed*)obj)->setColor(Qt::white);
 							((SinglePointLed*)obj)->on(); 
 						}
 
 						if(state == FailureLevel)
 						{ //Blue means Communication driver error state or Invalid
-								((SinglePointLed*)obj)->setBlue();
+								((SinglePointLed*)obj)->setColor(Qt::blue);
 								((SinglePointLed*)obj)->on(); 
 						}
 						
@@ -398,11 +398,9 @@ void HMI_manager::sendCommand()
 		{
 			Sleep(100);
 			QString name = obj->name();
-			//((QButton*)obj)->setEnabled( FALSE );
 
 			char str[100];
 
-			//sample_point_name = name.remove(QString("command_button"));
 			strcpy(str, (const char*)name.replace("command_button", ""));
 
 			sample_point_name = QString(str);
@@ -462,7 +460,6 @@ void HMI_manager::QueryResponse (QObject *p, const QString &c, int id, QObject*c
 	};
 };
 
-//void HMI_manager::DoCommand(const QString & sample_point_name)
 void HMI_manager::DoCommand()
 {
 	IT_IT("HMI_manager::DoCommand");
@@ -488,5 +485,71 @@ void HMI_manager::DoCommand()
 		QString cmd = "select UNIT from SAMPLE where NAME='"+ sample_point_name +"';";
 
 		GetConfigureDb()->DoExec(this, cmd, tUnit, value_for_command, sample_point_name); // kick it off
+	}
+};
+
+/*
+*Function:CurrentNotify
+*Inputs:notification code
+*Outputs:none
+*Returns:none
+*/
+void HMI_manager::ReceivedNotify(int ntf, const char * data)
+{
+	IT_IT("HMI_manager::ReceivedNotify");
+	
+	switch(ntf)
+	{
+		case NotificationEvent::CMD_LOGOUT:
+		{
+			QObjectList *l = p->queryList( "QButton" );
+
+			QObjectListIt it( *l ); // iterate over the buttons
+
+			QObject *obj;
+
+			while((obj = it.current()) != 0) 
+			{
+				// for each found object...
+				++it;
+
+				QString name = obj->name();
+
+				((QButton*)obj)->setEnabled( FALSE );
+			}
+
+			delete l; // delete the list, not the objects
+		}
+		break;
+		case NotificationEvent::CMD_LOGON:
+		{
+			QObjectList *l = p->queryList( "QButton" );
+
+			QObjectListIt it( *l ); // iterate over the buttons
+
+			QObject *obj;
+
+			while((obj = it.current()) != 0) 
+			{
+				// for each found object...
+				++it;
+
+				QString name = obj->name();
+
+				if(GetUserDetails().privs & PRIVS_ACK_ALARMS)
+				{
+					((QButton*)obj)->setEnabled(TRUE);
+				}
+				else
+				{
+					((QButton*)obj)->setEnabled( FALSE );
+				}
+			}
+
+			delete l; // delete the list, not the objects
+		}
+		break;
+		default:
+		break;
 	}
 };

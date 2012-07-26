@@ -260,6 +260,7 @@ void UserFrameWork::Logout()
 {
 	IT_IT("UserFrameWork::Logout");
 	
+	GetDispatcher()->DoExec(NotificationEvent::CMD_LOGOUT); //apa+++ 24-07-2012
 	//
 	pLogoffTimer->stop(); // halt the auto log 
 	AutoLogOffCount = AutoLogoffTime;
@@ -460,6 +461,8 @@ void UserFrameWork::Login()
 		LoginDlg dlg(this);
 		if(dlg.exec())
 		{
+			GetDispatcher()->DoExec(NotificationEvent::CMD_LOGON); //apa+++ 24-07-2012
+
 			// on success we load up the full menu based on the user' s privileges
 			removeToolBar(pToolBar);
 			delete pToolBar;
@@ -599,6 +602,7 @@ void UserFrameWork::Login()
 				#include "ackall.xpm"
 				pToolBar->addSeparator();
 				(void)  new QToolButton(QPixmap((const char **)ackall),tr("Acknowledge All Alarms"),0, this,SLOT(ackAllAlarms()),pToolBar, "Ack. All Alarms");
+
 			};
 			//
 			// add the help option
@@ -1046,6 +1050,8 @@ void UserFrameWork::restart() // stop and start monitoring
 
 	if(!YESNO(tr("Restart Monitoring"),tr("Restart Monitoring Are You Sure?")))
 	{
+		QString msg = "All messages acknowledged automatically by restarting the monitor"; //apa+++ 26-07-2012
+		AckAllAlarms(msg);
 		//broadcast
 		GetDispatcher()->DoExec(NotificationEvent::CMD_MONITOR_STOP);
 		DOAUDIT(tr("Stop Monitor"));

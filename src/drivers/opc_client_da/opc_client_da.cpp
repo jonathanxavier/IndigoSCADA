@@ -93,7 +93,7 @@ void Opc_client_da::GetInputList(const QString &type, QStringList &list,const QS
 		<< "09" << "10" << "11" << "12" << "13" << "14" << "15" << "16";         
 	}
 
-	if(type == TYPE_M_SP_NA_1)
+	if(type == TYPE_M_SP_TA_1)
 	{
 		list << "01" << "02" << "03" << "04" << "05" << "06" << "07" << "08" 
 		<< "09" << "10" << "11" << "12" << "13" << "14" << "15" << "16";         
@@ -114,7 +114,7 @@ QWidget * Opc_client_da::GetSpecificConfig(QWidget *parent, const QString &spnam
 		p = new Opc_client_daInput(parent,spname);
 		return p;
 	}
-	else if (sptype == TYPE_M_SP_NA_1)
+	else if (sptype == TYPE_M_SP_TA_1)
 	{
 		p = new Opc_client_daInput(parent,spname);
 		return p;
@@ -134,7 +134,7 @@ void Opc_client_da::GetTagList(const QString &type, QStringList &list,const QStr
 	{
 		list << VALUE_TAG;
 	}
-	else if (type == TYPE_M_SP_NA_1)
+	else if (type == TYPE_M_SP_TA_1)
 	{
 		list << BIT_TAG;
 	}
