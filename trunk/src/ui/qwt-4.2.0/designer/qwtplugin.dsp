@@ -42,7 +42,6 @@ RSC=rc.exe
 # PROP Intermediate_Dir "Release"
 # PROP Ignore_Export_Lib 1
 # PROP Target_Dir ""
-F90=df.exe
 LIB32=link.exe -lib
 # ADD CPP /nologo /MD /W3 /GX /O1 /I "..\include" /I "$(QTDIR)\include" /I "moc\\" /I "$(QTDIR)\mkspecs\win32-msvc" /I ".\pixmaps" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "UNICODE" /D "QT_DLL" /D "QT_PLUGIN" /D "QT_THREAD_SUPPORT" /D "QT_NO_DEBUG" /FD -Zm200 /c
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
@@ -68,7 +67,6 @@ LINK32=link.exe
 # PROP Intermediate_Dir "obj"
 # PROP Ignore_Export_Lib 1
 # PROP Target_Dir ""
-F90=df.exe
 LIB32=link.exe -lib
 # ADD CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\include" /I "$(QTDIR)\include" /I "moc\\" /I "$(QTDIR)\mkspecs\win32-msvc" /I ".\pixmaps" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "UNICODE" /D "QT_DLL" /D "QT_PLUGIN" /D "QT_THREAD_SUPPORT" /FD /GZ -Zm200 /c
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32

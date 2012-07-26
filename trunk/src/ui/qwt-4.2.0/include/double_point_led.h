@@ -10,8 +10,8 @@
  *
  */
 
-#ifndef __SINGLE_POINT_LED
-#define __SINGLE_POINT_LED
+#ifndef __DOUBLE_POINT_LED
+#define __DOUBLE_POINT_LED
 
 #include "qpixmap.h"
 #include "qframe.h"
@@ -20,32 +20,17 @@
 #include "qpainter.h"
 #include "qtimer.h"
 #include "qwt_global.h"
-/*
-#include "single0000.xpm"
-#include "single0001.xpm"
-#include "single0002.xpm"
-#include "single0004.xpm"
-#include "single0005.xpm"
-#include "qlabel.h"
 
-#define GREEN_LED_0000 QPixmap((const char **)single0000_xpm)
-#define RED_LED_0001 QPixmap((const char **)single0001_xpm)
-#define YELLOW_LED_0002 QPixmap((const char **)single0002_xpm)
-#define YELLOW_LED_0003 QPixmap((const char **)single0002_xpm)
-#define BLUE_LED_0004 QPixmap((const char **)single0004_xpm)
-#define WHITE_LED_0005 QPixmap((const char **)single0005_xpm)
-*/
-
-class QWT_EXPORT SinglePointLed : public QFrame
+class QWT_EXPORT DoublePointLed : public QFrame
 {
   Q_OBJECT
 public:
-   SinglePointLed(QWidget *parent= NULL,const char *name = NULL);
+   DoublePointLed(QWidget *parent= NULL,const char *name = NULL);
    enum State { On, Off };
    State state() const { return s; }
    void setState(State state) { s= state; repaint(); }
    void toggleState() { if (s == On) s= Off; else if (s == Off) s= On; repaint(); }
-   virtual ~SinglePointLed();
+   virtual ~DoublePointLed();
    void setText(const char *s){text=s;}
    void setColor(QColor newColor)
    {
@@ -83,4 +68,4 @@ public:
    
 };
 
-#endif //__SINGLE_POINT_LED
+#endif //__DOUBLE_POINT_LED
