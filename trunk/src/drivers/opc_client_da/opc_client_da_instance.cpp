@@ -234,7 +234,7 @@ void Opc_client_da_Instance::QueryResponse(QObject *p, const QString &c, int id,
 					command_value = atof((const char*)t.Data1);
 				}
 
-				printf("Command from %s, IOA = %d, value = %d\n", (const char*)t.Data2, IOACommand, command_value);
+				printf("Command from %s, IOA = %d, value = %lf\n", (const char*)t.Data2, IOACommand, command_value);
 
 				//Send C_SE_TC_1//////////////////////////////////////////////////////////////////////////
 				struct iec_item item_to_send;
