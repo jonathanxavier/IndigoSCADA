@@ -686,6 +686,20 @@ QSize QwtThermo::minimumSizeHint() const
     return QSize( w, h );
 }
 
+
+/*!
+  \brief Mouse Release Event management
+*/
+void QwtThermo::mouseReleaseEvent(QMouseEvent * e)
+{
+	if(e->button() == Qt::RightButton)
+	{
+		QString name = this->name();
+
+		emit RightClicked(QString("QwtThermo"), name);
+	}
+}
+
 // Local Variables:
 // mode: C++
 // c-file-style: "stroustrup"

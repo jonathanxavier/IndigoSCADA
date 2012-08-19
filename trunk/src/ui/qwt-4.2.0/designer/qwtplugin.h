@@ -1,6 +1,8 @@
 #include <qwidgetplugin.h>
 
-class QT_WIDGET_PLUGIN_EXPORT QwtPlugin : public QWidgetPlugin
+#include "qwt_global.h"
+
+class QWT_EXPORT QwtPlugin : public QWidgetPlugin
 {
 public:
     QwtPlugin();

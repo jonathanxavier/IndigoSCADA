@@ -19,8 +19,17 @@
 #include "qwt_slider.h"
 #include "qwt_analog_clock.h"
 #include "qwt_compass.h"
+//apa+++
 #include "single_point_led.h"
 #include "double_point_led.h"
+#include "ptoggle.h"
+#include "pthermometer.h"
+#include "ptank.h"
+#include "pswitch.h"
+#include "psinglepointled.h"
+#include "pmeter.h"
+#include "plcdnumber.h"
+#include "pdoublepointled.h"
 
 namespace
 {
@@ -84,6 +93,22 @@ QwtPlugin::QwtPlugin()
         "led_rg0000.png", "SinglePointLed", "whatsthis"));
     vec.append(Entry("DoublePointLed", "double_point_led.h",
         "led_rg0001.png", "DoublePointLed", "whatsthis"));
+	vec.append(Entry("PSinglePointLed", "psinglepointled.h",
+        "led_by0000.png", "PSinglePointLed", "whatsthis"));
+    vec.append(Entry("PDoublePointLed", "pdoublepointled.h",
+        "led_by0001.png", "PDoublePointLed", "whatsthis"));
+	vec.append(Entry("PToggle", "ptoggle.h",
+        "ptoggleicon.png", "PToggle", "whatsthis"));
+    vec.append(Entry("PThermometer", "pthermometer.h",
+        "pthermometericon.png", "PThermometer", "whatsthis"));
+	vec.append(Entry("PTank", "ptank.h",
+        "ptankicon.png", "PTank", "whatsthis"));
+    vec.append(Entry("PSwitch", "pswitch.h",
+        "pswitchicon.png", "PSwitch", "whatsthis"));
+	vec.append(Entry("PMeter", "pmeter.h",
+        "pmetericon.png", "PMeter", "whatsthis"));
+    vec.append(Entry("PLCDNumber", "plcdnumber.h",
+        "plcdnumbericon.png", "PLCDNumber", "whatsthis"));
 
 }
 
@@ -117,6 +142,22 @@ QWidget* QwtPlugin::create(const QString &key,
         return new SinglePointLed(parent, name );
 	else if ( key == "DoublePointLed" )
         return new DoublePointLed(parent, name );
+	else if ( key == "PSinglePointLed" )
+        return new PSinglePointLed(parent, name );
+	else if ( key == "PDoublePointLed" )
+        return new PDoublePointLed(parent, name );
+	else if ( key == "PToggle" )
+        return new PToggle(parent, name );
+	else if ( key == "PThermometer" )
+        return new PThermometer(parent, name );
+	else if ( key == "PTank" )
+        return new PTank(parent, name );
+	else if ( key == "PSwitch" )
+        return new PSwitch(parent, name );
+	else if ( key == "PMeter" )
+        return new PMeter(parent, name );
+	else if ( key == "PLCDNumber" )
+        return new PLCDNumber(parent, name );
 
     return 0;
 }
@@ -135,7 +176,7 @@ QStringList QwtPlugin::keys() const
 QString QwtPlugin::group( const QString& feature ) const
 {
     if (entry(feature) != NULL )
-        return QString("Qwt"); 
+        return QString("SCADA Widgets"); 
     return QString::null;
 }
 

@@ -94,6 +94,38 @@ SOURCE=.\src\double_point_led.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\pdoublepointled.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\plcdnumber.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\pmeter.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\psinglepointled.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\pswitch.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\ptank.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\pthermometer.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\ptoggle.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=src\qwt_analog_clock.cpp
 # End Source File
 # Begin Source File
@@ -327,6 +359,270 @@ InputName=double_point_led
 
 "$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	%qtdir%\bin\moc.exe $(InputDir)\$(InputName).h -o $(InputDir)\moc_$(InputName).cpp
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\pdoublepointled.h
+
+!IF  "$(CFG)" == "qwt - Win32 Release"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - MOCing pdoublepointled.h...
+InputDir=.\include
+InputPath=.\include\pdoublepointled.h
+InputName=pdoublepointled
+
+"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	"%qtdir%\bin\moc.exe" "$(InputDir)\$(InputName).h" -o "$(InputDir)\moc_$(InputName).cpp"
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "qwt - Win32 Debug"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - MOCing pdoublepointled.h...
+InputDir=.\include
+InputPath=.\include\pdoublepointled.h
+InputName=pdoublepointled
+
+"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	"%qtdir%\bin\moc.exe" "$(InputDir)\$(InputName).h" -o "$(InputDir)\moc_$(InputName).cpp"
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\plcdnumber.h
+
+!IF  "$(CFG)" == "qwt - Win32 Release"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - MOCing plcdnumber.h...
+InputDir=.\include
+InputPath=.\include\plcdnumber.h
+InputName=plcdnumber
+
+"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	"%qtdir%\bin\moc.exe" "$(InputDir)\$(InputName).h" -o "$(InputDir)\moc_$(InputName).cpp"
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "qwt - Win32 Debug"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - MOCing plcdnumber.h...
+InputDir=.\include
+InputPath=.\include\plcdnumber.h
+InputName=plcdnumber
+
+"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	"%qtdir%\bin\moc.exe" "$(InputDir)\$(InputName).h" -o "$(InputDir)\moc_$(InputName).cpp"
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\pmeter.h
+
+!IF  "$(CFG)" == "qwt - Win32 Release"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - MOCing pmeter.h...
+InputDir=.\include
+InputPath=.\include\pmeter.h
+InputName=pmeter
+
+"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	"%qtdir%\bin\moc.exe" "$(InputDir)\$(InputName).h" -o "$(InputDir)\moc_$(InputName).cpp"
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "qwt - Win32 Debug"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - MOCing pmeter.h...
+InputDir=.\include
+InputPath=.\include\pmeter.h
+InputName=pmeter
+
+"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	"%qtdir%\bin\moc.exe" "$(InputDir)\$(InputName).h" -o "$(InputDir)\moc_$(InputName).cpp"
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\psinglepointled.h
+
+!IF  "$(CFG)" == "qwt - Win32 Release"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - MOCing psinglepointled.h...
+InputDir=.\include
+InputPath=.\include\psinglepointled.h
+InputName=psinglepointled
+
+"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	"%qtdir%\bin\moc.exe" "$(InputDir)\$(InputName).h" -o "$(InputDir)\moc_$(InputName).cpp"
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "qwt - Win32 Debug"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - MOCing psinglepointled.h...
+InputDir=.\include
+InputPath=.\include\psinglepointled.h
+InputName=psinglepointled
+
+"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	"%qtdir%\bin\moc.exe" "$(InputDir)\$(InputName).h" -o "$(InputDir)\moc_$(InputName).cpp"
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\pswitch.h
+
+!IF  "$(CFG)" == "qwt - Win32 Release"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - MOCing pswitch.h...
+InputDir=.\include
+InputPath=.\include\pswitch.h
+InputName=pswitch
+
+"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	"%qtdir%\bin\moc.exe" "$(InputDir)\$(InputName).h" -o "$(InputDir)\moc_$(InputName).cpp"
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "qwt - Win32 Debug"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - MOCing pswitch.h...
+InputDir=.\include
+InputPath=.\include\pswitch.h
+InputName=pswitch
+
+"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	"%qtdir%\bin\moc.exe" "$(InputDir)\$(InputName).h" -o "$(InputDir)\moc_$(InputName).cpp"
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\ptank.h
+
+!IF  "$(CFG)" == "qwt - Win32 Release"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - MOCing ptank.h...
+InputDir=.\include
+InputPath=.\include\ptank.h
+InputName=ptank
+
+"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	"%qtdir%\bin\moc.exe" "$(InputDir)\$(InputName).h" -o "$(InputDir)\moc_$(InputName).cpp"
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "qwt - Win32 Debug"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - MOCing ptank.h...
+InputDir=.\include
+InputPath=.\include\ptank.h
+InputName=ptank
+
+"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	"%qtdir%\bin\moc.exe" "$(InputDir)\$(InputName).h" -o "$(InputDir)\moc_$(InputName).cpp"
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\pthermometer.h
+
+!IF  "$(CFG)" == "qwt - Win32 Release"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - MOCing pthermometer.h...
+InputDir=.\include
+InputPath=.\include\pthermometer.h
+InputName=pthermometer
+
+"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	"%qtdir%\bin\moc.exe" "$(InputDir)\$(InputName).h" -o "$(InputDir)\moc_$(InputName).cpp"
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "qwt - Win32 Debug"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - MOCing pthermometer.h...
+InputDir=.\include
+InputPath=.\include\pthermometer.h
+InputName=pthermometer
+
+"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	"%qtdir%\bin\moc.exe" "$(InputDir)\$(InputName).h" -o "$(InputDir)\moc_$(InputName).cpp"
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\ptoggle.h
+
+!IF  "$(CFG)" == "qwt - Win32 Release"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - MOCing ptoggle.h...
+InputDir=.\include
+InputPath=.\include\ptoggle.h
+InputName=ptoggle
+
+"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	"%qtdir%\bin\moc.exe" "$(InputDir)\$(InputName).h" -o "$(InputDir)\moc_$(InputName).cpp"
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "qwt - Win32 Debug"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - MOCing ptoggle.h...
+InputDir=.\include
+InputPath=.\include\ptoggle.h
+InputName=ptoggle
+
+"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	"%qtdir%\bin\moc.exe" "$(InputDir)\$(InputName).h" -o "$(InputDir)\moc_$(InputName).cpp"
 
 # End Custom Build
 
@@ -1027,6 +1323,38 @@ InputName=single_point_led
 # Begin Source File
 
 SOURCE=.\include\moc_double_point_led.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\moc_pdoublepointled.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\moc_plcdnumber.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\moc_pmeter.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\moc_psinglepointled.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\moc_pswitch.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\moc_ptank.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\moc_pthermometer.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\moc_ptoggle.cpp
 # End Source File
 # Begin Source File
 
