@@ -140,4 +140,7 @@ Maps tab is no more visible, the code is still there
 -------------------------------------------------------------------------------------------------------
 21-07-2012
 Added all the code of HMI_designer.exe
-
+-------------------------------------------------------------------------------------------------------
+19-08-2012
+Added other SCADA widgets
+Added popup window on HMI widgets

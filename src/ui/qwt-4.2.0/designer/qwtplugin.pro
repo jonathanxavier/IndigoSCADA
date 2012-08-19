@@ -23,7 +23,7 @@ win32:LIBS    += ../lib/qwt.lib
 
 linux-g++:QMAKE_CXXFLAGS += -fno-exceptions 
 
-target.path=$(QTDIR)/plugins/designer
+target.path=C:/scada/plugins
 INSTALLS += target
 
 HEADERS  += qwtplugin.h
@@ -40,4 +40,15 @@ IMAGES   += \
         pixmaps/qwtslider.png \
         pixmaps/qwtthermo.png \
         pixmaps/qwtwheel.png \
-        pixmaps/qwtwidget.png 
+        pixmaps/qwtwidget.png \
+		pixmaps/led_by0000.png \
+		pixmaps/led_by0001.png \
+		pixmaps/led_rg0000.png \
+		pixmaps/led_rg0001.png \
+		pixmaps/plcdnumbericon.png \
+		pixmaps/pmetericon.png \
+		pixmaps/pswitchicon.png \
+		pixmaps/ptankicon.png \
+		pixmaps/pthermometericon.png \
+		pixmaps/ptoggleicon.png 
+

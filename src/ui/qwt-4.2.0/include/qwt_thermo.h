@@ -149,6 +149,13 @@ public:
 
 public slots:
     void setValue(double val);
+
+signals:
+    /*!
+      \brief This signal reports when the thermo is right clicked
+    */
+	void RightClicked(QString &class_name, QString &name);
+
     
 protected:
     void draw(QPainter *p, const QRect& update_rect);
@@ -159,6 +166,7 @@ protected:
 
     virtual void paintEvent(QPaintEvent *e);
     virtual void resizeEvent(QResizeEvent *e);
+	void mouseReleaseEvent(QMouseEvent *);
 
 private:
     void init();

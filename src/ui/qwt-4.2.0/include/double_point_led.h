@@ -40,6 +40,11 @@ public:
    void startFlash();
    void stopFlash();
 
+   bool GetFlash() const
+   {
+       return isFlashing;
+   }
+
    QSize sizeHint() const;
    QSizePolicy sizePolicy() const;
    
@@ -56,6 +61,7 @@ public:
    const int lheight;
    const int dx;
    State s;
+   bool isFlashing;
 
  protected slots:
    void timerSlot();

@@ -19,6 +19,7 @@ DoublePointLed::DoublePointLed(QWidget *parent, const char *name) : QFrame(paren
 //   setFrameStyle(Sunken | Box);
    setGeometry(0,0,lwidth,lheight);
    color = yellow;
+   isFlashing = false;
 
    setSizePolicy( QSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum ) );
 }
@@ -89,6 +90,7 @@ void DoublePointLed::startFlash()
 {
    if(timer == NULL)
    {
+	    isFlashing = true;
 		timer = new QTimer(this);
 		timer->start(1000);
 		connect(timer,SIGNAL(timeout()), this, SLOT(timerSlot()));
@@ -99,6 +101,7 @@ void DoublePointLed::stopFlash()
 {
    if(timer)
    {
+	  isFlashing = false;
 	  timer->stop();
 	  delete timer;
 	  timer = NULL;
