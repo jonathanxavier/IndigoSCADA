@@ -247,7 +247,6 @@ void HMI_manager::setInitialValues()
 
 			QString name = obj->name();
 
-			//((PSinglePointLed*)obj)->setValue(true);
 			((PSinglePointLed*)obj)->on();
 			((PSinglePointLed*)obj)->setOnColor(white);
 		}
@@ -314,7 +313,10 @@ void HMI_manager::UpdateTags()
 
 					// e.g. OPCPoint09QwtThermo
 
-					if(name == s + "QwtThermo")
+					int idx = name.find('_');
+					name.truncate(idx);
+
+					if(name == s)
 					{
 						double v = atof((const char*)(GetCurrentDb()->GetString("VAL")));
 
@@ -341,9 +343,12 @@ void HMI_manager::UpdateTags()
 
 					QString name = obj->name();
 
-					// e.g. OPCPoint09QLCDNumber
+					// e.g. OPCPoint09
 
-					if(name == s + "QLCDNumber")
+					int idx = name.find('_');
+					name.truncate(idx);
+
+					if(name == s)
 					{
 						double v = atof((const char*)(GetCurrentDb()->GetString("VAL")));
 
@@ -370,9 +375,12 @@ void HMI_manager::UpdateTags()
 
 					QString name = obj->name();
 
-					// e.g. OPCPoint09PLCDNumber
+					// e.g. OPCPoint09
 
-					if(name == s + "PLCDNumber")
+					int idx = name.find('_');
+					name.truncate(idx);
+
+					if(name == s)
 					{
 						double v = atof((const char*)(GetCurrentDb()->GetString("VAL")));
 
@@ -399,9 +407,12 @@ void HMI_manager::UpdateTags()
 
 					QString name = obj->name();
 
-					// e.g. OPCPoint09SinglePointLed
+					// e.g. OPCPoint09
 
-					if(name == s + "SinglePointLed")
+					int idx = name.find('_');
+					name.truncate(idx);
+
+					if(name == s)
 					{
 						double v = atof((const char*)(GetCurrentDb()->GetString("VAL")));
 						
@@ -465,9 +476,12 @@ void HMI_manager::UpdateTags()
 
 					QString name = obj->name();
 
-					// e.g. IEC104PointDoublePointLed
+					// e.g. IEC104Point
 
-					if(name == s + "DoublePointLed")
+					int idx = name.find('_');
+					name.truncate(idx);
+
+					if(name == s)
 					{
 						double v = atof((const char*)(GetCurrentDb()->GetString("VAL")));
 						
@@ -531,9 +545,16 @@ void HMI_manager::UpdateTags()
 
 					QString name = obj->name();
 
-					// e.g. OPCPoint09PSinglePointLed
+					// e.g. OPCPoint09
 
-					if(name == s + "PSinglePointLed")
+					int idx = name.find('_');
+
+					name.truncate(idx);
+
+					///////////////////////////////////////////////////////
+
+					//if(name == s + "PSinglePointLed")
+					if(name == s)
 					{
 						double v = atof((const char*)(GetCurrentDb()->GetString("VAL")));
 						
@@ -544,7 +565,6 @@ void HMI_manager::UpdateTags()
 							case 0:
 							{
 								//Green means state off
-//								((PSinglePointLed*)obj)->setValue(true);
 								((PSinglePointLed*)obj)->on();
 								((PSinglePointLed*)obj)->setOnColor(green);
 							}
@@ -552,7 +572,6 @@ void HMI_manager::UpdateTags()
 							case 1:
 							{
 								//	Red means state on
-//								((PSinglePointLed*)obj)->setValue(true);
 								((PSinglePointLed*)obj)->on();
 								((PSinglePointLed*)obj)->setOnColor(red);
 							}
@@ -560,7 +579,6 @@ void HMI_manager::UpdateTags()
 							case 2:
 							{
 								//Yellow is not used for Single point
-//								((PSinglePointLed*)obj)->setValue(true);
 								((PSinglePointLed*)obj)->on();
 								((PSinglePointLed*)obj)->setOnColor(yellow);
 							}
@@ -568,14 +586,12 @@ void HMI_manager::UpdateTags()
 							case 3:
 							{
 								//Yellow is not used for Single point
-//								((PSinglePointLed*)obj)->setValue(true);
 								((PSinglePointLed*)obj)->on();
 								((PSinglePointLed*)obj)->setOnColor(yellow);
 							}
 							break;
 							default:
 								//White means HMI state none or Invalid
-//								((PSinglePointLed*)obj)->setValue(true);
 								((PSinglePointLed*)obj)->on();
 								((PSinglePointLed*)obj)->setOnColor(white);
 							break;
@@ -602,9 +618,12 @@ void HMI_manager::UpdateTags()
 
 					QString name = obj->name();
 
-					// e.g. OPCPoint09PDoublePointLed
+					// e.g. OPCPoint09
 
-					if(name == s + "PDoublePointLed")
+					int idx = name.find('_');
+					name.truncate(idx);
+
+					if(name == s)
 					{
 						double v = atof((const char*)(GetCurrentDb()->GetString("VAL")));
 						
@@ -669,9 +688,12 @@ void HMI_manager::UpdateTags()
 
 					QString name = obj->name();
 
-					// e.g. OPCPoint09PSwitch
+					// e.g. OPCPoint09
 
-					if(name == s + "PSwitch")
+					int idx = name.find('_');
+					name.truncate(idx);
+
+					if(name == s)
 					{
 						double v = atof((const char*)(GetCurrentDb()->GetString("VAL")));
 						
@@ -718,9 +740,12 @@ void HMI_manager::UpdateTags()
 
 					QString name = obj->name();
 
-					// e.g. OPCPoint09PTank
+					// e.g. OPCPoint09
 
-					if(name == s + "PTank")
+					int idx = name.find('_');
+					name.truncate(idx);
+
+					if(name == s)
 					{
 						double v = atof((const char*)(GetCurrentDb()->GetString("VAL")));
 
@@ -747,9 +772,12 @@ void HMI_manager::UpdateTags()
 
 					QString name = obj->name();
 
-					// e.g. OPCPoint09PThermometer
+					// e.g. OPCPoint09
 
-					if(name == s + "PThermometer")
+					int idx = name.find('_');
+					name.truncate(idx);
+
+					if(name == s)
 					{
 						double v = atof((const char*)(GetCurrentDb()->GetString("VAL")));
 
@@ -769,7 +797,7 @@ void HMI_manager::UpdateTags()
 
 /*
 *Function: Query Response - handle transactions with the current values database
-*Inputs:object,command, transaction code
+*Inputs:
 *Outputs:none
 *Returns:none
 */
@@ -806,9 +834,12 @@ void HMI_manager::UpdateSamplePoint() // handle updated sample points
 
 					QString name = obj->name();
 
-					// e.g. OPCPoint09SinglePointLed
+					// e.g. OPCPoint09
 
-					if(name == s + "SinglePointLed")
+					int idx = name.find('_');
+					name.truncate(idx);
+
+					if(name == s)
 					{
 						int state = GetCurrentDb()->GetInt("STATE");
 
@@ -857,9 +888,12 @@ void HMI_manager::UpdateSamplePoint() // handle updated sample points
 
 					QString name = obj->name();
 
-					// e.g. IEC104PointDoublePointLed
+					// e.g. IEC104Point
 
-					if(name == s + "DoublePointLed")
+					int idx = name.find('_');
+					name.truncate(idx);
+
+					if(name == s)
 					{
 						int state = GetCurrentDb()->GetInt("STATE");
 
@@ -908,9 +942,12 @@ void HMI_manager::UpdateSamplePoint() // handle updated sample points
 
 					QString name = obj->name();
 
-					// e.g. OPCPoint09PSinglePointLed
+					// e.g. OPCPoint09
 
-					if(name == s + "PSinglePointLed")
+					int idx = name.find('_');
+					name.truncate(idx);
+
+					if(name == s)
 					{
 						int state = GetCurrentDb()->GetInt("STATE");
 
@@ -928,14 +965,12 @@ void HMI_manager::UpdateSamplePoint() // handle updated sample points
 						if(state == NoLevel)
 						{
 							//White means HMI state none or NO or Invalid
-//							((PSinglePointLed*)obj)->setValue(true);
 							((PSinglePointLed*)obj)->on();
 							((PSinglePointLed*)obj)->setOnColor(white);
 						}
 
 						if(state == FailureLevel)
-						{ //Blue means Communication driver error state or Invalid
-//							((PSinglePointLed*)obj)->setValue(true);
+						{   //Blue means Communication driver error state or Invalid
 							((PSinglePointLed*)obj)->on();
 							((PSinglePointLed*)obj)->setOnColor(blue);
 						}
@@ -961,9 +996,12 @@ void HMI_manager::UpdateSamplePoint() // handle updated sample points
 
 					QString name = obj->name();
 
-					// e.g. IEC104PointPDoublePointLed
+					// e.g. IEC104Point
 
-					if(name == s + "PDoublePointLed")
+					int idx = name.find('_');
+					name.truncate(idx);
+
+					if(name == s)
 					{
 						int state = GetCurrentDb()->GetInt("STATE");
 
@@ -986,7 +1024,7 @@ void HMI_manager::UpdateSamplePoint() // handle updated sample points
 						}
 
 						if(state == FailureLevel)
-						{ //Blue means Communication driver error state or Invalid
+						{   //Blue means Communication driver error state or Invalid
 							((PDoublePointLed*)obj)->on();
 							((PDoublePointLed*)obj)->setOnColor(blue);
 						}
@@ -1012,7 +1050,10 @@ void HMI_manager::UpdateSamplePoint() // handle updated sample points
 
 					QString name = obj->name();
 
-					if(name == s + "PSwitch")
+					int idx = name.find('_');
+					name.truncate(idx);
+
+					if(name == s)
 					{
 						int state = GetCurrentDb()->GetInt("STATE");
 
@@ -1036,7 +1077,7 @@ void HMI_manager::UpdateSamplePoint() // handle updated sample points
 						}
 
 						if(state == FailureLevel)
-						{ //Blue means Communication driver error state or Invalid
+						{   //Blue means Communication driver error state or Invalid
 							((PSwitch*)obj)->setPSwitchValueInvalid(false);
 						}
 						
@@ -1071,12 +1112,10 @@ void HMI_manager::sendCommand()
 			Sleep(100);
 			QString name = obj->name();
 
-			char str[100];
-
-			strcpy(str, (const char*)name.replace("QwtPushButton", ""));
-
-			sample_point_name = QString(str);
-
+			int idx = name.find('_');
+			name.truncate(idx);
+			sample_point_name = name;
+			
 			QTimer::singleShot(10,this,SLOT(DoButtonCommand()));
 	
 			break;
@@ -1115,11 +1154,9 @@ void HMI_manager::pSwitchToggledSendCommand()
 
 			QString name = obj->name();
 
-			char str[100];
-
-			strcpy(str, (const char*)name.replace("PSwitch", ""));
-
-			sample_point_name = QString(str);
+			int idx = name.find('_');
+			name.truncate(idx);
+			sample_point_name = name;
 
 			QTimer::singleShot(10,this,SLOT(Do_pSwitchCommand()));
 
@@ -1164,11 +1201,9 @@ void HMI_manager::RightClicked(QString &class_name, QString &widget_name) // sho
 
 			if(widget_name == obj->name())
 			{
-				char str[100];
-
-				strcpy(str, (const char*)widget_name.replace("SinglePointLed", ""));
-
-				sample_point_name = QString(str);
+				int idx = widget_name.find('_');
+				widget_name.truncate(idx);
+				sample_point_name = widget_name;
 				
 				found = true;
 
@@ -1202,11 +1237,9 @@ void HMI_manager::RightClicked(QString &class_name, QString &widget_name) // sho
 
 			if(widget_name == obj->name())
 			{
-				char str[100];
-
-				strcpy(str, (const char*)widget_name.replace("DoublePointLed", ""));
-
-				sample_point_name = QString(str);
+				int idx = widget_name.find('_');
+				widget_name.truncate(idx);
+				sample_point_name = widget_name;
 				
 				found = true;
 
@@ -1240,11 +1273,9 @@ void HMI_manager::RightClicked(QString &class_name, QString &widget_name) // sho
 
 			if(widget_name == obj->name())
 			{
-				char str[100];
-
-				strcpy(str, (const char*)widget_name.replace("PSwitch", ""));
-
-				sample_point_name = QString(str);
+				int idx = widget_name.find('_');
+				widget_name.truncate(idx);
+				sample_point_name = widget_name;
 				
 				found = true;
 
@@ -1276,11 +1307,9 @@ void HMI_manager::RightClicked(QString &class_name, QString &widget_name) // sho
 
 			if(widget_name == obj->name())
 			{
-				char str[100];
-
-				strcpy(str, (const char*)widget_name.replace("PSinglePointLed", ""));
-
-				sample_point_name = QString(str);
+				int idx = widget_name.find('_');
+				widget_name.truncate(idx);
+				sample_point_name = widget_name;
 				
 				found = true;
 
@@ -1314,11 +1343,9 @@ void HMI_manager::RightClicked(QString &class_name, QString &widget_name) // sho
 
 			if(widget_name == obj->name())
 			{
-				char str[100];
-
-				strcpy(str, (const char*)widget_name.replace("PDoublePointLed", ""));
-
-				sample_point_name = QString(str);
+				int idx = widget_name.find('_');
+				widget_name.truncate(idx);
+				sample_point_name = widget_name;
 				
 				found = true;
 
@@ -1352,11 +1379,9 @@ void HMI_manager::RightClicked(QString &class_name, QString &widget_name) // sho
 
 			if(widget_name == obj->name())
 			{
-				char str[100];
-
-				strcpy(str, (const char*)widget_name.replace("QwtThermo", ""));
-
-				sample_point_name = QString(str);
+				int idx = widget_name.find('_');
+				widget_name.truncate(idx);
+				sample_point_name = widget_name;
 				
 				found = true;
 
@@ -1388,11 +1413,9 @@ void HMI_manager::RightClicked(QString &class_name, QString &widget_name) // sho
 
 			if(widget_name == obj->name())
 			{
-				char str[100];
-
-				strcpy(str, (const char*)widget_name.replace("PTank", ""));
-
-				sample_point_name = QString(str);
+				int idx = widget_name.find('_');
+				widget_name.truncate(idx);
+				sample_point_name = widget_name;
 				
 				found = true;
 
@@ -1424,11 +1447,9 @@ void HMI_manager::RightClicked(QString &class_name, QString &widget_name) // sho
 
 			if(widget_name == obj->name())
 			{
-				char str[100];
-
-				strcpy(str, (const char*)widget_name.replace("PThermometer", ""));
-
-				sample_point_name = QString(str);
+				int idx = widget_name.find('_');
+				widget_name.truncate(idx);
+				sample_point_name = widget_name;
 				
 				found = true;
 
@@ -1460,11 +1481,9 @@ void HMI_manager::RightClicked(QString &class_name, QString &widget_name) // sho
 
 			if(widget_name == obj->name())
 			{
-				char str[100];
-
-				strcpy(str, (const char*)widget_name.replace("PLCDNumber", ""));
-
-				sample_point_name = QString(str);
+				int idx = widget_name.find('_');
+				widget_name.truncate(idx);
+				sample_point_name = widget_name;
 				
 				found = true;
 
@@ -1535,25 +1554,55 @@ void HMI_manager::DoButtonCommand()
 
 	if(QMessageBox::information(NULL,tr("Command confirmation"),tr("Send the command - Are You Sure?"),QObject::tr("Yes"),QObject::tr("No"),0,1) == 0)
 	{
-		QString edit_child_name = sample_point_name + QString("QLineEdit");
-		QLineEdit* edit = (QLineEdit *) p->child(edit_child_name, "QLineEdit");
+		bool found = false;
+		QString edit_child_name;
+		
+		QObjectList *l = p->queryList( "QLineEdit" );
 
-		//QString value_for_command;
+		QObjectListIt it( *l ); // iterate over the buttons
 
-		if(edit)
+		QObject *obj;
+
+		while((obj = it.current()) != 0) 
 		{
-			QString v = edit->text();
+			// for each found object...
+			++it;
 
-			value_for_command.sprintf("%s", (const char*)v);
+			edit_child_name = obj->name();
+
+			QString truncated_edit_child_name = edit_child_name;
+
+			int idx = truncated_edit_child_name.find('_');
+			truncated_edit_child_name.truncate(idx);
+
+			if(sample_point_name == truncated_edit_child_name)
+			{
+				found = true;
+				break;
+			}
 		}
-		else
+
+		delete l; // delete the list, not the objects
+		
+		if(found)
 		{
-			return;
+			QLineEdit* edit = (QLineEdit *) p->child(edit_child_name, "QLineEdit");
+
+			if(edit)
+			{
+				QString v = edit->text();
+
+				value_for_command.sprintf("%s", (const char*)v);
+			}
+			else
+			{
+				return;
+			}
+
+			QString cmd = "select UNIT from SAMPLE where NAME='"+ sample_point_name +"';";
+
+			GetConfigureDb()->DoExec(this, cmd, tUnit, value_for_command, sample_point_name); // kick it off
 		}
-
-		QString cmd = "select UNIT from SAMPLE where NAME='"+ sample_point_name +"';";
-
-		GetConfigureDb()->DoExec(this, cmd, tUnit, value_for_command, sample_point_name); // kick it off
 	}
 };
 
@@ -1589,7 +1638,6 @@ void HMI_manager::Do_pSwitchCommand()
 		}
 
 		delete l; // delete the list, not the objects
-
 	}
 };
 
