@@ -19,7 +19,7 @@
   \param name Name
 */
 PSinglePointLed::PSinglePointLed(QWidget *parent, const char *name)
-        : QWidget(parent,name)
+        : QWidget(parent,name), timer(NULL)
 {
     OnColor = QColor(white); // default on color is white
     OffColor = paletteBackgroundColor() ;
