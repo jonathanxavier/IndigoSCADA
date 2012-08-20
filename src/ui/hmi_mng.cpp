@@ -9,12 +9,12 @@
  *   for full copyright notice and license terms. 
  *
  */
+
 #include <qt.h>
 #include "hmi_mng.h"
 #include "qwt_thermo.h"
 #include "single_point_led.h"
 #include "double_point_led.h"
-#include <qlcdnumber.h>
 #include "realtimedb.h"
 #include "dispatch.h"
 #include "helper_functions.h"
@@ -80,29 +80,7 @@ void HMI_manager::setInitialValues()
 
 		delete l; // delete the list, not the objects
 	}
-
-	{
-		QObjectList *l = p->queryList( "QLCDNumber" );
-
-		QObjectListIt it( *l ); // iterate over the buttons
-
-		QObject *obj;
-
-		while((obj = it.current()) != 0) 
-		{
-			// for each found object...
-			++it;
-
-			QString name = obj->name();
-
-			double val = 0.0;
-
-			((QLCDNumber*)obj)->display(val);
-		}
-
-		delete l; // delete the list, not the objects
-	}
-
+	
 	{
 		QObjectList *l = p->queryList( "PLCDNumber" );
 
@@ -146,7 +124,7 @@ void HMI_manager::setInitialValues()
 		delete l; // delete the list, not the objects
 	}
 
-    {
+    	{
 		QObjectList *l = p->queryList( "DoublePointLed" );
 
 		QObjectListIt it( *l ); // iterate over the buttons
@@ -274,6 +252,26 @@ void HMI_manager::setInitialValues()
 
 		delete l; // delete the list, not the objects
 	}
+
+	{
+		QObjectList *l = p->queryList( "PSwitch" );
+
+		QObjectListIt it( *l ); // iterate over the buttons
+
+		QObject *obj;
+
+		while((obj = it.current()) != 0) 
+		{
+			// for each found object...
+			++it;
+
+			QString name = obj->name();
+
+			((PSwitch*)obj)->setPSwitchValue(false);
+		}
+
+		delete l; // delete the list, not the objects
+	}
 }
 
 //TODO: put at startup the content of QObjectList in a Map and make tree search
@@ -321,38 +319,6 @@ void HMI_manager::UpdateTags()
 						double v = atof((const char*)(GetCurrentDb()->GetString("VAL")));
 
 						((QwtThermo*)obj)->setValue(v);
-						
-						break; // handle the next record
-					}
-				}
-
-				delete l; // delete the list, not the objects
-			}
-
-			{
-				QObjectList *l = p->queryList( "QLCDNumber" );
-
-				QObjectListIt it( *l ); // iterate over the buttons
-
-				QObject *obj;
-
-				while((obj = it.current()) != 0) 
-				{
-					// for each found object...
-					++it;
-
-					QString name = obj->name();
-
-					// e.g. OPCPoint09
-
-					int idx = name.find('_');
-					name.truncate(idx);
-
-					if(name == s)
-					{
-						double v = atof((const char*)(GetCurrentDb()->GetString("VAL")));
-
-						((QLCDNumber*)obj)->display(v);
 						
 						break; // handle the next record
 					}
@@ -462,7 +428,7 @@ void HMI_manager::UpdateTags()
 				delete l; // delete the list, not the objects
 			}
 
-            {
+            		{
 				QObjectList *l = p->queryList( "DoublePointLed" );
 
 				QObjectListIt it( *l ); // iterate over the buttons
@@ -874,7 +840,7 @@ void HMI_manager::UpdateSamplePoint() // handle updated sample points
 				delete l; // delete the list, not the objects
 			}
 
-            {
+            		{
 				QObjectList *l = p->queryList( "DoublePointLed" );
 
 				QObjectListIt it( *l ); // iterate over the buttons
