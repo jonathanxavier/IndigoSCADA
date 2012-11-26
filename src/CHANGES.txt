@@ -144,3 +144,6 @@ Added all the code of HMI_designer.exe
 19-08-2012
 Added other SCADA widgets
 Added popup window on HMI widgets
+-------------------------------------------------------------------------------------------------------
+26-11-2012
+Added support for multiple HMI windows
