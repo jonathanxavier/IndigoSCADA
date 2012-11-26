@@ -187,7 +187,7 @@ UserFrameWork::~UserFrameWork()
 {
 	IT_IT("UserFrameWork::~UserFrameWork");
 
-	delete hmi_mng;
+//	delete hmi_mng;
 	delete designerHMI;
 };
 /*
@@ -362,6 +362,8 @@ void UserFrameWork::Logout()
 *Returns:none
 */
 
+static HMIDict	hmi_database;
+
 void UserFrameWork::SetTabs()
 {
 	IT_IT("UserFrameWork::SetTabs");
@@ -376,20 +378,36 @@ void UserFrameWork::SetTabs()
 
         //Dinamic dialog loading from .ui designer file//////////////////////////////////////////
 		QApplication::addLibraryPath("C:\\scada\\plugins"); //apa+++ 21-07-2012 So we can load qwtplugin.dll from directory C:\scada\plugins\designer
-		hmi_mng = new HMI_manager;
 
-		QWidgetFactory::loadImages("../Bitmaps");
-		designerHMI = (QDialog *)QWidgetFactory::create("../Maps/hmi.ui", hmi_mng);
+		///////////////Create an HMI dictionary//////////////////////////////////
+		int n = 10;
+		QString hmi_index;
 
-		if(designerHMI)
+		for(int i = 0; i < n; i++)
 		{
-			hmi_mng->setParent(designerHMI); 
-
-			((QTabWidget *)centralWidget())->addTab(designerHMI, tr("HMI"));
+			hmi_index = "hmi" + QString::number(i) + ".ui";	
+			HMIDict::value_type pr(hmi_index, new HMI_manager);
+			hmi_database.insert(pr); // put in the dictionary
 		}
-		else
+						
+		for(HMIDict::iterator it = hmi_database.begin(); !(it == hmi_database.end()); it++)
 		{
-			QSMessage(QDateTimeString(QDateTime::currentDateTime()) + ":" + QString(tr("HMI -> hmi.ui file not found in Maps folder")));
+			hmi_mng = (*it).second;
+		
+			QWidgetFactory::loadImages("../Bitmaps");
+			QString map_path = QString("../Maps/") + (*it).first;
+			designerHMI = (QDialog *)QWidgetFactory::create(map_path, hmi_mng);
+
+			if(designerHMI)
+			{
+				hmi_mng->setParent(designerHMI); 
+
+				((QTabWidget *)centralWidget())->addTab(designerHMI, (*it).first);
+			}
+			else
+			{
+				QSMessage(QDateTimeString(QDateTime::currentDateTime()) + ":" + QString(tr(".ui file for not found in Maps folder")) + QString("for ") + hmi_index);
+			}
 		}
 		//////////////////////////////////////////////////////////////////////////////////////////
 
@@ -402,7 +420,6 @@ void UserFrameWork::SetTabs()
 		pMessage = new MessageDisplay(centralWidget()); // we need a trace / message window from the off
 		((QTabWidget *)centralWidget())->addTab(pMessage,tr("&Messages"));
 		//
-		
 		centralWidget()->show();
 		((QTabWidget *)centralWidget())->showPage(pAlarms);
 		pAlarms->setFocus();
@@ -543,6 +560,11 @@ void UserFrameWork::Login()
 	            //configMenu->insertItem(QPixmap((const char **)magick),tr("&Configure Serial Ports..."),this,SLOT(configurePorts()));
 	            configMenu->insertItem(QPixmap((const char **)alarmsreport),tr("&Configure Alarm Groups..."),this,SLOT(configureAlarmGroups()));
 	            //configMenu->insertItem(QPixmap((const char **)configreport),tr("&Configure Report..."),this,SLOT(configureReport()));
+
+				configMenu->insertItem(QPixmap((const char **)scada),tr("&Configure HMI ..."),this,SLOT(configureHMI()));
+
+				configMenu->insertItem(QPixmap((const char **)scada),tr("&Configure Protocol ..."),this,SLOT(configureProtocol()));
+				
 	            menuBar()->insertItem(tr("&Configure"),configMenu);
 
 				QPopupMenu *control = new QPopupMenu(this);
@@ -719,6 +741,7 @@ void UserFrameWork::configurePorts()
 	SerialCfg dlg(this);
 	dlg.exec();
 };
+
 /*
 *Function:configureAlarmGroups
 *Inputs:none
@@ -731,6 +754,95 @@ void UserFrameWork::configureAlarmGroups()
 	
 	AlarmGroupCfg dlg(this);
 	dlg.exec();
+};
+
+/*
+*Function:configureHMI
+*Inputs:none
+*Outputs:none
+*Returns:none
+*/
+void UserFrameWork::configureHMI()
+{
+	IT_IT("UserFrameWork::configureHMI");
+
+	qApp->processEvents();
+	QString path;
+
+	#ifdef UNIX
+	//QString cmd = QSBIN_DIR + "/helpviewer " + QSREPORT_DIR + "/" + dlg.List->currentText() + "/index.html&";
+	system((const char *)cmd);
+	#endif
+
+	#ifdef WIN32
+	QString cmd = "C:\\scada\\bin\\hmi_designer.exe";
+	
+	// create new process
+	STARTUPINFO startup_information;
+
+	ZeroMemory( &startup_information, sizeof( startup_information ) );
+	startup_information.cb = sizeof( startup_information );
+
+	PROCESS_INFORMATION process_information;
+ 	ZeroMemory( &process_information, sizeof( process_information ) );
+	
+	if ( CreateProcess( NULL,
+						  (char*)((const char*)cmd),
+						  0,
+						  0,
+						  1,
+						  NORMAL_PRIORITY_CLASS,
+						  0,
+						  0,
+						 &startup_information,
+						 &process_information ) != FALSE );
+
+	#endif
+};
+
+
+/*
+*Function:configureProtocol
+*Inputs:none
+*Outputs:none
+*Returns:none
+*/
+void UserFrameWork::configureProtocol()
+{
+	IT_IT("UserFrameWork::configureProtocol");
+
+	qApp->processEvents();
+	QString path;
+
+	#ifdef UNIX
+	//QString cmd = QSBIN_DIR + "/helpviewer " + QSREPORT_DIR + "/" + dlg.List->currentText() + "/index.html&";
+	system((const char *)cmd);
+	#endif
+
+	#ifdef WIN32
+	QString cmd = "C:\\scada\\bin\\protocol_configurator.exe";
+	
+	// create new process
+	STARTUPINFO startup_information;
+
+	ZeroMemory( &startup_information, sizeof( startup_information ) );
+	startup_information.cb = sizeof( startup_information );
+
+	PROCESS_INFORMATION process_information;
+ 	ZeroMemory( &process_information, sizeof( process_information ) );
+	
+	if ( CreateProcess( NULL,
+						  (char*)((const char*)cmd),
+						  0,
+						  0,
+						  1,
+						  NORMAL_PRIORITY_CLASS,
+						  0,
+						  0,
+						 &startup_information,
+						 &process_information ) != FALSE );
+
+	#endif
 };
 
 /*

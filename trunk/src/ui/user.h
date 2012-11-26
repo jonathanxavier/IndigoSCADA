@@ -30,6 +30,13 @@ class ReportGenerator;
 class RIntro;
 class HMI_manager;
 
+//typedef QMap<int, class HMI_manager> indexHMI;
+
+#ifdef USE_STD_MAP
+typedef std::map<QString, HMI_manager*, std::less<QString> > HMIDict; // the HMI dictionary 26-11-2012
+#endif
+
+
 class UserFrameWork : public QMainWindow
 {
 	Q_OBJECT
@@ -42,6 +49,7 @@ class UserFrameWork : public QMainWindow
 	SysMgrFrameWork *pSys;   // system manager framework
 	QDialog *designerHMI;
 	HMI_manager     *hmi_mng;
+		
 	//
 	unsigned AutoLogoffTime; // number of seconds to wait before forcing a log off
 	int AutoLogOffCount; // count down for auto log off
@@ -116,6 +124,8 @@ class UserFrameWork : public QMainWindow
     void configureSamplePoints();
     void configureSchedule();
     void configureAlarmGroups();
+	void configureHMI(); //Start the hmi_designer.exe tool
+	void configureProtocol(); //Start the protocol_configurator.exe tool
     void configurePorts();
     void configureUser();
 	void restart(); // stop and start monitoring
