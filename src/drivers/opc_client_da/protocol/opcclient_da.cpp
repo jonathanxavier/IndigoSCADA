@@ -2761,6 +2761,11 @@ void Opc_client_da_imp::check_for_commands(struct iec_item *queued_item)
 			fprintf(stderr,"Receiving general interrogation command from monitor.exe\n");
 			fflush(stderr);
 
+			//Check if resources are allocated
+
+			if(hServerRead == NULL)
+				alloc_command_resources();
+
 			for(dw = 0; dw < g_dwNumItems; dw++)
 			{
 				hServerRead[dw] = Item[dw].hServer;
