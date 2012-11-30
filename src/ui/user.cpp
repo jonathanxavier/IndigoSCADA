@@ -1,7 +1,7 @@
 /*
  *                         IndigoSCADA
  *
- *   This software and documentation are Copyright 2002 to 2009 Enscada 
+ *   This software and documentation are Copyright 2002 to 2012 Enscada 
  *   Limited and its licensees. All rights reserved. See file:
  *
  *                     $HOME/LICENSE 
@@ -21,8 +21,6 @@
 #include "alarmdisplay.h"
 #include "messages.h"
 #include "statusdisplay.h"
-#include "mapdisplay.h"
-#include "sysmgr.h"
 #include "helpwindow.h"
 #include "multitrace.h"
 #include "realtime_browsedb.h"
@@ -187,8 +185,10 @@ UserFrameWork::~UserFrameWork()
 {
 	IT_IT("UserFrameWork::~UserFrameWork");
 
-//	delete hmi_mng;
-	delete designerHMI;
+//	for(HMIDict::iterator it = hmi_database.begin(); !(it == hmi_database.end()); it++)
+///	{
+///		delete ((*it).second);
+//	}
 };
 /*
 *Function:void AutoLogOut(); // automatic logout 
@@ -234,11 +234,11 @@ void UserFrameWork::AutoLogOut() // automatic logout
 			//cerr << "Trying to Auto Close System Manager" << endl;
 			//
 			// we cannot close the system manager here - a bit too tangled
-			if(SysMgrFrameWork::Active && pSys)
-			{
-				QTimer::singleShot(50,pSys,SLOT(CloseSysMgr()));
-				pSys = 0;
-			};
+			//if(SysMgrFrameWork::Active && pSys)
+			//{
+			//	QTimer::singleShot(50,pSys,SLOT(CloseSysMgr()));
+			//	pSys = 0;
+			//};
 			QTimer::singleShot(150,this,SLOT(Logout()));
 			QSLogEvent(GetUserDetails().Name,tr("Auto Logged Off"));
 		};
@@ -346,11 +346,11 @@ void UserFrameWork::Logout()
 	pToolBar->raise();
 	pToolBar->show();
 
-	if(SysMgrFrameWork::Active && pSys)
-	{
-		QTimer::singleShot(50,pSys,SLOT(CloseSysMgr()));
-		pSys = 0;
-	}
+	//if(SysMgrFrameWork::Active && pSys)
+	//{
+	//	QTimer::singleShot(50,pSys,SLOT(CloseSysMgr()));
+	//	pSys = 0;
+	//}
 	//
 	Login();
 };
@@ -363,6 +363,7 @@ void UserFrameWork::Logout()
 */
 
 static HMIDict	hmi_database;
+#define MAX_HMI_WINDOWS 10
 
 void UserFrameWork::SetTabs()
 {
@@ -372,17 +373,24 @@ void UserFrameWork::SetTabs()
 	if(!pMessage)
 	{
 		setCentralWidget(new QTabWidget(this)); // create the work area	
-		// Create the tab widgets for the map display
-		//pMaps = new MapDisplay(centralWidget());
-		//((QTabWidget *)centralWidget())->addTab(pMaps,tr("Ma&ps"));
+		        
+		pAlarms = new AlarmDisplay(centralWidget());
+		((QTabWidget *)centralWidget())->addTab(pAlarms,tr("&Alarms"));
+		
+		pStatus = new StatusDisplay(centralWidget());
+		((QTabWidget *)centralWidget())->addTab(pStatus,tr("&Status"));
 
-        //Dinamic dialog loading from .ui designer file//////////////////////////////////////////
-		QApplication::addLibraryPath("C:\\scada\\plugins"); //apa+++ 21-07-2012 So we can load qwtplugin.dll from directory C:\scada\plugins\designer
+		pMessage = new MessageDisplay(centralWidget()); // we need a trace / message window from the off
+		((QTabWidget *)centralWidget())->addTab(pMessage,tr("&Messages"));
 
 		///////////////Create an HMI dictionary//////////////////////////////////
-		int n = 10;
+		//Dinamic dialog loading from .ui designer file//////////////////////////////////////////
+		QApplication::addLibraryPath("C:\\scada\\plugins"); //apa+++ 21-07-2012 So we can load qwtplugin.dll from directory C:\scada\plugins\designer
+		
+		int n = MAX_HMI_WINDOWS;
 		QString hmi_index;
-
+		HMI_manager     *hmi_mng;
+		
 		for(int i = 0; i < n; i++)
 		{
 			hmi_index = "hmi" + QString::number(i) + ".ui";	
@@ -396,29 +404,22 @@ void UserFrameWork::SetTabs()
 		
 			QWidgetFactory::loadImages("../Bitmaps");
 			QString map_path = QString("../Maps/") + (*it).first;
-			designerHMI = (QDialog *)QWidgetFactory::create(map_path, hmi_mng);
+			QDialog *designerHMI = (QDialog *)QWidgetFactory::create(map_path, hmi_mng);
 
 			if(designerHMI)
 			{
 				hmi_mng->setParent(designerHMI); 
 
 				((QTabWidget *)centralWidget())->addTab(designerHMI, (*it).first);
+
+				QSLogEvent("HMI", QString((*it).first) + QString(" displayed"));
 			}
 			else
 			{
-				QSMessage(QDateTimeString(QDateTime::currentDateTime()) + ":" + QString(tr(".ui file for not found in Maps folder")) + QString("for ") + hmi_index);
+				QSLogEvent("HMI", QString((*it).first) + QString(" not displayed"));
 			}
 		}
 		//////////////////////////////////////////////////////////////////////////////////////////
-
-		pAlarms = new AlarmDisplay(centralWidget());
-		((QTabWidget *)centralWidget())->addTab(pAlarms,tr("&Alarms"));
-		
-		pStatus = new StatusDisplay(centralWidget());
-		((QTabWidget *)centralWidget())->addTab(pStatus,tr("&Status"));
-
-		pMessage = new MessageDisplay(centralWidget()); // we need a trace / message window from the off
-		((QTabWidget *)centralWidget())->addTab(pMessage,tr("&Messages"));
 		//
 		centralWidget()->show();
 		((QTabWidget *)centralWidget())->showPage(pAlarms);
@@ -456,8 +457,8 @@ void UserFrameWork::SetTabs()
 #include "UserCfgDlg.h"
 #include "driver.h"
 //xpm
-#include "fileopen.xpm"
-#include "filesave.xpm"
+//#include "fileopen.xpm"
+//#include "filesave.xpm"
 #include "datasourcesuser.xpm"
 #include "driver.xpm"
 #include "computergreen.xpm"
@@ -682,7 +683,7 @@ void UserFrameWork::Login()
 */
 void UserFrameWork::configureSystem()
 {
-	IT_IT("SysMgrFrameWork::configureSystem");
+	IT_IT("UserFrameWork::configureSystem");
 	
 	SystemCfg dlg(this);
 	dlg.exec();
@@ -696,7 +697,7 @@ void UserFrameWork::configureSystem()
 */
 void UserFrameWork::configureUnits()
 {
-	IT_IT("SysMgrFrameWork::configureUnits");
+	IT_IT("UserFrameWork::configureUnits");
 	
 	UnitCfg dlg(this);
 	dlg.exec();
@@ -709,7 +710,7 @@ void UserFrameWork::configureUnits()
 */
 void UserFrameWork::configureSamplePoints()
 {
-	IT_IT("SysMgrFrameWork::configureSamplePoints");
+	IT_IT("UserFrameWork::configureSamplePoints");
 	
 	SampleCfg dlg(this);
 	dlg.exec();
@@ -1261,18 +1262,18 @@ void UserFrameWork::systemManager() // start the system manager
 	// first we must try and lock the database against other people being 
 	// System Manager at the same time
 	// 
-	if(!SysMgrFrameWork::Active)
-	{
+	//if(!SysMgrFrameWork::Active)
+	//{
 		// Try and lock
 		GetCurrentDb()->DoExec(this,"select DVAL from PROPS where SKEY='System' and IKEY='Lock';",tLockSysMgr); // get the system manager lock 
-	}
-	else
-	{
-		if(pSys)
-		{
-			pSys->raise();
-		};
-	};
+	//}
+	//else
+	///{
+	//	if(pSys)
+	//	{
+	//		pSys->raise();
+	//	};
+	//};
 };
 /*-Function: printReport
 *Inputs:none
@@ -1474,9 +1475,9 @@ void UserFrameWork::QueryResponse (QObject *p,const QString &c, int id, QObject*
 			{
 				DOAUDIT(tr("Start System Manager"));
 				GetCurrentDb()->DoExec(0,"update PROPS set DVAL='1' where SKEY='System' and IKEY='Lock';",0);
-				pSys = new SysMgrFrameWork(0, "System Manager");
-				pSys->show();
-				pSys->raise();
+				//pSys = new SysMgrFrameWork(0, "System Manager");
+				//pSys->show();
+				//pSys->raise();
 			}
 			else
 			{
@@ -1994,13 +1995,13 @@ void UserFrameWork::closeEvent(QCloseEvent *e)
 	{
 		// we must allow enough time for the database queues to finish their stuff
 		// do we have the system manager active or not ?
-		if(SysMgrFrameWork::Active)
-		{
-			// clear the semaphore
-			GetCurrentDb()->DoExec(0,"update PROPS set DVAL='0' where SKEY='System' and IKEY='Lock';",0);
-
-			pSys->hide();			
-		};		
+		//if(SysMgrFrameWork::Active)
+		//{
+		//	// clear the semaphore
+		//	GetCurrentDb()->DoExec(0,"update PROPS set DVAL='0' where SKEY='System' and IKEY='Lock';",0);
+//
+//			pSys->hide();			
+//		};		
 		this->hide(); // hide the application
 		QTimer::singleShot(3000,qApp,SLOT(quit())); // quit in 3 seconds
 		e->ignore();

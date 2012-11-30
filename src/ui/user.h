@@ -1,7 +1,7 @@
 /*
  *                         IndigoSCADA
  *
- *   This software and documentation are Copyright 2002 to 2009 Enscada 
+ *   This software and documentation are Copyright 2002 to 2012 Enscada 
  *   Limited and its licensees. All rights reserved. See file:
  *
  *                     $HOME/LICENSE 
@@ -19,7 +19,6 @@
 #include "dbase.h"
 #include "dispatch.h"
 //
-class MapDisplay;
 class AlarmDisplay;
 class MessageDisplay;
 class StatusDisplay;
@@ -43,13 +42,9 @@ class UserFrameWork : public QMainWindow
 	//
 	QToolBar       *pToolBar; // the current tool bar
 	QToolBar       *pToolBarLogo; // the current tool bar logo
-	MapDisplay     *pMaps; // the map window
 	AlarmDisplay   *pAlarms; // the alarms window
 	StatusDisplay  *pStatus; // the status window
 	SysMgrFrameWork *pSys;   // system manager framework
-	QDialog *designerHMI;
-	HMI_manager     *hmi_mng;
-		
 	//
 	unsigned AutoLogoffTime; // number of seconds to wait before forcing a log off
 	int AutoLogOffCount; // count down for auto log off
