@@ -1,7 +1,7 @@
 /*
  *                         IndigoSCADA
  *
- *   This software and documentation are Copyright 2002 to 2012 Enscada 
+ *   This software and documentation are Copyright 2002 to 2013 Enscada 
  *   Limited and its licensees. All rights reserved. See file:
  *
  *                     $HOME/LICENSE 
@@ -30,8 +30,7 @@ enum {
     RTU
 };
 
-static int timeout_connection_with_parent = 0;
- 
+int gl_timeout_connection_with_parent = 0;
 
 #define SUPPLIER "@ enscada.com"
 #define APPLICATION "modbus_master.exe"
@@ -719,7 +718,7 @@ void PipeWorker(void* pParam)
 
 				if(p_item->iec_obj.ioa == 4004)
 				{ 
-					timeout_connection_with_parent = 0;
+					gl_timeout_connection_with_parent = 0;
 					//fprintf(stderr, "Receive keep alive # %d from front end\n", p_item->msg_id);
                     fprintf(stderr, "wdg %d\r", p_item->msg_id);
 				    fflush(stderr);
