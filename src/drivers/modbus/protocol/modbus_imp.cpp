@@ -14,8 +14,8 @@
 #include "iec104types.h"
 #include "iec_item.h"
 #include "clear_crc_eight.h"
-#include "rfc1006_item.h"
-#include "rfc1006_imp.h"
+#include "modbus_item.h"
+#include "modbus_imp.h"
 #include "stdlib.h"
 
 #define MAX_KEYLEN 256
@@ -75,7 +75,7 @@ void rebuild_iec_item_message(struct iec_item *item2, iec_item_type *item1)
 
 void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackParam) 
 {
-	rfc1006_imp * cl = (rfc1006_imp*)recvCallBackParam;
+	modbus_imp * cl = (modbus_imp*)recvCallBackParam;
 	iec_item_type *item1 = (iec_item_type*)vinstance;
 
 	switch (info->status) 
@@ -102,8 +102,8 @@ void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackPa
 ////////////////////////////////Middleware/////////////////////////////////////
 
 ////////////////////////////////Middleware/////////////////
-iec_item_type rfc1006_imp::instanceSend;
-ORTEPublication* rfc1006_imp::publisher = NULL;
+iec_item_type modbus_imp::instanceSend;
+ORTEPublication* modbus_imp::publisher = NULL;
 ////////////////////////////////Middleware/////////////////
 
 //Global to remove ASAP///////////////////////
@@ -114,13 +114,13 @@ ORTEPublication* global_publisher;
 //   
 //  Class constructor.   
 //   
-rfc1006_imp::rfc1006_imp(char* rfc1006server_address, char*rfc1006server_port, char* line_number, int polling_time):
+modbus_imp::modbus_imp(struct modbusContext* ctx, char* line_number, int polling_time):
 fExit(false),pollingTime(polling_time)
 {   
-	strcpy(ServerIPAddress, rfc1006server_address);
-	strcpy(ServerPort, rfc1006server_port);
+	strcpy(ServerIPAddress, ctx->modbus_server_address);
+	strcpy(ServerPort, ctx->modbus_server_port);
 
-	//if(!OpenLink(ServerIPAddress, atoi(rfc1006ServerPort)))
+	//if(!OpenLink(ServerIPAddress, atoi(modbus_ServerPort)))
 	{
 		/////////////////////Middleware/////////////////////////////////////////////////////////////////
 		received_command_callback = 0;
@@ -152,7 +152,7 @@ fExit(false),pollingTime(polling_time)
 		char fifo_monitor_name[150];
 		strcpy(fifo_monitor_name,"fifo_monitor_direction");
 		strcat(fifo_monitor_name, line_number);
-		strcat(fifo_monitor_name, "rfc1006");
+		strcat(fifo_monitor_name, "modbus");
 
 		publisher = ORTEPublicationCreate(
 		domain,
@@ -170,7 +170,7 @@ fExit(false),pollingTime(polling_time)
 		char fifo_control_name[150];
 		strcpy(fifo_control_name,"fifo_control_direction");
 		strcat(fifo_control_name, line_number);
-		strcat(fifo_control_name, "rfc1006");
+		strcat(fifo_control_name, "modbus");
 
 		//Create subscriber
 		NTPTIME_BUILD(deadline,3);
@@ -203,7 +203,7 @@ fExit(false),pollingTime(polling_time)
 //   
 //  Class destructor.   
 //   
-rfc1006_imp::~rfc1006_imp()  
+modbus_imp::~modbus_imp()  
 {   
     // free resources   
 	
@@ -213,9 +213,9 @@ rfc1006_imp::~rfc1006_imp()
 
 static u_int n_msg_sent = 0;
 
-int rfc1006_imp::Async2Update()
+int modbus_imp::Async2Update()
 {
-	IT_IT("rfc1006_imp::Async2Update");
+	IT_IT("modbus_imp::Async2Update");
 
 	
 	int rc = 0;
@@ -235,9 +235,9 @@ int rfc1006_imp::Async2Update()
 
 		if(rc)
 		{ 
-			//fprintf(stderr,"rfc1006_imp exiting...., due to lack of connection with server\n");
+			//fprintf(stderr,"modbus_imp exiting...., due to lack of connection with server\n");
 			//fflush(stderr);
-			IT_COMMENT("rfc1006_imp exiting...., due to lack of connection with server");
+			IT_COMMENT("modbus_imp exiting...., due to lack of connection with server");
 			
 			//Send LOST message to parent (monitor.exe)
 			struct iec_item item_to_send;
@@ -276,7 +276,7 @@ int rfc1006_imp::Async2Update()
 
 		if(fExit)
 		{
-			IT_COMMENT("Terminate rfc1006 loop!");
+			IT_COMMENT("Terminate modbus loop!");
 			break;
 		}
 
@@ -294,9 +294,9 @@ int rfc1006_imp::Async2Update()
 	return 0;
 }
 
-int rfc1006_imp::RfcStart(char* RfcServerProgID, char* RfcclassId, char* RfcUpdateRate, char* RfcPercentDeadband)
+int modbus_imp::RfcStart(char* RfcServerProgID, char* RfcclassId, char* RfcUpdateRate, char* RfcPercentDeadband)
 {
-	IT_IT("rfc1006_imp::RfcStart");
+	IT_IT("modbus_imp::RfcStart");
 	
 	char show_msg[200];
 	sprintf(show_msg, " IndigoSCADA OPC DA Client Start\n");
@@ -326,9 +326,9 @@ int rfc1006_imp::RfcStart(char* RfcServerProgID, char* RfcclassId, char* RfcUpda
     return(0);
 }
 
-int rfc1006_imp::RfcStop()
+int modbus_imp::RfcStop()
 {
-	IT_IT("rfc1006_imp::RfcStop");
+	IT_IT("modbus_imp::RfcStop");
 
 	fprintf(stderr,"Entering RfcStop()\n");
 	fflush(stderr);
@@ -348,9 +348,9 @@ int rfc1006_imp::RfcStop()
 	return 1;
 }
 
-int rfc1006_imp::check_connection_to_server(void)
+int modbus_imp::check_connection_to_server(void)
 {
-	IT_IT("rfc1006_imp::check_connection_to_server");
+	IT_IT("modbus_imp::check_connection_to_server");
 
 	WORD wMajor, wMinor, wBuild;
 
@@ -369,9 +369,9 @@ int rfc1006_imp::check_connection_to_server(void)
 	return 0;
 }
 
-int rfc1006_imp::GetStatus(WORD *pwMav, WORD *pwMiv, WORD *pwB, LPWSTR *pszV)
+int modbus_imp::GetStatus(WORD *pwMav, WORD *pwMiv, WORD *pwB, LPWSTR *pszV)
 {
-	IT_IT("rfc1006_imp::GetStatus");
+	IT_IT("modbus_imp::GetStatus");
 	
 	IT_EXIT;
 	return 0;
@@ -383,7 +383,7 @@ struct log_message{
 	char message[150];
 };
 
-void rfc1006_imp::LogMessage(int* error, const char* name)
+void modbus_imp::LogMessage(int* error, const char* name)
 {
 	//TODO: send message to monitor.exe as a single point
 
@@ -407,7 +407,7 @@ void rfc1006_imp::LogMessage(int* error, const char* name)
 #include <time.h>
 #include <sys/timeb.h>
 
-void rfc1006_imp::get_utc_host_time(struct cp56time2a* time)
+void modbus_imp::get_utc_host_time(struct cp56time2a* time)
 {
 	struct timeb tb;
 	struct tm	*ptm;
@@ -431,7 +431,7 @@ void rfc1006_imp::get_utc_host_time(struct cp56time2a* time)
     return;
 }
 
-time_t rfc1006_imp::epoch_from_cp56time2a(const struct cp56time2a* time)
+time_t modbus_imp::epoch_from_cp56time2a(const struct cp56time2a* time)
 {
 	struct tm	t;
 	time_t epoch = 0;
@@ -458,7 +458,7 @@ time_t rfc1006_imp::epoch_from_cp56time2a(const struct cp56time2a* time)
 	return epoch;
 }
 
-void rfc1006_imp::epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch_in_millisec)
+void modbus_imp::epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch_in_millisec)
 {
 	struct tm	*ptm;
 	int ms = (int)(epoch_in_millisec%1000);
@@ -489,9 +489,9 @@ void rfc1006_imp::epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch_in_
 
 //#define ABS(x) ((x) >= 0 ? (x) : -(x))
 
-void rfc1006_imp::SendEvent2(void)
+void modbus_imp::SendEvent2(void)
 {
-	IT_IT("rfc1006_imp::SendEvent2");
+	IT_IT("modbus_imp::SendEvent2");
 /*
 	VARIANT *pValue;
 	const FILETIME* ft;
@@ -953,7 +953,7 @@ void rfc1006_imp::SendEvent2(void)
 //epoch_in_millisec is a 64-bit value representing the number of milliseconds 
 //elapsed since January 1, 1970
 
-signed __int64 rfc1006_imp::epoch_from_FILETIME(const FILETIME *fileTime)
+signed __int64 modbus_imp::epoch_from_FILETIME(const FILETIME *fileTime)
 {
 	IT_IT("epoch_from_FILETIME");
 	
@@ -1014,7 +1014,7 @@ signed __int64 rfc1006_imp::epoch_from_FILETIME(const FILETIME *fileTime)
 
 #define DO_NOT_RESCALE
 
-short rfc1006_imp::rescale_value(double V, double Vmin, double Vmax, int* error)
+short modbus_imp::rescale_value(double V, double Vmin, double Vmax, int* error)
 {
 	#ifdef DO_SCALE
 	double Amin;
@@ -1077,7 +1077,7 @@ short rfc1006_imp::rescale_value(double V, double Vmin, double Vmax, int* error)
 	#endif //DO_NOT_RESCALE
 }
 
-double rfc1006_imp::rescale_value_inv(double A, double Vmin, double Vmax, int* error)
+double modbus_imp::rescale_value_inv(double A, double Vmin, double Vmax, int* error)
 {
 	#ifdef DO_SCALE
 	double Amin;
@@ -1122,7 +1122,7 @@ double rfc1006_imp::rescale_value_inv(double A, double Vmin, double Vmax, int* e
 }
 
 
-void rfc1006_imp::check_for_commands(struct iec_item *queued_item)
+void modbus_imp::check_for_commands(struct iec_item *queued_item)
 {
 	/*
 	DWORD dw = 0;
@@ -1355,7 +1355,7 @@ void rfc1006_imp::check_for_commands(struct iec_item *queued_item)
 
 					char show_msg[200];
 					sprintf(show_msg, "Error %d, %s\n",__LINE__, __FILE__);
-					rfc1006_imp::LogMessage(0, show_msg);
+					modbus_imp::LogMessage(0, show_msg);
 				
 					return;
 				}
@@ -1507,7 +1507,7 @@ void rfc1006_imp::check_for_commands(struct iec_item *queued_item)
 
 								char show_msg[200];
 								sprintf(show_msg, "Error %d, %s\n",__LINE__, __FILE__);
-								rfc1006_imp::LogMessage(0, show_msg);
+								modbus_imp::LogMessage(0, show_msg);
 
 
 								
@@ -1529,7 +1529,7 @@ void rfc1006_imp::check_for_commands(struct iec_item *queued_item)
 
 							char show_msg[200];
 							sprintf(show_msg, "Error %d, %s\n",__LINE__, __FILE__);
-							rfc1006_imp::LogMessage(0, show_msg);
+							modbus_imp::LogMessage(0, show_msg);
 							
 							return;
 						}
@@ -1653,7 +1653,7 @@ void rfc1006_imp::check_for_commands(struct iec_item *queued_item)
 
 								char show_msg[200];
 								sprintf(show_msg, "Error %d, %s\n",__LINE__, __FILE__);
-								rfc1006_imp::LogMessage(0, show_msg);
+								modbus_imp::LogMessage(0, show_msg);
 								
 								return;
 							}
@@ -1669,7 +1669,7 @@ void rfc1006_imp::check_for_commands(struct iec_item *queued_item)
 
 							char show_msg[200];
 							sprintf(show_msg, "Error %d, %s\n",__LINE__, __FILE__);
-							rfc1006_imp::LogMessage(0, show_msg);
+							modbus_imp::LogMessage(0, show_msg);
 						
 							return;
 						}
@@ -1693,7 +1693,7 @@ void rfc1006_imp::check_for_commands(struct iec_item *queued_item)
 
 					char show_msg[200];
 					sprintf(show_msg, "Error %d, %s\n",__LINE__, __FILE__);
-					rfc1006_imp::LogMessage(0, show_msg);
+					modbus_imp::LogMessage(0, show_msg);
 
 					return;
 				}
@@ -1704,7 +1704,7 @@ void rfc1006_imp::check_for_commands(struct iec_item *queued_item)
 
 				if(dwAccessRights == OPC_WRITEABLE)
 				{
-					//rfc1006_imp::g_bWriteComplete = false;
+					//modbus_imp::g_bWriteComplete = false;
 
 					hr = g_pIOPCAsyncIO2->Write(nWriteItems, hServer, Val, ++g_dwWriteTransID, &g_dwCancelID, &pErrorsWrite);
 
@@ -1746,7 +1746,7 @@ void rfc1006_imp::check_for_commands(struct iec_item *queued_item)
 					
 					char show_msg[200];
 					sprintf(show_msg, "No access write for sample point %s\n", Item[hClient - 1].spname);
-					rfc1006_imp::LogMessage(0, show_msg);
+					modbus_imp::LogMessage(0, show_msg);
 					
 					return;
 				}
@@ -1759,7 +1759,7 @@ void rfc1006_imp::check_for_commands(struct iec_item *queued_item)
 
 				char show_msg[200];
 				sprintf(show_msg, "Rejeced command for sample point %s, aged for %ld s; max aging time %d s\n", Item[hClient - 1].spname, delta, MAX_COMMAND_SEND_TIME);
-				rfc1006_imp::LogMessage(0, show_msg);
+				modbus_imp::LogMessage(0, show_msg);
 			
 				return;
 			}
@@ -1822,7 +1822,7 @@ void rfc1006_imp::check_for_commands(struct iec_item *queued_item)
 	return;
 }
 
-void rfc1006_imp::alloc_command_resources(void)
+void modbus_imp::alloc_command_resources(void)
 {
 	/*
 	hServerRead = (OPCHANDLE*)calloc(1, g_dwNumItems*sizeof(OPCHANDLE));
@@ -1840,7 +1840,7 @@ void rfc1006_imp::alloc_command_resources(void)
 	*/
 }
 
-void rfc1006_imp::free_command_resources(void)
+void modbus_imp::free_command_resources(void)
 {
 	/*
 	DWORD dw = 0;
