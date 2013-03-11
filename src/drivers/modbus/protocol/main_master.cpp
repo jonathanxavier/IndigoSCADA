@@ -23,12 +23,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <modbus.h>
-
-enum {
-    TCP,
-    TCP_PI,
-    RTU
-};
+#include "modbus_imp.h"
 
 int gl_timeout_connection_with_parent = 0;
 
@@ -66,7 +61,7 @@ struct args{
 
 void PipeWorker(void* pParam);
 
-#define RUNTIME_USAGE "Run time usage: %s -a server IP address -p server TCP port -l line number -t polling time\n"
+#define RUNTIME_USAGE "Run time usage: %s -a server IP address -p server TCP port -d serial device -b serial baud -c serial databits -e serial stopbit -f serial parity -s server_id -l line number -t polling time\n"
 
 void usage(char** argv)
 {
@@ -77,8 +72,17 @@ void usage(char** argv)
 int main( int argc, char **argv )
 {
 	char version[100];
+	/////////MODBUS TCP/////////////////
 	char modbusServerAddress[80];
 	char modbusServerPort[80];
+	/////////MODBUS RTU/////////////////
+	char serial_device[40]; /* "/dev/ttyS0" or "\\\\.\\COM10" */
+	char baud[20];/* Bauds: 9600, 19200, 57600, 115200, etc */
+    char data_bit[5];/* Data bit, eg. 8 */
+    char stop_bit[5];/* Stop bit, eg. 1 */
+    char parity[5];/* Parity: 'N', 'O', 'E' */
+	char server_id[5];
+
 	char line_number[80];
 	char polling_time[80];
 	char fifo_monitor_direction_name[70];
@@ -88,9 +92,19 @@ int main( int argc, char **argv )
 	int c;
 	unsigned long pollingTime = 1000;
 	int serverID = 0;
+	int use_backend;
 	
+	//TCP
 	modbusServerAddress[0] = '\0';
 	modbusServerPort[0] = '\0';
+	//RTU
+	serial_device[0] = '\0';
+	baud[0] = '\0';
+    data_bit[0] = '\0';
+    stop_bit[0] = '\0';
+    parity[0] = '\0';
+	server_id[0] = '\0';
+	//
 	line_number[0] = '\0';
 	polling_time[0] = '\0';
 	fifo_monitor_direction_name[0] = '\0';
@@ -111,11 +125,29 @@ int main( int argc, char **argv )
 			case 'a' :
 			strcpy(modbusServerAddress, optarg);
 			break;
+			case 'b' :
+			strcpy(baud, optarg);
+			break;
+			case 'c' :
+			strcpy(data_bit, optarg);
+			break;
+			case 'd' :
+			strcpy(serial_device, optarg);
+			break;
+			case 'e' :
+			strcpy(stop_bit, optarg);
+			break;
+			case 'f' :
+			strcpy(parity, optarg);
+			break;
 			case 'p' :
 			strcpy(modbusServerPort, optarg);
 			break;
 			case 'l' :
 			strcpy(line_number, optarg);
+			break;
+			case 's' :
+			strcpy(server_id, optarg);
 			break;
 			case 't' :
 			strcpy(polling_time, optarg);
@@ -132,20 +164,6 @@ int main( int argc, char **argv )
 		usage(argv);
 		exit(-1);
     }
-
-	if(strlen(modbusServerAddress) == 0)
-	{
-		fprintf(stderr,"modbus server IP address is not known\n");
-		fflush(stderr);
-		return EXIT_FAILURE;
-	}
-
-	if(strlen(modbusServerPort) == 0)
-	{
-		fprintf(stderr,"modbus TCP port is not known\n");
-		fflush(stderr);
-		return EXIT_FAILURE;
-	}
 
 	if(strlen(line_number) == 0)
 	{
@@ -177,10 +195,37 @@ int main( int argc, char **argv )
     strcat(fifo_control_direction_name, "modbus");
     strcat(fifo_monitor_direction_name, "modbus");
 
-	strcpy(NewConsoleTitle, "modbus_master IP ");
-	strcat(NewConsoleTitle, modbusServerAddress);
-	strcat(NewConsoleTitle, " PORT ");
-	strcat(NewConsoleTitle, modbusServerPort);
+	if(strlen(modbusServerAddress) > 0 && strlen(modbusServerPort) > 0)
+	{
+		strcpy(NewConsoleTitle, "MODBUS TCP address ");
+		strcat(NewConsoleTitle, modbusServerAddress);
+		strcat(NewConsoleTitle, " PORT ");
+		strcat(NewConsoleTitle, modbusServerPort);
+
+		use_backend = TCP;
+	}
+	else
+	{
+		strcpy(NewConsoleTitle, "MODBUS RTU device ");
+		strcat(NewConsoleTitle, serial_device);
+		strcat(NewConsoleTitle, " BAUD ");
+		strcat(NewConsoleTitle, baud);
+
+		strcat(NewConsoleTitle, " DATA BITS ");
+		strcat(NewConsoleTitle, data_bit);
+
+		strcat(NewConsoleTitle, " STOP BIT ");
+		strcat(NewConsoleTitle, stop_bit);
+
+		strcat(NewConsoleTitle, " PARITY ");
+		strcat(NewConsoleTitle, parity);
+
+		strcat(NewConsoleTitle, " SERVER_ID ");
+		strcat(NewConsoleTitle, server_id);
+
+		use_backend = RTU;
+	}
+
 	strcat(NewConsoleTitle, " LINE ");
 	strcat(NewConsoleTitle, line_number);
 	strcat(NewConsoleTitle, " polling time ");
@@ -213,373 +258,24 @@ int main( int argc, char **argv )
 	}
 	#endif
 
-//TODO:  Sobstitute the following code with the class modbus_imp
+	struct modbusContext my_ctx;
 
-	////////////////////////////////Start protocol implementation///////////////////////////////////
-	uint8_t *tab_rp_bits;
-    uint16_t *tab_rp_registers;
-    modbus_t *ctx;
-    int i;
-    uint8_t value;
-    int nb_points;
-    float real;
-    struct timeval old_response_timeout;
-    struct timeval response_timeout;
+	my_ctx.baud = atoi(baud);
+	my_ctx.data_bit = atoi(data_bit);
+	strcpy(my_ctx.modbus_server_address, modbusServerAddress); 
+	strcpy(my_ctx.modbus_server_port, modbusServerPort); 
+	my_ctx.parity = parity[0];
+	strcpy(my_ctx.serial_device, serial_device);
+	my_ctx.server_id = atoi(server_id);
+	my_ctx.stop_bit = atoi(stop_bit);
+	my_ctx.use_backend = use_backend;
 
-    const uint16_t UT_BITS_ADDRESS = 0x13;
-    const uint16_t UT_BITS_NB = 0x25;
-    const uint8_t UT_BITS_TAB[] = { 0xCD, 0x6B, 0xB2, 0x0E, 0x1B };
-    const uint16_t UT_INPUT_BITS_ADDRESS = 0xC4;
-    const uint16_t UT_INPUT_BITS_NB = 0x16;
-    const uint16_t UT_REGISTERS_ADDRESS = 0x6B;
-    const uint16_t UT_REGISTERS_NB = 0x3;
-    const uint16_t UT_REGISTERS_TAB[] = { 0x022B, 0x0001, 0x0064 };
-    const uint16_t UT_INPUT_REGISTERS_ADDRESS = 0x08;
-    const uint16_t UT_INPUT_REGISTERS_NB = 0x1;
-    const float UT_REAL = (float)916.540649;
-    const uint32_t UT_IREAL = 0x4465229a;
+	modbus_imp* po = new modbus_imp(&my_ctx, line_number, atoi(polling_time));
 
-	ctx = modbus_new_tcp(modbusServerAddress, atoi(modbusServerPort));
-
-    if(ctx == NULL)
+	if(po == NULL)
 	{
-        fprintf(stderr, "Unable to allocate modbus context\n");
-        return -1;
-    }
-
-    modbus_set_debug(ctx, TRUE);
-    modbus_set_error_recovery(ctx, (modbus_error_recovery_mode)(MODBUS_ERROR_RECOVERY_LINK | MODBUS_ERROR_RECOVERY_PROTOCOL));
-
-    if(modbus_connect(ctx) == -1)
-	{
-        fprintf(stderr, "Connection failed: %s\n",
-                modbus_strerror(errno));
-        modbus_free(ctx);
-        return -1;
-    }
-
-    /* Allocate and initialize the memory to store the bits */
-    nb_points = (UT_BITS_NB > UT_INPUT_BITS_NB) ? UT_BITS_NB : UT_INPUT_BITS_NB;
-    tab_rp_bits = (uint8_t *) malloc(nb_points * sizeof(uint8_t));
-    memset(tab_rp_bits, 0, nb_points * sizeof(uint8_t));
-
-    /* Allocate and initialize the memory to store the registers */
-    nb_points = (UT_REGISTERS_NB > UT_INPUT_REGISTERS_NB) ?
-        UT_REGISTERS_NB : UT_INPUT_REGISTERS_NB;
-    tab_rp_registers = (uint16_t *) malloc(nb_points * sizeof(uint16_t));
-    memset(tab_rp_registers, 0, nb_points * sizeof(uint16_t));
-
-    printf("** UNIT TESTING **\n");
-
-	for(;;)
-	{
-		Sleep(pollingTime);
-
-	    /* Allocate and initialize the memory to store the bits */
-		memset(tab_rp_bits, 0, nb_points * sizeof(uint8_t));
-
-		/* Allocate and initialize the memory to store the registers */
-		memset(tab_rp_registers, 0, nb_points * sizeof(uint16_t));
-
-#if 0
-		printf("\nTEST WRITE/READ:\n");
-
-		/** COIL BITS **/
-
-		/* Single */
-		rc = modbus_write_bit(ctx, UT_BITS_ADDRESS, ON);
-		printf("1/2 modbus_write_bit: ");
-		if (rc == 1) {
-			printf("OK\n");
-		} else {
-			printf("FAILED\n");
-//			goto close;
-		}
-#endif
-		rc = modbus_read_bits(ctx, UT_BITS_ADDRESS, 1, tab_rp_bits);
-		printf("2/2 modbus_read_bits: ");
-		if (rc != 1) {
-			printf("FAILED (nb points %d)\n", rc);
-			goto close;
-		}
-
-		if (tab_rp_bits[0] != ON) {
-			printf("FAILED (%0X = != %0X)\n", tab_rp_bits[0], ON);
-			goto close;
-		}
-		printf("OK\n");
-		/* End single */
-#if 0
-		/* Multiple bits */
-		{
-			//uint8_t tab_value[UT_BITS_NB];
-			uint8_t tab_value[0x25];
-
-			modbus_set_bits_from_bytes(tab_value, 0, UT_BITS_NB, UT_BITS_TAB);
-			rc = modbus_write_bits(ctx, UT_BITS_ADDRESS,
-								   UT_BITS_NB, tab_value);
-			printf("1/2 modbus_write_bits: ");
-			if (rc == UT_BITS_NB) {
-				printf("OK\n");
-			} else {
-				printf("FAILED\n");
-				goto close;
-			}
-		}
-#endif
-		rc = modbus_read_bits(ctx, UT_BITS_ADDRESS, UT_BITS_NB, tab_rp_bits);
-		printf("2/2 modbus_read_bits: ");
-		if (rc != UT_BITS_NB) {
-			printf("FAILED (nb points %d)\n", rc);
-			goto close;
-		}
-
-		i = 0;
-		nb_points = UT_BITS_NB;
-		while (nb_points > 0) {
-			int nb_bits = (nb_points > 8) ? 8 : nb_points;
-
-			value = modbus_get_byte_from_bits(tab_rp_bits, i*8, nb_bits);
-			if (value != UT_BITS_TAB[i]) {
-				printf("FAILED (%0X != %0X)\n", value, UT_BITS_TAB[i]);
-				goto close;
-			}
-
-			nb_points -= nb_bits;
-			i++;
-		}
-		printf("OK\n");
-		/* End of multiple bits */
-	
-#if 0		
-		/* Single register */
-		rc = modbus_write_register(ctx, UT_REGISTERS_ADDRESS, 0x1234);
-		printf("1/2 modbus_write_register: ");
-		if (rc == 1) {
-			printf("OK\n");
-		} else {
-			printf("FAILED\n");
-			goto close;
-		}
-#endif
-		rc = modbus_read_registers(ctx, UT_REGISTERS_ADDRESS,
-								   1, tab_rp_registers);
-		printf("2/2 modbus_read_registers: ");
-		if (rc != 1) {
-			printf("FAILED (nb points %d)\n", rc);
-			goto close;
-		}
-
-		if (tab_rp_registers[0] != 0x1234) {
-			printf("FAILED (%0X != %0X)\n",
-				   tab_rp_registers[0], 0x1234);
-			goto close;
-		}
-		printf("OK\n");
-		/* End of single register */
-#if 0
-		/* Many registers */
-		rc = modbus_write_registers(ctx, UT_REGISTERS_ADDRESS,
-									UT_REGISTERS_NB, UT_REGISTERS_TAB);
-		printf("1/5 modbus_write_registers: ");
-		if (rc == UT_REGISTERS_NB) {
-			printf("OK\n");
-		} else {
-			printf("FAILED\n");
-			goto close;
-		}
-
-#endif
-
-		rc = modbus_read_registers(ctx, UT_REGISTERS_ADDRESS,
-								   UT_REGISTERS_NB, tab_rp_registers);
-		printf("2/5 modbus_read_registers: ");
-		if (rc != UT_REGISTERS_NB) {
-			printf("FAILED (nb points %d)\n", rc);
-			goto close;
-		}
-
-		for (i=0; i < UT_REGISTERS_NB; i++) {
-			if (tab_rp_registers[i] != UT_REGISTERS_TAB[i]) {
-				printf("FAILED (%0X != %0X)\n",
-					   tab_rp_registers[i],
-					   UT_REGISTERS_TAB[i]);
-				goto close;
-			}
-		}
-		printf("OK\n");
-
-		rc = modbus_read_registers(ctx, UT_REGISTERS_ADDRESS,
-								   0, tab_rp_registers);
-		printf("3/5 modbus_read_registers (0): ");
-		if (rc != 0) {
-			printf("FAILED (nb points %d)\n", rc);
-			goto close;
-		}
-		printf("OK\n");
-	
-		/* End of many registers */
-
-		printf("\nTEST FLOATS\n");
-		/** FLOAT **/
-		printf("1/2 Set float: ");
-		modbus_set_float(UT_REAL, tab_rp_registers);
-		if (tab_rp_registers[1] == (UT_IREAL >> 16) &&
-			tab_rp_registers[0] == (UT_IREAL & 0xFFFF)) {
-			printf("OK\n");
-		} else {
-			printf("FAILED (%x != %x)\n",
-				   *((uint32_t *)tab_rp_registers), UT_IREAL);
-			goto close;
-		}
-
-		printf("2/2 Get float: ");
-		real = modbus_get_float(tab_rp_registers);
-		if (real == UT_REAL) {
-			printf("OK\n");
-		} else {
-			printf("FAILED (%f != %f)\n", real, UT_REAL);
-			goto close;
-		}
-
-		printf("\nAt this point, error messages doesn't mean the test has failed\n");
-	
-		/** TOO MANY DATA **/
-		printf("\nTEST TOO MANY DATA ERROR:\n");
-
-		rc = modbus_read_bits(ctx, UT_BITS_ADDRESS,
-							  MODBUS_MAX_READ_BITS + 1, tab_rp_bits);
-		printf("* modbus_read_bits: ");
-		if (rc == -1 && errno == EMBMDATA) {
-			printf("OK\n");
-		} else {
-			printf("FAILED\n");
-			goto close;
-		}
-
-		rc = modbus_read_input_bits(ctx, UT_INPUT_BITS_ADDRESS,
-									MODBUS_MAX_READ_BITS + 1, tab_rp_bits);
-		printf("* modbus_read_input_bits: ");
-		if (rc == -1 && errno == EMBMDATA) {
-			printf("OK\n");
-		} else {
-			printf("FAILED\n");
-			goto close;
-		}
-
-		rc = modbus_read_registers(ctx, UT_REGISTERS_ADDRESS,
-								   MODBUS_MAX_READ_REGISTERS + 1,
-								   tab_rp_registers);
-		printf("* modbus_read_registers: ");
-		if (rc == -1 && errno == EMBMDATA) {
-			printf("OK\n");
-		} else {
-			printf("FAILED\n");
-			goto close;
-		}
-
-		rc = modbus_read_input_registers(ctx, UT_INPUT_REGISTERS_ADDRESS,
-										 MODBUS_MAX_READ_REGISTERS + 1,
-										 tab_rp_registers);
-		printf("* modbus_read_input_registers: ");
-		if (rc == -1 && errno == EMBMDATA) {
-			printf("OK\n");
-		} else {
-			printf("FAILED\n");
-			goto close;
-		}
-#if 0
-		rc = modbus_write_bits(ctx, UT_BITS_ADDRESS,
-							   MODBUS_MAX_WRITE_BITS + 1, tab_rp_bits);
-		printf("* modbus_write_bits: ");
-		if (rc == -1 && errno == EMBMDATA) {
-			printf("OK\n");
-		} else {
-			goto close;
-			printf("FAILED\n");
-		}
-
-		rc = modbus_write_registers(ctx, UT_REGISTERS_ADDRESS,
-									MODBUS_MAX_WRITE_REGISTERS + 1,
-									tab_rp_registers);
-		printf("* modbus_write_registers: ");
-		if (rc == -1 && errno == EMBMDATA) {
-			printf("OK\n");
-		} else {
-			printf("FAILED\n");
-			goto close;
-		}
-#endif
-		/** SLAVE REPLY **/
-		printf("\nTEST SLAVE REPLY:\n");
-		modbus_set_slave(ctx, serverID);
-		rc = modbus_read_registers(ctx, UT_REGISTERS_ADDRESS, UT_REGISTERS_NB, tab_rp_registers);
-		
-		/* Response in TCP mode */
-		printf("1/4 Response from slave %d: ", 18);
-
-		if (rc == UT_REGISTERS_NB) {
-			printf("OK\n");
-		} else {
-			printf("FAILED\n");
-			goto close;
-		}
-		
-		rc = modbus_set_slave(ctx, MODBUS_BROADCAST_ADDRESS);
-		if (rc == -1) {
-			printf("Invalid broacast address\n");
-			goto close;
-		}
-
-		rc = modbus_read_registers(ctx, UT_REGISTERS_ADDRESS,
-								   UT_REGISTERS_NB, tab_rp_registers);
-		printf("2/4 Reply after a broadcast query: ");
-		if (rc == UT_REGISTERS_NB) {
-			printf("OK\n");
-		} else {
-			printf("FAILED\n");
-			goto close;
-		}
-		
-		modbus_set_slave(ctx, MODBUS_TCP_SLAVE);
-		
-		/* Save original timeout */
-		modbus_get_response_timeout(ctx, &old_response_timeout);
-
-		/* Define a new and too short timeout */
-		response_timeout.tv_sec = 0;
-		response_timeout.tv_usec = 0;
-		modbus_set_response_timeout(ctx, &response_timeout);
-
-		rc = modbus_read_registers(ctx, UT_REGISTERS_ADDRESS,
-								   UT_REGISTERS_NB, tab_rp_registers);
-		printf("4/4 Too short timeout: ");
-		if (rc == -1 && errno == ETIMEDOUT) {
-			printf("OK\n");
-		} else {
-			printf("FAILED (can fail on slow systems or Windows)\n");
-		}
-
-		/* Restore original timeout */
-		modbus_set_response_timeout(ctx, &old_response_timeout);
-
-		/* A wait and flush operation is done by the error recovery code of
-		 * libmodbus */
-	
-		printf("\nALL TESTS PASS WITH SUCCESS.\n");
-
+		return EXIT_FAILURE;
 	}
-
-close:
-    /* Free the memory */
-    free(tab_rp_bits);
-    free(tab_rp_registers);
-
-    /* Close the connection */
-    modbus_close(ctx);
-    modbus_free(ctx);
-
-    return 0;
 }
 
 ///////////////////////////////////Keep alive pipe management/////////////////////////////////////////////////////

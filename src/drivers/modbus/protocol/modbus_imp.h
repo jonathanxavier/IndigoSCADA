@@ -30,6 +30,7 @@ extern void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCal
 
 struct modbusContext
 {
+	int use_backend;
 	//////////////////MODBUS TCP context///////////////////////
 	char modbus_server_address[40];
 	char modbus_server_port[40];
@@ -39,15 +40,23 @@ struct modbusContext
 	//name with '\\.\' for COM number greater than 9, eg. '\\\\.\\COM10'. See
 	//http://msdn.microsoft.com/en-us/library/aa365247(v=vs.85).aspx for details
 
-	char device[40];
+	char serial_device[40];
 	/* Bauds: 9600, 19200, 57600, 115200, etc */
     int baud;
-    /* Data bit */
+    /* Data bit, eg. 8 */
     uint8_t data_bit;
-    /* Stop bit */
+    /* Stop bit, eg. 1 */
     uint8_t stop_bit;
     /* Parity: 'N', 'O', 'E' */
     char parity;
+
+	int server_id; //ID of the RTU slave
+};
+
+enum {
+    TCP,
+    TCP_PI,
+    RTU
 };
 
 class modbus_imp
@@ -72,9 +81,9 @@ class modbus_imp
 	char		ServerIPAddress[80];
 	char		ServerPort[80];
 	int local_server;
-	double		pollingTime;
+	unsigned long pollingTime;
 	
-	modbus_imp(struct modbusContext* ctx, char* line_number, int polling_time);
+	modbus_imp(struct modbusContext* my_ctx, char* line_number, int polling_time);
 	~modbus_imp();
 	int AddItems(void);
 	void CreateSqlConfigurationFile(char* sql_file_name, char* opc_path);
