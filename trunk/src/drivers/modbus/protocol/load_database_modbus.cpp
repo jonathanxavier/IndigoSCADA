@@ -46,96 +46,109 @@ static int db_callback(void *NotUsed, int argc, char **argv, char **azColName)
 			{
 				//column 1 in table modbus_table
 				//name
-				strcpy(gl_Config_db[gl_row_counter].name, argv[i]);
+				if(argv[i] != NULL)
+					strcpy(gl_Config_db[gl_row_counter].name, argv[i]);
 			}
 			break;
 			case 1:
 			{
 				//column 2 in table modbus_table
 				//modbus_function_read
-				gl_Config_db[gl_row_counter].modbus_function_read = atoi(argv[i]);
+				if(argv[i] != NULL)
+					gl_Config_db[gl_row_counter].modbus_function_read = atoi(argv[i]);
 			}
 			break;
 			case 2:
 			{
 				//column 3 in table modbus_table
 				//modbus_function_write
-				gl_Config_db[gl_row_counter].modbus_function_write = atoi(argv[i]);
+				if(argv[i] != NULL)
+					gl_Config_db[gl_row_counter].modbus_function_write = atoi(argv[i]);
 			}
 			break;
 			case 3:
 			{
 				//column 4 in table modbus_table
 				//modbus_start_address
-				gl_Config_db[gl_row_counter].modbus_start_address = atoi(argv[i]);
+				if(argv[i] != NULL)
+					gl_Config_db[gl_row_counter].modbus_start_address = atoi(argv[i]);
 			}
 			break;
 			case 4:
 			{
 				//column 5 in table modbus_table
 				//modbus_bit_size
-				gl_Config_db[gl_row_counter].modbus_bit_size = atoi(argv[i]);
+				if(argv[i] != NULL)
+					gl_Config_db[gl_row_counter].modbus_bit_size = atoi(argv[i]);
 			}
 			break;
 			case 5:
 			{
 				//column 6 in table modbus_table
 				//offset_in_bits
-				gl_Config_db[gl_row_counter].offset_in_bits = atoi(argv[i]);
+				if(argv[i] != NULL)
+					gl_Config_db[gl_row_counter].offset_in_bits = atoi(argv[i]);
 			}
 			break;
 			case 6:
 			{
 				//column 7 in table modbus_table
 				//ioa_control_center Unstructured
-				gl_Config_db[gl_row_counter].ioa_control_center = atoi(argv[i]);
+				if(argv[i] != NULL)
+					gl_Config_db[gl_row_counter].ioa_control_center = atoi(argv[i]);
 			}
 			break;
 			case 7:
 			{
 				//column 8 in table modbus_table
 				//iec_type_read
-				if(strcmp(argv[i], "M_ME_TF_1") == 0)
+				if(argv[i] != NULL)
 				{
-					gl_Config_db[gl_row_counter].iec_type_read = M_ME_TF_1;
-				}
-				else if(strcmp(argv[i], "M_SP_TB_1") == 0)
-				{
-					gl_Config_db[gl_row_counter].iec_type_read = M_SP_TB_1;
-				}
-				else if(strcmp(argv[i], "M_IT_TB_1") == 0)
-				{
-					gl_Config_db[gl_row_counter].iec_type_read = M_IT_TB_1;
-				}
-				else
-				{
-					fprintf(stderr,"IEC type %s from I/O list NOT supported\n", argv[i]);
-					fflush(stderr);
-					//ExitProcess(0);
+					if(strcmp(argv[i], "M_ME_TF_1") == 0)
+					{
+						gl_Config_db[gl_row_counter].iec_type_read = M_ME_TF_1;
+					}
+					else if(strcmp(argv[i], "M_SP_TB_1") == 0)
+					{
+						gl_Config_db[gl_row_counter].iec_type_read = M_SP_TB_1;
+					}
+					else if(strcmp(argv[i], "M_IT_TB_1") == 0)
+					{
+						gl_Config_db[gl_row_counter].iec_type_read = M_IT_TB_1;
+					}
+					else
+					{
+						fprintf(stderr,"IEC type %s from I/O list NOT supported\n", argv[i]);
+						fflush(stderr);
+						//ExitProcess(0);
+					}
 				}
 			}	
 			break;
 			case 8:
 			{
-				//column 9 in table modbus_table
-				//iec_type_write
-				if(strcmp(argv[i], "C_SC_TA_1") == 0)
+				if(argv[i] != NULL)
 				{
-					gl_Config_db[gl_row_counter].iec_type_write = C_SC_TA_1;
-				}
-				else if(strcmp(argv[i], "C_BO_TA_1") == 0)
-				{
-					gl_Config_db[gl_row_counter].iec_type_write = C_BO_TA_1;
-				}
-				else if(strcmp(argv[i], "C_SE_TC_1") == 0)
-				{
-					gl_Config_db[gl_row_counter].iec_type_write = C_SE_TC_1;
-				}
-				else
-				{
-					fprintf(stderr,"IEC type %s from I/O list NOT supported\n", argv[i]);
-					fflush(stderr);
-					//ExitProcess(0);
+					//column 9 in table modbus_table
+					//iec_type_write
+					if(strcmp(argv[i], "C_SC_TA_1") == 0)
+					{
+						gl_Config_db[gl_row_counter].iec_type_write = C_SC_TA_1;
+					}
+					else if(strcmp(argv[i], "C_BO_TA_1") == 0)
+					{
+						gl_Config_db[gl_row_counter].iec_type_write = C_BO_TA_1;
+					}
+					else if(strcmp(argv[i], "C_SE_TC_1") == 0)
+					{
+						gl_Config_db[gl_row_counter].iec_type_write = C_SE_TC_1;
+					}
+					else
+					{
+						fprintf(stderr,"IEC type %s from I/O list NOT supported\n", argv[i]);
+						fflush(stderr);
+						//ExitProcess(0);
+					}
 				}
 			}	
 			break;
@@ -143,7 +156,8 @@ static int db_callback(void *NotUsed, int argc, char **argv, char **azColName)
 			{
 				//column 10 in table modbus_table
 				//size_in_bits_of_iec_type
-				gl_Config_db[gl_row_counter].size_in_bits_of_iec_type = atoi(argv[i]);
+				if(argv[i] != NULL)
+					gl_Config_db[gl_row_counter].size_in_bits_of_iec_type = atoi(argv[i]);
 			}
 			break;
 			default:

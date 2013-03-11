@@ -46,53 +46,58 @@ static int db_callback(void *NotUsed, int argc, char **argv, char **azColName)
 			{
 				//column 1 in table opc_client_da_table
 				//opc_server_item_id
-				strcpy(gl_Config_db[gl_row_counter].spname, argv[i]);
+				if(argv[i] != NULL)
+					strcpy(gl_Config_db[gl_row_counter].spname, argv[i]);
 			}
 			break;
 			case 1:
 			{
 				//column 2 in table opc_client_da_table
 				//ioa_control_center Unstructured
-				gl_Config_db[gl_row_counter].ioa_control_center = atoi(argv[i]);
+				if(argv[i] != NULL)
+					gl_Config_db[gl_row_counter].ioa_control_center = atoi(argv[i]);
 			}
 			break;
 			case 2:
 			{
-				//column 3 in table opc_client_da_table
-				//iec_type
-				if(strcmp(argv[i], "M_ME_TF_1") == 0)
+				if(argv[i] != NULL)
 				{
-					gl_Config_db[gl_row_counter].io_list_iec_type = M_ME_TF_1;
-				}
-				else if(strcmp(argv[i], "M_SP_TB_1") == 0)
-				{
-					gl_Config_db[gl_row_counter].io_list_iec_type = M_SP_TB_1;
-				}
-				else if(strcmp(argv[i], "M_DP_TB_1") == 0)
-				{
-					gl_Config_db[gl_row_counter].io_list_iec_type = M_DP_TB_1;
-				}
-				else if(strcmp(argv[i], "C_DC_NA_1") == 0)
-				{
-					gl_Config_db[gl_row_counter].io_list_iec_type = C_DC_NA_1;
-				}
-				else if(strcmp(argv[i], "C_SC_NA_1") == 0)
-				{
-					gl_Config_db[gl_row_counter].io_list_iec_type = C_SC_NA_1;
-				}
-				else if(strcmp(argv[i], "M_IT_TB_1") == 0)
-				{
-					gl_Config_db[gl_row_counter].io_list_iec_type = M_IT_TB_1;
-				}
-				else if(strcmp(argv[i], "M_ME_TN_1") == 0)
-				{
-					gl_Config_db[gl_row_counter].io_list_iec_type = M_ME_TN_1;
-				}
-				else
-				{
-					fprintf(stderr,"IEC type %s from I/O list NOT supported\n", argv[i]);
-					fflush(stderr);
-					//ExitProcess(0);
+					//column 3 in table opc_client_da_table
+					//iec_type
+					if(strcmp(argv[i], "M_ME_TF_1") == 0)
+					{
+						gl_Config_db[gl_row_counter].io_list_iec_type = M_ME_TF_1;
+					}
+					else if(strcmp(argv[i], "M_SP_TB_1") == 0)
+					{
+						gl_Config_db[gl_row_counter].io_list_iec_type = M_SP_TB_1;
+					}
+					else if(strcmp(argv[i], "M_DP_TB_1") == 0)
+					{
+						gl_Config_db[gl_row_counter].io_list_iec_type = M_DP_TB_1;
+					}
+					else if(strcmp(argv[i], "C_DC_NA_1") == 0)
+					{
+						gl_Config_db[gl_row_counter].io_list_iec_type = C_DC_NA_1;
+					}
+					else if(strcmp(argv[i], "C_SC_NA_1") == 0)
+					{
+						gl_Config_db[gl_row_counter].io_list_iec_type = C_SC_NA_1;
+					}
+					else if(strcmp(argv[i], "M_IT_TB_1") == 0)
+					{
+						gl_Config_db[gl_row_counter].io_list_iec_type = M_IT_TB_1;
+					}
+					else if(strcmp(argv[i], "M_ME_TN_1") == 0)
+					{
+						gl_Config_db[gl_row_counter].io_list_iec_type = M_ME_TN_1;
+					}
+					else
+					{
+						fprintf(stderr,"IEC type %s from I/O list NOT supported\n", argv[i]);
+						fflush(stderr);
+						//ExitProcess(0);
+					}
 				}
 			}	
 			break;
@@ -100,35 +105,40 @@ static int db_callback(void *NotUsed, int argc, char **argv, char **azColName)
 			{
 				//column 4 in table opc_client_da_table
 				//readable
-				gl_Config_db[gl_row_counter].readable = atoi(argv[i]);
+				if(argv[i] != NULL)
+					gl_Config_db[gl_row_counter].readable = atoi(argv[i]);
 			}
 			break;
 			case 4:
 			{
 				//column 5 in table opc_client_da_table
 				//writeable
-				gl_Config_db[gl_row_counter].writeable = atoi(argv[i]);
+				if(argv[i] != NULL)
+					gl_Config_db[gl_row_counter].writeable = atoi(argv[i]);
 			}
 			break;
 			case 5:
 			{
 				//column 6 in table opc_client_da_table
 				//HiHiLimit
-				gl_Config_db[gl_row_counter].max_measure = (float)atof(argv[i]);
+				if(argv[i] != NULL)
+					gl_Config_db[gl_row_counter].max_measure = (float)atof(argv[i]);
 			}
 			break;
 			case 6:
 			{
 				//column 7 in table opc_client_da_table
 				//LoLoLimit
-				gl_Config_db[gl_row_counter].min_measure = (float)atof(argv[i]);				
+				if(argv[i] != NULL)
+					gl_Config_db[gl_row_counter].min_measure = (float)atof(argv[i]);				
 			}
 			break;
 			case 7:
 			{
 				//column 8 in table opc_client_da_table
 				//opc_type in OPC format 
-				strcpy(gl_Config_db[gl_row_counter].opc_type, argv[i]);
+				if(argv[i] != NULL)
+					strcpy(gl_Config_db[gl_row_counter].opc_type, argv[i]);
 			}
 			break;
 			default:
