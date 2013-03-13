@@ -85,14 +85,11 @@ int main( int argc, char **argv )
 
 	char line_number[80];
 	char polling_time[80];
-	char fifo_monitor_direction_name[70];
-	char fifo_control_direction_name[70];
 	char OldConsoleTitle[500];
 	char NewConsoleTitle[500];
-	int c;
+	int  c, rc;
 	unsigned long pollingTime = 1000;
-	int serverID = 0;
-	int use_backend;
+	int use_context = TCP;
 	
 	//TCP
 	modbusServerAddress[0] = '\0';
@@ -107,8 +104,6 @@ int main( int argc, char **argv )
 	//
 	line_number[0] = '\0';
 	polling_time[0] = '\0';
-	fifo_monitor_direction_name[0] = '\0';
-	fifo_control_direction_name[0] = '\0';
 
 	//version control///////////////////////////////////////////////////////////////
 	sprintf(version, ""APPLICATION" - Built on %s %s %s",__DATE__,__TIME__,SUPPLIER);
@@ -120,7 +115,7 @@ int main( int argc, char **argv )
 	fflush(stderr);
 	////////////////////////////////////////////////////////////////////////////////
 
-	while( ( c = getopt ( argc, argv, "a:p:l:t:?" )) != EOF ) {
+	while( ( c = getopt ( argc, argv, "a:b:c:d:e:f:p:l:s:t:?" )) != EOF ) {
 		switch ( c ) {
 			case 'a' :
 			strcpy(modbusServerAddress, optarg);
@@ -181,20 +176,6 @@ int main( int argc, char **argv )
 
 	pollingTime = atoi(polling_time);
 
-	serverID = atoi(line_number);
-
-	strcpy(fifo_monitor_direction_name, "fifo_monitor_direction");
-	strcpy(fifo_control_direction_name, "fifo_control_direction");
-	
-	if(strlen(line_number) > 0)
-	{
-		strcat(fifo_monitor_direction_name, line_number);
-		strcat(fifo_control_direction_name, line_number);
-	}
-
-    strcat(fifo_control_direction_name, "modbus");
-    strcat(fifo_monitor_direction_name, "modbus");
-
 	if(strlen(modbusServerAddress) > 0 && strlen(modbusServerPort) > 0)
 	{
 		strcpy(NewConsoleTitle, "MODBUS TCP address ");
@@ -202,7 +183,7 @@ int main( int argc, char **argv )
 		strcat(NewConsoleTitle, " PORT ");
 		strcat(NewConsoleTitle, modbusServerPort);
 
-		use_backend = TCP;
+		use_context = TCP;
 	}
 	else
 	{
@@ -223,7 +204,7 @@ int main( int argc, char **argv )
 		strcat(NewConsoleTitle, " SERVER_ID ");
 		strcat(NewConsoleTitle, server_id);
 
-		use_backend = RTU;
+		use_context = RTU;
 	}
 
 	strcat(NewConsoleTitle, " LINE ");
@@ -237,8 +218,7 @@ int main( int argc, char **argv )
 		fflush(stderr);
 		return EXIT_FAILURE;
 	}
-
-	int rc;
+	
 	if((rc = GetConsoleTitle(OldConsoleTitle, sizeof(OldConsoleTitle))) > 0)
 	{
 		SetConsoleTitle(NewConsoleTitle);
@@ -260,22 +240,42 @@ int main( int argc, char **argv )
 
 	struct modbusContext my_ctx;
 
-	my_ctx.baud = atoi(baud);
-	my_ctx.data_bit = atoi(data_bit);
+	my_ctx.use_context = use_context;
+	//MODBUS TCP
 	strcpy(my_ctx.modbus_server_address, modbusServerAddress); 
 	strcpy(my_ctx.modbus_server_port, modbusServerPort); 
-	my_ctx.parity = parity[0];
+	//MODBUS RTU
 	strcpy(my_ctx.serial_device, serial_device);
-	my_ctx.server_id = atoi(server_id);
+	my_ctx.baud = atoi(baud);
+	my_ctx.data_bit = atoi(data_bit);
 	my_ctx.stop_bit = atoi(stop_bit);
-	my_ctx.use_backend = use_backend;
-
+	my_ctx.parity = parity[0];
+	my_ctx.server_id = atoi(server_id);
+	
 	modbus_imp* po = new modbus_imp(&my_ctx, line_number, atoi(polling_time));
 
 	if(po == NULL)
 	{
 		return EXIT_FAILURE;
 	}
+
+	rc = po->Start();
+
+	if(rc)
+	{
+		return EXIT_FAILURE;
+	}
+
+	rc = po->PollServer();
+
+	if(rc)
+	{
+		return EXIT_FAILURE;
+	}
+
+	po->Stop();
+
+	return 0;
 }
 
 ///////////////////////////////////Keep alive pipe management/////////////////////////////////////////////////////

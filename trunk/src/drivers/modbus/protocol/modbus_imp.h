@@ -22,6 +22,7 @@
 #include <time.h>
 #include "itrace.h"
 #include "iec_item_type.h" //Middleware
+#include <modbus.h>
 
 ////////////////////////////Middleware///////////////////////////////////////////////////////
 extern void onRegFail(void *param);
@@ -30,7 +31,7 @@ extern void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCal
 
 struct modbusContext
 {
-	int use_backend;
+	int use_context;
 	//////////////////MODBUS TCP context///////////////////////
 	char modbus_server_address[40];
 	char modbus_server_port[40];
@@ -59,10 +60,27 @@ enum {
     RTU
 };
 
+/* Modbus function codes */
+#define FC_READ_COILS                0x01
+#define FC_READ_DISCRETE_INPUTS      0x02
+#define FC_READ_HOLDING_REGISTERS    0x03
+#define FC_READ_INPUT_REGISTERS      0x04
+#define FC_WRITE_SINGLE_COIL         0x05
+#define FC_WRITE_SINGLE_REGISTER     0x06
+#define FC_READ_EXCEPTION_STATUS     0x07
+#define FC_WRITE_MULTIPLE_COILS      0x0F
+#define FC_WRITE_MULTIPLE_REGISTERS  0x10
+#define FC_REPORT_SLAVE_ID           0x11
+#define FC_WRITE_AND_READ_REGISTERS  0x17
+
 class modbus_imp
 {
 	public:
-	char plc_server_prog_id[100];
+	///////////////////database//////////////////////
+	char database_name[MAX_PATH];
+	int db_n_rows;
+	int db_m_columns;
+	/////////////////////////////////////////////////
 	int g_dwNumItems;
 	struct modbusItem* Config_db;
 	/////////////////////Middleware/////////////////////////
@@ -76,26 +94,26 @@ class modbus_imp
 	ORTEDomainAppEvents     events;
 	///////////////////////////////////Middleware///////////
 	bool fExit;
-	int  g_dwUpdateRate;
-	double dead_band_percent;
-	char		ServerIPAddress[80];
-	char		ServerPort[80];
-	int local_server;
 	unsigned long pollingTime;
+	struct modbusContext my_modbus_context;
+	////////////////Modbus specific/////////////////
+	modbus_t *ctx; //context
+	uint8_t *tab_rp_bits;
+    uint16_t *tab_rp_registers;
+	////////////////////////////////////////////////
+	char lineNumber[80];
 	
 	modbus_imp(struct modbusContext* my_ctx, char* line_number, int polling_time);
 	~modbus_imp();
 	int AddItems(void);
-	void CreateSqlConfigurationFile(char* sql_file_name, char* opc_path);
-	int Async2Update();
-	int check_connection_to_server(void);
-	int RfcStart(char* RfcServerProgID, char* RfcclassId, char* RfcUpdateRate, char* RfcPercentDeadband);
+	int PollServer(void);
+	int Start(void);
 	void LogMessage(int* error = 0, const char* name = NULL);
-	int RfcStop();
+	int Stop(void);
 	int GetStatus(WORD *pwMav, WORD *pwMiv, WORD *pwB, LPWSTR *pszV);
 	time_t epoch_from_cp56time2a(const struct cp56time2a* time);
 	void epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch_in_millisec);
-	void SendEvent2(void);
+	int PollItems(void);
 	signed __int64 epoch_from_FILETIME(const FILETIME *fileTime);
 	short rescale_value(double V, double Vmin, double Vmax, int* error);
 	double rescale_value_inv(double A, double Vmin, double Vmax, int* error);

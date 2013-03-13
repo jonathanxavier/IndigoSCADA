@@ -182,16 +182,14 @@ int modbus_imp::AddItems(void)
 	sqlite3 *db;
 	char *zErrMsg = 0;
 	int rc;
-	int n_rows = 0;
-	int m_columns = 0;
 	//FILE* fp = NULL;
 
-	char db_name[100];
-	strcpy(db_name, "C:\\scada\\bin\\");
-	strcat(db_name, plc_server_prog_id);
-	strcat(db_name, ".db");
+	strcpy(database_name, "C:\\scada\\bin\\");
+	strcat(database_name, "database");
+	strcat(database_name, lineNumber);
+	strcat(database_name, ".db");
 
-	rc = sqlite3_open(db_name, &db);
+	rc = sqlite3_open(database_name, &db);
 
 	if(rc)
 	{
@@ -221,28 +219,28 @@ int modbus_imp::AddItems(void)
 
 	sqlite3_close(db);
 
-	n_rows = gl_row_counter;
-	m_columns = gl_column_counter;
+	db_n_rows = gl_row_counter;
+	db_m_columns = gl_column_counter;
 
-	if(n_rows == 0)
+	if(db_n_rows == 0)
 	{
-		fprintf(stderr, "Error: n_rows = %d\n", n_rows);
+		fprintf(stderr, "Error: db_n_rows = %d\n", db_n_rows);
 		fflush(stderr);
 		IT_EXIT;
 		return 1;
 	}
 	
-	g_dwNumItems = n_rows;
+	g_dwNumItems = db_n_rows;
 
 
 	return(0);
 }
 
+/*
 void modbus_imp::CreateSqlConfigurationFile(char* sql_file_name, char* opc_path)
 {
 	//Make browsing of S7 PLC server for available ItemID's
-
-/*	
+	
 	HRESULT hr = 0;
 	FILE *dump = NULL;
 	char iec_type[100];
@@ -312,7 +310,8 @@ void modbus_imp::CreateSqlConfigurationFile(char* sql_file_name, char* opc_path)
 	fprintf(stderr,"PLC browsing is complete!\n");
 
 	fflush(stderr);
-*/
 	
 	IT_EXIT;
 }
+
+*/

@@ -17,12 +17,10 @@
 #include "modbus_item.h"
 #include "modbus_imp.h"
 #include "stdlib.h"
-#include <modbus.h>
+
 
 #define MAX_KEYLEN 256
 #define MAX_COMMAND_SEND_TIME 60
-
-static int g_dwSleepInLoop = 1000;
 
 #include <sys/stat.h>
 
@@ -118,389 +116,34 @@ ORTEPublication* global_publisher;
 modbus_imp::modbus_imp(struct modbusContext* my_ctx, char* line_number, int polling_time):
 fExit(false),pollingTime(polling_time)
 {   
-	strcpy(ServerIPAddress, my_ctx->modbus_server_address);
-	strcpy(ServerPort, my_ctx->modbus_server_port);
+	strcpy(lineNumber, line_number);
+	my_modbus_context.use_context = my_ctx->use_context;
 
-	////////////////////////////////////////////////////////////////////////
-	////////////////////////////////Start protocol implementation///////////////////////////////////
-	uint8_t *tab_rp_bits;
-    uint16_t *tab_rp_registers;
-    modbus_t *ctx; //context
-    int i;
-    uint8_t value;
-    int nb_points;
-    float real;
-    struct timeval old_response_timeout;
-    struct timeval response_timeout;
-
-    const uint16_t UT_BITS_ADDRESS = 0x13;
-    const uint16_t UT_BITS_NB = 0x25;
-    const uint8_t UT_BITS_TAB[] = { 0xCD, 0x6B, 0xB2, 0x0E, 0x1B };
-    const uint16_t UT_INPUT_BITS_ADDRESS = 0xC4;
-    const uint16_t UT_INPUT_BITS_NB = 0x16;
-    const uint16_t UT_REGISTERS_ADDRESS = 0x6B;
-    const uint16_t UT_REGISTERS_NB = 0x3;
-    const uint16_t UT_REGISTERS_TAB[] = { 0x022B, 0x0001, 0x0064 };
-    const uint16_t UT_INPUT_REGISTERS_ADDRESS = 0x08;
-    const uint16_t UT_INPUT_REGISTERS_NB = 0x1;
-    const float UT_REAL = (float)916.540649;
-    const uint32_t UT_IREAL = 0x4465229a;
-
-	if(my_ctx->use_backend == TCP) 
+	if(my_modbus_context.use_context == TCP)
 	{
-        ctx = modbus_new_tcp(my_ctx->modbus_server_address, atoi(my_ctx->modbus_server_port));
+		strcpy(my_modbus_context.modbus_server_address, my_ctx->modbus_server_address);
+		strcpy(my_modbus_context.modbus_server_port, my_ctx->modbus_server_port);
+	}
+	else if(my_modbus_context.use_context == RTU)
+	{
+		strcpy(my_modbus_context.serial_device, my_ctx->serial_device);
+		my_modbus_context.baud = my_ctx->baud;
+		my_modbus_context.data_bit = my_ctx->data_bit;
+		my_modbus_context.stop_bit = my_ctx->stop_bit;
+		my_modbus_context.parity = my_ctx->parity;
+		my_modbus_context.server_id = my_ctx->server_id;
+	}
+
+	if(my_modbus_context.use_context == TCP) 
+	{
+        ctx = modbus_new_tcp(my_modbus_context.modbus_server_address, atoi(my_modbus_context.modbus_server_port));
     } 
 	else 
 	{
-        ctx = modbus_new_rtu(my_ctx->serial_device, my_ctx->baud, my_ctx->parity, my_ctx->data_bit, my_ctx->stop_bit);
+        ctx = modbus_new_rtu(my_modbus_context.serial_device, my_modbus_context.baud, my_modbus_context.parity, my_modbus_context.data_bit, my_modbus_context.stop_bit);
     }
 
-    if (ctx == NULL) 
-	{
-        fprintf(stderr, "Unable to allocate libmodbus context\n");
-        //return -1;
-    }
-
-    modbus_set_debug(ctx, TRUE);
-    modbus_set_error_recovery(ctx,(modbus_error_recovery_mode)(MODBUS_ERROR_RECOVERY_LINK | MODBUS_ERROR_RECOVERY_PROTOCOL));
-
-    if(my_ctx->use_backend == RTU) 
-	{
-          modbus_set_slave(ctx, my_ctx->server_id);
-    }
-
-    if (modbus_connect(ctx) == -1) {
-        fprintf(stderr, "Connection failed: %s\n",
-                modbus_strerror(errno));
-        modbus_free(ctx);
-//        return -1;
-    }
-	/////////////////////////////////////////////////////////////////////////////
-
-    /* Allocate and initialize the memory to store the bits */
-    nb_points = (UT_BITS_NB > UT_INPUT_BITS_NB) ? UT_BITS_NB : UT_INPUT_BITS_NB;
-    tab_rp_bits = (uint8_t *) malloc(nb_points * sizeof(uint8_t));
-    memset(tab_rp_bits, 0, nb_points * sizeof(uint8_t));
-
-    /* Allocate and initialize the memory to store the registers */
-    nb_points = (UT_REGISTERS_NB > UT_INPUT_REGISTERS_NB) ?
-        UT_REGISTERS_NB : UT_INPUT_REGISTERS_NB;
-    tab_rp_registers = (uint16_t *) malloc(nb_points * sizeof(uint16_t));
-    memset(tab_rp_registers, 0, nb_points * sizeof(uint16_t));
-
-    printf("** UNIT TESTING **\n");
-
-	for(;;)
-	{
-		Sleep(pollingTime);
-
-	    /* Allocate and initialize the memory to store the bits */
-		memset(tab_rp_bits, 0, nb_points * sizeof(uint8_t));
-
-		/* Allocate and initialize the memory to store the registers */
-		memset(tab_rp_registers, 0, nb_points * sizeof(uint16_t));
-
-#if 0
-		printf("\nTEST WRITE/READ:\n");
-
-		/** COIL BITS **/
-
-		/* Single */
-		rc = modbus_write_bit(ctx, UT_BITS_ADDRESS, ON);
-		printf("1/2 modbus_write_bit: ");
-		if (rc == 1) {
-			printf("OK\n");
-		} else {
-			printf("FAILED\n");
-//			goto close;
-		}
-#endif
-		int rc = modbus_read_bits(ctx, UT_BITS_ADDRESS, 1, tab_rp_bits);
-		printf("2/2 modbus_read_bits: ");
-		if (rc != 1) {
-			printf("FAILED (nb points %d)\n", rc);
-			goto close;
-		}
-
-		if (tab_rp_bits[0] != ON) {
-			printf("FAILED (%0X = != %0X)\n", tab_rp_bits[0], ON);
-			goto close;
-		}
-		printf("OK\n");
-		/* End single */
-#if 0
-		/* Multiple bits */
-		{
-			//uint8_t tab_value[UT_BITS_NB];
-			uint8_t tab_value[0x25];
-
-			modbus_set_bits_from_bytes(tab_value, 0, UT_BITS_NB, UT_BITS_TAB);
-			rc = modbus_write_bits(ctx, UT_BITS_ADDRESS,
-								   UT_BITS_NB, tab_value);
-			printf("1/2 modbus_write_bits: ");
-			if (rc == UT_BITS_NB) {
-				printf("OK\n");
-			} else {
-				printf("FAILED\n");
-				goto close;
-			}
-		}
-#endif
-		rc = modbus_read_bits(ctx, UT_BITS_ADDRESS, UT_BITS_NB, tab_rp_bits);
-		printf("2/2 modbus_read_bits: ");
-		if (rc != UT_BITS_NB) {
-			printf("FAILED (nb points %d)\n", rc);
-			goto close;
-		}
-
-		i = 0;
-		nb_points = UT_BITS_NB;
-		while (nb_points > 0) {
-			int nb_bits = (nb_points > 8) ? 8 : nb_points;
-
-			value = modbus_get_byte_from_bits(tab_rp_bits, i*8, nb_bits);
-			if (value != UT_BITS_TAB[i]) {
-				printf("FAILED (%0X != %0X)\n", value, UT_BITS_TAB[i]);
-				goto close;
-			}
-
-			nb_points -= nb_bits;
-			i++;
-		}
-		printf("OK\n");
-		/* End of multiple bits */
-	
-#if 0		
-		/* Single register */
-		rc = modbus_write_register(ctx, UT_REGISTERS_ADDRESS, 0x1234);
-		printf("1/2 modbus_write_register: ");
-		if (rc == 1) {
-			printf("OK\n");
-		} else {
-			printf("FAILED\n");
-			goto close;
-		}
-#endif
-		rc = modbus_read_registers(ctx, UT_REGISTERS_ADDRESS,
-								   1, tab_rp_registers);
-		printf("2/2 modbus_read_registers: ");
-		if (rc != 1) {
-			printf("FAILED (nb points %d)\n", rc);
-			goto close;
-		}
-
-		if (tab_rp_registers[0] != 0x1234) {
-			printf("FAILED (%0X != %0X)\n",
-				   tab_rp_registers[0], 0x1234);
-			goto close;
-		}
-		printf("OK\n");
-		/* End of single register */
-#if 0
-		/* Many registers */
-		rc = modbus_write_registers(ctx, UT_REGISTERS_ADDRESS,
-									UT_REGISTERS_NB, UT_REGISTERS_TAB);
-		printf("1/5 modbus_write_registers: ");
-		if (rc == UT_REGISTERS_NB) {
-			printf("OK\n");
-		} else {
-			printf("FAILED\n");
-			goto close;
-		}
-
-#endif
-
-		rc = modbus_read_registers(ctx, UT_REGISTERS_ADDRESS,
-								   UT_REGISTERS_NB, tab_rp_registers);
-		printf("2/5 modbus_read_registers: ");
-		if (rc != UT_REGISTERS_NB) {
-			printf("FAILED (nb points %d)\n", rc);
-			goto close;
-		}
-
-		for (i=0; i < UT_REGISTERS_NB; i++) {
-			if (tab_rp_registers[i] != UT_REGISTERS_TAB[i]) {
-				printf("FAILED (%0X != %0X)\n",
-					   tab_rp_registers[i],
-					   UT_REGISTERS_TAB[i]);
-				goto close;
-			}
-		}
-		printf("OK\n");
-
-		rc = modbus_read_registers(ctx, UT_REGISTERS_ADDRESS,
-								   0, tab_rp_registers);
-		printf("3/5 modbus_read_registers (0): ");
-		if (rc != 0) {
-			printf("FAILED (nb points %d)\n", rc);
-			goto close;
-		}
-		printf("OK\n");
-	
-		/* End of many registers */
-
-		printf("\nTEST FLOATS\n");
-		/** FLOAT **/
-		printf("1/2 Set float: ");
-		modbus_set_float(UT_REAL, tab_rp_registers);
-		if (tab_rp_registers[1] == (UT_IREAL >> 16) &&
-			tab_rp_registers[0] == (UT_IREAL & 0xFFFF)) {
-			printf("OK\n");
-		} else {
-			printf("FAILED (%x != %x)\n",
-				   *((uint32_t *)tab_rp_registers), UT_IREAL);
-			goto close;
-		}
-
-		printf("2/2 Get float: ");
-		real = modbus_get_float(tab_rp_registers);
-		if (real == UT_REAL) {
-			printf("OK\n");
-		} else {
-			printf("FAILED (%f != %f)\n", real, UT_REAL);
-			goto close;
-		}
-
-		printf("\nAt this point, error messages doesn't mean the test has failed\n");
-	
-		/** TOO MANY DATA **/
-		printf("\nTEST TOO MANY DATA ERROR:\n");
-
-		rc = modbus_read_bits(ctx, UT_BITS_ADDRESS,
-							  MODBUS_MAX_READ_BITS + 1, tab_rp_bits);
-		printf("* modbus_read_bits: ");
-		if (rc == -1 && errno == EMBMDATA) {
-			printf("OK\n");
-		} else {
-			printf("FAILED\n");
-			goto close;
-		}
-
-		rc = modbus_read_input_bits(ctx, UT_INPUT_BITS_ADDRESS,
-									MODBUS_MAX_READ_BITS + 1, tab_rp_bits);
-		printf("* modbus_read_input_bits: ");
-		if (rc == -1 && errno == EMBMDATA) {
-			printf("OK\n");
-		} else {
-			printf("FAILED\n");
-			goto close;
-		}
-
-		rc = modbus_read_registers(ctx, UT_REGISTERS_ADDRESS,
-								   MODBUS_MAX_READ_REGISTERS + 1,
-								   tab_rp_registers);
-		printf("* modbus_read_registers: ");
-		if (rc == -1 && errno == EMBMDATA) {
-			printf("OK\n");
-		} else {
-			printf("FAILED\n");
-			goto close;
-		}
-
-		rc = modbus_read_input_registers(ctx, UT_INPUT_REGISTERS_ADDRESS,
-										 MODBUS_MAX_READ_REGISTERS + 1,
-										 tab_rp_registers);
-		printf("* modbus_read_input_registers: ");
-		if (rc == -1 && errno == EMBMDATA) {
-			printf("OK\n");
-		} else {
-			printf("FAILED\n");
-			goto close;
-		}
-#if 0
-		rc = modbus_write_bits(ctx, UT_BITS_ADDRESS,
-							   MODBUS_MAX_WRITE_BITS + 1, tab_rp_bits);
-		printf("* modbus_write_bits: ");
-		if (rc == -1 && errno == EMBMDATA) {
-			printf("OK\n");
-		} else {
-			goto close;
-			printf("FAILED\n");
-		}
-
-		rc = modbus_write_registers(ctx, UT_REGISTERS_ADDRESS,
-									MODBUS_MAX_WRITE_REGISTERS + 1,
-									tab_rp_registers);
-		printf("* modbus_write_registers: ");
-		if (rc == -1 && errno == EMBMDATA) {
-			printf("OK\n");
-		} else {
-			printf("FAILED\n");
-			goto close;
-		}
-#endif
-		/** SLAVE REPLY **/
-		printf("\nTEST SLAVE REPLY:\n");
-		modbus_set_slave(ctx, my_ctx->server_id);
-		rc = modbus_read_registers(ctx, UT_REGISTERS_ADDRESS, UT_REGISTERS_NB, tab_rp_registers);
-		
-		/* Response in TCP mode */
-		printf("1/4 Response from slave %d: ", 18);
-
-		if (rc == UT_REGISTERS_NB) {
-			printf("OK\n");
-		} else {
-			printf("FAILED\n");
-			goto close;
-		}
-		
-		rc = modbus_set_slave(ctx, MODBUS_BROADCAST_ADDRESS);
-		if (rc == -1) {
-			printf("Invalid broacast address\n");
-			goto close;
-		}
-
-		rc = modbus_read_registers(ctx, UT_REGISTERS_ADDRESS,
-								   UT_REGISTERS_NB, tab_rp_registers);
-		printf("2/4 Reply after a broadcast query: ");
-		if (rc == UT_REGISTERS_NB) {
-			printf("OK\n");
-		} else {
-			printf("FAILED\n");
-			goto close;
-		}
-		
-		modbus_set_slave(ctx, MODBUS_TCP_SLAVE);
-		
-		/* Save original timeout */
-		modbus_get_response_timeout(ctx, &old_response_timeout);
-
-		/* Define a new and too short timeout */
-		response_timeout.tv_sec = 0;
-		response_timeout.tv_usec = 0;
-		modbus_set_response_timeout(ctx, &response_timeout);
-
-		rc = modbus_read_registers(ctx, UT_REGISTERS_ADDRESS,
-								   UT_REGISTERS_NB, tab_rp_registers);
-		printf("4/4 Too short timeout: ");
-		if (rc == -1 && errno == ETIMEDOUT) {
-			printf("OK\n");
-		} else {
-			printf("FAILED (can fail on slow systems or Windows)\n");
-		}
-
-		/* Restore original timeout */
-		modbus_set_response_timeout(ctx, &old_response_timeout);
-
-		/* A wait and flush operation is done by the error recovery code of
-		 * libmodbus */
-	
-		printf("\nALL TESTS PASS WITH SUCCESS.\n");
-
-	}
-
-close:
-    /* Free the memory */
-    free(tab_rp_bits);
-    free(tab_rp_registers);
-
-    /* Close the connection */
-    modbus_close(ctx);
-    modbus_free(ctx);
-
-	////////////////////////////////////////////////////////////////////////
-
-	//if(!OpenLink(ServerIPAddress, atoi(modbus_ServerPort)))
+    if (ctx != NULL) 
 	{
 		/////////////////////Middleware/////////////////////////////////////////////////////////////////
 		received_command_callback = 0;
@@ -572,13 +215,32 @@ close:
 		///////////////////////////////////Middleware//////////////////////////////////////////////////
 		
 		////////////remove ASAP/////////////////////////
-		//Pass instanceSend and publisher as parameters to Factory calls through Master class
 		global_instanceSend = &instanceSend;
 		global_publisher = publisher;
 		////////////////////////////////////////////////
-
-		//master_p = new Master(masterConfig, datalinkConfig, &stationConfig, 1, &db, &timer);
 	}
+	else
+	{
+        fprintf(stderr, "Unable to allocate libmodbus context\n");
+		fExit = 1;
+		return;
+    }
+
+	modbus_set_debug(ctx, TRUE);
+    modbus_set_error_recovery(ctx,(modbus_error_recovery_mode)(MODBUS_ERROR_RECOVERY_LINK | MODBUS_ERROR_RECOVERY_PROTOCOL));
+
+    if(my_modbus_context.use_context == RTU)
+	{
+       modbus_set_slave(ctx, my_modbus_context.server_id);
+    }
+
+    if (modbus_connect(ctx) == -1) 
+	{
+        fprintf(stderr, "Connection failed: %s\n", modbus_strerror(errno));
+        modbus_free(ctx);
+		fExit = 1;
+        return;
+    }
 }   
 //   
 //  Class destructor.   
@@ -590,29 +252,21 @@ modbus_imp::~modbus_imp()
     return;   
 }   
 
-
 static u_int n_msg_sent = 0;
 
-int modbus_imp::Async2Update()
+int modbus_imp::PollServer(void)
 {
-	IT_IT("modbus_imp::Async2Update");
-
+	IT_IT("modbus_imp::PollServer");
 	
 	int rc = 0;
-	int check_server = 0;
 
-	while(true)
-	{
-		//check connection every g_dwUpdateRate*10 (about 10 or 30 secondi)
-		if((check_server%10) == 0)
-		{
-			rc = check_connection_to_server();
-			fprintf(stderr,"check for server connection...\n");
-			fflush(stderr);
-		}
-
-		check_server++;
-
+	rc = PollItems();
+	
+	return rc;
+  /*
+	while(true) //the polling loop
+	{	
+		
 		if(rc)
 		{ 
 			//fprintf(stderr,"modbus_imp exiting...., due to lack of connection with server\n");
@@ -654,64 +308,59 @@ int modbus_imp::Async2Update()
 			break; 
 		}
 
+
 		if(fExit)
 		{
 			IT_COMMENT("Terminate modbus loop!");
 			break;
 		}
 
-		gl_timeout_connection_with_parent++;
-
-		if(gl_timeout_connection_with_parent > 1000*20/(int)g_dwSleepInLoop)
-		{
-			break; //exit loop for timeout of connection with parent
-		}
 				
-		::Sleep(g_dwSleepInLoop);
+		::Sleep(pollingTime);
 	}
 	
 	IT_EXIT;
 	return 0;
+
+  */
 }
 
-int modbus_imp::RfcStart(char* RfcServerProgID, char* RfcclassId, char* RfcUpdateRate, char* RfcPercentDeadband)
+int modbus_imp::Start(void)
 {
-	IT_IT("modbus_imp::RfcStart");
+	IT_IT("modbus_imp::Start");
 	
 	char show_msg[200];
-	sprintf(show_msg, " IndigoSCADA OPC DA Client Start\n");
+	sprintf(show_msg, " IndigoSCADA MODBUS master Start\n");
 	LogMessage(NULL, show_msg);
 
-	float fTemp = 0.0f;
-
-	if(strlen(RfcUpdateRate) > 0)
+	if(fExit == 1)
 	{
-		g_dwUpdateRate = atoi(RfcUpdateRate);
-	}
-
-	if(strlen(RfcPercentDeadband) > 0)
-	{
-		dead_band_percent = atof(RfcPercentDeadband);
+		return(1); //error
 	}
 	
-	if((strlen(ServerIPAddress) == 0) || (strcmp("127.0.0.1", ServerIPAddress) == 0))
+	if(AddItems())
 	{
-		local_server = 1;
+		return(1); //error
 	}
-
-	strcpy(plc_server_prog_id, RfcServerProgID);
-	
 
 	IT_EXIT;
     return(0);
 }
 
-int modbus_imp::RfcStop()
+int modbus_imp::Stop()
 {
-	IT_IT("modbus_imp::RfcStop");
+	IT_IT("modbus_imp::Stop");
 
-	fprintf(stderr,"Entering RfcStop()\n");
+	fprintf(stderr,"Entering Stop()\n");
 	fflush(stderr);
+
+	/* Free the memory */
+    free(tab_rp_bits);
+    free(tab_rp_registers);
+
+    /* Close the connection */
+    modbus_close(ctx);
+    modbus_free(ctx);
 
 	while(received_command_callback)
 	{
@@ -721,32 +370,11 @@ int modbus_imp::RfcStop()
 	// terminate server and it will clean up itself
 
 	char show_msg[200];
-	sprintf(show_msg, " IndigoSCADA OPC DA Client End\n");
+	sprintf(show_msg, " IndigoSCADA MODBUS master End\n");
 	LogMessage(NULL, show_msg);
 
 	IT_EXIT;
 	return 1;
-}
-
-int modbus_imp::check_connection_to_server(void)
-{
-	IT_IT("modbus_imp::check_connection_to_server");
-
-	WORD wMajor, wMinor, wBuild;
-
-	LPWSTR pwsz = NULL;
-
-	if(!GetStatus(&wMajor, &wMinor, &wBuild, &pwsz))
-	{
-		
-	}
-	else
-	{
-		IT_EXIT;
-		return 1;
-	}
-
-	return 0;
 }
 
 int modbus_imp::GetStatus(WORD *pwMav, WORD *pwMiv, WORD *pwB, LPWSTR *pszV)
@@ -869,9 +497,250 @@ void modbus_imp::epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch_in_m
 
 //#define ABS(x) ((x) >= 0 ? (x) : -(x))
 
-void modbus_imp::SendEvent2(void)
+int modbus_imp::PollItems(void)
 {
-	IT_IT("modbus_imp::SendEvent2");
+	IT_IT("modbus_imp::PollItems");
+
+	////////////////////////////////Start protocol implementation///////////////////////////////////
+	int i, rc;
+    uint8_t value;
+    int nb_points;
+    float real;
+//    struct timeval old_response_timeout;
+//    struct timeval response_timeout;
+
+    //const uint16_t UT_BITS_ADDRESS = 0x13;
+    //const uint16_t UT_BITS_NB = 0x25;
+    const uint8_t UT_BITS_TAB[] = { 0xCD, 0x6B, 0xB2, 0x0E, 0x1B };
+    //const uint16_t UT_INPUT_BITS_ADDRESS = 0xC4;
+    //const uint16_t UT_INPUT_BITS_NB = 0x16;
+    //const uint16_t UT_REGISTERS_ADDRESS = 0x6B;
+    //const uint16_t UT_REGISTERS_NB = 0x3;
+    const uint16_t UT_REGISTERS_TAB[] = { 0x022B, 0x0001, 0x0064 };
+    //const uint16_t UT_INPUT_REGISTERS_ADDRESS = 0x08;
+    //const uint16_t UT_INPUT_REGISTERS_NB = 0x1;
+    const float UT_REAL = (float)916.540649;
+    //const uint32_t UT_IREAL = 0x4465229a;
+
+	    /* Allocate and initialize the memory to store the bits */
+#define MAX_BITS_IN_MEMORY_BLOCK 1000
+
+    nb_points = MAX_BITS_IN_MEMORY_BLOCK;
+    tab_rp_bits = (uint8_t *) malloc(nb_points * sizeof(uint8_t));
+
+    memset(tab_rp_bits, 0, nb_points * sizeof(uint8_t));
+
+#define MAX_REGISTERS_IN_MEMORY_BLOCK 1000
+
+    /* Allocate and initialize the memory to store the registers */
+    nb_points = MAX_REGISTERS_IN_MEMORY_BLOCK;
+
+    tab_rp_registers = (uint16_t *) malloc(nb_points * sizeof(uint16_t));
+
+    memset(tab_rp_registers, 0, nb_points * sizeof(uint16_t));
+
+	/*
+	//////////////////MODBUS RTU part/////////////////////////////////////////
+	Config_db[i].name[100];			//Item ID is an unique name identifing it
+	Config_db[i].modbus_function_read;	//modbus funtion to read
+	Config_db[i].modbus_function_write;	//modbus funtion to write
+	Config_db[i].modbus_start_address; //start address of the memory to fetch
+	Config_db[i].modbus_bit_size; //size in bit of the the memory to fetch
+	Config_db[i].offset_in_bits; //offset in bits into the memory to fetch (to sum with start address in order to find the address of interested data)
+	//////////////control center part///////////////////////////////////
+	Config_db[i].ioa_control_center; //unique inside CASDU
+	Config_db[i].iec_type_read;   //IEC 104 type to read
+	Config_db[i].iec_type_write;   //IEC 104 type to write
+	Config_db[i].size_in_bits_of_iec_type; //The sise in bits of the IEC 104 type
+*/
+	for(i = 0; i < db_n_rows; i++)
+	{
+		/* Function codes */
+		if(Config_db[i].modbus_function_read == FC_READ_COILS)
+		{
+			//0x01
+
+			rc = modbus_read_bits(ctx, Config_db[i].modbus_start_address, Config_db[i].modbus_bit_size, tab_rp_bits);
+
+			printf("modbus_read_bits: ");
+
+			if (rc != Config_db[i].modbus_bit_size) 
+			{
+				printf("FAILED (nb points %d)\n", rc);
+				//error
+			}
+
+			i = 0;
+			nb_points = Config_db[i].modbus_bit_size;
+
+			while (nb_points > 0) 
+			{
+				int nb_bits = (nb_points > 8) ? 8 : nb_points;
+
+				value = modbus_get_byte_from_bits(tab_rp_bits, i*8, nb_bits);
+
+				if (value != UT_BITS_TAB[i]) {
+					printf("FAILED (%0X != %0X)\n", value, UT_BITS_TAB[i]);
+					//error
+				}
+
+				nb_points -= nb_bits;
+				i++;
+			}
+			printf("OK\n");
+			/* End of multiple bits */
+		}
+		else if(Config_db[i].modbus_function_read == FC_READ_DISCRETE_INPUTS)
+		{
+			//0x02
+		
+		}
+		else if(Config_db[i].modbus_function_read == FC_READ_HOLDING_REGISTERS)
+		{
+			//0x03
+			int registers = Config_db[i].modbus_bit_size/16;
+
+			rc = modbus_read_registers(ctx, Config_db[i].modbus_start_address, registers, tab_rp_registers);
+			printf("modbus_read_registers: ");
+
+			if (rc != registers) {
+				printf("FAILED (nb points %d)\n", rc);
+				//error
+			}
+
+			for (i=0; i < registers; i++) {
+				if (tab_rp_registers[i] != UT_REGISTERS_TAB[i]) {
+					printf("FAILED (%0X != %0X)\n",
+						   tab_rp_registers[i],
+						   UT_REGISTERS_TAB[i]);
+					//error
+				}
+			}
+
+			printf("OK\n");
+		}
+		else if(Config_db[i].modbus_function_read == FC_READ_INPUT_REGISTERS)
+		{
+			//0x04
+		
+		}
+		else if(Config_db[i].modbus_function_write == FC_WRITE_SINGLE_COIL)
+		{
+			//0x05
+
+			/** COIL BITS **/
+
+			/* Single */
+			rc = modbus_write_bit(ctx, Config_db[i].modbus_function_write, ON);
+			printf("modbus_write_bit: ");
+			if (rc == 1) {
+				printf("OK\n");
+			} else {
+				printf("FAILED\n");
+	//			//error
+			}
+		}
+		else if(Config_db[i].modbus_function_write == FC_WRITE_SINGLE_REGISTER)
+		{
+			//0x06
+
+			/* Single register */
+			rc = modbus_write_register(ctx, Config_db[i].modbus_start_address, 0x1234);
+			printf("1/2 modbus_write_register: ");
+			if (rc == 1) {
+				printf("OK\n");
+			} else {
+				printf("FAILED\n");
+				//error
+			}
+		}
+		else if(Config_db[i].modbus_function_read == FC_READ_EXCEPTION_STATUS)
+		{
+			//0x07
+		
+		}
+		else if(Config_db[i].modbus_function_write == FC_WRITE_MULTIPLE_COILS)
+		{
+			//0x0F
+
+			//uint8_t tab_value[UT_BITS_NB];
+			uint8_t tab_value[0x25];
+
+			modbus_set_bits_from_bytes(tab_value, 0, Config_db[i].modbus_bit_size, UT_BITS_TAB);
+
+			rc = modbus_write_bits(ctx, Config_db[i].modbus_start_address, Config_db[i].modbus_bit_size, tab_value);
+			printf("1/2 modbus_write_bits: ");
+			if (rc == Config_db[i].modbus_bit_size) 
+			{
+				printf("OK\n");
+			} else {
+				printf("FAILED\n");
+				//error
+			}
+		}
+		else if(Config_db[i].modbus_function_write == FC_WRITE_MULTIPLE_REGISTERS)
+		{
+			//0x10
+
+			int registers = Config_db[i].modbus_bit_size/16;
+
+			/* Many registers */
+			rc = modbus_write_registers(ctx, Config_db[i].modbus_start_address, registers, UT_REGISTERS_TAB);
+			printf("1/5 modbus_write_registers: ");
+			if (rc == registers) {
+				printf("OK\n");
+			} else {
+				printf("FAILED\n");
+				//error
+			}
+		}
+		else if(Config_db[i].modbus_function_read == FC_REPORT_SLAVE_ID)
+		{
+			//0x11
+		
+		}
+	//	else if(Config_db[i].modbus_function_read == FC_WRITE_AND_READ_REGISTERS)
+	//	{
+	//		//0x17
+	//	}
+		else
+		{
+			printf("Function not supported\n");
+		}
+
+		if(Config_db[i].iec_type_read == M_ME_TF_1)
+		{
+			printf("Get float: ");
+			real = modbus_get_float(tab_rp_registers);
+
+			//if (real == UT_REAL) {
+			//	printf("OK\n");
+			//} else {
+			//	printf("FAILED (%f != %f)\n", real, UT_REAL);
+			//	goto close;
+			///}
+		}
+
+		if(Config_db[i].iec_type_read == C_SE_TC_1)
+		{
+			float command_value = UT_REAL;
+			/** FLOAT **/
+			printf("Set float: ");
+			modbus_set_float(command_value, tab_rp_registers);
+
+			//if (tab_rp_registers[1] == (UT_IREAL >> 16) &&
+			//	tab_rp_registers[0] == (UT_IREAL & 0xFFFF)) {
+			//	printf("OK\n");
+			//} else {
+			//	printf("FAILED (%x != %x)\n",
+			//		   *((uint32_t *)tab_rp_registers), UT_IREAL);
+			//	goto close;
+			//}
+		}
+	}
+
+	return 0;
+
 /*
 	VARIANT *pValue;
 	const FILETIME* ft;
