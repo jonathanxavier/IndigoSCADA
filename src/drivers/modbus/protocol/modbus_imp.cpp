@@ -18,7 +18,6 @@
 #include "modbus_imp.h"
 #include "stdlib.h"
 
-
 #define MAX_KEYLEN 256
 #define MAX_COMMAND_SEND_TIME 60
 
@@ -104,11 +103,6 @@ void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackPa
 iec_item_type modbus_imp::instanceSend;
 ORTEPublication* modbus_imp::publisher = NULL;
 ////////////////////////////////Middleware/////////////////
-
-//Global to remove ASAP///////////////////////
-iec_item_type* global_instanceSend;
-ORTEPublication* global_publisher;
-//////////////////////////////////////////////
 
 //   
 //  Class constructor.   
@@ -213,11 +207,6 @@ fExit(false),pollingTime(polling_time)
 
 		//if(subscriber == NULL){} //check this error
 		///////////////////////////////////Middleware//////////////////////////////////////////////////
-		
-		////////////remove ASAP/////////////////////////
-		global_instanceSend = &instanceSend;
-		global_publisher = publisher;
-		////////////////////////////////////////////////
 	}
 	else
 	{
@@ -259,18 +248,16 @@ int modbus_imp::PollServer(void)
 	IT_IT("modbus_imp::PollServer");
 	
 	int rc = 0;
-
-	rc = PollItems();
-	
-	return rc;
-  /*
+  
 	while(true) //the polling loop
 	{	
-		
+		rc = PollItems();
+	
 		if(rc)
 		{ 
-			//fprintf(stderr,"modbus_imp exiting...., due to lack of connection with server\n");
-			//fflush(stderr);
+			fprintf(stderr,"modbus on line %d exiting...., due to lack of connection with server\n", lineNumber);
+			fflush(stderr);
+
 			IT_COMMENT("modbus_imp exiting...., due to lack of connection with server");
 			
 			//Send LOST message to parent (monitor.exe)
@@ -304,6 +291,8 @@ int modbus_imp::PollServer(void)
 			instanceSend.checksum = item_to_send.checksum;
 
 			ORTEPublicationSend(publisher);
+
+			n_msg_sent++;
 		
 			break; 
 		}
@@ -314,15 +303,12 @@ int modbus_imp::PollServer(void)
 			IT_COMMENT("Terminate modbus loop!");
 			break;
 		}
-
 				
 		::Sleep(pollingTime);
 	}
 	
 	IT_EXIT;
 	return 0;
-
-  */
 }
 
 int modbus_imp::Start(void)
@@ -466,71 +452,31 @@ time_t modbus_imp::epoch_from_cp56time2a(const struct cp56time2a* time)
 	return epoch;
 }
 
-void modbus_imp::epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch_in_millisec)
-{
-	struct tm	*ptm;
-	int ms = (int)(epoch_in_millisec%1000);
-	time_t seconds;
-
-	IT_IT("epoch_to_cp56time2a");
-	
-	memset(time, 0x00,sizeof(cp56time2a));
-	seconds = (long)(epoch_in_millisec/1000);
-	ptm = localtime(&seconds);
-		
-    if(ptm)
-	{
-		time->hour = ptm->tm_hour;					//<0.23>
-		time->min = ptm->tm_min;					//<0..59>
-		time->msec = ptm->tm_sec*1000 + ms; //<0.. 59999>
-		time->mday = ptm->tm_mday; //<1..31>
-		time->wday = (ptm->tm_wday == 0) ? ptm->tm_wday + 7 : ptm->tm_wday; //<1..7>
-		time->month = ptm->tm_mon + 1; //<1..12>
-		time->year = ptm->tm_year - 100; //<0.99>
-		time->iv = 0; //<0..1> Invalid: <0> is valid, <1> is invalid
-		time->su = (u_char)ptm->tm_isdst; //<0..1> SUmmer time: <0> is standard time, <1> is summer time
-	}
-
-	IT_EXIT;
-    return;
-}
-
 //#define ABS(x) ((x) >= 0 ? (x) : -(x))
 
+//Retun 1 on error
 int modbus_imp::PollItems(void)
 {
 	IT_IT("modbus_imp::PollItems");
 
+	struct iec_item item_to_send;
+	struct cp56time2a actual_time;
 	////////////////////////////////Start protocol implementation///////////////////////////////////
-	int i, rc;
-    uint8_t value;
+	int rc;
     int nb_points;
+	int bit_size;
     float real;
-//    struct timeval old_response_timeout;
-//    struct timeval response_timeout;
+	unsigned int integer;
 
-    //const uint16_t UT_BITS_ADDRESS = 0x13;
-    //const uint16_t UT_BITS_NB = 0x25;
-    const uint8_t UT_BITS_TAB[] = { 0xCD, 0x6B, 0xB2, 0x0E, 0x1B };
-    //const uint16_t UT_INPUT_BITS_ADDRESS = 0xC4;
-    //const uint16_t UT_INPUT_BITS_NB = 0x16;
-    //const uint16_t UT_REGISTERS_ADDRESS = 0x6B;
-    //const uint16_t UT_REGISTERS_NB = 0x3;
-    const uint16_t UT_REGISTERS_TAB[] = { 0x022B, 0x0001, 0x0064 };
-    //const uint16_t UT_INPUT_REGISTERS_ADDRESS = 0x08;
-    //const uint16_t UT_INPUT_REGISTERS_NB = 0x1;
-    const float UT_REAL = (float)916.540649;
-    //const uint32_t UT_IREAL = 0x4465229a;
-
-	    /* Allocate and initialize the memory to store the bits */
-#define MAX_BITS_IN_MEMORY_BLOCK 1000
+    /* Allocate and initialize the memory to store the bits */
+	#define MAX_BITS_IN_MEMORY_BLOCK 30
 
     nb_points = MAX_BITS_IN_MEMORY_BLOCK;
     tab_rp_bits = (uint8_t *) malloc(nb_points * sizeof(uint8_t));
 
     memset(tab_rp_bits, 0, nb_points * sizeof(uint8_t));
 
-#define MAX_REGISTERS_IN_MEMORY_BLOCK 1000
+	#define MAX_REGISTERS_IN_MEMORY_BLOCK 30
 
     /* Allocate and initialize the memory to store the registers */
     nb_points = MAX_REGISTERS_IN_MEMORY_BLOCK;
@@ -553,607 +499,127 @@ int modbus_imp::PollItems(void)
 	Config_db[i].iec_type_write;   //IEC 104 type to write
 	Config_db[i].size_in_bits_of_iec_type; //The sise in bits of the IEC 104 type
 */
-	for(i = 0; i < db_n_rows; i++)
+
+	for(int rowNumber = 0; rowNumber < db_n_rows; rowNumber++)
 	{
+		memset(&item_to_send,0x00, sizeof(struct iec_item));
+
 		/* Function codes */
-		if(Config_db[i].modbus_function_read == FC_READ_COILS)
+		if(Config_db[rowNumber].modbus_function_read == FC_READ_COILS)
 		{
 			//0x01
-
-			rc = modbus_read_bits(ctx, Config_db[i].modbus_start_address, Config_db[i].modbus_bit_size, tab_rp_bits);
-
-			printf("modbus_read_bits: ");
-
-			if (rc != Config_db[i].modbus_bit_size) 
-			{
-				printf("FAILED (nb points %d)\n", rc);
-				//error
-			}
-
-			i = 0;
-			nb_points = Config_db[i].modbus_bit_size;
-
-			while (nb_points > 0) 
-			{
-				int nb_bits = (nb_points > 8) ? 8 : nb_points;
-
-				value = modbus_get_byte_from_bits(tab_rp_bits, i*8, nb_bits);
-
-				if (value != UT_BITS_TAB[i]) {
-					printf("FAILED (%0X != %0X)\n", value, UT_BITS_TAB[i]);
+				
+				if(Config_db[rowNumber].modbus_bit_size != 1)
+				{
 					//error
 				}
 
-				nb_points -= nb_bits;
-				i++;
-			}
-			printf("OK\n");
-			/* End of multiple bits */
+				bit_size = 1;
+
+				rc = modbus_read_bits(ctx, Config_db[rowNumber].modbus_start_address + Config_db[rowNumber].offset_in_bits, bit_size, tab_rp_bits);
+
+				printf("modbus_read_bits: ");
+
+				if (rc != Config_db[rowNumber].modbus_bit_size) 
+				{
+					printf("FAILED (nb points %d)\n", rc);
+					//error
+				}
+
+				uint8_t value = tab_rp_bits[0];
+			
+				item_to_send.iec_type = M_SP_TB_1;
+				
+				get_utc_host_time(&actual_time);
+
+				item_to_send.iec_obj.o.type30.sp = value;
+				item_to_send.iec_obj.o.type30.time = actual_time;
+
+//				if(pwQualities != OPC_QUALITY_GOOD)
+//					item_to_send.iec_obj.o.type30.iv = 1;
+				
+				IT_COMMENT1("Value = %d", value);
+			
 		}
-		else if(Config_db[i].modbus_function_read == FC_READ_DISCRETE_INPUTS)
+		else if(Config_db[rowNumber].modbus_function_read == FC_READ_DISCRETE_INPUTS)
 		{
 			//0x02
-		
+			printf("Function %x not supported\n", 0x02);
 		}
-		else if(Config_db[i].modbus_function_read == FC_READ_HOLDING_REGISTERS)
+		else if(Config_db[rowNumber].modbus_function_read == FC_READ_HOLDING_REGISTERS)
 		{
 			//0x03
-			int registers = Config_db[i].modbus_bit_size/16;
+			//int registers = Config_db[i].modbus_bit_size/16;
 
-			rc = modbus_read_registers(ctx, Config_db[i].modbus_start_address, registers, tab_rp_registers);
+			int registers = 2; //we read 32 bits
+
+			rc = modbus_read_registers(ctx, Config_db[rowNumber].modbus_start_address + Config_db[rowNumber].offset_in_bits, registers, tab_rp_registers);
 			printf("modbus_read_registers: ");
 
-			if (rc != registers) {
+			if (rc != registers) 
+			{
 				printf("FAILED (nb points %d)\n", rc);
 				//error
 			}
 
-			for (i=0; i < registers; i++) {
-				if (tab_rp_registers[i] != UT_REGISTERS_TAB[i]) {
-					printf("FAILED (%0X != %0X)\n",
-						   tab_rp_registers[i],
-						   UT_REGISTERS_TAB[i]);
-					//error
-				}
-			}
+			if(Config_db[rowNumber].iec_type_read == M_ME_TF_1)
+			{
+				printf("Get float: ");
+				real = modbus_get_float(tab_rp_registers);
 
-			printf("OK\n");
+				item_to_send.iec_type = M_ME_TF_1;
+				
+				get_utc_host_time(&actual_time);
+
+				item_to_send.iec_obj.o.type36.mv = real;
+				item_to_send.iec_obj.o.type36.time = actual_time;
+
+//				if(pwQualities != OPC_QUALITY_GOOD)
+//					item_to_send.iec_obj.o.type36.iv = 1;
+			}
+			else if(Config_db[rowNumber].iec_type_read == M_IT_TB_1)
+			{
+				printf("Get integer: ");
+				memcpy(&integer, tab_rp_registers, sizeof(unsigned int));
+
+				item_to_send.iec_type = M_IT_TB_1;
+				
+				get_utc_host_time(&actual_time);
+
+				item_to_send.iec_obj.o.type37.counter = integer;
+				item_to_send.iec_obj.o.type37.time = actual_time;
+					
+				//if(pwQualities != OPC_QUALITY_GOOD)
+				//	item_to_send.iec_obj.o.type37.iv = 1;
+			}
 		}
-		else if(Config_db[i].modbus_function_read == FC_READ_INPUT_REGISTERS)
+		else if(Config_db[rowNumber].modbus_function_read == FC_READ_INPUT_REGISTERS)
 		{
 			//0x04
+			printf("Function %x not supported\n", 0x04);
 		
 		}
-		else if(Config_db[i].modbus_function_write == FC_WRITE_SINGLE_COIL)
-		{
-			//0x05
-
-			/** COIL BITS **/
-
-			/* Single */
-			rc = modbus_write_bit(ctx, Config_db[i].modbus_function_write, ON);
-			printf("modbus_write_bit: ");
-			if (rc == 1) {
-				printf("OK\n");
-			} else {
-				printf("FAILED\n");
-	//			//error
-			}
-		}
-		else if(Config_db[i].modbus_function_write == FC_WRITE_SINGLE_REGISTER)
-		{
-			//0x06
-
-			/* Single register */
-			rc = modbus_write_register(ctx, Config_db[i].modbus_start_address, 0x1234);
-			printf("1/2 modbus_write_register: ");
-			if (rc == 1) {
-				printf("OK\n");
-			} else {
-				printf("FAILED\n");
-				//error
-			}
-		}
-		else if(Config_db[i].modbus_function_read == FC_READ_EXCEPTION_STATUS)
+		else if(Config_db[rowNumber].modbus_function_read == FC_READ_EXCEPTION_STATUS)
 		{
 			//0x07
+			printf("Function %x not supported\n", 0x07);
 		
 		}
-		else if(Config_db[i].modbus_function_write == FC_WRITE_MULTIPLE_COILS)
-		{
-			//0x0F
-
-			//uint8_t tab_value[UT_BITS_NB];
-			uint8_t tab_value[0x25];
-
-			modbus_set_bits_from_bytes(tab_value, 0, Config_db[i].modbus_bit_size, UT_BITS_TAB);
-
-			rc = modbus_write_bits(ctx, Config_db[i].modbus_start_address, Config_db[i].modbus_bit_size, tab_value);
-			printf("1/2 modbus_write_bits: ");
-			if (rc == Config_db[i].modbus_bit_size) 
-			{
-				printf("OK\n");
-			} else {
-				printf("FAILED\n");
-				//error
-			}
-		}
-		else if(Config_db[i].modbus_function_write == FC_WRITE_MULTIPLE_REGISTERS)
-		{
-			//0x10
-
-			int registers = Config_db[i].modbus_bit_size/16;
-
-			/* Many registers */
-			rc = modbus_write_registers(ctx, Config_db[i].modbus_start_address, registers, UT_REGISTERS_TAB);
-			printf("1/5 modbus_write_registers: ");
-			if (rc == registers) {
-				printf("OK\n");
-			} else {
-				printf("FAILED\n");
-				//error
-			}
-		}
-		else if(Config_db[i].modbus_function_read == FC_REPORT_SLAVE_ID)
+		else if(Config_db[rowNumber].modbus_function_read == FC_REPORT_SLAVE_ID)
 		{
 			//0x11
-		
+			printf("Function %x not supported\n", 0x11);
 		}
-	//	else if(Config_db[i].modbus_function_read == FC_WRITE_AND_READ_REGISTERS)
-	//	{
-	//		//0x17
-	//	}
+		else if(Config_db[rowNumber].modbus_function_read == FC_WRITE_AND_READ_REGISTERS)
+		{
+			//0x17
+			printf("Function %x not supported\n", 0x17);
+		}
 		else
 		{
 			printf("Function not supported\n");
 		}
-
-		if(Config_db[i].iec_type_read == M_ME_TF_1)
-		{
-			printf("Get float: ");
-			real = modbus_get_float(tab_rp_registers);
-
-			//if (real == UT_REAL) {
-			//	printf("OK\n");
-			//} else {
-			//	printf("FAILED (%f != %f)\n", real, UT_REAL);
-			//	goto close;
-			///}
-		}
-
-		if(Config_db[i].iec_type_read == C_SE_TC_1)
-		{
-			float command_value = UT_REAL;
-			/** FLOAT **/
-			printf("Set float: ");
-			modbus_set_float(command_value, tab_rp_registers);
-
-			//if (tab_rp_registers[1] == (UT_IREAL >> 16) &&
-			//	tab_rp_registers[0] == (UT_IREAL & 0xFFFF)) {
-			//	printf("OK\n");
-			//} else {
-			//	printf("FAILED (%x != %x)\n",
-			//		   *((uint32_t *)tab_rp_registers), UT_IREAL);
-			//	goto close;
-			//}
-		}
 	}
-
-	return 0;
-
-/*
-	VARIANT *pValue;
-	const FILETIME* ft;
-	DWORD pwQualities;
-	OPCHANDLE phClientItem;
-	unsigned char cot;
-	cp56time2a time;
-	signed __int64 epoch_in_millisec;
-	struct iec_item item_to_send;
-	double delta = 0.0;
-	
-	USES_CONVERSION;
-
-	IT_COMMENT1("pwQualities = %d", pwQualities);
-	IT_COMMENT1("phClientItem = %d", phClientItem);
-
-	if(Item == NULL)
-	{
-		//print error message
-		return;
-	}
-    	
-	memset(&item_to_send,0x00, sizeof(struct iec_item));
-		
-	item_to_send.iec_obj.ioa = Item[phClientItem - 1].ioa_control_center;
-
-	item_to_send.cause = cot;
-
-	const char* parc = (const char*)W2T(Item[phClientItem - 1].wszName); // togliere - 1 poiche il primo elemento del vettore Item parte da 0
-	
-	if(parc == NULL)
-	{
-		//print error message
-		return;
-	}
-		
-	//strcpy(item_to_send.opc_server_item_id, parc);
-
-	epoch_in_millisec = epoch_from_FILETIME(ft);
-	
-	if(!pValue)
-	{
-		VARIANT Value;
-		pValue = &Value;
-		V_VT(pValue) = VT_EMPTY;
-	}
-	
-	switch(V_VT(pValue))
-	{
-		//case VT_EMPTY:
-		//{
-			//IT_COMMENT1("Value = %d", V_EMPTY(pValue));
-		//}
-		//break;
-		case VT_I1:
-		{
-			switch(Item[phClientItem - 1].io_list_iec_type)
-			{
-				case M_IT_TB_1:
-				{
-					item_to_send.iec_type = M_IT_TB_1;
-					epoch_to_cp56time2a(&time, epoch_in_millisec);
-					item_to_send.iec_obj.o.type37.counter = V_I1(pValue);
-					item_to_send.iec_obj.o.type37.time = time;
-						
-					if(pwQualities != OPC_QUALITY_GOOD)
-						item_to_send.iec_obj.o.type37.iv = 1;
-
-					IT_COMMENT1("Value = %d", V_I1(pValue));
-				}
-				break;
-				case M_ME_TE_1:
-				{
-					int error = 0;
-
-					item_to_send.iec_type = M_ME_TE_1;
-					epoch_to_cp56time2a(&time, epoch_in_millisec);
-					item_to_send.iec_obj.o.type35.mv = rescale_value(V_I1(pValue),
-					Item[phClientItem - 1].min_measure, 
-					Item[phClientItem - 1].max_measure, &error);
-					
-					if(pwQualities != OPC_QUALITY_GOOD)
-						item_to_send.iec_obj.o.type35.iv = 1;
-
-					IT_COMMENT1("Value = %d", V_I1(pValue));
-				}
-				break;
-				case C_DC_NA_1:
-				{
-					fprintf(stderr,"IEC type %d is NOT sent in monitoring direction\n", Item[phClientItem - 1].io_list_iec_type);
-					fflush(stderr);
-				}
-				break;
-				default:
-				{
-				  fprintf(stderr,"IEC type %d is NOT supported for VT_I1\n", Item[phClientItem - 1].io_list_iec_type);
-				  fflush(stderr);
-				}
-				break;
-			}
-		}
-		break;
-		case VT_UI1:
-		{
-			switch(Item[phClientItem - 1].io_list_iec_type)
-			{
-				case M_IT_TB_1:
-				{
-					item_to_send.iec_type = M_IT_TB_1;
-					epoch_to_cp56time2a(&time, epoch_in_millisec);
-					item_to_send.iec_obj.o.type37.counter = V_UI1(pValue);
-					item_to_send.iec_obj.o.type37.time = time;
-						
-					if(pwQualities != OPC_QUALITY_GOOD)
-						item_to_send.iec_obj.o.type37.iv = 1;
-
-					IT_COMMENT1("Value = %d", V_UI1(pValue));
-				}
-				break;
-				case M_ME_TE_1:
-				{
-					int error = 0;
-
-					item_to_send.iec_type = M_ME_TE_1;
-					epoch_to_cp56time2a(&time, epoch_in_millisec);
-					item_to_send.iec_obj.o.type35.mv = rescale_value(V_UI1(pValue),
-					Item[phClientItem - 1].min_measure, 
-					Item[phClientItem - 1].max_measure, &error);
-					
-					if(pwQualities != OPC_QUALITY_GOOD)
-						item_to_send.iec_obj.o.type35.iv = 1;
-
-					IT_COMMENT1("Value = %d", V_UI1(pValue));
-				}
-				break;
-				case C_DC_NA_1:
-				{
-					fprintf(stderr,"IEC type %d is NOT sent in monitoring direction\n", Item[phClientItem - 1].io_list_iec_type);
-					fflush(stderr);
-				}
-				break;
-				default:
-				{
-				  fprintf(stderr,"IEC type %d is NOT supported for VT_UI1\n", Item[phClientItem - 1].io_list_iec_type);
-				  fflush(stderr);
-				}
-				break;
-			}
-		}
-		break;
-		case VT_I2:
-		{
-				switch(Item[phClientItem - 1].io_list_iec_type)
-				{
-					case M_IT_TB_1:
-					{
-						item_to_send.iec_type = M_IT_TB_1;
-						epoch_to_cp56time2a(&time, epoch_in_millisec);
-						item_to_send.iec_obj.o.type37.counter = V_I2(pValue);
-						item_to_send.iec_obj.o.type37.time = time;
-							
-						if(pwQualities != OPC_QUALITY_GOOD)
-							item_to_send.iec_obj.o.type37.iv = 1;
-
-						IT_COMMENT1("Value = %d", V_I2(pValue));
-					}
-					break;
-					case M_ME_TE_1:
-					{
-						int error = 0;
-
-						item_to_send.iec_type = M_ME_TE_1;
-						epoch_to_cp56time2a(&time, epoch_in_millisec);
-						item_to_send.iec_obj.o.type35.mv = rescale_value(V_I2(pValue),
-						Item[phClientItem - 1].min_measure, 
-						Item[phClientItem - 1].max_measure, &error);
-						
-						if(pwQualities != OPC_QUALITY_GOOD)
-							item_to_send.iec_obj.o.type35.iv = 1;
-
-						IT_COMMENT1("Value = %d", V_I2(pValue));
-					}
-					break;
-					case C_DC_NA_1:
-					{
-						fprintf(stderr,"IEC type %d is NOT sent in monitoring direction\n", Item[phClientItem - 1].io_list_iec_type);
-						fflush(stderr);
-					}
-					break;
-					default:
-					{
-					  fprintf(stderr,"IEC type %d is NOT supported for VT_I2\n", Item[phClientItem - 1].io_list_iec_type);
-					  fflush(stderr);
-					}
-					break;
-				}
-		}
-		break;
-		case VT_UI2:
-		{
-				switch(Item[phClientItem - 1].io_list_iec_type)
-				{
-					case M_IT_TB_1:
-					{
-						item_to_send.iec_type = M_IT_TB_1;
-						epoch_to_cp56time2a(&time, epoch_in_millisec);
-						item_to_send.iec_obj.o.type37.counter = V_UI2(pValue);
-						item_to_send.iec_obj.o.type37.time = time;
-							
-						if(pwQualities != OPC_QUALITY_GOOD)
-							item_to_send.iec_obj.o.type37.iv = 1;
-
-						IT_COMMENT1("Value = %d", V_UI2(pValue));
-					}
-					break;
-					case M_ME_TE_1:
-					{
-						int error = 0;
-
-						item_to_send.iec_type = M_ME_TE_1;
-						epoch_to_cp56time2a(&time, epoch_in_millisec);
-						item_to_send.iec_obj.o.type35.mv = rescale_value(V_UI2(pValue),
-						Item[phClientItem - 1].min_measure, 
-						Item[phClientItem - 1].max_measure, &error);
-						
-						if(pwQualities != OPC_QUALITY_GOOD)
-							item_to_send.iec_obj.o.type35.iv = 1;
-
-						IT_COMMENT1("Value = %d", V_UI2(pValue));
-					}
-					break;
-					default:
-					{
-					  fprintf(stderr,"IEC type %d is NOT supported for VT_UI2\n", Item[phClientItem - 1].io_list_iec_type);
-					  fflush(stderr);
-					}
-					break;
-				}
-		}
-		break;
-		case VT_I4:
-		{
-				switch(Item[phClientItem - 1].io_list_iec_type)
-				{
-					case M_IT_TB_1:
-					{
-						item_to_send.iec_type = M_IT_TB_1;
-						epoch_to_cp56time2a(&time, epoch_in_millisec);
-						item_to_send.iec_obj.o.type37.counter = V_I4(pValue);
-						item_to_send.iec_obj.o.type37.time = time;
-							
-						if(pwQualities != OPC_QUALITY_GOOD)
-							item_to_send.iec_obj.o.type37.iv = 1;
-
-						IT_COMMENT1("Value = %d", V_I4(pValue));
-					}
-					break;
-					case M_ME_TE_1:
-					{
-						int error = 0;
-
-						item_to_send.iec_type = M_ME_TE_1;
-						epoch_to_cp56time2a(&time, epoch_in_millisec);
-						item_to_send.iec_obj.o.type35.mv = rescale_value(V_I4(pValue),
-						Item[phClientItem - 1].min_measure, 
-						Item[phClientItem - 1].max_measure, &error);
-							
-						if(pwQualities != OPC_QUALITY_GOOD)
-							item_to_send.iec_obj.o.type35.iv = 1;
-
-						IT_COMMENT1("Value = %d", V_I4(pValue));
-					}
-					break;
-					default:
-					{
-					  fprintf(stderr,"IEC type %d is NOT supported for VT_I4\n", Item[phClientItem - 1].io_list_iec_type);
-					  fflush(stderr);
-					}
-					break;
-				}
-		}
-		break;
-		case VT_UI4:
-		{
-				switch(Item[phClientItem - 1].io_list_iec_type)
-				{
-					case M_IT_TB_1:
-					{
-						item_to_send.iec_type = M_IT_TB_1;
-						epoch_to_cp56time2a(&time, epoch_in_millisec);
-						item_to_send.iec_obj.o.type37.counter = V_UI4(pValue); //over 2^31 - 1 there is overflow!
-						item_to_send.iec_obj.o.type37.time = time;
-							
-						if(pwQualities != OPC_QUALITY_GOOD)
-							item_to_send.iec_obj.o.type37.iv = 1;
-
-						IT_COMMENT1("Value = %d", V_UI4(pValue));
-					}
-					break;
-					case M_ME_TE_1:
-					{
-						int error = 0;
-
-						item_to_send.iec_type = M_ME_TE_1;
-						epoch_to_cp56time2a(&time, epoch_in_millisec);
-						item_to_send.iec_obj.o.type35.mv = rescale_value(V_UI4(pValue),
-						Item[phClientItem - 1].min_measure, 
-						Item[phClientItem - 1].max_measure, &error);
-							
-						if(pwQualities != OPC_QUALITY_GOOD)
-							item_to_send.iec_obj.o.type35.iv = 1;
-
-						IT_COMMENT1("Value = %d", V_UI4(pValue));
-					}
-					break;
-					default:
-					{
-					  fprintf(stderr,"IEC type %d is NOT supported for VT_UI4\n", Item[phClientItem - 1].io_list_iec_type);
-					  fflush(stderr);
-					}
-					break;
-				}
-		}
-		break;
-		case VT_R4:
-		{
-			item_to_send.iec_type = M_ME_TF_1;
-			epoch_to_cp56time2a(&time, epoch_in_millisec);
-			item_to_send.iec_obj.o.type36.mv = V_R4(pValue);
-			item_to_send.iec_obj.o.type36.time = time;
-
-			if(pwQualities != OPC_QUALITY_GOOD)
-				item_to_send.iec_obj.o.type36.iv = 1;
-
-			IT_COMMENT1("Value = %f", V_R4(pValue));
-		}
-		break;
-		case VT_R8:
-		{
-			item_to_send.iec_type = M_ME_TN_1;
-			epoch_to_cp56time2a(&time, epoch_in_millisec);
-			item_to_send.iec_obj.o.type150.mv = V_R8(pValue);
-			item_to_send.iec_obj.o.type150.time = time;
-
-			if(pwQualities != OPC_QUALITY_GOOD)
-				item_to_send.iec_obj.o.type150.iv = 1;
-			
-			IT_COMMENT1("Value = %lf", V_R8(pValue));
-		}
-		break;
-		case VT_BOOL:
-		{
-				item_to_send.iec_type = M_SP_TB_1;
-				epoch_to_cp56time2a(&time, epoch_in_millisec);
-				item_to_send.iec_obj.o.type30.sp = (V_BOOL(pValue) < 0 ? 1 : 0);
-				item_to_send.iec_obj.o.type30.time = time;
-
-				if(pwQualities != OPC_QUALITY_GOOD)
-					item_to_send.iec_obj.o.type30.iv = 1;
-				
-				IT_COMMENT1("Value = %d", V_BOOL(pValue));
-		}
-		break;
-		case VT_DATE:
-		{
-		}
-		break;
-		case VT_BSTR:
-		{
-				//fprintf(stderr,"ItemID = %s: ", (const char*)W2T(Item[phClientItem - 1].wszName));
-				//fflush(stderr);
-
-				//fprintf(stderr,"%ls\t", V_BSTR(pValue));
-				//fflush(stderr);
-				//IT_COMMENT1("Value STRING = %ls", V_BSTR(pValue));
-
-				//Definizione di BSTR:
-				//typedef OLECHAR *BSTR;
-
-				//Conversioni:
-
-				//Da const char* a OLE
-
-				//TCHAR* pColumnName
-				//OLECHAR*    pOleColumnName = T2OLE(pColumnName);
-									
-				//Da OLE a const char*
-				TCHAR* str = OLE2T(pValue->bstrVal);
-				//fprintf(stderr,"%s\n", str);
-				//fflush(stderr);
-				
-				item_to_send.iec_type = M_ME_TF_1;
-				epoch_to_cp56time2a(&time, epoch_in_millisec);
-							
-				item_to_send.iec_obj.o.type36.mv = (float)atof(str);
-				item_to_send.iec_obj.o.type36.time = time;
-
-				if(pwQualities != OPC_QUALITY_GOOD)
-					item_to_send.iec_obj.o.type36.iv = 1;
-										
-				IT_COMMENT1("Value STRING = %s", str);
-		}
-		break;
-		default:
-		{
-			IT_COMMENT1("V_VT(pValue) non gestito = %d", V_VT(pValue));
-		
-			item_to_send.iec_type = 0;
-		}
-		break;
-	}
-
-	//IT_COMMENT6("at time: %d_%d_%d_%d_%d_%d", time.hour, time.min, time.msec, time.mday, time.month, time.year);
 
 	item_to_send.msg_id = n_msg_sent;
 	item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
@@ -1193,70 +659,9 @@ int modbus_imp::PollItems(void)
 	n_msg_sent++;
 
 	IT_EXIT;
-*/
-}
 
-//The FILETIME structure is a 64-bit value representing the number 
-//of 100-nanosecond intervals since January 1, 1601.
-//
-//epoch_in_millisec is a 64-bit value representing the number of milliseconds 
-//elapsed since January 1, 1970
+	return 0;
 
-signed __int64 modbus_imp::epoch_from_FILETIME(const FILETIME *fileTime)
-{
-	IT_IT("epoch_from_FILETIME");
-	
-	FILETIME localTime;
-	struct tm	t;
-
-	time_t sec;
-	signed __int64 epoch_in_millisec;
-
-	if(fileTime == NULL)
-	{
-		IT_EXIT;
-		return 0;
-	}
-	
-	// first convert file time (UTC time) to local time
-	if (!FileTimeToLocalFileTime(fileTime, &localTime))
-	{
-		IT_EXIT;
-		return 0;
-	}
-
-	// then convert that time to system time
-	SYSTEMTIME sysTime;
-	if (!FileTimeToSystemTime(&localTime, &sysTime))
-	{
-		IT_EXIT;
-		return 0;
-	}
-	
-	memset(&t, 0x00, sizeof(struct tm));
-	
-	t.tm_hour = sysTime.wHour;
-	t.tm_min = sysTime.wMinute;
-	t.tm_sec = sysTime.wSecond;
-	t.tm_mday = sysTime.wDay;
-	t.tm_mon = sysTime.wMonth - 1;
-	t.tm_year = sysTime.wYear - 1900; //tm_year contains years after 1900
-	t.tm_isdst = -1; //to force mktime to check for dst
-	
-	sec = mktime(&t);
-
-	if(sec < 0)
-	{
-		IT_EXIT;
-		return 0;
-	}
-
-	epoch_in_millisec =  (signed __int64)sec;
-
-	epoch_in_millisec =  epoch_in_millisec*1000 + sysTime.wMilliseconds;
-
-	IT_EXIT;
-	return epoch_in_millisec;
 }
 
 #define _EPSILON_ ((double)(2.220446E-16))
@@ -1373,44 +778,6 @@ double modbus_imp::rescale_value_inv(double A, double Vmin, double Vmax, int* er
 
 void modbus_imp::check_for_commands(struct iec_item *queued_item)
 {
-	/*
-	DWORD dw = 0;
-	DWORD nWriteItems = ITEM_WRITTEN_AT_A_TIME;
-	HRESULT hr = S_OK;
-	HRESULT *pErrorsWrite = NULL;
-	HRESULT *pErrorsRead = NULL;
-
-
-	struct cp56time2a actual_time;
-	get_utc_host_time(&actual_time);
-
-	time_t command_arrive_time_in_seconds = epoch_from_cp56time2a(&actual_time);
-
-	while(!g_pIOPCAsyncIO2)
-	{
-		//LogMessage(E_FAIL,"g_pIOPCAsyncIO2 == NULL");
-		//fprintf(stderr,"Exit al line %d\n", __LINE__);
-		//fflush(stderr);
-
-		Sleep(100);
-		
-		if(g_pIOPCAsyncIO2)
-		{
-			break;
-		}
-		else
-		{
-			get_utc_host_time(&actual_time);
-
-			time_t attual_time_in_seconds = epoch_from_cp56time2a(&actual_time);
-
-			if(attual_time_in_seconds - command_arrive_time_in_seconds > 10)
-			{
-				ExitProcess(0);
-			}
-		}
-	}
-        
 	if(!fExit)
 	{ 
 		fprintf(stderr,"Receiving %d th message \n", queued_item->msg_id);
@@ -1432,18 +799,18 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 		{
 			Sleep(100); //Delay between one command and the next one
 
-			/////////Here we make the QUERY:////////////////////////////////////////// /////////////////////////////
-			// select from Item table hClient where ioa is equal to ioa of packet arriving (command) from monitor.exe
+			/////////Here we execute the QUERY:////////////////////////////////////////// /////////////////////////////
+			// select from Config_db table the rowNumber where ioa is equal to ioa of packet arriving (command) from monitor.exe
 			///////////////////////////////////////////////////////////////////////////////////////
 			int found = 0;
-			DWORD hClient = -1;
+			DWORD rowNumber = -1;
 
-			for(dw = 0; dw < g_dwNumItems; dw++) 
+			for(int dw = 0; dw < db_n_rows; dw++) 
 			{ 
-				if(queued_item->iec_obj.ioa == Item[dw].ioa_control_center)
+				if(queued_item->iec_obj.ioa == Config_db[dw].ioa_control_center)
 				{
 					found = 1;
-					hClient = Item[dw].hClient;
+					rowNumber = dw;
 					break;
 				}
 			}
@@ -1456,23 +823,22 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 				fflush(stderr);
 				return;
 			}
-			/////////////////////////////////////////////////////////////////////
-			#ifdef CHECK_TYPE
+			
 			//check iec type of command
-			if(Item[hClient - 1].io_list_iec_type != queued_item->iec_type)
+			if(Config_db[rowNumber].iec_type_write != queued_item->iec_type)
 			{
 				//error
-				fprintf(stderr,"Error: Command with IOA %d has iec_type %d, different from IO list type %d\n", queued_item->iec_obj.ioa, queued_item->iec_type, Item[hClient - 1].io_list_iec_type);
+				fprintf(stderr,"Error: Command with IOA %d has iec_type %d, different from IO list type %d\n", queued_item->iec_obj.ioa, queued_item->iec_type, Config_db[rowNumber].iec_type_write);
 				fflush(stderr);
 				fprintf(stderr,"Command NOT executed\n");
 				fflush(stderr);
 				return;
 			}
-			#endif
+			
 
 			//Receive a write command
 								
-			fprintf(stderr,"Receiving command for hClient %d, ioa %d\n", hClient, queued_item->iec_obj.ioa);
+			fprintf(stderr,"Receiving command for ioa %d\n", queued_item->iec_obj.ioa);
 			fflush(stderr);
 			
 			//Check the life time of the command/////////////////////////////////////////////////////////////////
@@ -1635,382 +1001,189 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 
 			if(delta < MAX_COMMAND_SEND_TIME && delta >= 0)
 			{
-				hServer[id_of_ItemToWrite] = Item[hClient - 1].hServer; //<--the server handle identifies the item to write
+				
+				unsigned int v = 0;
+				float cmd_val = 0.0;
 
-				switch(V_VT(&Item[hClient - 1]))
+				switch(queued_item->iec_type)
 				{
-					case VT_BSTR:
+					case C_SC_TA_1:
 					{
-						#define COMMAND_STR_LEN 20
-						char command_string[COMMAND_STR_LEN];
-
-						double val_to_write = 0.0;
+						v = queued_item->iec_obj.o.type58.scs;
 						
-						switch(queued_item->iec_type)
+						if(Config_db[rowNumber].modbus_function_write == FC_WRITE_SINGLE_COIL)
 						{
-							case C_SC_TA_1:
-							{
-								val_to_write = queued_item->iec_obj.o.type58.scs;
-								sprintf(command_string, "%f", val_to_write);
-							}
-							break;
-							case C_DC_TA_1:
-							{
-								val_to_write = queued_item->iec_obj.o.type59.dcs;
-								sprintf(command_string, "%f", val_to_write);
-							}
-							break;
-							case C_SE_TA_1:
-							{
-								double Vmin = Item[hClient - 1].min_measure;
-								double Vmax = Item[hClient - 1].max_measure;
-								double A = (double)queued_item->iec_obj.o.type61.sv;
-								int error = 0;
+							//0x05
 
-								val_to_write = rescale_value_inv(A, Vmin, Vmax, &error);
-								if(error){ return;}
+							//COIL BITS
 
-								sprintf(command_string, "%lf", val_to_write);
-							}
-							break;
-							case C_SE_TB_1:
-							{
-								double Vmin = Item[hClient - 1].min_measure;
-								double Vmax = Item[hClient - 1].max_measure;
-								double A = (double)queued_item->iec_obj.o.type62.sv;
-								int error = 0;
-
-								val_to_write = rescale_value_inv(A, Vmin, Vmax, &error);
-								if(error){ return;}
-								
-								sprintf(command_string, "%lf", val_to_write);
-							}
-							break;
-							case C_SE_TC_1:
-							{
-								val_to_write = queued_item->iec_obj.o.type63.sv;
-								sprintf(command_string, "%lf", val_to_write);
-							}
-							break;
-							case C_BO_TA_1:
-							{
-								memset(command_string, 0x00, COMMAND_STR_LEN);
-								memcpy(command_string, &(queued_item->iec_obj.o.type64.stcd), sizeof(struct iec_stcd));
-							}
-							break;
-							case C_SC_NA_1:
-							{
-								val_to_write = queued_item->iec_obj.o.type45.scs;
-								sprintf(command_string, "%lf", val_to_write);
-							}
-							break;
-							case C_DC_NA_1:
-							{
-								val_to_write = queued_item->iec_obj.o.type46.dcs;
-								sprintf(command_string, "%lf", val_to_write);
-							}
-							break;
-							case C_SE_NA_1:
-							{
-								double Vmin = Item[hClient - 1].min_measure;
-								double Vmax = Item[hClient - 1].max_measure;
-								double A = (double)queued_item->iec_obj.o.type48.sv;
-								int error = 0;
-
-								val_to_write = rescale_value_inv(A, Vmin, Vmax, &error);
-								if(error){ return;}
+							// Single
+							int rc;
 							
-								sprintf(command_string, "%lf", val_to_write);
-							}
-							break;
-							case C_SE_NB_1:
-							{
-								double Vmin = Item[hClient - 1].min_measure;
-								double Vmax = Item[hClient - 1].max_measure;
-								double A = (double)queued_item->iec_obj.o.type49.sv;
-								int error = 0;
+							rc = modbus_write_bit(ctx, Config_db[rowNumber].modbus_start_address + Config_db[rowNumber].offset_in_bits, v);
 
-								val_to_write = rescale_value_inv(A, Vmin, Vmax, &error);
-								if(error){ return;}
-								
-								sprintf(command_string, "%lf", val_to_write);
-							}
-							break;
-							case C_SE_NC_1:
-							{
-								val_to_write = queued_item->iec_obj.o.type50.sv;
-								sprintf(command_string, "%lf", val_to_write);
-							}
-							break;
-							case C_BO_NA_1:
-							{
-								memset(command_string, 0x00, COMMAND_STR_LEN);
-								memcpy(command_string, &(queued_item->iec_obj.o.type51.stcd), sizeof(struct iec_stcd));
-							}
-							break;
-							default:
-							{
+							printf("modbus_write_bit: ");
+
+							if (rc == 1) {
+								printf("OK\n");
+							} else {
+								printf("FAILED\n");
 								//error
-								//fprintf(stderr,"Error %d, %s\n",__LINE__, __FILE__);
-								//fflush(stderr);
-
-								char show_msg[200];
-								sprintf(show_msg, "Error %d, %s\n",__LINE__, __FILE__);
-								modbus_imp::LogMessage(0, show_msg);
-
-
-								
-								return;
 							}
-							break;
 						}
-						
-						USES_CONVERSION;
+					}
+					break;
+					case C_DC_TA_1:
+					{
+						v = queued_item->iec_obj.o.type59.dcs;
+						cmd_val = (float)v;
+					}
+					break;
+					case C_SE_TA_1:
+					{
+						//double Vmin = Item[hClient - 1].min_measure;
+						//double Vmax = Item[hClient - 1].max_measure;
+						//double A = (double)queued_item->iec_obj.o.type61.sv;
+						//int error = 0;
 
-						V_VT(&vCommandValue) = VT_BSTR;
+						//cmd_val = rescale_value_inv(A, Vmin, Vmax, &error);
+						//if(error){ return;}
+					}
+					break;
+					case C_SE_TB_1:
+					{
+						//double Vmin = Item[hClient - 1].min_measure;
+						//double Vmax = Item[hClient - 1].max_measure;
+						//double A = (double)queued_item->iec_obj.o.type62.sv;
+						//int error = 0;
 
-						V_BSTR(&vCommandValue) = SysAllocString(T2COLE(command_string));
-						
-						if(FAILED(::VariantCopy(&Val[id_of_ItemToWrite], &vCommandValue)))
+						//cmd_val = rescale_value_inv(A, Vmin, Vmax, &error);
+						//if(error){ return;}
+					}
+					break;
+					case C_SE_TC_1:
+					{
+						cmd_val = queued_item->iec_obj.o.type63.sv;
+
+						if(Config_db[rowNumber].modbus_function_write == FC_WRITE_MULTIPLE_REGISTERS)
 						{
-							//fprintf(stderr,"Error %d, %s\n",__LINE__, __FILE__);
-							//fflush(stderr);
+							//0x10
 
-							char show_msg[200];
-							sprintf(show_msg, "Error %d, %s\n",__LINE__, __FILE__);
-							modbus_imp::LogMessage(0, show_msg);
-							
-							return;
+							modbus_set_float(cmd_val, tab_rp_registers);
+
+							//int registers = (Config_db[rowNumber].modbus_bit_size - Config_db[rowNumber].offset_in_bits)/16;
+
+							int registers = 2; //we write 32 bits
+
+							// Many registers
+							int rc;
+							rc = modbus_write_registers(ctx, Config_db[rowNumber].modbus_start_address + Config_db[rowNumber].offset_in_bits, registers, tab_rp_registers);
+
+							printf("modbus_write_registers: ");
+
+							if (rc == registers) 
+							{
+								printf("OK\n");
+							} 
+							else 
+							{
+								printf("FAILED\n");
+								//error
+							}
 						}
-
-						//fprintf(stderr,"Command for sample point %s, value: %s\n", Item[hClient - 1].spname, OLE2T(V_BSTR(&vCommandValue)));
-						//fflush(stderr);
-
-						char show_msg[450];
-						sprintf(show_msg, "Command for sample point %s, value: %s\n", Item[hClient - 1].spname, OLE2T(V_BSTR(&vCommandValue)));
-						LogMessage(NULL, show_msg);
+					}
+					break;
+					case C_BO_TA_1:
+					{
+						memcpy(&v, &(queued_item->iec_obj.o.type64.stcd), sizeof(struct iec_stcd));
 						
-						IT_COMMENT2("Command for sample point %s, value: %s\n", Item[hClient - 1].spname, OLE2T(V_BSTR(&vCommandValue)));
+						if(Config_db[rowNumber].modbus_function_write == FC_WRITE_MULTIPLE_REGISTERS)
+						{
+							//0x10
 
-						SysFreeString(V_BSTR(&vCommandValue));
+							memcpy(tab_rp_registers, &v, sizeof(unsigned int));
+
+							//int registers = (Config_db[rowNumber].modbus_bit_size - Config_db[rowNumber].offset_in_bits)/16;
+
+							int registers = 2; //we write 32 bits
+
+							// Many registers
+							int rc;
+							rc = modbus_write_registers(ctx, Config_db[rowNumber].modbus_start_address + Config_db[rowNumber].offset_in_bits, registers, tab_rp_registers);
+
+							printf("modbus_write_registers: ");
+
+							if (rc == registers) 
+							{
+								printf("OK\n");
+							} 
+							else 
+							{
+								printf("FAILED\n");
+								//error
+							}
+						}
+					}
+					break;
+					case C_SC_NA_1:
+					{
+						v = queued_item->iec_obj.o.type45.scs;
+						cmd_val = (float)v;
+					}
+					break;
+					case C_DC_NA_1:
+					{
+						v = queued_item->iec_obj.o.type46.dcs;
+						cmd_val = (float)v;
+					}
+					break;
+					case C_SE_NA_1:
+					{
+						//double Vmin = Item[hClient - 1].min_measure;
+						//double Vmax = Item[hClient - 1].max_measure;
+						//double A = (double)queued_item->iec_obj.o.type48.sv;
+						//int error = 0;
+
+						//cmd_val = rescale_value_inv(A, Vmin, Vmax, &error);
+						//if(error){ return;}
+					}
+					break;
+					case C_SE_NB_1:
+					{
+						//double Vmin = Item[hClient - 1].min_measure;
+						//double Vmax = Item[hClient - 1].max_measure;
+						//double A = (double)queued_item->iec_obj.o.type49.sv;
+						//int error = 0;
+
+						//cmd_val = rescale_value_inv(A, Vmin, Vmax, &error);
+						//if(error){ return;}
+					}
+					break;
+					case C_SE_NC_1:
+					{
+						cmd_val = queued_item->iec_obj.o.type50.sv;
+					}
+					break;
+					case C_BO_NA_1:
+					{
+						memcpy(&v, &(queued_item->iec_obj.o.type51.stcd), sizeof(struct iec_stcd));
+						cmd_val = (float)v;
 					}
 					break;
 					default:
 					{
-						V_VT(&vCommandValue) = VT_R4;
-
-						unsigned int v = 0;
-						double cmd_val = 0.0;
-
-						switch(queued_item->iec_type)
-						{
-							case C_SC_TA_1:
-							{
-								v = queued_item->iec_obj.o.type58.scs;
-								cmd_val = (double)v;
-							}
-							break;
-							case C_DC_TA_1:
-							{
-								v = queued_item->iec_obj.o.type59.dcs;
-								cmd_val = (double)v;
-							}
-							break;
-							case C_SE_TA_1:
-							{
-								double Vmin = Item[hClient - 1].min_measure;
-								double Vmax = Item[hClient - 1].max_measure;
-								double A = (double)queued_item->iec_obj.o.type61.sv;
-								int error = 0;
-
-								cmd_val = rescale_value_inv(A, Vmin, Vmax, &error);
-								if(error){ return;}
-							}
-							break;
-							case C_SE_TB_1:
-							{
-								double Vmin = Item[hClient - 1].min_measure;
-								double Vmax = Item[hClient - 1].max_measure;
-								double A = (double)queued_item->iec_obj.o.type62.sv;
-								int error = 0;
-
-								cmd_val = rescale_value_inv(A, Vmin, Vmax, &error);
-								if(error){ return;}
-							}
-							break;
-							case C_SE_TC_1:
-							{
-								cmd_val = queued_item->iec_obj.o.type63.sv;
-							}
-							break;
-							case C_BO_TA_1:
-							{
-								memcpy(&v, &(queued_item->iec_obj.o.type64.stcd), sizeof(struct iec_stcd));
-								cmd_val = (double)v;
-							}
-							break;
-							case C_SC_NA_1:
-							{
-								v = queued_item->iec_obj.o.type45.scs;
-								cmd_val = (double)v;
-							}
-							break;
-							case C_DC_NA_1:
-							{
-								v = queued_item->iec_obj.o.type46.dcs;
-								cmd_val = (double)v;
-							}
-							break;
-							case C_SE_NA_1:
-							{
-								double Vmin = Item[hClient - 1].min_measure;
-								double Vmax = Item[hClient - 1].max_measure;
-								double A = (double)queued_item->iec_obj.o.type48.sv;
-								int error = 0;
-
-								cmd_val = rescale_value_inv(A, Vmin, Vmax, &error);
-								if(error){ return;}
-							}
-							break;
-							case C_SE_NB_1:
-							{
-								double Vmin = Item[hClient - 1].min_measure;
-								double Vmax = Item[hClient - 1].max_measure;
-								double A = (double)queued_item->iec_obj.o.type49.sv;
-								int error = 0;
-
-								cmd_val = rescale_value_inv(A, Vmin, Vmax, &error);
-								if(error){ return;}
-							}
-							break;
-							case C_SE_NC_1:
-							{
-								cmd_val = queued_item->iec_obj.o.type50.sv;
-							}
-							break;
-							case C_BO_NA_1:
-							{
-								memcpy(&v, &(queued_item->iec_obj.o.type51.stcd), sizeof(struct iec_stcd));
-								cmd_val = (double)v;
-							}
-							break;
-							default:
-							{
-								//error
-								//fprintf(stderr,"Error %d, %s\n",__LINE__, __FILE__);
-								//fflush(stderr);
-
-								char show_msg[200];
-								sprintf(show_msg, "Error %d, %s\n",__LINE__, __FILE__);
-								modbus_imp::LogMessage(0, show_msg);
-								
-								return;
-							}
-							break;
-						}
-						
-						V_R4(&vCommandValue) = (float)cmd_val;
-
-						if (FAILED(::VariantCopy(&Val[id_of_ItemToWrite], &vCommandValue)))
-						{
-							//fprintf(stderr,"Error %d, %s\n",__LINE__, __FILE__);
-							//fflush(stderr);
-
-							char show_msg[200];
-							sprintf(show_msg, "Error %d, %s\n",__LINE__, __FILE__);
-							modbus_imp::LogMessage(0, show_msg);
-						
-							return;
-						}
-
-						//fprintf(stderr,"Command for sample point %s, value: %lf\n", Item[hClient - 1].spname, cmd_val);
+						//error
+						//fprintf(stderr,"Error %d, %s\n",__LINE__, __FILE__);
 						//fflush(stderr);
 
-						char show_msg[450];
-						sprintf(show_msg, " Command for sample point %s, value: %lf\n", Item[hClient - 1].spname, cmd_val);
-						LogMessage(NULL, show_msg);
-
-						//IT_COMMENT2("Command for sample point %s, value: %lf", Item[hClient - 1].spname, cmd_val);
+						char show_msg[200];
+						sprintf(show_msg, "Error %d, %s\n",__LINE__, __FILE__);
+						modbus_imp::LogMessage(0, show_msg);
+						
+						return;
 					}
 					break;
 				}
-
-				if(FAILED(::VariantChangeType(&Val[id_of_ItemToWrite], &Val[id_of_ItemToWrite], 0, V_VT(&Item[hClient - 1]))))
-				{
-					//fprintf(stderr,"Error %d, %s\n",__LINE__, __FILE__);
-					//fflush(stderr);
-
-					char show_msg[200];
-					sprintf(show_msg, "Error %d, %s\n",__LINE__, __FILE__);
-					modbus_imp::LogMessage(0, show_msg);
-
-					return;
-				}
-								
-				DWORD dwAccessRights = Item[hClient - 1].dwAccessRights;
-
-				dwAccessRights = dwAccessRights & OPC_WRITEABLE;
-
-				if(dwAccessRights == OPC_WRITEABLE)
-				{
-					//modbus_imp::g_bWriteComplete = false;
-
-					hr = g_pIOPCAsyncIO2->Write(nWriteItems, hServer, Val, ++g_dwWriteTransID, &g_dwCancelID, &pErrorsWrite);
-
-					if(FAILED(hr))
-					{
-						LogMessage(hr,"AsyncIO2->Write()");
-
-						return;
-					}
-					else if(hr == S_FALSE)
-					{
-						for(dw = 0; dw < nWriteItems; dw++)
-						{
-							if(FAILED(pErrorsWrite[dw]))
-							{
-								LogMessage(pErrorsWrite[dw],"AsyncIO2->Write() item returned");
-
-								return;
-							}
-						}
-
-						::CoTaskMemFree(pErrorsWrite);
-					}
-					else // S_OK
-					{
-						::CoTaskMemFree(pErrorsWrite);
-					}
-
-					if(V_VT(&Val[id_of_ItemToWrite]) == VT_BSTR)
-					{
-						SysFreeString(V_BSTR(&Val[id_of_ItemToWrite]));
-					}
-				}
-				else
-				{
-					IT_COMMENT1("No access write for sample point %s", Item[hClient - 1].spname);
-					//fprintf(stderr,"No access write for sample point %s\n", Item[hClient - 1].spname);
-					//fflush(stderr);
-					
-					char show_msg[200];
-					sprintf(show_msg, "No access write for sample point %s\n", Item[hClient - 1].spname);
-					modbus_imp::LogMessage(0, show_msg);
-					
-					return;
-				}
-			}
-			else
-			{
-				IT_COMMENT3("Rejeced command for sample point %s, aged for %ld s; max aging time %d s\n", Item[hClient - 1].spname, delta, MAX_COMMAND_SEND_TIME);
-				//fprintf(stderr,"Rejeced command for sample point %s, aged for %ld s; max aging time %d s\n", Item[hClient - 1].spname, delta, MAX_COMMAND_SEND_TIME);
-				//fflush(stderr);
-
-				char show_msg[200];
-				sprintf(show_msg, "Rejeced command for sample point %s, aged for %ld s; max aging time %d s\n", Item[hClient - 1].spname, delta, MAX_COMMAND_SEND_TIME);
-				modbus_imp::LogMessage(0, show_msg);
-			
-				return;
 			}
 		}
 		else if(queued_item->iec_type == C_EX_IT_1)
@@ -2025,81 +1198,59 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 			IT_COMMENT("Receiving general interrogation command from monitor.exe");
 			fprintf(stderr,"Receiving general interrogation command from monitor.exe\n");
 			fflush(stderr);
-
-			for(dw = 0; dw < g_dwNumItems; dw++)
-			{
-				hServerRead[dw] = Item[dw].hServer;
-			}
-			
-			// read all items in group
-
-			hr = g_pIOPCAsyncIO2->Read(g_dwNumItems, hServerRead, ++g_dwReadTransID, &g_dwCancelID, &pErrorsRead);
-
-			if(FAILED(hr))
-			{
-				LogMessage(hr,"AsyncIO2->Read()");
-				//When this happen the read is no more working,
-				//this means that the General Interrogation is no more working
-				//The asyncronous events could still arriving form the server
-				//So we exit the process
-				fExit = 1;
-			}
-			else if(hr == S_FALSE)
-			{
-				//If we arrive here there is something wrong in AddItems()
-				for(dw = 0; dw < g_dwNumItems; dw++)
-				{
-					if(FAILED(pErrorsRead[dw]))
-					{
-						LogMessage(pErrorsRead[dw],"AsyncIO2->Read() item returned");
-					}
-				}
-
-				::CoTaskMemFree(pErrorsRead);
-
-				//So we exit the process
-				fExit = 1;
-			}
-			else // S_OK
-			{
-				::CoTaskMemFree(pErrorsRead);
-			}
-			/////////end General interrogation command
 		}
 	}
-*/
+
 	return;
 }
 
+/*
+		MODBUS FUNCTIONS NOT USED
+		
+		if(Config_db[i].modbus_function_write == FC_WRITE_SINGLE_REGISTER)
+		{
+			//0x06
+
+			//Single register
+			rc = modbus_write_register(ctx, Config_db[i].modbus_start_address, 0x1234);
+			printf("1/2 modbus_write_register: ");
+			if (rc == 1) {
+				printf("OK\n");
+			} else {
+				printf("FAILED\n");
+				//error
+			}
+		}
+		else if(Config_db[i].modbus_function_write == FC_WRITE_MULTIPLE_COILS)
+		{
+			//0x0F
+
+			//uint8_t tab_value[UT_BITS_NB];
+			uint8_t tab_value[0x25];
+
+			modbus_set_bits_from_bytes(tab_value, 0, Config_db[i].modbus_bit_size, UT_BITS_TAB);
+
+			rc = modbus_write_bits(ctx, Config_db[i].modbus_start_address, Config_db[i].modbus_bit_size, tab_value);
+
+			printf("1/2 modbus_write_bits: ");
+
+			if (rc == Config_db[i].modbus_bit_size) 
+			{
+				printf("OK\n");
+			} else {
+				printf("FAILED\n");
+				//error
+			}
+		}
+*/
+
+
 void modbus_imp::alloc_command_resources(void)
 {
-	/*
-	hServerRead = (OPCHANDLE*)calloc(1, g_dwNumItems*sizeof(OPCHANDLE));
-		
-	DWORD dw = 0;
-	DWORD nWriteItems = ITEM_WRITTEN_AT_A_TIME;
 
-	::VariantInit(&vCommandValue);
-
-	for(dw = 0; dw < nWriteItems; dw++)
-	{
-		id_of_ItemToWrite = dw;
-		::VariantInit(&Val[dw]);
-	}
-	*/
 }
 
 void modbus_imp::free_command_resources(void)
 {
-	/*
-	DWORD dw = 0;
-	DWORD nWriteItems = ITEM_WRITTEN_AT_A_TIME;
 
-	for(dw = 0; dw < nWriteItems; dw++)
-	{
-		::VariantClear(&Val[dw]);
-	}
-	
-	::VariantClear(&vCommandValue);
-	*/
 }
