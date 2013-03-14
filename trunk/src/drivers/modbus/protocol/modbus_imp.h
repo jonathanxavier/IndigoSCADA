@@ -92,7 +92,7 @@ class modbus_imp
 	static iec_item_type    instanceSend;
 	iec_item_type		    instanceRecv;
 	ORTEDomainAppEvents     events;
-	///////////////////////////////////Middleware///////////
+	//////////////////////////////end//Middleware///////////
 	bool fExit;
 	unsigned long pollingTime;
 	struct modbusContext my_modbus_context;
@@ -112,9 +112,7 @@ class modbus_imp
 	int Stop(void);
 	int GetStatus(WORD *pwMav, WORD *pwMiv, WORD *pwB, LPWSTR *pszV);
 	time_t epoch_from_cp56time2a(const struct cp56time2a* time);
-	void epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch_in_millisec);
 	int PollItems(void);
-	signed __int64 epoch_from_FILETIME(const FILETIME *fileTime);
 	short rescale_value(double V, double Vmin, double Vmax, int* error);
 	double rescale_value_inv(double A, double Vmin, double Vmax, int* error);
 	
