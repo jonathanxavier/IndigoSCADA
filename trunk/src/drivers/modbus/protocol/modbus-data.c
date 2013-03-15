@@ -94,3 +94,25 @@ void modbus_set_float(float f, uint16_t *dest)
     dest[0] = (uint16_t)i;
     dest[1] = (uint16_t)(i >> 16);
 }
+
+/* Get a int from 4 bytes in Modbus format apa+++ */
+int modbus_get_int(const uint16_t *src)
+{
+    int ret  = 0;
+    uint32_t i;
+
+    i = (((uint32_t)src[1]) << 16) + src[0];
+    memcpy(&ret, &i, sizeof(int));
+
+    return ret;
+}
+
+/* Set a int to 4 bytes in Modbus format apa+++ */
+void modbus_set_int(int n, uint16_t *dest)
+{
+    uint32_t i = 0;
+
+    memcpy(&i, &n, sizeof(uint32_t));
+    dest[0] = (uint16_t)i;
+    dest[1] = (uint16_t)(i >> 16);
+}
