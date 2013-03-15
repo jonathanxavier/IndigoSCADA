@@ -76,7 +76,7 @@ enum {
 class modbus_imp
 {
 	public:
-	///////////////////database//////////////////////
+	///////////////////configuration database//////////////////////
 	char database_name[MAX_PATH];
 	int db_n_rows;
 	int db_m_columns;
@@ -96,10 +96,12 @@ class modbus_imp
 	bool fExit;
 	unsigned long pollingTime;
 	struct modbusContext my_modbus_context;
+	bool general_interrogation;
 	////////////////Modbus specific/////////////////
 	modbus_t *ctx; //context
 	uint8_t *tab_rp_bits;
     uint16_t *tab_rp_registers;
+	int nb_points;
 	////////////////////////////////////////////////
 	char lineNumber[80];
 	
@@ -110,7 +112,6 @@ class modbus_imp
 	int Start(void);
 	void LogMessage(int* error = 0, const char* name = NULL);
 	int Stop(void);
-	int GetStatus(WORD *pwMav, WORD *pwMiv, WORD *pwB, LPWSTR *pszV);
 	time_t epoch_from_cp56time2a(const struct cp56time2a* time);
 	int PollItems(void);
 	short rescale_value(double V, double Vmin, double Vmax, int* error);

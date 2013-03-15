@@ -28,6 +28,7 @@ extern void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCal
 /////////////////////////fifo///////////////////////////////////////////
 extern void iec_call_exit_handler(int line, char* file, char* reason);
 #include "fifoc.h"
+#define MAX_FIFO_SIZE 65535
 ////////////////////////////////////////////////////////////////////////
 
 class Opc_client_da_DriverThread;
@@ -172,7 +173,7 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 		///////////////////////////////////Middleware//////////////////////////////////////////////////
 
 		/////////////////////////////////////local fifo//////////////////////////////////////////////////////////
-		const size_t max_fifo_queue_size = 65535;
+		const size_t max_fifo_queue_size = MAX_FIFO_SIZE;
 		
 		strcat(fifo_monitor_name, "_fifo_");
 
@@ -190,8 +191,10 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 			Values = NULL;
 		}
 
+		///////////////////////////////////Middleware//////////////////////////////////////////////////
 		ORTEDomainAppDestroy(domain);
         domain = NULL;
+		///////////////////////////////////Middleware//////////////////////////////////////////////////
 	};
 
 	void Fail(const QString &s)
@@ -226,10 +229,10 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 	void removeTransaction();
 	//////Middleware//////////////////////////////////////
 	void get_utc_host_time(struct cp56time2a* time);
-	void get_items(struct iec_item* p_item); //NOT USED
-	////////////////////////////////////////////////
+	//////////////////////////////////////////////////////
+	////////////////local fifo////////////////////////////
 	void get_items_form_local_fifo(void);
-	//
+	//////////////////////////////////////////////////////
 	public slots:
 	//
 	virtual void Start(); // start everything under this driver's control

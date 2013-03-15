@@ -108,10 +108,11 @@ ORTEPublication* modbus_imp::publisher = NULL;
 //  Class constructor.   
 //   
 modbus_imp::modbus_imp(struct modbusContext* my_ctx, char* line_number, int polling_time):
-fExit(false),pollingTime(polling_time)
+fExit(false),pollingTime(polling_time), general_interrogation(true)
 {   
 	strcpy(lineNumber, line_number);
 	my_modbus_context.use_context = my_ctx->use_context;
+	my_modbus_context.server_id = my_ctx->server_id;
 
 	if(my_modbus_context.use_context == TCP)
 	{
@@ -125,7 +126,6 @@ fExit(false),pollingTime(polling_time)
 		my_modbus_context.data_bit = my_ctx->data_bit;
 		my_modbus_context.stop_bit = my_ctx->stop_bit;
 		my_modbus_context.parity = my_ctx->parity;
-		my_modbus_context.server_id = my_ctx->server_id;
 	}
 
 	if(my_modbus_context.use_context == TCP) 
@@ -216,12 +216,10 @@ fExit(false),pollingTime(polling_time)
     }
 
 	modbus_set_debug(ctx, TRUE);
+
     modbus_set_error_recovery(ctx,(modbus_error_recovery_mode)(MODBUS_ERROR_RECOVERY_LINK | MODBUS_ERROR_RECOVERY_PROTOCOL));
 
-    if(my_modbus_context.use_context == RTU)
-	{
-       modbus_set_slave(ctx, my_modbus_context.server_id);
-    }
+    modbus_set_slave(ctx, my_modbus_context.server_id);
 
     if (modbus_connect(ctx) == -1) 
 	{
@@ -237,7 +235,7 @@ fExit(false),pollingTime(polling_time)
 modbus_imp::~modbus_imp()  
 {   
     // free resources   
-	
+	fExit = 1;
     return;   
 }   
 
@@ -248,10 +246,37 @@ int modbus_imp::PollServer(void)
 	IT_IT("modbus_imp::PollServer");
 	
 	int rc = 0;
+
+	/* Allocate and initialize the memory to store the bits */
+	#define MAX_BITS_IN_MEMORY_BLOCK 30
+
+	nb_points = MAX_BITS_IN_MEMORY_BLOCK;
+	tab_rp_bits = (uint8_t *) malloc(nb_points * sizeof(uint8_t));
+
+	memset(tab_rp_bits, 0, nb_points * sizeof(uint8_t));
+
+	#define MAX_REGISTERS_IN_MEMORY_BLOCK 30
+
+	/* Allocate and initialize the memory to store the registers */
+	nb_points = MAX_REGISTERS_IN_MEMORY_BLOCK;
+
+	tab_rp_registers = (uint16_t *) malloc(nb_points * sizeof(uint16_t));
+
+	memset(tab_rp_registers, 0, nb_points * sizeof(uint16_t));
+
+	general_interrogation = true;
   
+	int loops = 0;
+
 	while(true) //the polling loop
 	{	
 		rc = PollItems();
+
+		loops++;
+		if(loops == 2)
+		{
+			general_interrogation = false;
+		}
 	
 		if(rc)
 		{ 
@@ -363,14 +388,6 @@ int modbus_imp::Stop()
 	return 1;
 }
 
-int modbus_imp::GetStatus(WORD *pwMav, WORD *pwMiv, WORD *pwB, LPWSTR *pszV)
-{
-	IT_IT("modbus_imp::GetStatus");
-	
-	IT_EXIT;
-	return 0;
-}
-
 struct log_message{
 
 	int ioa;
@@ -463,27 +480,10 @@ int modbus_imp::PollItems(void)
 	struct cp56time2a actual_time;
 	////////////////////////////////Start protocol implementation///////////////////////////////////
 	int rc;
-    int nb_points;
+    bool send_item;
 	int bit_size;
     float real;
-	unsigned int integer;
-
-    /* Allocate and initialize the memory to store the bits */
-	#define MAX_BITS_IN_MEMORY_BLOCK 30
-
-    nb_points = MAX_BITS_IN_MEMORY_BLOCK;
-    tab_rp_bits = (uint8_t *) malloc(nb_points * sizeof(uint8_t));
-
-    memset(tab_rp_bits, 0, nb_points * sizeof(uint8_t));
-
-	#define MAX_REGISTERS_IN_MEMORY_BLOCK 30
-
-    /* Allocate and initialize the memory to store the registers */
-    nb_points = MAX_REGISTERS_IN_MEMORY_BLOCK;
-
-    tab_rp_registers = (uint16_t *) malloc(nb_points * sizeof(uint16_t));
-
-    memset(tab_rp_registers, 0, nb_points * sizeof(uint16_t));
+	int integer;
 
 	/*
 	//////////////////MODBUS RTU part/////////////////////////////////////////
@@ -491,8 +491,8 @@ int modbus_imp::PollItems(void)
 	Config_db[i].modbus_function_read;	//modbus funtion to read
 	Config_db[i].modbus_function_write;	//modbus funtion to write
 	Config_db[i].modbus_start_address; //start address of the memory to fetch
-	Config_db[i].modbus_bit_size; //size in bit of the the memory to fetch
-	Config_db[i].offset_in_bits; //offset in bits into the memory to fetch (to sum with start address in order to find the address of interested data)
+	Config_db[i].block_size; //size in bit of the the memory to fetch
+	Config_db[i].offset; //offset in bits into the memory to fetch (to sum with start address in order to find the address of interested data)
 	//////////////control center part///////////////////////////////////
 	Config_db[i].ioa_control_center; //unique inside CASDU
 	Config_db[i].iec_type_read;   //IEC 104 type to read
@@ -504,29 +504,50 @@ int modbus_imp::PollItems(void)
 	{
 		memset(&item_to_send,0x00, sizeof(struct iec_item));
 
+		memset(tab_rp_bits, 0x00, nb_points * sizeof(uint8_t));
+
+		memset(tab_rp_registers, 0x00, nb_points * sizeof(uint16_t));
+
 		/* Function codes */
 		if(Config_db[rowNumber].modbus_function_read == FC_READ_COILS)
 		{
 			//0x01
 				
-				if(Config_db[rowNumber].modbus_bit_size != 1)
-				{
+				//if(Config_db[rowNumber].block_size != 1)
+				//{
 					//error
-				}
+				//}
 
 				bit_size = 1;
 
-				rc = modbus_read_bits(ctx, Config_db[rowNumber].modbus_start_address + Config_db[rowNumber].offset_in_bits, bit_size, tab_rp_bits);
+				int address = Config_db[rowNumber].modbus_start_address + Config_db[rowNumber].offset;
 
-				printf("modbus_read_bits: ");
+				rc = modbus_read_bits(ctx, address, bit_size, tab_rp_bits);
 
-				if (rc != Config_db[rowNumber].modbus_bit_size) 
-				{
-					printf("FAILED (nb points %d)\n", rc);
+				//if (rc != Config_db[rowNumber].block_size) 
+				//{
+					//printf("FAILED (nb points %d)\n", rc);
 					//error
-				}
+				//}
 
 				uint8_t value = tab_rp_bits[0];
+
+				printf("modbus_read_bits: value = %d\n", (int)value);
+
+				if(Config_db[rowNumber].last_value.a != value)
+				{
+					Config_db[rowNumber].last_value.a = value;
+
+					send_item = true;
+				}
+				else
+				{
+					send_item = false;
+				}
+
+				item_to_send.iec_obj.ioa = Config_db[rowNumber].ioa_control_center;
+
+				item_to_send.cause = 0x03;
 			
 				item_to_send.iec_type = M_SP_TB_1;
 				
@@ -534,9 +555,7 @@ int modbus_imp::PollItems(void)
 
 				item_to_send.iec_obj.o.type30.sp = value;
 				item_to_send.iec_obj.o.type30.time = actual_time;
-
-//				if(pwQualities != OPC_QUALITY_GOOD)
-//					item_to_send.iec_obj.o.type30.iv = 1;
+				item_to_send.iec_obj.o.type30.iv = 0;
 				
 				IT_COMMENT1("Value = %d", value);
 			
@@ -549,11 +568,13 @@ int modbus_imp::PollItems(void)
 		else if(Config_db[rowNumber].modbus_function_read == FC_READ_HOLDING_REGISTERS)
 		{
 			//0x03
-			//int registers = Config_db[i].modbus_bit_size/16;
+			//int registers = Config_db[i].block_size/16;
 
 			int registers = 2; //we read 32 bits
 
-			rc = modbus_read_registers(ctx, Config_db[rowNumber].modbus_start_address + Config_db[rowNumber].offset_in_bits, registers, tab_rp_registers);
+			int address = Config_db[rowNumber].modbus_start_address + Config_db[rowNumber].offset;
+
+			rc = modbus_read_registers(ctx, address, registers, tab_rp_registers);
 			printf("modbus_read_registers: ");
 
 			if (rc != registers) 
@@ -564,8 +585,24 @@ int modbus_imp::PollItems(void)
 
 			if(Config_db[rowNumber].iec_type_read == M_ME_TF_1)
 			{
-				printf("Get float: ");
 				real = modbus_get_float(tab_rp_registers);
+
+				printf("Get float: %f\n", real);
+
+				if(Config_db[rowNumber].last_value.f != real)
+				{
+					Config_db[rowNumber].last_value.f = real;
+
+					send_item = true;
+				}
+				else
+				{
+					send_item = false;
+				}
+
+				item_to_send.iec_obj.ioa = Config_db[rowNumber].ioa_control_center;
+
+				item_to_send.cause = 0x03;
 
 				item_to_send.iec_type = M_ME_TF_1;
 				
@@ -573,14 +610,28 @@ int modbus_imp::PollItems(void)
 
 				item_to_send.iec_obj.o.type36.mv = real;
 				item_to_send.iec_obj.o.type36.time = actual_time;
-
-//				if(pwQualities != OPC_QUALITY_GOOD)
-//					item_to_send.iec_obj.o.type36.iv = 1;
+				item_to_send.iec_obj.o.type36.iv = 0;
 			}
 			else if(Config_db[rowNumber].iec_type_read == M_IT_TB_1)
 			{
-				printf("Get integer: ");
-				memcpy(&integer, tab_rp_registers, sizeof(unsigned int));
+				memcpy(&integer, tab_rp_registers, sizeof(int));
+
+				printf("Get integer: %d\n", integer);
+
+				if(Config_db[rowNumber].last_value.a != integer)
+				{
+					Config_db[rowNumber].last_value.a = integer;
+
+					send_item = true;
+				}
+				else
+				{
+					send_item = false;
+				}
+
+				item_to_send.iec_obj.ioa = Config_db[rowNumber].ioa_control_center;
+
+				item_to_send.cause = 0x03;
 
 				item_to_send.iec_type = M_IT_TB_1;
 				
@@ -588,9 +639,7 @@ int modbus_imp::PollItems(void)
 
 				item_to_send.iec_obj.o.type37.counter = integer;
 				item_to_send.iec_obj.o.type37.time = actual_time;
-					
-				//if(pwQualities != OPC_QUALITY_GOOD)
-				//	item_to_send.iec_obj.o.type37.iv = 1;
+				item_to_send.iec_obj.o.type37.iv = 0;
 			}
 		}
 		else if(Config_db[rowNumber].modbus_function_read == FC_READ_INPUT_REGISTERS)
@@ -619,44 +668,47 @@ int modbus_imp::PollItems(void)
 		{
 			printf("Function not supported\n");
 		}
+
+		if(send_item || general_interrogation)
+		{
+			item_to_send.msg_id = n_msg_sent;
+			item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
+
+			//unsigned char buf[sizeof(struct iec_item)];
+			//int len = sizeof(struct iec_item);
+			//memcpy(buf, &item_to_send, len);
+			//	for(j = 0;j < len; j++)
+			//	{
+			//	  unsigned char c = *(buf + j);
+				//fprintf(stderr,"tx ---> 0x%02x\n", c);
+				//fflush(stderr);
+				//IT_COMMENT1("tx ---> 0x%02x\n", c);
+			//	}
+
+			Sleep(10); //Without delay there is missing of messages in the loading
+
+			//Send in monitor direction
+			fprintf(stderr,"Sending message %u th\n", n_msg_sent);
+			fflush(stderr);
+			IT_COMMENT1("Sending message %u th\n", n_msg_sent);
+
+			//prepare published data
+			memset(&instanceSend,0x00, sizeof(iec_item_type));
+
+			instanceSend.iec_type = item_to_send.iec_type;
+			memcpy(&(instanceSend.iec_obj), &(item_to_send.iec_obj), sizeof(struct iec_object));
+			instanceSend.cause = item_to_send.cause;
+			instanceSend.msg_id = item_to_send.msg_id;
+			instanceSend.ioa_control_center = item_to_send.ioa_control_center;
+			instanceSend.casdu = item_to_send.casdu;
+			instanceSend.is_neg = item_to_send.is_neg;
+			instanceSend.checksum = item_to_send.checksum;
+
+			ORTEPublicationSend(publisher);
+
+			n_msg_sent++;
+		}
 	}
-
-	item_to_send.msg_id = n_msg_sent;
-	item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
-
-	//unsigned char buf[sizeof(struct iec_item)];
-	//int len = sizeof(struct iec_item);
-	//memcpy(buf, &item_to_send, len);
-	//	for(j = 0;j < len; j++)
-	//	{
-	//	  unsigned char c = *(buf + j);
-		//fprintf(stderr,"tx ---> 0x%02x\n", c);
-		//fflush(stderr);
-		//IT_COMMENT1("tx ---> 0x%02x\n", c);
-	//	}
-
-	Sleep(10); //Without delay there is missing of messages in the loading
-
-	//Send in monitor direction
-	fprintf(stderr,"Sending message %u th\n", n_msg_sent);
-	fflush(stderr);
-	IT_COMMENT1("Sending message %u th\n", n_msg_sent);
-
-	//prepare published data
-	memset(&instanceSend,0x00, sizeof(iec_item_type));
-
-	instanceSend.iec_type = item_to_send.iec_type;
-	memcpy(&(instanceSend.iec_obj), &(item_to_send.iec_obj), sizeof(struct iec_object));
-	instanceSend.cause = item_to_send.cause;
-	instanceSend.msg_id = item_to_send.msg_id;
-	instanceSend.ioa_control_center = item_to_send.ioa_control_center;
-	instanceSend.casdu = item_to_send.casdu;
-	instanceSend.is_neg = item_to_send.is_neg;
-	instanceSend.checksum = item_to_send.checksum;
-
-	ORTEPublicationSend(publisher);
-
-	n_msg_sent++;
 
 	IT_EXIT;
 
@@ -825,17 +877,16 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 			}
 			
 			//check iec type of command
-			if(Config_db[rowNumber].iec_type_write != queued_item->iec_type)
-			{
-				//error
-				fprintf(stderr,"Error: Command with IOA %d has iec_type %d, different from IO list type %d\n", queued_item->iec_obj.ioa, queued_item->iec_type, Config_db[rowNumber].iec_type_write);
-				fflush(stderr);
-				fprintf(stderr,"Command NOT executed\n");
-				fflush(stderr);
-				return;
-			}
+			//if(Config_db[rowNumber].iec_type_write != queued_item->iec_type)
+			//{
+			//	//error
+			//	fprintf(stderr,"Error: Command with IOA %d has iec_type %d, different from IO list type %d\n", queued_item->iec_obj.ioa, queued_item->iec_type, Config_db[rowNumber].iec_type_write);
+			//	fflush(stderr);
+			//	fprintf(stderr,"Command NOT executed\n");
+			//	fflush(stderr);
+			//	return;
+			//}
 			
-
 			//Receive a write command
 								
 			fprintf(stderr,"Receiving command for ioa %d\n", queued_item->iec_obj.ioa);
@@ -1005,11 +1056,14 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 				unsigned int v = 0;
 				float cmd_val = 0.0;
 
-				switch(queued_item->iec_type)
+				//switch(queued_item->iec_type)
+				switch(Config_db[rowNumber].iec_type_write)
 				{
 					case C_SC_TA_1:
 					{
-						v = queued_item->iec_obj.o.type58.scs;
+						//v = queued_item->iec_obj.o.type58.scs;
+
+						v = queued_item->iec_obj.o.type63.sv;
 						
 						if(Config_db[rowNumber].modbus_function_write == FC_WRITE_SINGLE_COIL)
 						{
@@ -1020,7 +1074,7 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 							// Single
 							int rc;
 							
-							rc = modbus_write_bit(ctx, Config_db[rowNumber].modbus_start_address + Config_db[rowNumber].offset_in_bits, v);
+							rc = modbus_write_bit(ctx, Config_db[rowNumber].modbus_start_address + Config_db[rowNumber].offset, v);
 
 							printf("modbus_write_bit: ");
 
@@ -1071,13 +1125,13 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 
 							modbus_set_float(cmd_val, tab_rp_registers);
 
-							//int registers = (Config_db[rowNumber].modbus_bit_size - Config_db[rowNumber].offset_in_bits)/16;
+							//int registers = (Config_db[rowNumber].block_size - Config_db[rowNumber].offset)/16;
 
 							int registers = 2; //we write 32 bits
 
 							// Many registers
 							int rc;
-							rc = modbus_write_registers(ctx, Config_db[rowNumber].modbus_start_address + Config_db[rowNumber].offset_in_bits, registers, tab_rp_registers);
+							rc = modbus_write_registers(ctx, Config_db[rowNumber].modbus_start_address + Config_db[rowNumber].offset, registers, tab_rp_registers);
 
 							printf("modbus_write_registers: ");
 
@@ -1103,13 +1157,13 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 
 							memcpy(tab_rp_registers, &v, sizeof(unsigned int));
 
-							//int registers = (Config_db[rowNumber].modbus_bit_size - Config_db[rowNumber].offset_in_bits)/16;
+							//int registers = (Config_db[rowNumber].block_size - Config_db[rowNumber].offset)/16;
 
 							int registers = 2; //we write 32 bits
 
 							// Many registers
 							int rc;
-							rc = modbus_write_registers(ctx, Config_db[rowNumber].modbus_start_address + Config_db[rowNumber].offset_in_bits, registers, tab_rp_registers);
+							rc = modbus_write_registers(ctx, Config_db[rowNumber].modbus_start_address + Config_db[rowNumber].offset, registers, tab_rp_registers);
 
 							printf("modbus_write_registers: ");
 
@@ -1228,13 +1282,13 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 			//uint8_t tab_value[UT_BITS_NB];
 			uint8_t tab_value[0x25];
 
-			modbus_set_bits_from_bytes(tab_value, 0, Config_db[i].modbus_bit_size, UT_BITS_TAB);
+			modbus_set_bits_from_bytes(tab_value, 0, Config_db[i].block_size, UT_BITS_TAB);
 
-			rc = modbus_write_bits(ctx, Config_db[i].modbus_start_address, Config_db[i].modbus_bit_size, tab_value);
+			rc = modbus_write_bits(ctx, Config_db[i].modbus_start_address, Config_db[i].block_size, tab_value);
 
 			printf("1/2 modbus_write_bits: ");
 
-			if (rc == Config_db[i].modbus_bit_size) 
+			if (rc == Config_db[i].block_size) 
 			{
 				printf("OK\n");
 			} else {
