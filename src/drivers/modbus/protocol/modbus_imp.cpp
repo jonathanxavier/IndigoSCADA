@@ -264,10 +264,11 @@ int modbus_imp::PollServer(void)
 
 	memset(tab_rp_registers, 0, nb_points * sizeof(uint16_t));
 
+	////////////General interrogation condition//////////////
 	general_interrogation = true;
+	loops = 0;
+	//////////////////////////////////////////////////////////
   
-	int loops = 0;
-
 	while(true) //the polling loop
 	{	
 		rc = PollItems();
@@ -321,7 +322,6 @@ int modbus_imp::PollServer(void)
 		
 			break; 
 		}
-
 
 		if(fExit)
 		{
@@ -614,7 +614,7 @@ int modbus_imp::PollItems(void)
 			}
 			else if(Config_db[rowNumber].iec_type_read == M_IT_TB_1)
 			{
-				memcpy(&integer, tab_rp_registers, sizeof(int));
+				integer = modbus_get_int(tab_rp_registers);
 
 				printf("Get integer: %d\n", integer);
 
@@ -1052,45 +1052,21 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 
 			if(delta < MAX_COMMAND_SEND_TIME && delta >= 0)
 			{
-				
-				unsigned int v = 0;
-				float cmd_val = 0.0;
+				union {
+					unsigned int v;
+					float f;
+				} cmd_val;
 
-				//switch(queued_item->iec_type)
-				switch(Config_db[rowNumber].iec_type_write)
+				switch(queued_item->iec_type)
 				{
 					case C_SC_TA_1:
 					{
-						//v = queued_item->iec_obj.o.type58.scs;
-
-						v = queued_item->iec_obj.o.type63.sv;
-						
-						if(Config_db[rowNumber].modbus_function_write == FC_WRITE_SINGLE_COIL)
-						{
-							//0x05
-
-							//COIL BITS
-
-							// Single
-							int rc;
-							
-							rc = modbus_write_bit(ctx, Config_db[rowNumber].modbus_start_address + Config_db[rowNumber].offset, v);
-
-							printf("modbus_write_bit: ");
-
-							if (rc == 1) {
-								printf("OK\n");
-							} else {
-								printf("FAILED\n");
-								//error
-							}
-						}
+						cmd_val.v = queued_item->iec_obj.o.type58.scs;
 					}
 					break;
 					case C_DC_TA_1:
 					{
-						v = queued_item->iec_obj.o.type59.dcs;
-						cmd_val = (float)v;
+						cmd_val.f = (float)queued_item->iec_obj.o.type59.dcs;
 					}
 					break;
 					case C_SE_TA_1:
@@ -1117,78 +1093,22 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 					break;
 					case C_SE_TC_1:
 					{
-						cmd_val = queued_item->iec_obj.o.type63.sv;
-
-						if(Config_db[rowNumber].modbus_function_write == FC_WRITE_MULTIPLE_REGISTERS)
-						{
-							//0x10
-
-							modbus_set_float(cmd_val, tab_rp_registers);
-
-							//int registers = (Config_db[rowNumber].block_size - Config_db[rowNumber].offset)/16;
-
-							int registers = 2; //we write 32 bits
-
-							// Many registers
-							int rc;
-							rc = modbus_write_registers(ctx, Config_db[rowNumber].modbus_start_address + Config_db[rowNumber].offset, registers, tab_rp_registers);
-
-							printf("modbus_write_registers: ");
-
-							if (rc == registers) 
-							{
-								printf("OK\n");
-							} 
-							else 
-							{
-								printf("FAILED\n");
-								//error
-							}
-						}
+						cmd_val.f = queued_item->iec_obj.o.type63.sv;
 					}
 					break;
 					case C_BO_TA_1:
 					{
-						memcpy(&v, &(queued_item->iec_obj.o.type64.stcd), sizeof(struct iec_stcd));
-						
-						if(Config_db[rowNumber].modbus_function_write == FC_WRITE_MULTIPLE_REGISTERS)
-						{
-							//0x10
-
-							memcpy(tab_rp_registers, &v, sizeof(unsigned int));
-
-							//int registers = (Config_db[rowNumber].block_size - Config_db[rowNumber].offset)/16;
-
-							int registers = 2; //we write 32 bits
-
-							// Many registers
-							int rc;
-							rc = modbus_write_registers(ctx, Config_db[rowNumber].modbus_start_address + Config_db[rowNumber].offset, registers, tab_rp_registers);
-
-							printf("modbus_write_registers: ");
-
-							if (rc == registers) 
-							{
-								printf("OK\n");
-							} 
-							else 
-							{
-								printf("FAILED\n");
-								//error
-							}
-						}
+						memcpy(&(cmd_val.v), &(queued_item->iec_obj.o.type64.stcd), sizeof(struct iec_stcd));
 					}
 					break;
 					case C_SC_NA_1:
 					{
-						v = queued_item->iec_obj.o.type45.scs;
-						cmd_val = (float)v;
+						cmd_val.f = (float)queued_item->iec_obj.o.type45.scs;
 					}
 					break;
 					case C_DC_NA_1:
 					{
-						v = queued_item->iec_obj.o.type46.dcs;
-						cmd_val = (float)v;
+						cmd_val.f = (float)queued_item->iec_obj.o.type46.dcs;
 					}
 					break;
 					case C_SE_NA_1:
@@ -1215,13 +1135,12 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 					break;
 					case C_SE_NC_1:
 					{
-						cmd_val = queued_item->iec_obj.o.type50.sv;
+						cmd_val.f = queued_item->iec_obj.o.type50.sv;
 					}
 					break;
 					case C_BO_NA_1:
 					{
-						memcpy(&v, &(queued_item->iec_obj.o.type51.stcd), sizeof(struct iec_stcd));
-						cmd_val = (float)v;
+						memcpy(&(cmd_val.v), &(queued_item->iec_obj.o.type51.stcd), sizeof(struct iec_stcd));
 					}
 					break;
 					default:
@@ -1238,6 +1157,102 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 					}
 					break;
 				}
+
+				switch(Config_db[rowNumber].iec_type_write)
+				{
+					case C_SC_TA_1:
+					{
+						if(Config_db[rowNumber].modbus_function_write == FC_WRITE_SINGLE_COIL)
+						{
+							//0x05
+
+							//COIL BITS
+
+							// Single
+							int rc;
+
+							int address = Config_db[rowNumber].modbus_start_address + Config_db[rowNumber].offset;
+							
+							rc = modbus_write_bit(ctx, address, cmd_val.v);
+
+							printf("modbus_write_bit: ");
+
+							if (rc == 1) {
+								printf("OK\n");
+							} else {
+								printf("FAILED\n");
+								//error
+							}
+						}
+					}
+					break;
+					case C_SE_TC_1:
+					{
+						if(Config_db[rowNumber].modbus_function_write == FC_WRITE_MULTIPLE_REGISTERS)
+						{
+							//0x10
+
+							modbus_set_float(cmd_val.f, tab_rp_registers);
+
+							//int registers = (Config_db[rowNumber].block_size - Config_db[rowNumber].offset)/16;
+
+							int registers = 2; //we write 32 bits
+
+							int address = Config_db[rowNumber].modbus_start_address + Config_db[rowNumber].offset;
+
+							// Many registers
+							int rc;
+							rc = modbus_write_registers(ctx, address, registers, tab_rp_registers);
+
+							printf("modbus_write_registers: ");
+
+							if (rc == registers) 
+							{
+								printf("OK\n");
+							} 
+							else 
+							{
+								printf("FAILED\n");
+								//error
+							}
+						}
+					}
+					break;
+					case C_BO_TA_1:
+					{
+						if(Config_db[rowNumber].modbus_function_write == FC_WRITE_MULTIPLE_REGISTERS)
+						{
+							//0x10
+							int int_val = (int)cmd_val.f;
+							modbus_set_int(int_val, tab_rp_registers);
+							
+							//int registers = (Config_db[rowNumber].block_size - Config_db[rowNumber].offset)/16;
+
+							int registers = 2; //we write 32 bits
+
+							int address = Config_db[rowNumber].modbus_start_address + Config_db[rowNumber].offset;
+
+							// Many registers
+							int rc;
+							rc = modbus_write_registers(ctx, address, registers, tab_rp_registers);
+
+							printf("modbus_write_registers: ");
+
+							if (rc == registers) 
+							{
+								printf("OK\n");
+							} 
+							else 
+							{
+								printf("FAILED\n");
+								//error
+							}
+						}
+					}
+					break;
+					default:
+					break;
+				}
 			}
 		}
 		else if(queued_item->iec_type == C_EX_IT_1)
@@ -1252,6 +1267,11 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 			IT_COMMENT("Receiving general interrogation command from monitor.exe");
 			fprintf(stderr,"Receiving general interrogation command from monitor.exe\n");
 			fflush(stderr);
+
+			////////////General interrogation condition//////////////
+			general_interrogation = true;
+			loops = 0;
+			//////////////////////////////////////////////////////////
 		}
 	}
 

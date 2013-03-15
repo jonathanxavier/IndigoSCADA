@@ -425,8 +425,12 @@ void Graph::Plot(QPainter &DC, const QRect &rect,  QColor bkg)
 					};
 				};
 				//
-				double sy = (scaleMax - scaleMin) / (double)nsteps;
-				int dy = plotRect.height() / nsteps;
+				double sy = 0.0;
+				int dy = 0;
+				if(nsteps != 0)
+					sy = (scaleMax - scaleMin) / (double)nsteps;
+				if(nsteps != 0)
+					dy = plotRect.height() / nsteps;
 				QString s;
 				// handle the problem of small steps
 				const char *Format = (sy < 1.0)?"%8.5g":"%6.1f";

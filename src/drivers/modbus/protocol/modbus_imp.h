@@ -97,6 +97,7 @@ class modbus_imp
 	unsigned long pollingTime;
 	struct modbusContext my_modbus_context;
 	bool general_interrogation;
+	int loops;
 	////////////////Modbus specific/////////////////
 	modbus_t *ctx; //context
 	uint8_t *tab_rp_bits;
