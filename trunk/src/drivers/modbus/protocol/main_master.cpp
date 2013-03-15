@@ -174,6 +174,13 @@ int main( int argc, char **argv )
 		return EXIT_FAILURE;
 	}
 
+//	if(strlen(server_id) == 0)
+//	{
+//		fprintf(stderr,"server_id is not known\n");
+//		fflush(stderr);
+//		return EXIT_FAILURE;
+//	}
+
 	pollingTime = atoi(polling_time);
 
 	if(strlen(modbusServerAddress) > 0 && strlen(modbusServerPort) > 0)
@@ -182,6 +189,9 @@ int main( int argc, char **argv )
 		strcat(NewConsoleTitle, modbusServerAddress);
 		strcat(NewConsoleTitle, " PORT ");
 		strcat(NewConsoleTitle, modbusServerPort);
+
+		strcat(NewConsoleTitle, " SERVER_ID ");
+		strcat(NewConsoleTitle, server_id);
 
 		use_context = TCP;
 	}
@@ -241,16 +251,23 @@ int main( int argc, char **argv )
 	struct modbusContext my_ctx;
 
 	my_ctx.use_context = use_context;
-	//MODBUS TCP
-	strcpy(my_ctx.modbus_server_address, modbusServerAddress); 
-	strcpy(my_ctx.modbus_server_port, modbusServerPort); 
-	//MODBUS RTU
-	strcpy(my_ctx.serial_device, serial_device);
-	my_ctx.baud = atoi(baud);
-	my_ctx.data_bit = atoi(data_bit);
-	my_ctx.stop_bit = atoi(stop_bit);
-	my_ctx.parity = parity[0];
 	my_ctx.server_id = atoi(server_id);
+
+	if(use_context == TCP)
+	{
+		//MODBUS TCP
+		strcpy(my_ctx.modbus_server_address, modbusServerAddress); 
+		strcpy(my_ctx.modbus_server_port, modbusServerPort); 
+	}
+	else if(use_context == RTU)
+	{
+		//MODBUS RTU
+		strcpy(my_ctx.serial_device, serial_device);
+		my_ctx.baud = atoi(baud);
+		my_ctx.data_bit = atoi(data_bit);
+		my_ctx.stop_bit = atoi(stop_bit);
+		my_ctx.parity = parity[0];
+	}
 	
 	modbus_imp* po = new modbus_imp(&my_ctx, line_number, atoi(polling_time));
 
@@ -274,6 +291,11 @@ int main( int argc, char **argv )
 	}
 
 	po->Stop();
+
+	if(po)
+	{
+		delete po;
+	}
 
 	return 0;
 }

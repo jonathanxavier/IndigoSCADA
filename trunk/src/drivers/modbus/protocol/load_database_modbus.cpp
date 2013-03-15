@@ -77,17 +77,17 @@ static int db_callback(void *NotUsed, int argc, char **argv, char **azColName)
 			case 4:
 			{
 				//column 5 in table modbus_table
-				//modbus_bit_size
+				//block_size
 				if(argv[i] != NULL)
-					gl_Config_db[gl_row_counter].modbus_bit_size = atoi(argv[i]);
+					gl_Config_db[gl_row_counter].block_size = atoi(argv[i]);
 			}
 			break;
 			case 5:
 			{
 				//column 6 in table modbus_table
-				//offset_in_bits
+				//offset
 				if(argv[i] != NULL)
-					gl_Config_db[gl_row_counter].offset_in_bits = atoi(argv[i]);
+					gl_Config_db[gl_row_counter].offset = atoi(argv[i]);
 			}
 			break;
 			case 6:
@@ -185,7 +185,7 @@ int modbus_imp::AddItems(void)
 	//FILE* fp = NULL;
 
 	strcpy(database_name, "C:\\scada\\bin\\");
-	strcat(database_name, "database");
+	strcat(database_name, "modbus_database");
 	strcat(database_name, lineNumber);
 	strcat(database_name, ".db");
 
@@ -235,83 +235,3 @@ int modbus_imp::AddItems(void)
 
 	return(0);
 }
-
-/*
-void modbus_imp::CreateSqlConfigurationFile(char* sql_file_name, char* opc_path)
-{
-	//Make browsing of S7 PLC server for available ItemID's
-	
-	HRESULT hr = 0;
-	FILE *dump = NULL;
-	char iec_type[100];
-	char opc_type[100];
-	char program_path[_MAX_PATH];
-	double max = 0.0;
-	double min = 0.0;
-	
-	iec_type[0] = '\0';
-	opc_type[0] = '\0';
-	program_path[0] = '\0';
-
-	if(GetModuleFileName(NULL, program_path, _MAX_PATH))
-	{
-		*(strrchr(program_path, '\\')) = '\0';        // Strip \\filename.exe off path
-		*(strrchr(program_path, '\\')) = '\0';        // Strip \\bin off path
-    }
-
-	char sql_file_path[MAX_PATH];
-
-	strcpy(sql_file_path, program_path);
-
-	//TODO: "\\bin\\" will be changed to "\\cfg\\"
-	strcat(sql_file_path, "\\bin\\"); 
-
-	strcat(sql_file_path, sql_file_name);
-	
-	dump = fopen(sql_file_path, "w");
-
-	fprintf(dump, "create table modbus_table(opc_server_item_id varchar(150), ioa_control_center varchar(150), iec_type varchar(150), readable varchar(150), writeable varchar(150), HiHiLimit varchar(150), LoLoLimit varchar(150), opc_type varchar(150));\n");
-	fflush(dump);
-							
-	if(dump == NULL)
-	{
-		fprintf(stderr,"Error opening file: %s\n", sql_file_path);
-		fflush(stderr);
-		IT_EXIT;
-		return;
-	}
-	
-	Item = (struct modbusItem*)calloc(1, g_dwNumItems*sizeof(struct modbusItem));
-
-	for(int i = 0; i < g_dwNumItems; i++)
-	{
-	
-		fprintf(dump, "insert into modbus_table values('%s', '%d', '%s', '%d', '%d', '%lf', '%lf', '%s');\n", 
-		Item[nTestItem].spname, nTestItem + 1, iec_type, readable,	writeable,	max, min, opc_type);
-		fflush(dump);
-	}
-	
-	////////////////////////////end dumping one record/////////////////////////////////////////////
-
-	nTestItem++;
-
-	if(nTestItem >= MAX_CONFIGURABLE_MODBUS_ITEMIDS)
-	{ 
-		printf("Warning! Increase ""MAX_CONFIGURABLE_MODBUS_ITEMIDS"" items\n");
-		break;
-	}
-
-	if(dump)
-	{
-		fclose(dump);
-		dump = NULL;
-	}
-
-	fprintf(stderr,"PLC browsing is complete!\n");
-
-	fflush(stderr);
-	
-	IT_EXIT;
-}
-
-*/
