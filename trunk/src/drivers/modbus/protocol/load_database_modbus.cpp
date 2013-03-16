@@ -216,9 +216,9 @@ static int db_callback(void *NotUsed, int argc, char **argv, char **azColName)
 			case 9:
 			{
 				//column 10 in table modbus_table
-				//size_in_bits_of_iec_type
+				//deadband
 				if(argv[i] != NULL)
-					gl_Config_db[gl_row_counter].size_in_bits_of_iec_type = atoi(argv[i]);
+					gl_Config_db[gl_row_counter].deadband = (float)atof(argv[i]);
 			}
 			break;
 			default:

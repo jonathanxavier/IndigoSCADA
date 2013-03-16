@@ -51,10 +51,6 @@ Inherited( parent, name ),Receipe(receipe)
 		MODBUSServerIPAddressText->setEnabled(false);
 		MODBUSServerIPPortText->setEnabled(false);
 	};
-
-	TCPButton->toggle();
-
-	context = TCP;
 }
 Modbus_driverConfiguration::~Modbus_driverConfiguration()
 {
@@ -133,6 +129,17 @@ void Modbus_driverConfiguration::QueryResponse (QObject *p, const QString &c, in
 				StopBit->setValue(n);
 				is >> t;
 				Parity->setText(t);
+
+                if(strlen((const char*)(SerialDevice->text())) == 0)
+				{
+					TCPButton->toggle();
+	                context = TCP;
+				}
+				else
+				{
+					RTUButton->toggle();
+	                context = RTU;
+				}
 			}
 			else
 			{
