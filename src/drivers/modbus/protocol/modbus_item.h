@@ -43,7 +43,7 @@ struct modbusItem
 	unsigned int ioa_control_center; //unique inside CASDU
 	unsigned int iec_type_read;   //IEC 104 type to read
 	unsigned int iec_type_write;   //IEC 104 type to write
-	int size_in_bits_of_iec_type; //The sise in bits of the IEC 104 type
+	float deadband; //Deadband for analog values
 	union {
 		int a;
 		float f;

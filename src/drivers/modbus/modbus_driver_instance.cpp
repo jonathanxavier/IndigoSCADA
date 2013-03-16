@@ -173,9 +173,7 @@ void Modbus_driver_Instance::QueryResponse(QObject *p, const QString &c, int id,
 				is >> Cfg.StopBit;
 				is >> Cfg.Parity;
 				
-				if(strlen((const char*)Cfg.SerialDevice) == 0
-					&&
-					strlen((const char*)Cfg.Baud) == 0)
+				if(strlen((const char*)Cfg.SerialDevice) == 0)
 				{
 					Cfg.context = InstanceCfg::TCP;
 				}

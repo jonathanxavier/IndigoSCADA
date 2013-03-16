@@ -234,10 +234,10 @@ int main( int argc, char **argv )
 		SetConsoleTitle(NewConsoleTitle);
 	}
 
+    /////////////////keep alive////////////////////////////////////////////////////
     struct args arg;
     strcpy(arg.line_number, line_number);
 
-	#ifdef TEST_ALONE
 	if(_beginthread(PipeWorker, 0, (void*)&arg) == -1)
 	{
 		long nError = GetLastError();
@@ -246,7 +246,7 @@ int main( int argc, char **argv )
 		fflush(stderr);
 		return EXIT_FAILURE;	
 	}
-	#endif
+	/////////////////end keep alive////////////////////////////////////////////////
 
 	struct modbusContext my_ctx;
 

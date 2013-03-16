@@ -469,7 +469,7 @@ time_t modbus_imp::epoch_from_cp56time2a(const struct cp56time2a* time)
 	return epoch;
 }
 
-//#define ABS(x) ((x) >= 0 ? (x) : -(x))
+#define ABS(x) ((x) >= 0 ? (x) : -(x))
 
 //Retun 1 on error
 int modbus_imp::PollItems(void)
@@ -482,21 +482,8 @@ int modbus_imp::PollItems(void)
 	int rc;
     bool send_item;
 	int bit_size;
-    
-	/*
-	//////////////////MODBUS RTU part/////////////////////////////////////////
-	Config_db[i].name[100];			//Item ID is an unique name identifing it
-	Config_db[i].modbus_function_read;	//modbus funtion to read
-	Config_db[i].modbus_function_write;	//modbus funtion to write
-	Config_db[i].modbus_start_address; //start address of the memory to fetch
-	Config_db[i].block_size; //size in bit of the the memory to fetch
-	Config_db[i].offset; //offset in bits into the memory to fetch (to sum with start address in order to find the address of interested data)
-	//////////////control center part///////////////////////////////////
-	Config_db[i].ioa_control_center; //unique inside CASDU
-	Config_db[i].iec_type_read;   //IEC 104 type to read
-	Config_db[i].iec_type_write;   //IEC 104 type to write
-	Config_db[i].size_in_bits_of_iec_type; //The sise in bits of the IEC 104 type
-*/
+    	
+    comm_error_counter = 0;
 
 	for(int rowNumber = 0; rowNumber < db_n_rows; rowNumber++)
 	{
@@ -521,7 +508,9 @@ int modbus_imp::PollItems(void)
 
 				if (rc != 1) 
 				{
-					return(1); //error
+                    comm_error_counter++;
+					
+                    continue;
 				}
 
 				uint8_t value = tab_rp_bits[0];
@@ -572,7 +561,9 @@ int modbus_imp::PollItems(void)
 
 				if (rc != 1) 
 				{
-					return(1); //error
+                    comm_error_counter++;
+					
+                    continue;
 				}
 
 				uint8_t value = tab_rp_bits[0];
@@ -624,7 +615,9 @@ int modbus_imp::PollItems(void)
 
 				if (rc != registers) 
 				{
-					return(1); //error
+                    comm_error_counter++;
+					
+                    continue;
 				}
 
 				if(Config_db[rowNumber].iec_type_read == M_ME_TF_1)
@@ -635,7 +628,7 @@ int modbus_imp::PollItems(void)
 
 					printf("Get float: %f\n", real);
 
-					if(Config_db[rowNumber].last_value.f != real)
+					if(ABS(Config_db[rowNumber].last_value.f - real) > Config_db[rowNumber].deadband)
 					{
 						Config_db[rowNumber].last_value.f = real;
 
@@ -665,7 +658,7 @@ int modbus_imp::PollItems(void)
 
 					printf("Get integer: %d\n", integer32);
 
-					if(Config_db[rowNumber].last_value.a != integer32)
+					if(ABS(Config_db[rowNumber].last_value.a - integer32) > (int)Config_db[rowNumber].deadband)
 					{
 						Config_db[rowNumber].last_value.a = integer32;
 
@@ -700,7 +693,9 @@ int modbus_imp::PollItems(void)
 
 				if (rc != registers) 
 				{
-					return(1); //error
+                    comm_error_counter++;
+					
+                    continue;
 				}
 
 				if(Config_db[rowNumber].iec_type_read == M_ME_TE_1)
@@ -710,7 +705,7 @@ int modbus_imp::PollItems(void)
 
 					printf("Get integer: %d\n", integer16);
 
-					if(Config_db[rowNumber].last_value.a != integer16)
+					if(ABS(Config_db[rowNumber].last_value.a - integer16) > (short)Config_db[rowNumber].deadband)
 					{
 						Config_db[rowNumber].last_value.a = integer16;
 
@@ -807,8 +802,13 @@ int modbus_imp::PollItems(void)
 		}
 	}
 
-	IT_EXIT;
+    if(comm_error_counter >= db_n_rows)
+    {
+        IT_EXIT; //Lost connection with server...
+	    return 1;
+    }
 
+	IT_EXIT;
 	return 0;
 
 }
@@ -1263,26 +1263,25 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 						{
 							if(Config_db[rowNumber].modbus_type == VT_BOOL)
 							{
-									//0x05
+								//0x05
 
-									//COIL BITS
+								//COIL BITS
 
-									// Single
-									int rc;
+								// Single
+								int rc;
 
-									int address = Config_db[rowNumber].modbus_start_address + Config_db[rowNumber].offset;
-									
-									rc = modbus_write_bit(ctx, address, cmd_val.v);
-
-									printf("modbus_write_bit: ");
-
-									if (rc == 1) {
-										printf("OK\n");
-									} else {
-										printf("FAILED\n");
-										//error
-									}
+								int address = Config_db[rowNumber].modbus_start_address + Config_db[rowNumber].offset;
 								
+								rc = modbus_write_bit(ctx, address, cmd_val.v);
+
+								printf("modbus_write_bit: ");
+
+								if (rc == 1) {
+									printf("OK\n");
+								} else {
+									printf("FAILED\n");
+									//error
+								}
 							}
 							else
 							{
