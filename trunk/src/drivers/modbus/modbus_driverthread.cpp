@@ -36,15 +36,41 @@ void Modbus_DriverThread::run()
     strcat(pipe_name, line_number);
 
 	itoa(((Modbus_driver_Instance*)Parent)->Cfg.SampleTime, polling_time, 10);
-		
-	strcpy(pCommandLine, "C:\\scada\\bin\\modbus_master.exe -a ");
-	strcat(pCommandLine, ((Modbus_driver_Instance*)Parent)->Cfg.MODBUSServerIPAddress);
-	strcat(pCommandLine, " -p ");
-	strcat(pCommandLine, ((Modbus_driver_Instance*)Parent)->Cfg.MODBUSServerIPPort);
-	strcat(pCommandLine, " -l ");
-	strcat(pCommandLine, line_number);
-	strcat(pCommandLine, " -t ");
-	strcat(pCommandLine, polling_time);
+
+	if(((Modbus_driver_Instance*)Parent)->Cfg.context == InstanceCfg::TCP)
+	{
+		//MODBUS TCP
+		strcpy(pCommandLine, "C:\\scada\\bin\\modbus_master.exe -a ");
+		strcat(pCommandLine, ((Modbus_driver_Instance*)Parent)->Cfg.MODBUSServerIPAddress);
+		strcat(pCommandLine, " -p ");
+		strcat(pCommandLine, ((Modbus_driver_Instance*)Parent)->Cfg.MODBUSServerTCPPort);
+		strcat(pCommandLine, " -l ");
+		strcat(pCommandLine, line_number);
+		strcat(pCommandLine, " -t ");
+		strcat(pCommandLine, polling_time);
+		strcat(pCommandLine, " -s ");
+		strcat(pCommandLine, ((Modbus_driver_Instance*)Parent)->Cfg.ServerID);
+	}
+	else if(((Modbus_driver_Instance*)Parent)->Cfg.context == InstanceCfg::RTU)
+	{
+		//MODBUS RTU
+		strcpy(pCommandLine, "C:\\scada\\bin\\modbus_master.exe -d ");
+		strcat(pCommandLine, ((Modbus_driver_Instance*)Parent)->Cfg.SerialDevice);
+		strcat(pCommandLine, " -b ");
+		strcat(pCommandLine, ((Modbus_driver_Instance*)Parent)->Cfg.Baud);
+		strcat(pCommandLine, " -c ");
+		strcat(pCommandLine, ((Modbus_driver_Instance*)Parent)->Cfg.DataBits);
+		strcat(pCommandLine, " -e ");
+		strcat(pCommandLine, ((Modbus_driver_Instance*)Parent)->Cfg.StopBit);
+		strcat(pCommandLine, " -f ");
+		strcat(pCommandLine, ((Modbus_driver_Instance*)Parent)->Cfg.Parity);
+		strcat(pCommandLine, " -l ");
+		strcat(pCommandLine, line_number);
+		strcat(pCommandLine, " -t ");
+		strcat(pCommandLine, polling_time);
+		strcat(pCommandLine, " -s ");
+		strcat(pCommandLine, ((Modbus_driver_Instance*)Parent)->Cfg.ServerID);
+	}
 		
 	strcpy(pWorkingDir,"C:\\scada\\bin");
 		

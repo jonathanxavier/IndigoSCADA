@@ -299,7 +299,7 @@ int rfc1006_imp::RfcStart(char* RfcServerProgID, char* RfcclassId, char* RfcUpda
 	IT_IT("rfc1006_imp::RfcStart");
 	
 	char show_msg[200];
-	sprintf(show_msg, " IndigoSCADA OPC DA Client Start\n");
+	sprintf(show_msg, " IndigoSCADA RFC1006 Client Start\n");
 	LogMessage(NULL, show_msg);
 
 	float fTemp = 0.0f;
@@ -341,7 +341,7 @@ int rfc1006_imp::RfcStop()
 	// terminate server and it will clean up itself
 
 	char show_msg[200];
-	sprintf(show_msg, " IndigoSCADA OPC DA Client End\n");
+	sprintf(show_msg, " IndigoSCADA RFC1006 Client End\n");
 	LogMessage(NULL, show_msg);
 
 	IT_EXIT;

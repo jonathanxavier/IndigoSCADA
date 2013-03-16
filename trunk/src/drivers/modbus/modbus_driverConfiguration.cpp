@@ -51,6 +51,10 @@ Inherited( parent, name ),Receipe(receipe)
 		MODBUSServerIPAddressText->setEnabled(false);
 		MODBUSServerIPPortText->setEnabled(false);
 	};
+
+	TCPButton->toggle();
+
+	context = TCP;
 }
 Modbus_driverConfiguration::~Modbus_driverConfiguration()
 {
@@ -68,8 +72,21 @@ void Modbus_driverConfiguration::OkClicked()
 	QString cmd = QString("delete from PROPS where SKEY='")+QString(Name->text()) + QString("' and IKEY='") + Receipe + "';";
 	GetConfigureDb()->DoExec(0,cmd,0); // delete the old value
 	//
-	cmd = "insert into PROPS values('"+Name->text() +"','" + Receipe + "','" + 
-	NItems->text() + " " + PollInterval->text() + " " + MODBUSServerIPAddressText->text() + " " + MODBUSServerIPPortText->text() +"');";
+	if(context == RTU)
+	{
+		MODBUSServerIPAddressText->setText("xxx.xxx.xxx.xxx");
+		MODBUSServerIPPortText->setText("502");
+
+		cmd = "insert into PROPS values('"+Name->text() +"','" + Receipe + "','" + 
+		NItems->text() + " " + PollInterval->text() + " " + ServerID->text() +" "+ MODBUSServerIPAddressText->text() + " " + MODBUSServerIPPortText->text() +
+		" " + SerialDevice->text() + " " + Baud->text() + " " + DataBits->text() +" "+ StopBit->text() +" "+ Parity->text() +	"');";
+	}
+	else if(context == TCP)
+	{
+		cmd = "insert into PROPS values('"+Name->text() +"','" + Receipe + "','" + 
+		NItems->text() + " " + PollInterval->text() + " " + ServerID->text() +" "+ MODBUSServerIPAddressText->text() + " " + MODBUSServerIPPortText->text() +"');";
+	}
+
 	GetConfigureDb()->DoExec(0,cmd,0);
 	QSAuditTrail(this,caption(), tr("Edited"));
 
@@ -101,9 +118,21 @@ void Modbus_driverConfiguration::QueryResponse (QObject *p, const QString &c, in
 				is >> n;
 				PollInterval->setValue(n);
 				is >> t;
+				ServerID->setText(t);
+				is >> t;
 				MODBUSServerIPAddressText->setText(t);
 				is >> t;
 				MODBUSServerIPPortText->setText(t);
+				is >> t;
+				SerialDevice->setText(t);
+				is >> n;
+				Baud->setValue(n);
+				is >> n;
+				DataBits->setValue(n);
+				is >> n;
+				StopBit->setValue(n);
+				is >> t;
+				Parity->setText(t);
 			}
 			else
 			{
@@ -114,8 +143,14 @@ void Modbus_driverConfiguration::QueryResponse (QObject *p, const QString &c, in
 				GetConfigureDb()->DoExec(0,cmd,0);
 				NItems->setValue(8);
 				PollInterval->setValue(1000);
+				ServerID->setText("");
 				MODBUSServerIPAddressText->setText("");
 				MODBUSServerIPPortText->setText("");
+				SerialDevice->setText("COM1");
+				Baud->setValue(9600);
+				DataBits->setValue(8);
+				StopBit->setValue(1);
+				Parity->setText("N");
 			}
 		} 
 		break;
@@ -123,4 +158,14 @@ void Modbus_driverConfiguration::QueryResponse (QObject *p, const QString &c, in
 		break;
 	};
 };
+
+void Modbus_driverConfiguration::RTUContextActive(bool)
+{
+	context = RTU;
+}
+
+void Modbus_driverConfiguration::TCPContextActive(bool)
+{
+    context = TCP;
+}
 
