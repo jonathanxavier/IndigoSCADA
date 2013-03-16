@@ -162,8 +162,27 @@ void Modbus_driver_Instance::QueryResponse(QObject *p, const QString &c, int id,
 				//
 				is >> IecItems;	  // how many modbus items there are in the RTU or PLC
 				is >> Cfg.SampleTime; // how long we sample for in milliseconds
-				is >> Cfg.MODBUSServerIPAddress; // MODBUS server IP Address
-				is >> Cfg.MODBUSServerIPPort; // MODBUS server TCP port
+				is >> Cfg.ServerID;
+				//MODBUS TCP
+				is >> Cfg.MODBUSServerIPAddress;  // MODBUS server IP address (slave)
+				is >> Cfg.MODBUSServerTCPPort;  // MODBUS server TCP port
+				//MODBUS RTU //If this fields are filled in, then we have a serial line
+				is >> Cfg.SerialDevice;
+				is >> Cfg.Baud;
+				is >> Cfg.DataBits;
+				is >> Cfg.StopBit;
+				is >> Cfg.Parity;
+				
+				if(strlen((const char*)Cfg.SerialDevice) == 0
+					&&
+					strlen((const char*)Cfg.Baud) == 0)
+				{
+					Cfg.context = InstanceCfg::TCP;
+				}
+				else
+				{
+					Cfg.context = InstanceCfg::RTU;
+				}
 
 				Countdown = 1;
 
@@ -453,7 +472,7 @@ void Modbus_driver_Instance::get_items_form_local_fifo(void)
 		if(State == STATE_FAIL)
 		{
 			QString msg;
-			msg.sprintf("OPC DA client on line %d is now connected to OPC DA server.", instanceID + 1); 
+			msg.sprintf("MODBUS master on line %d is now connected to MODBUS server.", instanceID + 1); 
 			UnFailUnit(msg);
 			State = STATE_ASK_GENERAL_INTERROGATION;
 		}
@@ -709,10 +728,10 @@ void Modbus_driver_Instance::get_items_form_local_fifo(void)
 			break;
 			case C_LO_ST_1:
 			{
-				printf("OPC DA client on line %d has lost connection with OPC DA server...\n", instanceID + 1);
+				printf("MODBUS master on line %d has lost connection with MODBUS server...\n", instanceID + 1);
 
 				QString msg;
-				msg.sprintf("OPC DA client on line %d has lost connection with OPC DA server...", instanceID + 1); 
+				msg.sprintf("MODBUS master on line %d has lost connection with MODBUS server...", instanceID + 1); 
 				FailUnit(msg);
 
 				State = STATE_FAIL;

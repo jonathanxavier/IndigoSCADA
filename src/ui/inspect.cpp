@@ -608,22 +608,22 @@ void InspectMenu(QWidget *parent, const QString &name, bool AckState)
 
         if(name.contains("IEC101", false) > 0)
 		{
-			m.insertItem(QPixmap((const char **)button),QObject::tr("Send command..."),6); // Send command
+			m.insertItem(QPixmap((const char **)button),QObject::tr("Send command..."),7); // Send command
 		}
 
         if(name.contains("IEC103", false) > 0)
 		{
-			m.insertItem(QPixmap((const char **)button),QObject::tr("Send command..."),6); // Send command
+			m.insertItem(QPixmap((const char **)button),QObject::tr("Send command..."),8); // Send command
 		}
 
         if(name.contains("DNP3", false) > 0)
 		{
-			m.insertItem(QPixmap((const char **)button),QObject::tr("Send command..."),6); // Send command
+			m.insertItem(QPixmap((const char **)button),QObject::tr("Send command..."),9); // Send command
 		}
 
 		if(name.contains("MDB", false) > 0)
 		{
-			m.insertItem(QPixmap((const char **)button),QObject::tr("Send command..."),6); // Send command
+			m.insertItem(QPixmap((const char **)button),QObject::tr("Send command..."),10); // Send command
 		}
 	}
 	
@@ -745,6 +745,74 @@ void InspectMenu(QWidget *parent, const QString &name, bool AckState)
 
 			QString unit_type; // the current unit type
 			unit_type = "iec104driver"; 
+			Driver *dp = FindDriver(unit_type);
+
+			if(dp)
+			{
+				dp->CommandDlg(parent, name);
+			}
+		};
+		break;
+		case 7: // send command to IEC 101 driver
+		{
+			//Send command trough dispatcher to monitor.exe
+			//In monitor. exe call the ::Command method of the drive of unit_type
+			//Note: dll drivers should be installed  on the client PC, where ist.exe is running
+			//in C:\scada\Drivers
+
+			QString unit_type; // the current unit type
+			unit_type = "iec101driver"; 
+			Driver *dp = FindDriver(unit_type);
+
+			if(dp)
+			{
+				dp->CommandDlg(parent, name);
+			}
+		};
+		break;
+		case 8: // send command to IEC 103 driver
+		{
+			//Send command trough dispatcher to monitor.exe
+			//In monitor. exe call the ::Command method of the drive of unit_type
+			//Note: dll drivers should be installed  on the client PC, where ist.exe is running
+			//in C:\scada\Drivers
+
+			QString unit_type; // the current unit type
+			unit_type = "iec103driver"; 
+			Driver *dp = FindDriver(unit_type);
+
+			if(dp)
+			{
+				dp->CommandDlg(parent, name);
+			}
+		};
+		break;
+		case 9: // send command to IEC 104 driver
+		{
+			//Send command trough dispatcher to monitor.exe
+			//In monitor. exe call the ::Command method of the drive of unit_type
+			//Note: dll drivers should be installed  on the client PC, where ist.exe is running
+			//in C:\scada\Drivers
+
+			QString unit_type; // the current unit type
+			unit_type = "dnp3driver"; 
+			Driver *dp = FindDriver(unit_type);
+
+			if(dp)
+			{
+				dp->CommandDlg(parent, name);
+			}
+		};
+		break;
+		case 10: // send command to MODBUS drive
+		{
+			//Send command trough dispatcher to monitor.exe
+			//In monitor. exe call the ::Command method of the drive of unit_type
+			//Note: dll drivers should be installed  on the client PC, where ist.exe is running
+			//in C:\scada\Drivers
+
+			QString unit_type; // the current unit type
+			unit_type = "modbus_driver"; 
 			Driver *dp = FindDriver(unit_type);
 
 			if(dp)

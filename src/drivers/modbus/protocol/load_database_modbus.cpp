@@ -77,17 +77,70 @@ static int db_callback(void *NotUsed, int argc, char **argv, char **azColName)
 			case 4:
 			{
 				//column 5 in table modbus_table
-				//block_size
+				//offset
 				if(argv[i] != NULL)
-					gl_Config_db[gl_row_counter].block_size = atoi(argv[i]);
+					gl_Config_db[gl_row_counter].offset = atoi(argv[i]);
 			}
 			break;
 			case 5:
 			{
 				//column 6 in table modbus_table
-				//offset
+				//modbus_type expressed like an OPC type
 				if(argv[i] != NULL)
-					gl_Config_db[gl_row_counter].offset = atoi(argv[i]);
+				{
+					if(strcmp(argv[i], "VT_BOOL") == 0)
+					{
+						gl_Config_db[gl_row_counter].modbus_type = VT_BOOL;
+					}
+					else if(strcmp(argv[i], "VT_I2") == 0)
+					{
+						gl_Config_db[gl_row_counter].modbus_type = VT_I2;
+					}
+					else if(strcmp(argv[i], "VT_UI2") == 0)
+					{
+						gl_Config_db[gl_row_counter].modbus_type = VT_UI2;
+					}
+					else if(strcmp(argv[i], "VT_I4") == 0)
+					{
+						gl_Config_db[gl_row_counter].modbus_type = VT_I4;
+					}
+					else if(strcmp(argv[i], "VT_UI4") == 0)
+					{
+						gl_Config_db[gl_row_counter].modbus_type = VT_UI4;
+					}
+					else if(strcmp(argv[i], "VT_R4") == 0)
+					{
+						gl_Config_db[gl_row_counter].modbus_type = VT_R4;
+					}
+					else if(strcmp(argv[i], "VT_R8") == 0)
+					{
+						gl_Config_db[gl_row_counter].modbus_type = VT_R8;
+					}
+					else if(strcmp(argv[i], "VT_I1") == 0)
+					{
+						gl_Config_db[gl_row_counter].modbus_type = VT_I1;
+					}
+					else if(strcmp(argv[i], "VT_UI1") == 0)
+					{
+						gl_Config_db[gl_row_counter].modbus_type = VT_UI1;
+					}
+					else if(strcmp(argv[i], "VT_I8") == 0)
+					{
+						gl_Config_db[gl_row_counter].modbus_type = VT_I8;
+					}
+					else if(strcmp(argv[i], "VT_UI8") == 0)
+					{
+						gl_Config_db[gl_row_counter].modbus_type = VT_UI8;
+					}
+					else
+					{
+						gl_Config_db[gl_row_counter].modbus_type = VT_ERROR;
+					}
+				}
+				else
+				{
+					gl_Config_db[gl_row_counter].modbus_type = VT_ERROR;
+				}
 			}
 			break;
 			case 6:
@@ -116,6 +169,10 @@ static int db_callback(void *NotUsed, int argc, char **argv, char **azColName)
 					{
 						gl_Config_db[gl_row_counter].iec_type_read = M_IT_TB_1;
 					}
+					else if(strcmp(argv[i], "M_ME_TE_1") == 0)
+					{
+						gl_Config_db[gl_row_counter].iec_type_read = M_ME_TE_1;
+					}
 					else
 					{
 						fprintf(stderr,"IEC type %s from I/O list NOT supported\n", argv[i]);
@@ -142,6 +199,10 @@ static int db_callback(void *NotUsed, int argc, char **argv, char **azColName)
 					else if(strcmp(argv[i], "C_SE_TC_1") == 0)
 					{
 						gl_Config_db[gl_row_counter].iec_type_write = C_SE_TC_1;
+					}
+					else if(strcmp(argv[i], "C_SE_TB_1") == 0)
+					{
+						gl_Config_db[gl_row_counter].iec_type_write = C_SE_TB_1;
 					}
 					else
 					{
