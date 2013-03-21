@@ -207,7 +207,11 @@ void Iec103driver_Instance::QueryResponse(QObject *p, const QString &c, int id, 
 				if(strlen((const char*)t.Data1) > 0)
 				{
 					v = atof((const char*)t.Data1);
-					PostValue(SamplePointName, "BIT", v); //Post the value directly in memory database
+
+                    if(GetConfigureDb()->GetString("TAG") == QString("BIT"))
+					    PostValue(SamplePointName, "BIT", v); //Post the value directly in memory database
+                    else if(GetConfigureDb()->GetString("TAG") == QString("VALUE"))
+                        PostValue(SamplePointName, "VALUE", v); //Post the value directly in memory database
 				}
 
 				printf("SamplePointName = %s, IOA = %s, value = %lf\n", (const char*)SamplePointName, (const char*)t.Data2, v);
@@ -623,7 +627,7 @@ void Iec103driver_Instance::Tick()
 		#ifdef DEPRECATED_IEC103_CONFIG
 		QString cmd = "select IKEY from PROPS where DVAL='"+ ioa + "' and SKEY='SAMPLEPROPS';";
 		#else
-		QString cmd = "select NAME from TAGS where IOA="+ ioa + " and UNIT='"+ Name + "';";
+		QString cmd = "select NAME, TAG from TAGS where IOA="+ ioa + " and UNIT='"+ Name + "';";
 		#endif
 
 		GetConfigureDb()->DoExec(this, cmd, tGetSamplePointNamefromIOA, value, ioa);

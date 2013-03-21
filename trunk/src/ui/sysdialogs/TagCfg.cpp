@@ -220,13 +220,15 @@ void TagCfg::QueryResponse (QObject *p, const QString &c, int State, QObject*cal
 				UWEnabled->setChecked (0);
 				UAEnabled->setChecked (0);
 				//
-				QString cmd = "insert into TAGS values ('"+SPName+"','"+Name->currentText()+"'"TAG_VALS"'"+ReceipeName+"',1,0,'','');";
+				//
+                QString cmd = "update TAGS set TAG='"+Name->currentText()+"'where NAME='"+ SPName +"';";
+                //QString cmd = "insert into TAGS values ('"+SPName+"','"+Name->currentText()+"'"TAG_VALS"'"+ReceipeName+"',1,0,'','');";
 				GetConfigureDb()->DoExec(0,cmd,0);
 				//
 				// create the entry in the current values database
 				// 
-				GetCurrentDb()->DoExec(0,"insert into TAGS_DB values('" + SPName +"','" + Name->currentText() +
-				"'," + DATETIME_EPOCH + ",0,0,0,0,0,0,0,0);" ,0); // create the tag entry into the current values
+				//GetCurrentDb()->DoExec(0,"insert into TAGS_DB values('" + SPName +"','" + Name->currentText() +
+				//"'," + DATETIME_EPOCH + ",0,0,0,0,0,0,0,0);" ,0); // create the tag entry into the current values
 				//
 				// amend the database table
 				// it does not matter that there may infact already be a column existing 

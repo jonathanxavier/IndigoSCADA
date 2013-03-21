@@ -131,7 +131,7 @@ QWidget * Opc_client_ae::GetSpecificConfig(QWidget *parent, const QString &spnam
 */
 void Opc_client_ae::GetTagList(const QString &type, QStringList &list,const QString &,const QString &) // returns the permitted tags for a given type for this unit
 {
-	if(type == TYPE_M_ME_TC_1)
+	if(type == TYPE_M_ME_TC_1 || type == TYPE_M_ME_NB_1 || type == TYPE_M_ME_TB_1)
 	{
 		list << VALUE_TAG;
 	}
