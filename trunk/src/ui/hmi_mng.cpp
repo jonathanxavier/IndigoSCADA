@@ -28,9 +28,7 @@
 
 void HMI_manager::setParent( QDialog *parent )
 {
-    p = parent;
-
-    setInitialValues();
+    dialog_parent = parent;
 
 	connect(qApp->mainWidget(),SIGNAL(UpdateTags()),this,SLOT(UpdateTags()));
 	connect(qApp->mainWidget(),SIGNAL(UpdateSamplePoint()),this,SLOT(UpdateSamplePoint()));
@@ -43,8 +41,9 @@ void HMI_manager::setParent( QDialog *parent )
 
 	connect (GetDispatcher (),
 	SIGNAL (ReceivedNotify(int, const char *)), this,
-	SLOT (ReceivedNotify(int, const char *)));	
+	SLOT (ReceivedNotify(int, const char *)));
 
+	setInitialValuesAndLimits();
 }
 
 //	QColor white(0xff, 0xff, 0xff);
@@ -53,10 +52,10 @@ void HMI_manager::setParent( QDialog *parent )
 //	QColor green(0x00, 0xff, 0x00);
 //	QColor blue(0x00, 0x00, 0xff);
 
-void HMI_manager::setInitialValues() 
+void HMI_manager::setInitialValuesAndLimits() 
 {
 	{
-		QObjectList *l = p->queryList( "QwtThermo" );
+		QObjectList *l = dialog_parent->queryList( "QwtThermo" );
 
 		QObjectListIt it( *l ); // iterate over the buttons
 
@@ -69,6 +68,16 @@ void HMI_manager::setInitialValues()
 
 			QString name = obj->name();
 
+			int idx = name.find('_');
+			name.truncate(idx);
+			
+			QString widget_type = "QwtThermo";
+
+			// get the alarm limits
+			QString cmd = "select * from TAGS where NAME='"+name+"' and RECEIPE='"+GetReceipeName()+"';";
+			GetConfigureDb()->DoExec(this, cmd, tTagLimits, widget_type, name);
+
+			/*
 			double val = 0.0;
 
 			((QwtThermo*)obj)->setMinValue(-500.0);
@@ -76,13 +85,14 @@ void HMI_manager::setInitialValues()
 			((QwtThermo*)obj)->setMaxValue(1000.0);
 
 			((QwtThermo*)obj)->setValue(val);
+			*/
 		}
 
 		delete l; // delete the list, not the objects
 	}
 
 	{
-		QObjectList *l = p->queryList( "QLCDNumber" );
+		QObjectList *l = dialog_parent->queryList( "QLCDNumber" );
 
 		QObjectListIt it( *l ); // iterate over the buttons
 
@@ -104,7 +114,7 @@ void HMI_manager::setInitialValues()
 	}
 
 	{
-		QObjectList *l = p->queryList( "PLCDNumber" );
+		QObjectList *l = dialog_parent->queryList( "PLCDNumber" );
 
 		QObjectListIt it( *l ); // iterate over the buttons
 
@@ -126,7 +136,7 @@ void HMI_manager::setInitialValues()
 	}
 
 	{
-		QObjectList *l = p->queryList( "SinglePointLed" );
+		QObjectList *l = dialog_parent->queryList( "SinglePointLed" );
 
 		QObjectListIt it( *l ); // iterate over the buttons
 
@@ -147,7 +157,7 @@ void HMI_manager::setInitialValues()
 	}
 
     {
-		QObjectList *l = p->queryList( "DoublePointLed" );
+		QObjectList *l = dialog_parent->queryList( "DoublePointLed" );
 
 		QObjectListIt it( *l ); // iterate over the buttons
 
@@ -168,7 +178,7 @@ void HMI_manager::setInitialValues()
 	}
 
 	{
-		QObjectList *l = p->queryList( "QButton" );
+		QObjectList *l = dialog_parent->queryList( "QButton" );
 
 		QObjectListIt it( *l ); // iterate over the buttons
 
@@ -190,7 +200,7 @@ void HMI_manager::setInitialValues()
 	}
 
 	{
-		QObjectList *l = p->queryList( "PTank" );
+		QObjectList *l = dialog_parent->queryList( "PTank" );
 
 		QObjectListIt it( *l ); // iterate over the buttons
 
@@ -203,16 +213,27 @@ void HMI_manager::setInitialValues()
 
 			QString name = obj->name();
 
+			int idx = name.find('_');
+			name.truncate(idx);
+
+			QString widget_type = "PTank";
+
+			// get the alarm limits
+			QString cmd = "select * from TAGS where NAME='"+name+"' and RECEIPE='"+GetReceipeName()+"';";
+			GetConfigureDb()->DoExec(this, cmd, tTagLimits, widget_type, name);
+
+			/*
 			((PTank*)obj)->setMinValue(-500.0);
 			((PTank*)obj)->setMaxValue(1000.0);
 			((PTank*)obj)->setValue(0);
+			*/
 		}
 
 		delete l; // delete the list, not the objects
 	}
 
 	{
-		QObjectList *l = p->queryList( "PThermometer" );
+		QObjectList *l = dialog_parent->queryList( "PThermometer" );
 
 		QObjectListIt it( *l ); // iterate over the buttons
 
@@ -225,16 +246,27 @@ void HMI_manager::setInitialValues()
 
 			QString name = obj->name();
 
+			int idx = name.find('_');
+			name.truncate(idx);
+
+			QString widget_type = "PThermometer";
+
+			// get the alarm limits
+			QString cmd = "select * from TAGS where NAME='"+name+"' and RECEIPE='"+GetReceipeName()+"';";
+			GetConfigureDb()->DoExec(this, cmd, tTagLimits, widget_type, name);
+
+			/*
 			((PThermometer*)obj)->setMinValue(-500.0);
 			((PThermometer*)obj)->setMaxValue(1000.0);
 			((PThermometer*)obj)->setValue(0);
+			*/
 		}
 
 		delete l; // delete the list, not the objects
 	}
 
 	{
-		QObjectList *l = p->queryList( "PSinglePointLed" );
+		QObjectList *l = dialog_parent->queryList( "PSinglePointLed" );
 
 		QObjectListIt it( *l ); // iterate over the buttons
 
@@ -255,7 +287,7 @@ void HMI_manager::setInitialValues()
 	}
 
 	{
-		QObjectList *l = p->queryList( "PDoublePointLed" );
+		QObjectList *l = dialog_parent->queryList( "PDoublePointLed" );
 
 		QObjectListIt it( *l ); // iterate over the buttons
 
@@ -298,7 +330,7 @@ void HMI_manager::UpdateTags()
 		if(s != lastName)
 		{
 			{
-				QObjectList *l = p->queryList( "QwtThermo" );
+				QObjectList *l = dialog_parent->queryList( "QwtThermo" );
 
 				QObjectListIt it( *l ); // iterate over the buttons
 
@@ -330,7 +362,7 @@ void HMI_manager::UpdateTags()
 			}
 
 			{
-				QObjectList *l = p->queryList( "QLCDNumber" );
+				QObjectList *l = dialog_parent->queryList( "QLCDNumber" );
 
 				QObjectListIt it( *l ); // iterate over the buttons
 
@@ -362,7 +394,7 @@ void HMI_manager::UpdateTags()
 			}
 
 			{
-				QObjectList *l = p->queryList( "PLCDNumber" );
+				QObjectList *l = dialog_parent->queryList( "PLCDNumber" );
 
 				QObjectListIt it( *l ); // iterate over the buttons
 
@@ -394,7 +426,7 @@ void HMI_manager::UpdateTags()
 			}
 
 			{
-				QObjectList *l = p->queryList( "SinglePointLed" );
+				QObjectList *l = dialog_parent->queryList( "SinglePointLed" );
 
 				QObjectListIt it( *l ); // iterate over the buttons
 
@@ -463,7 +495,7 @@ void HMI_manager::UpdateTags()
 			}
 
             {
-				QObjectList *l = p->queryList( "DoublePointLed" );
+				QObjectList *l = dialog_parent->queryList( "DoublePointLed" );
 
 				QObjectListIt it( *l ); // iterate over the buttons
 
@@ -532,7 +564,7 @@ void HMI_manager::UpdateTags()
 			}
 
 			{
-				QObjectList *l = p->queryList( "PSinglePointLed" );
+				QObjectList *l = dialog_parent->queryList( "PSinglePointLed" );
 
 				QObjectListIt it( *l ); // iterate over the buttons
 
@@ -605,7 +637,7 @@ void HMI_manager::UpdateTags()
 			}
 
 			{
-				QObjectList *l = p->queryList( "PDoublePointLed" );
+				QObjectList *l = dialog_parent->queryList( "PDoublePointLed" );
 
 				QObjectListIt it( *l ); // iterate over the buttons
 
@@ -675,7 +707,7 @@ void HMI_manager::UpdateTags()
 			}
 			
 			{
-				QObjectList *l = p->queryList( "PSwitch" );
+				QObjectList *l = dialog_parent->queryList( "PSwitch" );
 
 				QObjectListIt it( *l ); // iterate over the buttons
 
@@ -727,7 +759,7 @@ void HMI_manager::UpdateTags()
 			}
 
 			{
-				QObjectList *l = p->queryList( "PTank" );
+				QObjectList *l = dialog_parent->queryList( "PTank" );
 
 				QObjectListIt it( *l ); // iterate over the buttons
 
@@ -759,7 +791,7 @@ void HMI_manager::UpdateTags()
 			}
 
 			{
-				QObjectList *l = p->queryList( "PThermometer" );
+				QObjectList *l = dialog_parent->queryList( "PThermometer" );
 
 				QObjectListIt it( *l ); // iterate over the buttons
 
@@ -821,7 +853,7 @@ void HMI_manager::UpdateSamplePoint() // handle updated sample points
 		if(s != lastName)
 		{
 			{
-				QObjectList *l = p->queryList( "SinglePointLed" );
+				QObjectList *l = dialog_parent->queryList( "SinglePointLed" );
 
 				QObjectListIt it( *l ); // iterate over the buttons
 
@@ -875,7 +907,7 @@ void HMI_manager::UpdateSamplePoint() // handle updated sample points
 			}
 
             {
-				QObjectList *l = p->queryList( "DoublePointLed" );
+				QObjectList *l = dialog_parent->queryList( "DoublePointLed" );
 
 				QObjectListIt it( *l ); // iterate over the buttons
 
@@ -929,7 +961,7 @@ void HMI_manager::UpdateSamplePoint() // handle updated sample points
 			}
 
 			{
-				QObjectList *l = p->queryList( "PSinglePointLed" );
+				QObjectList *l = dialog_parent->queryList( "PSinglePointLed" );
 
 				QObjectListIt it( *l ); // iterate over the buttons
 
@@ -983,7 +1015,7 @@ void HMI_manager::UpdateSamplePoint() // handle updated sample points
 			}
 
 			{
-				QObjectList *l = p->queryList( "PDoublePointLed" );
+				QObjectList *l = dialog_parent->queryList( "PDoublePointLed" );
 
 				QObjectListIt it( *l ); // iterate over the buttons
 
@@ -1037,7 +1069,7 @@ void HMI_manager::UpdateSamplePoint() // handle updated sample points
 			}
 
 			{
-				QObjectList *l = p->queryList( "PSwitch" );
+				QObjectList *l = dialog_parent->queryList( "PSwitch" );
 
 				QObjectListIt it( *l ); // iterate over the buttons
 
@@ -1096,7 +1128,7 @@ void HMI_manager::UpdateSamplePoint() // handle updated sample points
 
 void HMI_manager::sendCommand() 
 {
-	QObjectList *l = p->queryList("QwtPushButton");
+	QObjectList *l = dialog_parent->queryList("QwtPushButton");
 
 	QObjectListIt it( *l ); // iterate over the buttons
 
@@ -1128,7 +1160,7 @@ void HMI_manager::sendCommand()
 
 void HMI_manager::pSwitchToggledSendCommand()
 {
-	QObjectList *l = p->queryList("PSwitch");
+	QObjectList *l = dialog_parent->queryList("PSwitch");
 
 	QObjectListIt it( *l ); // iterate over the switches
 
@@ -1188,7 +1220,7 @@ void HMI_manager::RightClicked(QString &class_name, QString &widget_name) // sho
 
 	if(class_name == QString("SinglePointLed"))
 	{
-		QObjectList *l = p->queryList("SinglePointLed");
+		QObjectList *l = dialog_parent->queryList("SinglePointLed");
 
 		QObjectListIt it( *l ); // iterate over the switches
 
@@ -1224,7 +1256,7 @@ void HMI_manager::RightClicked(QString &class_name, QString &widget_name) // sho
 	}
 	else if(class_name == QString("DoublePointLed"))
 	{
-		QObjectList *l = p->queryList("DoublePointLed");
+		QObjectList *l = dialog_parent->queryList("DoublePointLed");
 
 		QObjectListIt it( *l ); // iterate over the switches
 
@@ -1260,7 +1292,7 @@ void HMI_manager::RightClicked(QString &class_name, QString &widget_name) // sho
 	}
 	if(class_name == QString("PSwitch"))
 	{
-		QObjectList *l = p->queryList("PSwitch");
+		QObjectList *l = dialog_parent->queryList("PSwitch");
 
 		QObjectListIt it( *l ); // iterate over the switches
 
@@ -1294,7 +1326,7 @@ void HMI_manager::RightClicked(QString &class_name, QString &widget_name) // sho
 	}
 	else if(class_name == QString("PSinglePointLed"))
 	{
-		QObjectList *l = p->queryList("PSinglePointLed");
+		QObjectList *l = dialog_parent->queryList("PSinglePointLed");
 
 		QObjectListIt it( *l ); // iterate over the switches
 
@@ -1330,7 +1362,7 @@ void HMI_manager::RightClicked(QString &class_name, QString &widget_name) // sho
 	}
 	else if(class_name == QString("PDoublePointLed"))
 	{
-		QObjectList *l = p->queryList("PDoublePointLed");
+		QObjectList *l = dialog_parent->queryList("PDoublePointLed");
 
 		QObjectListIt it( *l ); // iterate over the switches
 
@@ -1366,7 +1398,7 @@ void HMI_manager::RightClicked(QString &class_name, QString &widget_name) // sho
 	}
 	else if(class_name == QString("QwtThermo"))
 	{
-		QObjectList *l = p->queryList("QwtThermo");
+		QObjectList *l = dialog_parent->queryList("QwtThermo");
 
 		QObjectListIt it( *l ); // iterate over the switches
 
@@ -1400,7 +1432,7 @@ void HMI_manager::RightClicked(QString &class_name, QString &widget_name) // sho
 	}
 	else if(class_name == QString("PTank"))
 	{
-		QObjectList *l = p->queryList("PTank");
+		QObjectList *l = dialog_parent->queryList("PTank");
 
 		QObjectListIt it( *l ); // iterate over the switches
 
@@ -1434,7 +1466,7 @@ void HMI_manager::RightClicked(QString &class_name, QString &widget_name) // sho
 	}
 	else if(class_name == QString("PThermometer"))
 	{
-		QObjectList *l = p->queryList("PThermometer");
+		QObjectList *l = dialog_parent->queryList("PThermometer");
 
 		QObjectListIt it( *l ); // iterate over the switches
 
@@ -1468,7 +1500,7 @@ void HMI_manager::RightClicked(QString &class_name, QString &widget_name) // sho
 	}
 	else if(class_name == QString("PLCDNumber"))
 	{
-		QObjectList *l = p->queryList("PLCDNumber");
+		QObjectList *l = dialog_parent->queryList("PLCDNumber");
 
 		QObjectListIt it( *l ); // iterate over the switches
 
@@ -1543,6 +1575,126 @@ void HMI_manager::QueryResponse (QObject *p, const QString &c, int id, QObject*c
 			}
 		} 
 		break;
+		case tTagLimits:
+		{
+			//
+			QSTransaction &t = GetConfigureDb()->CurrentTransaction();
+
+			int n = GetConfigureDb()->GetNumberResults();
+
+			GetConfigureDb()->GotoBegin();
+			//
+			for(int i = 0; i < n ; i++, GetConfigureDb()->FetchNext())
+			{
+				QString widget_type = t.Data1;
+				QString sample_point_name = t.Data2;
+				//
+				
+				{
+					QObjectList *l = dialog_parent->queryList(widget_type);
+
+					QObjectListIt it( *l ); // iterate over the buttons
+
+					QObject *obj;
+
+					while((obj = it.current()) != 0) 
+					{
+						// for each found object...
+						++it;
+
+						QString name = obj->name();
+
+						int idx = name.find('_');
+						name.truncate(idx);
+
+						if(sample_point_name == name)
+						{
+							if(widget_type == QString("QwtThermo"))
+							{
+								double val = 0.0;
+
+								((QwtThermo*)obj)->setValue(val);
+
+								if(GetConfigureDb()->GetInt("LAENABLE"))
+								{
+									QString min = GetConfigureDb()->GetString("LOWERALARM");
+									((QwtThermo*)obj)->setMinValue(atof((const char*)min));
+								}
+								else
+								{
+									((QwtThermo*)obj)->setMinValue(-500.0);
+								}
+
+								if(GetConfigureDb()->GetInt("UAENABLE"))
+								{
+									QString max = GetConfigureDb()->GetString("UPPERALARM");
+									((QwtThermo*)obj)->setMaxValue(atof((const char*)max));
+								}
+								else
+								{
+									((QwtThermo*)obj)->setMaxValue(1000.0);
+								}
+							}
+							else if(widget_type == QString("PTank"))
+							{
+								double val = 0.0;
+
+								((PTank*)obj)->setValue(val);
+
+								if(GetConfigureDb()->GetInt("LAENABLE"))
+								{
+									QString min = GetConfigureDb()->GetString("LOWERALARM");
+									((PTank*)obj)->setMinValue(atof((const char*)min));
+								}
+								else
+								{
+									((PTank*)obj)->setMinValue(-500.0);
+								}
+
+								if(GetConfigureDb()->GetInt("UAENABLE"))
+								{
+									QString max = GetConfigureDb()->GetString("UPPERALARM");
+									((PTank*)obj)->setMaxValue(atof((const char*)max));
+								}
+								else
+								{
+									((PTank*)obj)->setMaxValue(1000.0);
+								}
+							}
+							else if(widget_type == QString("PThermometer"))
+							{
+								double val = 0.0;
+
+								((PThermometer*)obj)->setValue(val);
+
+								if(GetConfigureDb()->GetInt("LAENABLE"))
+								{
+									QString min = GetConfigureDb()->GetString("LOWERALARM");
+									((PThermometer*)obj)->setMinValue(atof((const char*)min));
+								}
+								else
+								{
+									((PThermometer*)obj)->setMinValue(-500.0);
+								}
+
+								if(GetConfigureDb()->GetInt("UAENABLE"))
+								{
+									QString max = GetConfigureDb()->GetString("UPPERALARM");
+									((PThermometer*)obj)->setMaxValue(atof((const char*)max));
+								}
+								else
+								{
+									((PThermometer*)obj)->setMaxValue(1000.0);
+								}
+							}
+						}
+					}
+
+					delete l; // delete the list, not the objects
+				}
+			}
+		}
+		break;
 		default:
 		break;
 	};
@@ -1557,7 +1709,7 @@ void HMI_manager::DoButtonCommand()
 		bool found = false;
 		QString edit_child_name;
 		
-		QObjectList *l = p->queryList( "QLineEdit" );
+		QObjectList *l = dialog_parent->queryList( "QLineEdit" );
 
 		QObjectListIt it( *l ); // iterate over the buttons
 
@@ -1586,7 +1738,7 @@ void HMI_manager::DoButtonCommand()
 		
 		if(found)
 		{
-			QLineEdit* edit = (QLineEdit *) p->child(edit_child_name, "QLineEdit");
+			QLineEdit* edit = (QLineEdit *) dialog_parent->child(edit_child_name, "QLineEdit");
 
 			if(edit)
 			{
@@ -1618,7 +1770,7 @@ void HMI_manager::Do_pSwitchCommand()
 	}
 	else
 	{
-		QObjectList *l = p->queryList("PSwitch");
+		QObjectList *l = dialog_parent->queryList("PSwitch");
 
 		QObjectListIt it( *l ); // iterate over the switches
 
@@ -1656,7 +1808,7 @@ void HMI_manager::ReceivedNotify(int ntf, const char * data)
 	{
 		case NotificationEvent::CMD_LOGOUT:
 		{
-			QObjectList *l = p->queryList( "QButton" );
+			QObjectList *l = dialog_parent->queryList( "QButton" );
 
 			QObjectListIt it( *l ); // iterate over the buttons
 
@@ -1677,7 +1829,7 @@ void HMI_manager::ReceivedNotify(int ntf, const char * data)
 		break;
 		case NotificationEvent::CMD_LOGON:
 		{
-			QObjectList *l = p->queryList( "QButton" );
+			QObjectList *l = dialog_parent->queryList( "QButton" );
 
 			QObjectListIt it( *l ); // iterate over the buttons
 

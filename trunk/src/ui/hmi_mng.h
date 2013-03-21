@@ -18,7 +18,7 @@ class HMI_manager : public QObject
     Q_OBJECT
 
 	enum {
-		tUnit = 1
+		tUnit = 1, tTagLimits
 	}; // transaction codes
 
 	QString sample_point_name;
@@ -26,7 +26,7 @@ class HMI_manager : public QObject
 
 public:
     void setParent( QDialog *parent );
-	void setInitialValues();
+	void setInitialValuesAndLimits();
 	
 public slots:
     void sendCommand();
@@ -39,5 +39,5 @@ public slots:
 	void Do_pSwitchCommand();
 	void ReceivedNotify(int, const char *);
 private:
-    QDialog *p;
+    QDialog *dialog_parent;
 };
