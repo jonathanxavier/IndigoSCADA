@@ -370,7 +370,7 @@ void Simulator::GetTagList(const QString &type, QStringList &list,const QString 
 	{
 		list << "t03" << "t05" << "t10" << "t50";
 	}
-	else if(type == TYPE_M_ME_TC_1)
+	else if(type == TYPE_M_ME_TC_1 || type == TYPE_M_ME_NB_1 || type == TYPE_M_ME_TB_1)
 	{
 		list << VALUE_TAG;
 	}
