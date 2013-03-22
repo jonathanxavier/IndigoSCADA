@@ -207,11 +207,7 @@ void Rfc1006driver_Instance::QueryResponse(QObject *p, const QString &c, int id,
 				if(strlen((const char*)t.Data1) > 0)
 				{
 					v = atof((const char*)t.Data1);
-
-                    if(GetConfigureDb()->GetString("TAG") == QString("BIT"))
-					    PostValue(SamplePointName, "BIT", v); //Post the value directly in memory database
-                    else if(GetConfigureDb()->GetString("TAG") == QString("VALUE"))
-                        PostValue(SamplePointName, "VALUE", v); //Post the value directly in memory database
+                    PostValue(SamplePointName, "VALUE", v); //Post the value directly in memory database
 				}
 
 				printf("SamplePointName = %s, IOA = %s, value = %lf\n", (const char*)SamplePointName, (const char*)t.Data2, v);

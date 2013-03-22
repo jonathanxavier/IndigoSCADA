@@ -91,11 +91,6 @@
 
 // Common tags used, capital because they became column names in database
 #define VALUE_TAG "VALUE"
-#define BIT_TAG   "BIT"
-#define WORD_TAG  "WORD"
-#define MIN_TAG "MINIMUM"
-#define MAX_TAG "MAXIMUM"
-#define STATUS_TAG "STATUS"
 //
 #define DEFAULT_TAG_VALS ",0,0,0,0,0,0,0,0,'(default)',1,0,'',''"
 #define TAG_VALS ",0,0,0,0,0,0,0,0,"
