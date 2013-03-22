@@ -206,11 +206,7 @@ void Opc_client_da_Instance::QueryResponse(QObject *p, const QString &c, int id,
 				if(strlen((const char*)t.Data1) > 0)
 				{
 					v = atof((const char*)t.Data1);
-
-                    if(GetConfigureDb()->GetString("TAG") == QString("BIT"))
-					    PostValue(SamplePointName, "BIT", v); //Post the value directly in memory database
-                    else if(GetConfigureDb()->GetString("TAG") == QString("VALUE"))
-                        PostValue(SamplePointName, "VALUE", v); //Post the value directly in memory database
+                    PostValue(SamplePointName, "VALUE", v); //Post the value directly in memory database
 				}
 			}
 		}
@@ -982,7 +978,7 @@ void Opc_client_da_Instance::get_items_form_local_fifo(void)
 		#ifdef DEPRECATED_IEC101_CONFIG
 		QString cmd = "select IKEY from PROPS where DVAL='"+ ioa + "' and SKEY='SAMPLEPROPS';";
 		#else
-		QString cmd = "select NAME, TAG from TAGS where IOA="+ ioa + " and UNIT='"+ Name + "';";
+		QString cmd = "select NAME from TAGS where IOA="+ ioa + " and UNIT='"+ Name + "';";
 		#endif
 		
 		GetConfigureDb()->DoExec(this, cmd, tGetSamplePointNamefromIOA, value, ioa);

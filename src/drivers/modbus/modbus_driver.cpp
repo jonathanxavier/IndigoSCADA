@@ -135,14 +135,7 @@ QWidget * Modbus_driver::GetSpecificConfig(QWidget *parent, const QString &spnam
 */
 void Modbus_driver::GetTagList(const QString &type, QStringList &list,const QString &,const QString &) // returns the permitted tags for a given type for this unit
 {
-	if(type == TYPE_M_ME_TC_1 || type == TYPE_M_ME_NB_1 || type == TYPE_M_ME_TB_1)
-	{
-		list << VALUE_TAG;
-	}
-	else if (type == TYPE_M_SP_NA_1 || type == TYPE_M_SP_TA_1)
-	{
-		list << BIT_TAG;
-	}
+	list << VALUE_TAG;
 };
 /*
 *Function:Command
