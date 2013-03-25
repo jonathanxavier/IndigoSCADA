@@ -114,11 +114,22 @@ ORTEPublication* global_publisher;
 //   
 //  Class constructor.   
 //   
-DNP3MasterApp::DNP3MasterApp(char* dnp3server_address, char*dnp3server_port, char* line_number, int polling_time):
+DNP3MasterApp::DNP3MasterApp(char* dnp3server_address, char*dnp3server_port, char* line_number, int polling_time,
+		int nIOA_AO,
+		int nIOA_BO,
+		int nIOA_CI,
+		int nIOA_BI,
+		int nIOA_AI):
 Connected(false), tx_var(NULL), master_p(NULL), fExit(false),pollingTime(polling_time)
 {   
 	strcpy(dnp3ServerAddress, dnp3server_address);
 	strcpy(dnp3ServerPort, dnp3server_port);
+
+	db.nIOA_AI = nIOA_AI;
+	db.nIOA_AO = nIOA_AO;
+	db.nIOA_BI = nIOA_BI;
+	db.nIOA_BO = nIOA_BO;
+	db.nIOA_CI = nIOA_CI;
 
 	if(!OpenLink(dnp3ServerAddress, atoi(dnp3ServerPort)))
 	{

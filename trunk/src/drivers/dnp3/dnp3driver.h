@@ -39,18 +39,25 @@ struct InstanceCfg // friend to anyone
 {
 	QString DNP3ServerIPAddress;  // DNP3 server IP address (slave)
 	QString DNP3ServerIPPort;  // DNP3 server TCP port
+	QString IOA_AO;
+	QString IOA_BO;
+	QString IOA_CI;
+	QString IOA_BI;
+	QString IOA_AI;
 
 	unsigned SampleTime; // sampleing time 
 
 	InstanceCfg() : 
-	SampleTime(1000),DNP3ServerIPAddress(""),DNP3ServerIPPort("")
+	SampleTime(1000),DNP3ServerIPAddress(""),DNP3ServerIPPort(""),
+		IOA_AO(""),IOA_BO(""), IOA_CI(""), IOA_BI(""), IOA_AI("")
 	{
 	};
 
 	InstanceCfg(const InstanceCfg &m) : 
 
 	SampleTime(m.SampleTime),DNP3ServerIPAddress(m.DNP3ServerIPAddress),
-	DNP3ServerIPPort(m.DNP3ServerIPPort)
+	DNP3ServerIPPort(m.DNP3ServerIPPort),
+	IOA_AO(m.IOA_AO),IOA_BO(m.IOA_BO), IOA_CI(m.IOA_CI), IOA_BI(m.IOA_BI), IOA_AI(m.IOA_AI)
 	{
 	};
 };
