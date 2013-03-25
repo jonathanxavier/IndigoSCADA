@@ -42,6 +42,11 @@ public:
 				int            initialValue=0);
     int numInits;
     int n_sent_items;
+	int nIOA_AO;
+	int nIOA_BO;
+	int nIOA_CI;
+	int nIOA_BI;
+	int nIOA_AI;
 
 	/////////////////////////////////////apa+++/////////////////////////////////////
 	void epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch_in_millisec);

@@ -75,17 +75,34 @@ int main( int argc, char **argv )
 	char dnp3ServerPort[80];
 	char line_number[80];
 	char polling_time[80];
+	char IOA_AO[80];
+	char IOA_BO[80];
+	char IOA_CI[80];
+	char IOA_BI[80];
+	char IOA_AI[80];
+
 	char fifo_monitor_direction_name[70];
 	char fifo_control_direction_name[70];
 	char OldConsoleTitle[500];
 	char NewConsoleTitle[500];
 	int c;
-	double pollingTime = 1000;
-	
+	int pollingTime = 1000;
+	int nIOA_AO = 200;
+	int nIOA_BO = 150;
+	int nIOA_CI = 100;
+	int nIOA_BI = 50;
+	int nIOA_AI = 1;
+		
 	dnp3ServerAddress[0] = '\0';
 	dnp3ServerPort[0] = '\0';
 	line_number[0] = '\0';
 	polling_time[0] = '\0';
+	IOA_AO[0] = '\0';
+	IOA_BO[0] = '\0';
+	IOA_CI[0] = '\0';
+	IOA_BI[0] = '\0';
+	IOA_AI[0] = '\0';
+
 	fifo_monitor_direction_name[0] = '\0';
 	fifo_control_direction_name[0] = '\0';
 
@@ -99,7 +116,7 @@ int main( int argc, char **argv )
 	fflush(stderr);
 	////////////////////////////////////////////////////////////////////////////////
 
-	while( ( c = getopt ( argc, argv, "a:p:l:t:?" )) != EOF ) {
+	while( ( c = getopt ( argc, argv, "a:c:d:e:f:g:p:l:t:?" )) != EOF ) {
 		switch ( c ) {
 			case 'a' :
 			strcpy(dnp3ServerAddress, optarg);
@@ -113,6 +130,22 @@ int main( int argc, char **argv )
 			case 't' :
 			strcpy(polling_time, optarg);
 			break;
+			case 'c' :
+			strcpy(IOA_AO, optarg);
+			break;
+			case 'd' :
+			strcpy(IOA_BO, optarg);
+			break;
+			case 'e' :
+			strcpy(IOA_CI, optarg);
+			break;
+			case 'f' :
+			strcpy(IOA_BI, optarg);
+			break;
+			case 'g' :
+			strcpy(IOA_AI, optarg);
+			break;
+
 			case '?' :
 			fprintf(stderr, RUNTIME_USAGE, argv[0]);
 			fflush(stderr);
@@ -154,7 +187,13 @@ int main( int argc, char **argv )
 		return EXIT_FAILURE;
 	}
 
-	pollingTime = atof(polling_time);
+	pollingTime = atoi(polling_time);
+
+	nIOA_AO = atoi(IOA_AO);
+	nIOA_BO = atoi(IOA_BO);
+	nIOA_CI = atoi(IOA_CI);
+	nIOA_BI = atoi(IOA_BI);
+	nIOA_AI = atoi(IOA_AI);
 
 	strcpy(fifo_monitor_direction_name, "fifo_monitor_direction");
 	strcpy(fifo_control_direction_name, "fifo_control_direction");
@@ -176,6 +215,21 @@ int main( int argc, char **argv )
 	strcat(NewConsoleTitle, line_number);
 	strcat(NewConsoleTitle, " polling time ");
 	strcat(NewConsoleTitle, polling_time);
+
+	strcat(NewConsoleTitle, " IOA_AO ");
+	strcat(NewConsoleTitle, IOA_AO);
+
+	strcat(NewConsoleTitle, " IOA_BO ");
+	strcat(NewConsoleTitle, IOA_BO);
+
+	strcat(NewConsoleTitle, " IOA_CI ");
+	strcat(NewConsoleTitle, IOA_CI);
+
+	strcat(NewConsoleTitle, " IOA_BI ");
+	strcat(NewConsoleTitle, IOA_BI);
+
+	strcat(NewConsoleTitle, " IOA_AI ");
+	strcat(NewConsoleTitle, IOA_AI);
 
 	if(!IsSingleInstance(NewConsoleTitle))
 	{
@@ -206,7 +260,15 @@ int main( int argc, char **argv )
 
 	DNP3MasterApp* master_app;
 
-	master_app = new DNP3MasterApp(dnp3ServerAddress, dnp3ServerPort, line_number, pollingTime);
+	master_app = new DNP3MasterApp(dnp3ServerAddress, 
+		dnp3ServerPort, 
+		line_number, 
+		pollingTime,
+		nIOA_AO,
+		nIOA_BO,
+		nIOA_CI,
+		nIOA_BI,
+		nIOA_AI);
 	
 	master_app->run();
 	

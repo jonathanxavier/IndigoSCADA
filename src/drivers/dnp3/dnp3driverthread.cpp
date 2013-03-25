@@ -45,6 +45,16 @@ void Dnp3DriverThread::run()
 	strcat(pCommandLine, line_number);
 	strcat(pCommandLine, " -t ");
 	strcat(pCommandLine, polling_time);
+	strcat(pCommandLine, " -c ");
+	strcat(pCommandLine, ((Dnp3driver_Instance*)Parent)->Cfg.IOA_AO);
+	strcat(pCommandLine, " -d ");
+	strcat(pCommandLine, ((Dnp3driver_Instance*)Parent)->Cfg.IOA_BO);
+	strcat(pCommandLine, " -e ");
+	strcat(pCommandLine, ((Dnp3driver_Instance*)Parent)->Cfg.IOA_CI);
+	strcat(pCommandLine, " -f ");
+	strcat(pCommandLine, ((Dnp3driver_Instance*)Parent)->Cfg.IOA_BI);
+	strcat(pCommandLine, " -g ");
+	strcat(pCommandLine, ((Dnp3driver_Instance*)Parent)->Cfg.IOA_AI);
 	
 	strcpy(pWorkingDir,"C:\\scada\\bin");
 		

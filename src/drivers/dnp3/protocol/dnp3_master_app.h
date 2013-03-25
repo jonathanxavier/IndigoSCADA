@@ -57,7 +57,16 @@ public:
 	///////////////////////////////////Middleware///////////
 	bool fExit;
 public: 
-	DNP3MasterApp(char* dnp3server_address, char*dnp3server_port, char* line_number, int polling_time);
+	DNP3MasterApp(char* dnp3server_address, 
+		char*dnp3server_port, 
+		char* line_number, 
+		int polling_time,
+		int nIOA_AO,
+		int nIOA_BO,
+		int nIOA_CI,
+		int nIOA_BI,
+		int nIOA_AI);
+
 	~DNP3MasterApp(void); 
 	 
 	int OpenLink(char *serverIP,int port = 20000); 
