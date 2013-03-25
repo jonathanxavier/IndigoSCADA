@@ -76,77 +76,107 @@ void CustomDb::changePoint(   DnpAddr_t      addr,
 	{
 		case EventInterface::AI:
 		{
-			printf("AI\n");
+			if(grp == 32 && var == 1)
+			{
+				printf("AI\n");
+				//IT_COMMENT("AI\n");
+				//IT_COMMENT1("addr = %d\n", addr);
+				//IT_COMMENT1("index = %d\n", index);
 
-			//Index on RTU starts from 0, while IOA on control center starts from 1
-			item_to_send.iec_obj.ioa = index + 1 + OFFSET_AI;
+				//Index on RTU starts from 0, while IOA on control center starts from 1
+				item_to_send.iec_obj.ioa = index + OFFSET_AI;
 
-			printf("ioa = %d\n", item_to_send.iec_obj.ioa);
+				printf("ioa = %d\n", item_to_send.iec_obj.ioa);
+				//IT_COMMENT1("ioa = %d\n", item_to_send.iec_obj.ioa);
 
-			item_to_send.iec_type = M_ME_TF_1;
+				item_to_send.iec_type = M_ME_TF_1;
 
-			//DNP time (DnpTime_t) is a six byte unsigned int representing the number of milli-seconds
-			// since midnight UTC Jan 1, 1970 (does not include leap seconds)
-			
-			epoch_to_cp56time2a(&time, timestamp);
-			item_to_send.iec_obj.o.type36.mv = value;
+				//DNP time (DnpTime_t) is a six byte unsigned int representing the number of milli-seconds
+				// since midnight UTC Jan 1, 1970 (does not include leap seconds)
+				
+				epoch_to_cp56time2a(&time, timestamp);
+				item_to_send.iec_obj.o.type36.mv = value;
 
-			printf("value = %f\n", value);
-			
-			item_to_send.iec_obj.o.type36.time = time;
+				printf("value = %f\n", value);
+				//IT_COMMENT1("value = %f\n", value);
+				
+				item_to_send.iec_obj.o.type36.time = time;
 
-			if((flag & QUALITY_ONLINE) != QUALITY_ONLINE)
-				item_to_send.iec_obj.o.type36.iv = 1;
+				if((flag & QUALITY_ONLINE) != QUALITY_ONLINE)
+					item_to_send.iec_obj.o.type36.iv = 1;
+			}
 		}
 		break;
 		case EventInterface::BI:
 		{
 			printf("BI\n");
+			//IT_COMMENT("BI\n");
 
-			//Index on RTU starts from 0, while IOA on control center starts from 1
-			item_to_send.iec_obj.ioa = index + 1 + OFFSET_BI;
-			
-			printf("ioa = %d\n", item_to_send.iec_obj.ioa);
+			if(grp == 1 && var == 1)
+			{
+				//Index on RTU starts from 0, while IOA on control center starts from 1
+				item_to_send.iec_obj.ioa = index + OFFSET_BI;
+				
+				printf("ioa = %d\n", item_to_send.iec_obj.ioa);
 
-			item_to_send.iec_type = M_SP_TB_1;
-			epoch_to_cp56time2a(&time, timestamp);
-			item_to_send.iec_obj.o.type30.sp = value;
-			item_to_send.iec_obj.o.type30.time = time;
+				//IT_COMMENT1("ioa = %d\n", item_to_send.iec_obj.ioa);
 
-			printf("value = %f\n", value);
+				item_to_send.iec_type = M_SP_TB_1;
+				epoch_to_cp56time2a(&time, timestamp);
 
-			if((flag & QUALITY_ONLINE) != QUALITY_ONLINE)
-				item_to_send.iec_obj.o.type30.iv = 1;
+				if(value > 0.0)
+					item_to_send.iec_obj.o.type30.sp = 1;
+				else
+					item_to_send.iec_obj.o.type30.sp = 0;
+
+				item_to_send.iec_obj.o.type30.time = time;
+
+				printf("value = %f\n", value);
+
+				//IT_COMMENT1("item_to_send.iec_obj.o.type30.sp = %d\n", item_to_send.iec_obj.o.type30.sp);
+				
+				if((flag & QUALITY_ONLINE) != QUALITY_ONLINE)
+					item_to_send.iec_obj.o.type30.iv = 1;
+			}
 		}
 		break;
 		case EventInterface::CI:
 		{
-			printf("CI\n");
+			if(grp == 20 && var == 5)
+			{
+				printf("CI\n");
+				//IT_COMMENT("CI\n");
 
-			//Index on RTU starts from 0, while IOA on control center starts from 1
-			item_to_send.iec_obj.ioa = index + 1 + OFFSET_CI;
+				//Index on RTU starts from 0, while IOA on control center starts from 1
+				item_to_send.iec_obj.ioa = index + OFFSET_CI;
 
-			printf("ioa = %d\n", item_to_send.iec_obj.ioa);
+				printf("ioa = %d\n", item_to_send.iec_obj.ioa);
 
-			item_to_send.iec_type = M_IT_TB_1;
-			epoch_to_cp56time2a(&time, timestamp);
-			item_to_send.iec_obj.o.type37.counter = value;
-			item_to_send.iec_obj.o.type37.time = time;
-				
-			printf("value = %f\n", value);
+				//IT_COMMENT1("ioa = %d\n", item_to_send.iec_obj.ioa);
 
-			if((flag & QUALITY_ONLINE) != QUALITY_ONLINE)
-				item_to_send.iec_obj.o.type37.iv = 1;
+				item_to_send.iec_type = M_IT_TB_1;
+				epoch_to_cp56time2a(&time, timestamp);
+				item_to_send.iec_obj.o.type37.counter = value;
+				item_to_send.iec_obj.o.type37.time = time;
+					
+				printf("value = %f\n", value);
+				//IT_COMMENT1("value = %f\n", value);
+
+				if((flag & QUALITY_ONLINE) != QUALITY_ONLINE)
+					item_to_send.iec_obj.o.type37.iv = 1;
+			}
 		}
 		break;
 		case EventInterface::AO:
 		{
 			printf("AO\n");
+			//IT_COMMENT("AO\n");
 
 			//Index on RTU starts from 0, while IOA on control center starts from 1
-			item_to_send.iec_obj.ioa = index + 1 + OFFSET_AO;
+			item_to_send.iec_obj.ioa = index + OFFSET_AO;
 
 			printf("ioa = %d\n", item_to_send.iec_obj.ioa);
+			//IT_COMMENT1("ioa = %d\n", item_to_send.iec_obj.ioa);
 
 			item_to_send.iec_type = M_ME_TF_1;
 			epoch_to_cp56time2a(&time, timestamp);
@@ -154,6 +184,7 @@ void CustomDb::changePoint(   DnpAddr_t      addr,
 			item_to_send.iec_obj.o.type36.time = time;
 
 			printf("value = %f\n", value);
+			//IT_COMMENT1("value = %f\n", value);
 
 			if((flag & QUALITY_ONLINE) != QUALITY_ONLINE)
 				item_to_send.iec_obj.o.type36.iv = 1;
@@ -161,22 +192,28 @@ void CustomDb::changePoint(   DnpAddr_t      addr,
 		break;
 		case EventInterface::BO:
 		{
-			printf("BO\n");
+			if(grp == 10 && var == 2)
+			{
+				printf("BO\n");
+				//IT_COMMENT("BO");
 
-			//Index on RTU starts from 0, while IOA on control center starts from 1
-			item_to_send.iec_obj.ioa = index + 1 + OFFSET_BO;
+				//Index on RTU starts from 0, while IOA on control center starts from 1
+				item_to_send.iec_obj.ioa = index + OFFSET_BO;
 
-			printf("ioa = %d\n", item_to_send.iec_obj.ioa);
+				printf("ioa = %d\n", item_to_send.iec_obj.ioa);
+				//IT_COMMENT1("ioa = %d\n", item_to_send.iec_obj.ioa);
 
-			item_to_send.iec_type = M_SP_TB_1;
-			epoch_to_cp56time2a(&time, timestamp);
-			item_to_send.iec_obj.o.type30.sp = value;
-			item_to_send.iec_obj.o.type30.time = time;
+				item_to_send.iec_type = M_SP_TB_1;
+				epoch_to_cp56time2a(&time, timestamp);
+				item_to_send.iec_obj.o.type30.sp = value;
+				item_to_send.iec_obj.o.type30.time = time;
 
-			printf("value = %f\n", value);
+				printf("value = %f\n", value);
+				//IT_COMMENT1("value = %f\n", value);
 
-			if((flag & QUALITY_ONLINE) != QUALITY_ONLINE)
-				item_to_send.iec_obj.o.type30.iv = 1;
+				if((flag & QUALITY_ONLINE) != QUALITY_ONLINE)
+					item_to_send.iec_obj.o.type30.iv = 1;
+			}
 		}
 		break;
 		case EventInterface::NONE:
