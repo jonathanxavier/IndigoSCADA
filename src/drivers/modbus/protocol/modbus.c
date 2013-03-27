@@ -183,8 +183,9 @@ static int send_msg(modbus_t *ctx, uint8_t *msg, int msg_length)
                 int saved_errno = errno;
 
                 if ((errno == EBADF || errno == ECONNRESET || errno == EPIPE)) {
-                    modbus_close(ctx);
-                    modbus_connect(ctx);
+                    modbus_close(ctx); 
+                    //modbus_connect(ctx); //apa commented out
+					return -1; //apa+++ 27-03-2013
 				}
 				#ifdef WIN32
 				else if (errno = 10060)
@@ -193,7 +194,8 @@ static int send_msg(modbus_t *ctx, uint8_t *msg, int msg_length)
 					properly respond after a period of time, or established connection 
 					failed because connected */
 					modbus_close(ctx);
-					exit(1);
+					//exit(1); //apa commented out
+					return -1; //apa+++ 27-03-2013
                 } 
 				#endif
 				else 
@@ -389,7 +391,8 @@ static int receive_msg(modbus_t *ctx, uint8_t *msg, msg_type_t msg_type)
                     _sleep_and_flush(ctx);
                 } else if (errno == EBADF) {
                     modbus_close(ctx);
-                    modbus_connect(ctx);
+                    //modbus_connect(ctx);  //apa commented out
+					return -1; //apa+++ 27-03-2013
                 }
                 errno = saved_errno;
             }
@@ -409,7 +412,8 @@ static int receive_msg(modbus_t *ctx, uint8_t *msg, msg_type_t msg_type)
                  errno == EBADF)) {
                 int saved_errno = errno;
                 modbus_close(ctx);
-                modbus_connect(ctx);
+                //modbus_connect(ctx);  //apa commented out
+				return -1; //apa+++ 27-03-2013
                 /* Could be removed by previous calls */
                 errno = saved_errno;
             }

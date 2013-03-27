@@ -238,7 +238,7 @@ void Modbus_driver_Instance::QueryResponse(QObject *p, const QString &c, int id,
 			if(GetConfigureDb()->GetNumberResults() > 0)
 			{
 				// 
-				#ifdef DEPRECATED_OPC_CLIENT_DA_CONFIG
+				#ifdef DEPRECATED_MODBUS_MASTER_CONFIG
 				QString IOACommand = UndoEscapeSQLText(GetConfigureDb()->GetString("DVAL"));
 				#else
 				int IOACommand = GetConfigureDb()->GetInt("IOA");
@@ -478,7 +478,7 @@ void Modbus_driver_Instance::get_items_form_local_fifo(void)
 		p_item = (struct iec_item*)buf;
 			
 		//printf("Receiving %d th message \n", p_item->msg_id);
-		printf("Receiving %d th opc da message from line = %d\n", p_item->msg_id, instanceID + 1);
+		printf("Receiving %d th modbus message from line = %d\n", p_item->msg_id, instanceID + 1);
 
 		//for (int j = 0; j < len; j++) 
 		//{ 
