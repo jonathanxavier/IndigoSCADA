@@ -253,7 +253,7 @@ int modbus_imp::PollServer(void)
 	nb_points = MAX_BITS_IN_MEMORY_BLOCK;
 	tab_rp_bits = (uint8_t *) malloc(nb_points * sizeof(uint8_t));
 
-	memset(tab_rp_bits, 0, nb_points * sizeof(uint8_t));
+	memset(tab_rp_bits, 0x00, nb_points * sizeof(uint8_t));
 
 	#define MAX_REGISTERS_IN_MEMORY_BLOCK 30
 
@@ -262,7 +262,7 @@ int modbus_imp::PollServer(void)
 
 	tab_rp_registers = (uint16_t *) malloc(nb_points * sizeof(uint16_t));
 
-	memset(tab_rp_registers, 0, nb_points * sizeof(uint16_t));
+	memset(tab_rp_registers, 0x00, nb_points * sizeof(uint16_t));
 
 	////////////General interrogation condition//////////////
 	general_interrogation = true;
@@ -274,10 +274,7 @@ int modbus_imp::PollServer(void)
 		rc = PollItems();
 
 		loops++;
-		if(loops == 2)
-		{
-			general_interrogation = false;
-		}
+		general_interrogation = false;
 	
 		if(rc)
 		{ 
@@ -329,7 +326,7 @@ int modbus_imp::PollServer(void)
 			break;
 		}
 
-		#define USE_KEEP_ALIVE_WATCH_DOG
+		//#define USE_KEEP_ALIVE_WATCH_DOG
 
 		#ifdef USE_KEEP_ALIVE_WATCH_DOG
 		gl_timeout_connection_with_parent++;
@@ -771,7 +768,7 @@ int modbus_imp::PollItems(void)
 		{
 			printf("Function not supported\n");
 		}
-
+		
 		if(send_item || general_interrogation)
 		{
 			item_to_send.msg_id = n_msg_sent;
@@ -1434,7 +1431,7 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 
 			////////////General interrogation condition//////////////
 			general_interrogation = true;
-			loops = 0;
+			//loops = 0;
 			//////////////////////////////////////////////////////////
 		}
 	}
