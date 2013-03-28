@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>429</width>
-            <height>616</height>
+            <height>619</height>
         </rect>
     </property>
     <property name="caption">
@@ -271,35 +271,6 @@
             <string>Name</string>
         </property>
     </widget>
-    <widget class="QLineEdit">
-        <property name="name">
-            <cstring>ServerID</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>170</x>
-                <y>150</y>
-                <width>200</width>
-                <height>20</height>
-            </rect>
-        </property>
-    </widget>
-    <widget class="QSpinBox">
-        <property name="name">
-            <cstring>IOA_AI</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>170</x>
-                <y>270</y>
-                <width>200</width>
-                <height>20</height>
-            </rect>
-        </property>
-        <property name="maxValue">
-            <number>1000</number>
-        </property>
-    </widget>
     <widget class="QSpinBox">
         <property name="name">
             <cstring>IOA_BI</cstring>
@@ -410,6 +381,38 @@
         </property>
         <property name="text">
             <string>First IOA for AI</string>
+        </property>
+    </widget>
+    <widget class="QSpinBox">
+        <property name="name">
+            <cstring>IOA_AI</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>170</x>
+                <y>270</y>
+                <width>200</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property name="maxValue">
+            <number>1000</number>
+        </property>
+    </widget>
+    <widget class="QSpinBox">
+        <property name="name">
+            <cstring>ServerID</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>170</x>
+                <y>150</y>
+                <width>200</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property name="maxValue">
+            <number>1000</number>
         </property>
     </widget>
 </widget>

@@ -673,12 +673,12 @@ void Opc_client_da_Instance::Tick()
 		break;
 		case STATE_FAIL:
 		{
-			get_items_form_local_fifo();
+			get_items_from_local_fifo();
 		}
 		break;
 		case STATE_RUNNING:
 		{
-			get_items_form_local_fifo();
+			get_items_from_local_fifo();
 		}
 		break;
 		default:
@@ -687,7 +687,7 @@ void Opc_client_da_Instance::Tick()
 }
 
 
-void Opc_client_da_Instance::get_items_form_local_fifo(void)
+void Opc_client_da_Instance::get_items_from_local_fifo(void)
 {
 	unsigned char buf[sizeof(struct iec_item)];
 	int len;

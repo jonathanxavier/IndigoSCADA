@@ -85,11 +85,11 @@ class DNP_3_DRIVERDRV Dnp3driver_Instance : public DriverInstance
 	enum // states for the state machine
 	{
 		STATE_IDLE = 0,
-		STATE_READ,
-		STATE_WRITE,
 		STATE_RESET,
+		STATE_ASK_GENERAL_INTERROGATION,
+		STATE_GENERAL_INTERROGATION_DONE,
 		STATE_FAIL,
-		STATE_DONE
+		STATE_RUNNING
 	};
 
 	public:
@@ -230,8 +230,10 @@ class DNP_3_DRIVERDRV Dnp3driver_Instance : public DriverInstance
 	void removeTransaction();
 	//////Middleware//////////////////////////////////////
 	void get_utc_host_time(struct cp56time2a* time);
-	void get_items(struct iec_item* p_item);
 	////////////////////////////////////////////////
+	////////////////local fifo////////////////////////////
+	void get_items_from_local_fifo(void);
+	//////////////////////////////////////////////////////
     //
 	public slots:
 	//

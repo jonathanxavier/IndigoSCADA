@@ -114,13 +114,20 @@ ORTEPublication* global_publisher;
 //   
 //  Class constructor.   
 //   
-DNP3MasterApp::DNP3MasterApp(char* dnp3server_address, char*dnp3server_port, char* line_number, int polling_time,
+DNP3MasterApp::DNP3MasterApp(
+		char* dnp3server_address, 
+		char*dnp3server_port, 
+		char* line_number,
+		int server_id,
+		int polling_time,
 		int nIOA_AO,
 		int nIOA_BO,
 		int nIOA_CI,
 		int nIOA_BI,
 		int nIOA_AI):
-Connected(false), tx_var(NULL), master_p(NULL), fExit(false),pollingTime(polling_time)
+Connected(false), tx_var(NULL), master_p(NULL), 
+fExit(false),pollingTime(polling_time), serverID(server_id), 
+lineNumber(atoi(line_number))
 {   
 	strcpy(dnp3ServerAddress, dnp3server_address);
 	strcpy(dnp3ServerPort, dnp3server_port);
@@ -130,86 +137,92 @@ Connected(false), tx_var(NULL), master_p(NULL), fExit(false),pollingTime(polling
 	db.nIOA_BI = nIOA_BI;
 	db.nIOA_BO = nIOA_BO;
 	db.nIOA_CI = nIOA_CI;
+	
+	/////////////////////Middleware/////////////////////////////////////////////////////////////////
+	received_command_callback = 0;
 
-	if(!OpenLink(dnp3ServerAddress, atoi(dnp3ServerPort)))
+	int32_t                 strength = 1;
+	NtpTime                 persistence, deadline, minimumSeparation, delay;
+	IPAddress				smIPAddress = IPADDRESS_INVALID;
+	
+	subscriber = NULL;
+
+	ORTEInit();
+	ORTEDomainPropDefaultGet(&dp);
+	NTPTIME_BUILD(minimumSeparation,0); 
+	NTPTIME_BUILD(delay,1); //1s
+
+	//initiate event system
+	ORTEDomainInitEvents(&events);
+
+	events.onRegFail = onRegFail;
+
+	//Create application     
+	domain = ORTEDomainAppCreate(ORTE_DEFAULT_DOMAIN,&dp,&events,ORTE_FALSE);
+
+	iec_item_type_type_register(domain);
+
+	//Create publisher
+	NTPTIME_BUILD(persistence,5);
+
+	char fifo_monitor_name[150];
+	strcpy(fifo_monitor_name,"fifo_monitor_direction");
+	strcat(fifo_monitor_name, line_number);
+	strcat(fifo_monitor_name, "dnp3");
+
+	publisher = ORTEPublicationCreate(
+	domain,
+	fifo_monitor_name,
+	"iec_item_type",
+	&instanceSend,
+	&persistence,
+	strength,
+	NULL,
+	NULL,
+	NULL);
+
+	//if(publisher == NULL){} //check this error
+	
+	char fifo_control_name[150];
+	strcpy(fifo_control_name,"fifo_control_direction");
+	strcat(fifo_control_name, line_number);
+	strcat(fifo_control_name, "dnp3");
+
+	//Create subscriber
+	NTPTIME_BUILD(deadline,3);
+
+	subscriber = ORTESubscriptionCreate(
+	domain,
+	IMMEDIATE,
+	BEST_EFFORTS,
+	fifo_control_name,
+	"iec_item_type",
+	&instanceRecv,
+	&deadline,
+	&minimumSeparation,
+	recvCallBack,
+	this,
+	smIPAddress);
+
+	//if(subscriber == NULL){} //check this error
+	///////////////////////////////////Middleware//////////////////////////////////////////////////
+
+	if(OpenLink(dnp3ServerAddress, atoi(dnp3ServerPort)))
 	{
-		/////////////////////Middleware/////////////////////////////////////////////////////////////////
-		received_command_callback = 0;
-
-		int32_t                 strength = 1;
-		NtpTime                 persistence, deadline, minimumSeparation, delay;
-		IPAddress				smIPAddress = IPADDRESS_INVALID;
-		
-		subscriber = NULL;
-
-		ORTEInit();
-		ORTEDomainPropDefaultGet(&dp);
-		NTPTIME_BUILD(minimumSeparation,0); 
-		NTPTIME_BUILD(delay,1); //1s
-
-		//initiate event system
-		ORTEDomainInitEvents(&events);
-
-		events.onRegFail = onRegFail;
-
-		//Create application     
-		domain = ORTEDomainAppCreate(ORTE_DEFAULT_DOMAIN,&dp,&events,ORTE_FALSE);
-
-		iec_item_type_type_register(domain);
-
-		//Create publisher
-		NTPTIME_BUILD(persistence,5);
-
-		char fifo_monitor_name[150];
-		strcpy(fifo_monitor_name,"fifo_monitor_direction");
-		strcat(fifo_monitor_name, line_number);
-		strcat(fifo_monitor_name, "dnp3");
-
-		publisher = ORTEPublicationCreate(
-		domain,
-		fifo_monitor_name,
-		"iec_item_type",
-		&instanceSend,
-		&persistence,
-		strength,
-		NULL,
-		NULL,
-		NULL);
-
-		//if(publisher == NULL){} //check this error
-		
-		char fifo_control_name[150];
-		strcpy(fifo_control_name,"fifo_control_direction");
-		strcat(fifo_control_name, line_number);
-		strcat(fifo_control_name, "dnp3");
-
-		//Create subscriber
-		NTPTIME_BUILD(deadline,3);
-
-		subscriber = ORTESubscriptionCreate(
-		domain,
-		IMMEDIATE,
-		BEST_EFFORTS,
-		fifo_control_name,
-		"iec_item_type",
-		&instanceRecv,
-		&deadline,
-		&minimumSeparation,
-		recvCallBack,
-		this,
-		smIPAddress);
-
-		//if(subscriber == NULL){} //check this error
-		///////////////////////////////////Middleware//////////////////////////////////////////////////
+		Connected = false;
+	}
+	else
+	{
+		Connected = true;
 
 		debugLevel = 1;
 		integrityPollInterval = 10;
-		masterConfig.addr = 1;
+		masterConfig.addr = lineNumber;
 		masterConfig.consecutiveTimeoutsForCommsFail = 3;
 		masterConfig.integrityPollInterval_p = &integrityPollInterval;
 		masterConfig.debugLevel_p = &debugLevel;
 
-		stationConfig.addr = 1;
+		stationConfig.addr = serverID;
 		stationConfig.debugLevel_p = &debugLevel;
 
 		datalinkConfig.addr                  = masterConfig.addr;
@@ -226,9 +239,7 @@ Connected(false), tx_var(NULL), master_p(NULL), fExit(false),pollingTime(polling
 		global_instanceSend = &instanceSend;
 		global_publisher = publisher;
 		////////////////////////////////////////////////
-
 		master_p = new Master(masterConfig, datalinkConfig, &stationConfig, 1, &db, &timer);
-
 	}
 }   
 //   
@@ -290,18 +301,17 @@ int DNP3MasterApp::OpenLink(char *serverIP, int port)
 
 			return ENOENT;   
 		}   
-	#ifdef _DEBUG   
-		sprintf(LastError, "The Winsock dll found! - The status: %s.\n", wsaData.szSystemStatus);
-		fprintf(stderr, "%s\n", LastError);
-		fflush(stderr);
-    
-	#endif   
+	//#ifdef _DEBUG   
+	//	sprintf(LastError, "The Winsock dll found! - The status: %s.\n", wsaData.szSystemStatus);
+	//	fprintf(stderr, "%s\n", LastError);
+	//	fflush(stderr);
+    //#endif   
 		sprintf(this->RemoteHost, serverIP);
 
 		this->RemotePort = port;
 		
-		fprintf(stderr, "remote port %d\n", this->RemotePort);
-		fflush(stderr);
+		//fprintf(stderr, "remote port %d\n", this->RemotePort);
+		//fflush(stderr);
 
 		// init socket   
 		// Create the socket as an IPv4 (AF_INET)
@@ -419,7 +429,7 @@ void DNP3MasterApp::check_for_commands(struct iec_item *queued_item)
 			fprintf(stderr,"Receiving command for hClient %d, ioa %d\n", hClient, queued_item->iec_obj.ioa);
 			fflush(stderr);
 			
-			//TODO: implement OPC AE write operation
+			//TODO: implement command execution
 			
 		}
 		else if(queued_item->iec_type == C_EX_IT_1)
@@ -431,6 +441,32 @@ void DNP3MasterApp::check_for_commands(struct iec_item *queued_item)
 		else if(queued_item->iec_type == C_IC_NA_1)
 		{
 			//Do General Interrogation
+
+			/////////////General interrogation//////////////////////////////////////////
+			/*
+			if(master_p != NULL)
+			{
+				master_p->poll(Master::INTEGRITY);
+
+				char data_p[80];
+				int n_read;
+
+				n_read = tx_var->read(getSocket(), data_p, 1, 80, 15);
+
+				if(n_read > 0)
+				{
+					// put the char data into a Bytes container
+					Bytes bytes((unsigned char*)data_p, (unsigned char*)data_p + n_read);
+
+					master_p->rxData(&bytes, 0);
+				}
+				else
+				{
+					//error
+				}
+			}
+			*/
+			/////////////////////////////////////////////////////////////////////////////
 		}
 	}
 
@@ -449,34 +485,15 @@ void DNP3MasterApp::free_command_resources(void)
 
 int DNP3MasterApp::run(void)
 {
-	if(GetSockConnectStatus())
-	{  
-		master_p->poll(Master::INTEGRITY);
+	while(true)
+	{
+		if(GetSockConnectStatus())
+		{  
+			/////////////General interrogation//////////////////////////////////////////
+			master_p->poll(Master::INTEGRITY);
 
-		char data_p[80];
-		int n_read;
-
-		n_read = tx_var->read(getSocket(), data_p, 1, 80, 15);
-
-		if(n_read > 0)
-		{
-			// put the char data into a Bytes container
-			Bytes bytes((unsigned char*)data_p, (unsigned char*)data_p + n_read);
-
-			master_p->rxData(&bytes, 0);
-		}
-		else	
-		{
-			fExit = true;
-			return 1;
-		}
-
-
-		//master_p->poll(Master::EVENT);
-
-		for(;;)   
-		{   
-			master_p->startNewTransaction();
+			char data_p[80];
+			int n_read;
 
 			n_read = tx_var->read(getSocket(), data_p, 1, 80, 15);
 
@@ -489,31 +506,158 @@ int DNP3MasterApp::run(void)
 			}
 			else
 			{
-				break; //exit loop
+				//error
 			}
+			/////////////////////////////////////////////////////////////////////////////
 
-			#define USE_KEEP_ALIVE_WATCH_DOG
+			//master_p->poll(Master::EVENT);
 
-			#ifdef USE_KEEP_ALIVE_WATCH_DOG
-			gl_timeout_connection_with_parent++;
+			for(;;)   
+			{   
+				master_p->startNewTransaction();
 
-			if(gl_timeout_connection_with_parent > 1000*20/pollingTime)
-			{
-				break; //exit loop for timeout of connection with parent
-			}
-			#endif
+				n_read = tx_var->read(getSocket(), data_p, 1, 80, 15);
 
-			Sleep((unsigned long)pollingTime);
+				if(n_read > 0)
+				{
+					// put the char data into a Bytes container
+					Bytes bytes((unsigned char*)data_p, (unsigned char*)data_p + n_read);
+
+					master_p->rxData(&bytes, 0);
+				}
+				else
+				{
+					fprintf(stderr,"dnp3 on line %d exiting...., due to lack of connection with server\n", lineNumber);
+					fflush(stderr);
+
+					//IT_COMMENT("modbus_imp exiting...., due to lack of connection with server");
+					
+					//Send LOST message to parent (monitor.exe)
+					struct iec_item item_to_send;
+					struct cp56time2a actual_time;
+					get_utc_host_time(&actual_time);
+
+					memset(&item_to_send,0x00, sizeof(struct iec_item));
+
+					item_to_send.iec_obj.ioa = 0;
+
+					item_to_send.cause = 0x03;
+					item_to_send.iec_type = C_LO_ST_1;
+					item_to_send.iec_obj.o.type30.sp = 0;
+					item_to_send.iec_obj.o.type30.time = actual_time;
+					item_to_send.iec_obj.o.type30.iv = 0;
+					item_to_send.msg_id = 0;
+					item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
+
+					//Send in monitor direction
+					//prepare published data
+					memset(&instanceSend,0x00, sizeof(iec_item_type));
+
+					instanceSend.iec_type = item_to_send.iec_type;
+					memcpy(&(instanceSend.iec_obj), &(item_to_send.iec_obj), sizeof(struct iec_object));
+					instanceSend.cause = item_to_send.cause;
+					instanceSend.msg_id = item_to_send.msg_id;
+					instanceSend.ioa_control_center = item_to_send.ioa_control_center;
+					instanceSend.casdu = item_to_send.casdu;
+					instanceSend.is_neg = item_to_send.is_neg;
+					instanceSend.checksum = item_to_send.checksum;
+
+					ORTEPublicationSend(publisher);
+
+					CloseLink();
+			
+					if(tx_var)
+					{
+						delete tx_var;
+						tx_var = NULL;
+					}
+
+					if(master_p)
+					{
+						delete master_p;
+						master_p = NULL;
+					}
+
+					break; //exit inner loop
+				}
+
+				//#define USE_KEEP_ALIVE_WATCH_DOG
+
+				#ifdef USE_KEEP_ALIVE_WATCH_DOG
+				gl_timeout_connection_with_parent++;
+
+				if(gl_timeout_connection_with_parent > 1000*20/pollingTime)
+				{
+					break; //exit loop for timeout of connection with parent
+				}
+				#endif
+
+				Sleep((unsigned long)pollingTime);
+			}   
 		}   
+		else   
+		{   
+			if(OpenLink(dnp3ServerAddress, atoi(dnp3ServerPort)))
+			{
+				Connected = false;
+			}
+			else
+			{
+				Connected = true;
 
-		Sleep(1000);   
-		//CloseLink();   
-		fExit = true;
-	}   
-	else   
-	{   
-		fExit = true;
+				debugLevel = 1;
+				integrityPollInterval = 10;
+				masterConfig.addr = lineNumber;
+				masterConfig.consecutiveTimeoutsForCommsFail = 3;
+				masterConfig.integrityPollInterval_p = &integrityPollInterval;
+				masterConfig.debugLevel_p = &debugLevel;
+
+				stationConfig.addr = serverID;
+				stationConfig.debugLevel_p = &debugLevel;
+
+				datalinkConfig.addr                  = masterConfig.addr;
+				datalinkConfig.isMaster              = 1;
+				datalinkConfig.keepAliveInterval_ms  = 10000;
+
+				tx_var = new CustomInter(&debugLevel, 'M', 'S', getSocket());
+
+				datalinkConfig.tx_p                  = tx_var;
+				datalinkConfig.debugLevel_p          = &debugLevel;
+
+				////////////remove ASAP/////////////////////////
+				//Pass instanceSend and publisher as parameters to Factory calls through Master class
+				global_instanceSend = &instanceSend;
+				global_publisher = publisher;
+				////////////////////////////////////////////////
+				master_p = new Master(masterConfig, datalinkConfig, &stationConfig, 1, &db, &timer);
+			}
+		}
 	}
 
 	return 0;
+}
+
+
+#include <time.h>
+#include <sys/timeb.h>
+
+void DNP3MasterApp::get_utc_host_time(struct cp56time2a* time)
+{
+	struct timeb tb;
+	struct tm	*ptm;
+
+    ftime (&tb);
+	ptm = gmtime(&tb.time);
+		
+	time->hour = ptm->tm_hour;					//<0..23>
+	time->min = ptm->tm_min;					//<0..59>
+	time->msec = ptm->tm_sec*1000 + tb.millitm; //<0..59999>
+	time->mday = ptm->tm_mday; //<1..31>
+	time->wday = (ptm->tm_wday == 0) ? ptm->tm_wday + 7 : ptm->tm_wday; //<1..7>
+	time->month = ptm->tm_mon + 1; //<1..12>
+	time->year = ptm->tm_year - 100; //<0..99>
+	time->iv = 0; //<0..1> Invalid: <0> is valid, <1> is invalid
+	time->su = (u_char)tb.dstflag; //<0..1> SUmmer time: <0> is standard time, <1> is summer time
+
+    return;
 }

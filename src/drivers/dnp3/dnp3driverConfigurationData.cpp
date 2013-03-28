@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Form implementation generated from reading ui file 'dnp3_driver_configuration.ui'
 **
-** Created: Mon Mar 25 23:22:39 2013
+** Created: Thu Mar 28 15:22:18 2013
 **      by: The User Interface Compiler ($Id: qt/main.cpp   3.2.1   edited May 19 14:22 $)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -86,13 +86,6 @@ Dnp3driverConfigurationData::Dnp3driverConfigurationData( QWidget* parent, const
     textLabel1 = new QLabel( this, "textLabel1" );
     textLabel1->setGeometry( QRect( 40, 110, 49, 20 ) );
 
-    ServerID = new QLineEdit( this, "ServerID" );
-    ServerID->setGeometry( QRect( 170, 150, 200, 20 ) );
-
-    IOA_AI = new QSpinBox( this, "IOA_AI" );
-    IOA_AI->setGeometry( QRect( 170, 270, 200, 20 ) );
-    IOA_AI->setMaxValue( 1000 );
-
     IOA_BI = new QSpinBox( this, "IOA_BI" );
     IOA_BI->setGeometry( QRect( 170, 310, 200, 20 ) );
     IOA_BI->setMaxValue( 1000 );
@@ -115,8 +108,16 @@ Dnp3driverConfigurationData::Dnp3driverConfigurationData( QWidget* parent, const
 
     textLabel8 = new QLabel( this, "textLabel8" );
     textLabel8->setGeometry( QRect( 29, 270, 90, 20 ) );
+
+    IOA_AI = new QSpinBox( this, "IOA_AI" );
+    IOA_AI->setGeometry( QRect( 170, 270, 200, 20 ) );
+    IOA_AI->setMaxValue( 1000 );
+
+    ServerID = new QSpinBox( this, "ServerID" );
+    ServerID->setGeometry( QRect( 170, 150, 200, 20 ) );
+    ServerID->setMaxValue( 1000 );
     languageChange();
-    resize( QSize(429, 616).expandedTo(minimumSizeHint()) );
+    resize( QSize(429, 619).expandedTo(minimumSizeHint()) );
     clearWState( WState_Polished );
 
     // signals and slots connections

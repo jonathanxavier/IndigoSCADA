@@ -231,7 +231,7 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 	void get_utc_host_time(struct cp56time2a* time);
 	//////////////////////////////////////////////////////
 	////////////////local fifo////////////////////////////
-	void get_items_form_local_fifo(void);
+	void get_items_from_local_fifo(void);
 	//////////////////////////////////////////////////////
 	public slots:
 	//

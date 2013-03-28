@@ -45,6 +45,8 @@ public:
 	Datalink::DatalinkConfig      datalinkConfig;
 	Station::StationConfig        stationConfig;
 	CustomInter* tx_var;
+	int lineNumber;
+	int serverID;
 	/////////////////////Middleware/////////////////////////
 	int received_command_callback;
 	ORTEDomain              *domain;
@@ -57,9 +59,11 @@ public:
 	///////////////////////////////////Middleware///////////
 	bool fExit;
 public: 
-	DNP3MasterApp(char* dnp3server_address, 
+	DNP3MasterApp(
+		char* dnp3server_address, 
 		char*dnp3server_port, 
-		char* line_number, 
+		char* line_number,
+		int server_id,
 		int polling_time,
 		int nIOA_AO,
 		int nIOA_BO,
@@ -74,6 +78,7 @@ public:
 	SOCKET getSocket(void) { return Socket;};
 	bool GetSockConnectStatus(void);
 	int run(void);
+	void get_utc_host_time(struct cp56time2a* time);
 	////////////////////Middleware//////////////////////
 	void check_for_commands(struct iec_item *item);
 	void alloc_command_resources(void);

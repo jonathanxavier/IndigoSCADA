@@ -99,6 +99,7 @@ class modbus_imp
 	bool general_interrogation;
 	int loops;
     int comm_error_counter;
+	bool is_connected;
 	////////////////Modbus specific/////////////////
 	modbus_t *ctx; //context
 	uint8_t *tab_rp_bits;

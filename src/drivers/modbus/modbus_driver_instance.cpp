@@ -445,12 +445,12 @@ void Modbus_driver_Instance::Tick()
 		break;
 		case STATE_FAIL:
 		{
-			get_items_form_local_fifo();
+			get_items_from_local_fifo();
 		}
 		break;
 		case STATE_RUNNING:
 		{
-			get_items_form_local_fifo();
+			get_items_from_local_fifo();
 		}
 		break;
 		default:
@@ -458,7 +458,7 @@ void Modbus_driver_Instance::Tick()
 	}
 }
 
-void Modbus_driver_Instance::get_items_form_local_fifo(void)
+void Modbus_driver_Instance::get_items_from_local_fifo(void)
 {
 	unsigned char buf[sizeof(struct iec_item)];
 	int len;

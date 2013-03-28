@@ -55,6 +55,9 @@ void Dnp3DriverThread::run()
 	strcat(pCommandLine, ((Dnp3driver_Instance*)Parent)->Cfg.IOA_BI);
 	strcat(pCommandLine, " -g ");
 	strcat(pCommandLine, ((Dnp3driver_Instance*)Parent)->Cfg.IOA_AI);
+	strcat(pCommandLine, " -s ");
+	strcat(pCommandLine, ((Dnp3driver_Instance*)Parent)->Cfg.serverID);
+
 	
 	strcpy(pWorkingDir,"C:\\scada\\bin");
 		
