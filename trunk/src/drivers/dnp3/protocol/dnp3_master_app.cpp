@@ -600,6 +600,7 @@ int DNP3MasterApp::run(void)
 			if(OpenLink(dnp3ServerAddress, atoi(dnp3ServerPort)))
 			{
 				Connected = false;
+                                Sleep(3000);
 			}
 			else
 			{
