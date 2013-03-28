@@ -44,12 +44,13 @@ struct InstanceCfg // friend to anyone
 	QString IOA_CI;
 	QString IOA_BI;
 	QString IOA_AI;
+	QString serverID;
 
 	unsigned SampleTime; // sampleing time 
 
 	InstanceCfg() : 
 	SampleTime(1000),DNP3ServerIPAddress(""),DNP3ServerIPPort(""),
-		IOA_AO(""),IOA_BO(""), IOA_CI(""), IOA_BI(""), IOA_AI("")
+		IOA_AO(""),IOA_BO(""), IOA_CI(""), IOA_BI(""), IOA_AI(""),serverID("")
 	{
 	};
 
@@ -57,7 +58,8 @@ struct InstanceCfg // friend to anyone
 
 	SampleTime(m.SampleTime),DNP3ServerIPAddress(m.DNP3ServerIPAddress),
 	DNP3ServerIPPort(m.DNP3ServerIPPort),
-	IOA_AO(m.IOA_AO),IOA_BO(m.IOA_BO), IOA_CI(m.IOA_CI), IOA_BI(m.IOA_BI), IOA_AI(m.IOA_AI)
+	IOA_AO(m.IOA_AO),IOA_BO(m.IOA_BO), IOA_CI(m.IOA_CI), IOA_BI(m.IOA_BI), 
+	IOA_AI(m.IOA_AI),serverID(m.serverID)
 	{
 	};
 };

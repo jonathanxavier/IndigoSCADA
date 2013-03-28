@@ -80,6 +80,7 @@ int main( int argc, char **argv )
 	char IOA_CI[80];
 	char IOA_BI[80];
 	char IOA_AI[80];
+	char server_id[5];
 
 	char fifo_monitor_direction_name[70];
 	char fifo_control_direction_name[70];
@@ -92,6 +93,7 @@ int main( int argc, char **argv )
 	int nIOA_CI = 100;
 	int nIOA_BI = 50;
 	int nIOA_AI = 1;
+	int serverID;
 		
 	dnp3ServerAddress[0] = '\0';
 	dnp3ServerPort[0] = '\0';
@@ -102,6 +104,7 @@ int main( int argc, char **argv )
 	IOA_CI[0] = '\0';
 	IOA_BI[0] = '\0';
 	IOA_AI[0] = '\0';
+	server_id[0] = '\0';
 
 	fifo_monitor_direction_name[0] = '\0';
 	fifo_control_direction_name[0] = '\0';
@@ -116,7 +119,7 @@ int main( int argc, char **argv )
 	fflush(stderr);
 	////////////////////////////////////////////////////////////////////////////////
 
-	while( ( c = getopt ( argc, argv, "a:c:d:e:f:g:p:l:t:?" )) != EOF ) {
+	while( ( c = getopt ( argc, argv, "a:c:d:e:f:g:p:l:t:s:?" )) != EOF ) {
 		switch ( c ) {
 			case 'a' :
 			strcpy(dnp3ServerAddress, optarg);
@@ -145,7 +148,9 @@ int main( int argc, char **argv )
 			case 'g' :
 			strcpy(IOA_AI, optarg);
 			break;
-
+			case 's' :
+			strcpy(server_id, optarg);
+			break;
 			case '?' :
 			fprintf(stderr, RUNTIME_USAGE, argv[0]);
 			fflush(stderr);
@@ -179,6 +184,15 @@ int main( int argc, char **argv )
 		fflush(stderr);
 		return EXIT_FAILURE;
 	}
+
+	if(strlen(server_id) == 0)
+	{
+		fprintf(stderr,"server_id is not known\n");
+		fflush(stderr);
+		return EXIT_FAILURE;
+	}
+
+	serverID = atoi(server_id);
 
 	if(strlen(polling_time) == 0)
 	{
@@ -231,6 +245,9 @@ int main( int argc, char **argv )
 	strcat(NewConsoleTitle, " IOA_AI ");
 	strcat(NewConsoleTitle, IOA_AI);
 
+	strcat(NewConsoleTitle, " SERVER_ID ");
+	strcat(NewConsoleTitle, server_id);
+
 	if(!IsSingleInstance(NewConsoleTitle))
 	{
 		fprintf(stderr,"Another instance is already running\n");
@@ -262,7 +279,8 @@ int main( int argc, char **argv )
 
 	master_app = new DNP3MasterApp(dnp3ServerAddress, 
 		dnp3ServerPort, 
-		line_number, 
+		line_number,
+		serverID,
 		pollingTime,
 		nIOA_AO,
 		nIOA_BO,

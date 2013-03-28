@@ -174,12 +174,12 @@ int main( int argc, char **argv )
 		return EXIT_FAILURE;
 	}
 
-//	if(strlen(server_id) == 0)
-//	{
-//		fprintf(stderr,"server_id is not known\n");
-//		fflush(stderr);
-//		return EXIT_FAILURE;
-//	}
+	if(strlen(server_id) == 0)
+	{
+		fprintf(stderr,"server_id is not known\n");
+		fflush(stderr);
+		return EXIT_FAILURE;
+	}
 
 	pollingTime = atoi(polling_time);
 

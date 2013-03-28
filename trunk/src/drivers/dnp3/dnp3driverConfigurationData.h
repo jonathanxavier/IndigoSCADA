@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Form interface generated from reading ui file 'dnp3_driver_configuration.ui'
 **
-** Created: Mon Mar 25 23:22:37 2013
+** Created: Thu Mar 28 15:22:04 2013
 **      by: The User Interface Compiler ($Id: qt/main.cpp   3.2.1   edited May 19 14:22 $)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -45,8 +45,6 @@ public:
     QLabel* textLabel3;
     QLabel* textLabel2;
     QLabel* textLabel1;
-    QLineEdit* ServerID;
-    QSpinBox* IOA_AI;
     QSpinBox* IOA_BI;
     QSpinBox* IOA_CI;
     QLabel* textLabel9;
@@ -54,6 +52,8 @@ public:
     QLabel* textLabel11;
     QLabel* textLabel11_2;
     QLabel* textLabel8;
+    QSpinBox* IOA_AI;
+    QSpinBox* ServerID;
 
 public slots:
     virtual void Help();

@@ -108,7 +108,7 @@ ORTEPublication* modbus_imp::publisher = NULL;
 //  Class constructor.   
 //   
 modbus_imp::modbus_imp(struct modbusContext* my_ctx, char* line_number, int polling_time):
-fExit(false),pollingTime(polling_time), general_interrogation(true)
+fExit(false),pollingTime(polling_time), general_interrogation(true), is_connected(false)
 {   
 	strcpy(lineNumber, line_number);
 	my_modbus_context.use_context = my_ctx->use_context;
@@ -224,10 +224,15 @@ fExit(false),pollingTime(polling_time), general_interrogation(true)
     if (modbus_connect(ctx) == -1) 
 	{
         fprintf(stderr, "Connection failed: %s\n", modbus_strerror(errno));
-        modbus_free(ctx);
-		fExit = 1;
-        return;
+        //modbus_free(ctx);
+		//fExit = 1;
+        //return;
+		is_connected = false;
     }
+	else
+	{
+		is_connected = true;
+	}
 }   
 //   
 //  Class destructor.   
@@ -271,53 +276,81 @@ int modbus_imp::PollServer(void)
   
 	while(true) //the polling loop
 	{	
-		rc = PollItems();
+		if(is_connected)
+		{
+			rc = PollItems();
 
-		loops++;
-		general_interrogation = false;
-	
-		if(rc)
-		{ 
-			fprintf(stderr,"modbus on line %d exiting...., due to lack of connection with server\n", lineNumber);
-			fflush(stderr);
+			loops++;
 
-			IT_COMMENT("modbus_imp exiting...., due to lack of connection with server");
-			
-			//Send LOST message to parent (monitor.exe)
-			struct iec_item item_to_send;
-			struct cp56time2a actual_time;
-			get_utc_host_time(&actual_time);
-
-			memset(&item_to_send,0x00, sizeof(struct iec_item));
-
-			item_to_send.iec_obj.ioa = 0;
-
-			item_to_send.cause = 0x03;
-			item_to_send.iec_type = C_LO_ST_1;
-			item_to_send.iec_obj.o.type30.sp = 0;
-			item_to_send.iec_obj.o.type30.time = actual_time;
-			item_to_send.iec_obj.o.type30.iv = 0;
-			item_to_send.msg_id = n_msg_sent;
-			item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
-
-			//Send in monitor direction
-			//prepare published data
-			memset(&instanceSend,0x00, sizeof(iec_item_type));
-
-			instanceSend.iec_type = item_to_send.iec_type;
-			memcpy(&(instanceSend.iec_obj), &(item_to_send.iec_obj), sizeof(struct iec_object));
-			instanceSend.cause = item_to_send.cause;
-			instanceSend.msg_id = item_to_send.msg_id;
-			instanceSend.ioa_control_center = item_to_send.ioa_control_center;
-			instanceSend.casdu = item_to_send.casdu;
-			instanceSend.is_neg = item_to_send.is_neg;
-			instanceSend.checksum = item_to_send.checksum;
-
-			ORTEPublicationSend(publisher);
-
-			n_msg_sent++;
+			if(loops == 4)
+			{
+				general_interrogation = false;
+			}
 		
-			break; //this terminate the loop and the program
+			if(rc)
+			{ 
+				fprintf(stderr,"modbus on line %d exiting...., due to lack of connection with server\n", lineNumber);
+				fflush(stderr);
+
+				IT_COMMENT("modbus_imp exiting...., due to lack of connection with server");
+				
+				//Send LOST message to parent (monitor.exe)
+				struct iec_item item_to_send;
+				struct cp56time2a actual_time;
+				get_utc_host_time(&actual_time);
+
+				memset(&item_to_send,0x00, sizeof(struct iec_item));
+
+				item_to_send.iec_obj.ioa = 0;
+
+				item_to_send.cause = 0x03;
+				item_to_send.iec_type = C_LO_ST_1;
+				item_to_send.iec_obj.o.type30.sp = 0;
+				item_to_send.iec_obj.o.type30.time = actual_time;
+				item_to_send.iec_obj.o.type30.iv = 0;
+				item_to_send.msg_id = n_msg_sent;
+				item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
+
+				//Send in monitor direction
+				//prepare published data
+				memset(&instanceSend,0x00, sizeof(iec_item_type));
+
+				instanceSend.iec_type = item_to_send.iec_type;
+				memcpy(&(instanceSend.iec_obj), &(item_to_send.iec_obj), sizeof(struct iec_object));
+				instanceSend.cause = item_to_send.cause;
+				instanceSend.msg_id = item_to_send.msg_id;
+				instanceSend.ioa_control_center = item_to_send.ioa_control_center;
+				instanceSend.casdu = item_to_send.casdu;
+				instanceSend.is_neg = item_to_send.is_neg;
+				instanceSend.checksum = item_to_send.checksum;
+
+				ORTEPublicationSend(publisher);
+
+				n_msg_sent++;
+			
+				//break; //this terminate the loop and the program
+
+				is_connected = false;
+
+				modbus_close(ctx);
+			}
+		}
+		else
+		{
+			//Try to reconnect
+			if (modbus_connect(ctx) == -1) 
+			{
+				fprintf(stderr, "Connection failed: %s\n", modbus_strerror(errno));
+			}
+			else
+			{
+				is_connected = true;
+
+				////////////General interrogation condition//////////////
+				general_interrogation = true;
+				loops = 0;
+				//////////////////////////////////////////////////////////
+			}
 		}
 
 		if(fExit)
@@ -1431,7 +1464,7 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 
 			////////////General interrogation condition//////////////
 			general_interrogation = true;
-			//loops = 0;
+			loops = 0;
 			//////////////////////////////////////////////////////////
 		}
 	}

@@ -55,6 +55,7 @@ Inherited( parent, name ),Receipe(receipe)
 		IOA_CI->setEnabled(false);
 		IOA_BI->setEnabled(false);
 		IOA_AI->setEnabled(false);
+		ServerID->setEnabled(false);
 	};
 }
 Dnp3driverConfiguration::~Dnp3driverConfiguration()
@@ -76,7 +77,7 @@ void Dnp3driverConfiguration::OkClicked()
 	cmd = "insert into PROPS values('"+Name->text() +"','" + Receipe + "','" + 
 	NItems->text() + " " + PollInterval->text() + " " + DNP3ServerIPAddressText->text() + " " + DNP3ServerIPPortText->text() +  " " +
 	
-	IOA_AO->text() +  " " + IOA_BO->text() +  " " + IOA_CI->text() + " " + IOA_BI->text() + " " + IOA_AI->text() + "');";
+	IOA_AO->text() +  " " + IOA_BO->text() +  " " + IOA_CI->text() + " " + IOA_BI->text() + " " + IOA_AI->text() + " " + ServerID->text() + "');";
 
 	GetConfigureDb()->DoExec(0,cmd,0);
 	QSAuditTrail(this,caption(), tr("Edited"));
@@ -122,6 +123,8 @@ void Dnp3driverConfiguration::QueryResponse (QObject *p, const QString &c, int i
 				IOA_BI->setValue(n);
 				is >> n;
 				IOA_AI->setValue(n);
+				is >> n;
+				ServerID->setValue(n);
 			}
 			else
 			{
@@ -139,6 +142,7 @@ void Dnp3driverConfiguration::QueryResponse (QObject *p, const QString &c, int i
 				IOA_CI->setValue(100);
 				IOA_BI->setValue(50);
 				IOA_AI->setValue(1);
+				ServerID->setValue(1);
 			}
 		} 
 		break;

@@ -169,6 +169,7 @@ void Dnp3driver_Instance::QueryResponse(QObject *p, const QString &c, int id, QO
 				is >> Cfg.IOA_CI;
 				is >> Cfg.IOA_BI;
 				is >> Cfg.IOA_AI;
+				is >> Cfg.serverID;
 
 				Countdown = 1;
 
@@ -388,22 +389,85 @@ void Dnp3driver_Instance::Tick()
 {
 	IT_IT("Dnp3driver_Instance::Tick");
 
-	//This code runs inside main monitor.exe thread
+	switch(State)
+	{
+		case STATE_RESET:
+		{
+			State = STATE_ASK_GENERAL_INTERROGATION;
+		}
+		break;
+		case STATE_ASK_GENERAL_INTERROGATION:
+		{
+			//Send C_IC_NA_1//////////////////////////////////////////////////////////////////////////
+			struct iec_item item_to_send;
+			memset(&item_to_send,0x00, sizeof(struct iec_item));
+			item_to_send.iec_type = C_IC_NA_1;
+			item_to_send.iec_obj.ioa = 0;
+			item_to_send.iec_obj.o.type100.qoi = 1;
 
-	//cp56time2a time;
-	//signed __int64 epoch_in_millisec;
+			//struct cp56time2a actual_time;
+			//get_utc_host_time(&actual_time);
+			//item_to_send.iec_obj.o.type58.time = actual_time;
+			item_to_send.msg_id = msg_sent_in_control_direction++;
+			item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
+			///////////////////////////////////////////////////////////////////////////////////////////
 
+			//prepare published data
+			memset(&instanceSend,0x00, sizeof(iec_item_type));
+			instanceSend.iec_type = item_to_send.iec_type;
+			memcpy(&(instanceSend.iec_obj), &(item_to_send.iec_obj), sizeof(struct iec_object));
+			instanceSend.msg_id = item_to_send.msg_id;
+			instanceSend.checksum = item_to_send.checksum;
+
+			//printf("sizeof(struct iec_object) = %d\n", sizeof(struct iec_object));
+
+			ORTEPublicationSend(publisher);
+
+			State = STATE_GENERAL_INTERROGATION_DONE;
+		}
+		break;
+		case STATE_GENERAL_INTERROGATION_DONE:
+		{
+			State = STATE_RUNNING;
+		}
+		break;
+		case STATE_FAIL:
+		{
+			get_items_from_local_fifo();
+		}
+		break;
+		case STATE_RUNNING:
+		{
+			get_items_from_local_fifo();
+		}
+		break;
+		default:
+		break;
+	}
+}
+
+
+void Dnp3driver_Instance::get_items_from_local_fifo(void)
+{
 	unsigned char buf[sizeof(struct iec_item)];
 	int len;
 	const unsigned wait_limit_ms = 1;
 	struct iec_item* p_item;
 
-	for(int i = 0; (len = fifo_get(fifo_monitor_direction, (char*)buf, sizeof(struct iec_item), wait_limit_ms)) >= 0; i += 1)
+	for(int i = 0; (len = fifo_get(fifo_monitor_direction, (char*)buf, sizeof(struct iec_item), wait_limit_ms)) >= 0; i += 1)	
 	{ 
+		if(State == STATE_FAIL)
+		{
+			QString msg;
+			msg.sprintf("MODBUS master on line %d is now connected to MODBUS server.", instanceID + 1); 
+			UnFailUnit(msg);
+			State = STATE_ASK_GENERAL_INTERROGATION;
+		}
+
 		p_item = (struct iec_item*)buf;
 			
-		printf("Receiving %d dnp th message from line = %d\n", p_item->msg_id, instanceID + 1);
-		printf("ioa = %d\n", p_item->iec_obj.ioa);
+		//printf("Receiving %d th message \n", p_item->msg_id);
+		printf("Receiving %d th modbus message from line = %d\n", p_item->msg_id, instanceID + 1);
 
 		//for (int j = 0; j < len; j++) 
 		//{ 
@@ -419,6 +483,7 @@ void Dnp3driver_Instance::Tick()
 		//printf("---------------\n");
 
 		unsigned char rc = clearCrc((unsigned char *)buf, sizeof(struct iec_item));
+
 		if(rc != 0)
 		{
 			ExitProcess(1);
@@ -643,9 +708,20 @@ void Dnp3driver_Instance::Tick()
 				#endif
 			}
 			break;
-            case C_EX_IT_1:
+			case C_EX_IT_1:
 			{
-                printf("Child process exiting...\n");
+				printf("Child process is exiting...\n");
+			}
+			break;
+			case C_LO_ST_1:
+			{
+				printf("MODBUS master on line %d has lost connection with MODBUS server...\n", instanceID + 1);
+
+				QString msg;
+				msg.sprintf("MODBUS master on line %d has lost connection with MODBUS server...", instanceID + 1); 
+				FailUnit(msg);
+
+				State = STATE_FAIL;
 			}
 			break;
 			default:
@@ -659,7 +735,7 @@ void Dnp3driver_Instance::Tick()
 		QString ioa;
 		ioa.sprintf("%d", p_item->iec_obj.ioa);
 
-        #ifdef DEPRECATED_IEC101_CONFIG
+		#ifdef DEPRECATED_IEC101_CONFIG
 		QString cmd = "select IKEY from PROPS where DVAL='"+ ioa + "' and SKEY='SAMPLEPROPS';";
 		#else
 		QString cmd = "select NAME from TAGS where IOA="+ ioa + " and UNIT='"+ Name + "';";
@@ -675,6 +751,7 @@ void Dnp3driver_Instance::Tick()
 		}
 	}
 }
+
 
 /*
 *Function:event
@@ -871,7 +948,6 @@ void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackPa
 			  struct iec_item item2;
 			  rebuild_iec_item_message(&item2, item1);
 			  //TODO: detect losts messages when item2.msg_id are NOT consecutive
-//			  cl->get_items(&item2);
 			  fifo_put(cl->fifo_monitor_direction, (char *)&item2, sizeof(struct iec_item));
 		  }
 		}
@@ -882,259 +958,6 @@ void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackPa
 		}
 		break;
 	}
-}
-
-void Dnp3driver_Instance::get_items(struct iec_item* p_item)
-{
-	printf("Receiving %d th dnp message from line = %d\n", p_item->msg_id, instanceID + 1);
-
-	//for (int j = 0; j < len; j++) 
-	//{ 
-		//assert((unsigned char)buf[i] == len);
-		//unsigned char c = *((unsigned char*)buf + j);
-		//printf("rx <--- 0x%02x-\n", c);
-		//fprintf(fp,"rx <--- 0x%02x-\n", c);
-		//fflush(fp);
-
-		//IT_COMMENT1("rx <--- 0x%02x-\n", c);
-	//}
-
-	//printf("---------------\n");
-	
-	unsigned char rc = clearCrc((unsigned char *)p_item, sizeof(struct iec_item));
-
-	if(rc != 0)
-	{
-		ExitProcess(1);
-	}
-
-	QString value;
-
-	switch(p_item->iec_type)
-	{
-		case M_SP_NA_1:
-		{
-			#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
-
-			iec_type1 var = p_item->iec_obj.o.type1;
-			
-			SpValue v(VALUE_TAG, &var, M_SP_NA_1);
-			TODO:05-07-2011 Get name here
-			post_val(v, name);
-
-			#else
-
-			value.sprintf("%d", p_item->iec_obj.o.type1.sp);
-
-			#endif
-			
-		}
-		break;
-		case M_DP_NA_1:
-		{
-			#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
-
-			iec_type3 var = p_item->iec_obj.o.type3;
-			
-			SpValue v(VALUE_TAG, &var, M_DP_NA_1);
-			TODO:05-07-2011 Get name here
-			post_val(v, name);
-
-			#else
-
-			value.sprintf("%d", p_item->iec_obj.o.type3.dp);
-
-			#endif
-		}
-		break;
-		//case M_BO_NA_1:
-		//{
-		//}
-		//break;
-		case M_ME_NA_1:
-		{
-			#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
-
-			iec_type9 var = p_item->iec_obj.o.type9;
-			
-			SpValue v(VALUE_TAG, &var, M_ME_NA_1);
-			TODO:05-07-2011 Get name here
-			post_val(v, name);
-
-			#else
-
-			value.sprintf("%d", p_item->iec_obj.o.type9.mv);
-
-			#endif
-		}
-		break;
-		case M_ME_NB_1:
-		{
-			
-			#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
-
-			iec_type11 var = p_item->iec_obj.o.type11;
-			
-			SpValue v(VALUE_TAG, &var, M_ME_NB_1);
-			TODO:05-07-2011 Get name here
-			post_val(v, name);
-
-			#else
-
-			value.sprintf("%d", p_item->iec_obj.o.type11.mv);
-
-			#endif
-		}
-		break;
-		case M_ME_NC_1:
-		{
-			#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
-
-			iec_type13 var = p_item->iec_obj.o.type13;
-			
-			SpValue v(VALUE_TAG, &var, M_ME_NC_1);
-			TODO:05-07-2011 Get name here
-			post_val(v, name);
-
-			#else
-
-			value.sprintf("%d", p_item->iec_obj.o.type13.mv);
-
-			#endif
-		}
-		break;
-		case M_SP_TB_1:
-		{
-			#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
-
-			iec_type30 var = p_item->iec_obj.o.type30;
-			
-			SpValue v(VALUE_TAG, &var, M_SP_TB_1);
-			TODO:05-07-2011 Get name here
-			post_val(v, name);
-
-			#else
-
-			value.sprintf("%d", p_item->iec_obj.o.type30.sp);
-
-			#endif
-		}
-		break;
-		case M_DP_TB_1:
-		{
-			#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
-
-			iec_type31 var = p_item->iec_obj.o.type31;
-			
-			SpValue v(VALUE_TAG, &var, M_DP_TB_1);
-			TODO:05-07-2011 Get name here
-			post_val(v, name);
-
-			#else
-
-			value.sprintf("%d", p_item->iec_obj.o.type31.dp);
-
-			#endif
-		}
-		break;
-		case M_BO_TB_1:
-		{
-			//value.sprintf("%d", p_item->iec_obj.o.type33.stcd);
-		}
-		break;
-		case M_ME_TD_1:
-		{
-			#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
-
-			iec_type34 var = p_item->iec_obj.o.type34;
-			
-			SpValue v(VALUE_TAG, &var, M_ME_TD_1);
-			TODO:05-07-2011 Get name here
-			post_val(v, name);
-
-			#else
-
-			value.sprintf("%d", p_item->iec_obj.o.type34.mv);
-
-			#endif
-		}
-		break;
-		case M_ME_TE_1:
-		{
-			#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
-
-			iec_type35 var = p_item->iec_obj.o.type35;
-			
-			SpValue v(VALUE_TAG, &var, M_ME_TE_1);
-			TODO:05-07-2011 Get name here
-			post_val(v, name);
-
-			#else
-
-			value.sprintf("%d", p_item->iec_obj.o.type35.mv);
-
-			#endif
-		}
-		break;
-		case M_ME_TF_1:
-		{
-			#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
-
-			iec_type36 var = p_item->iec_obj.o.type36;
-			
-			SpValue v(VALUE_TAG, &var, M_ME_TF_1);
-			TODO:05-07-2011 Get name here
-			post_val(v, name);
-
-			#else
-
-			value.sprintf("%f", p_item->iec_obj.o.type36.mv);
-
-			#endif
-		}
-		break;
-		case M_IT_TB_1:
-		{
-			#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
-
-			iec_type37 var = p_item->iec_obj.o.type37;
-			
-			SpValue v(VALUE_TAG, &var, M_ME_TN_1);
-			TODO:05-07-2011 Get name here
-			post_val(v, name);
-
-			#else
-
-			value.sprintf("%d", p_item->iec_obj.o.type37.counter);
-
-			#endif
-		}
-		break;
-        case C_EX_IT_1:
-		{
-            printf("Child process exiting...\n");
-		}
-		break;
-		default:
-		{
-			printf("Not supported type\n");
-			value.sprintf("%d", 0);
-		}
-		break;
-	}
-	
-	QString ioa;
-	ioa.sprintf("%d", p_item->iec_obj.ioa);
-
-	#ifdef DEPRECATED_OPC_CLIENT_DA_CONFIG
-	QString cmd = "select IKEY from PROPS where DVAL='"+ ioa + "' and SKEY='SAMPLEPROPS';";
-	#else
-	QString cmd = "select NAME from TAGS where IOA="+ ioa + " and UNIT='"+ Name + "';";
-	#endif
-
-	GetConfigureDb()->DoExec(this, cmd, tGetSamplePointNamefromIOA, value, ioa);
-
-	//printf("ioa %s, value %s\n", (const char*)ioa, (const char*)value);
 }
 
 #include <time.h>
