@@ -588,7 +588,7 @@ int DNP3MasterApp::run(void)
 
 				if(gl_timeout_connection_with_parent > 1000*60/pollingTime)
 				{
-					return; //exit loops for timeout of connection with parent
+					return 1; //exit loops for timeout of connection with parent
 				}
 				#endif
 
@@ -600,7 +600,7 @@ int DNP3MasterApp::run(void)
 			if(OpenLink(dnp3ServerAddress, atoi(dnp3ServerPort)))
 			{
 				Connected = false;
-                                Sleep(3000);
+                Sleep(3000);
 			}
 			else
 			{
