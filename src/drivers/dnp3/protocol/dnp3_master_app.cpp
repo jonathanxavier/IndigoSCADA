@@ -588,7 +588,7 @@ int DNP3MasterApp::run(void)
 
 				if(gl_timeout_connection_with_parent > 1000*60/pollingTime)
 				{
-					break; //exit loop for timeout of connection with parent
+					return; //exit loops for timeout of connection with parent
 				}
 				#endif
 
