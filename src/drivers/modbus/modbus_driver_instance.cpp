@@ -467,15 +467,18 @@ void Modbus_driver_Instance::get_items_from_local_fifo(void)
 
 	for(int i = 0; (len = fifo_get(fifo_monitor_direction, (char*)buf, sizeof(struct iec_item), wait_limit_ms)) >= 0; i += 1)	
 	{ 
+		p_item = (struct iec_item*)buf;
+		
 		if(State == STATE_FAIL)
 		{
-			QString msg;
-			msg.sprintf("MODBUS master on line %d is now connected to MODBUS server.", instanceID + 1); 
-			UnFailUnit(msg);
-			State = STATE_ASK_GENERAL_INTERROGATION;
+			if(p_item->iec_type != C_LO_ST_1)
+			{
+				QString msg;
+				msg.sprintf("MODBUS master on line %d is now connected to MODBUS server.", instanceID + 1); 
+				UnFailUnit(msg);
+				State = STATE_ASK_GENERAL_INTERROGATION;
+			}
 		}
-
-		p_item = (struct iec_item*)buf;
 			
 		//printf("Receiving %d th message \n", p_item->msg_id);
 		printf("Receiving %d th modbus message from line = %d\n", p_item->msg_id, instanceID + 1);
@@ -726,13 +729,16 @@ void Modbus_driver_Instance::get_items_from_local_fifo(void)
 			break;
 			case C_LO_ST_1:
 			{
-				printf("MODBUS master on line %d has lost connection with MODBUS server...\n", instanceID + 1);
+				if(State != STATE_FAIL)
+				{
+					printf("MODBUS master on line %d has lost connection with MODBUS server...\n", instanceID + 1);
 
-				QString msg;
-				msg.sprintf("MODBUS master on line %d has lost connection with MODBUS server...", instanceID + 1); 
-				FailUnit(msg);
+					QString msg;
+					msg.sprintf("MODBUS master on line %d has lost connection with MODBUS server...", instanceID + 1); 
+					FailUnit(msg);
 
-				State = STATE_FAIL;
+					State = STATE_FAIL;
+				}
 			}
 			break;
 			default:

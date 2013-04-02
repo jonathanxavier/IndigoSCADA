@@ -56,20 +56,19 @@ struct InstanceCfg // friend to anyone
 		RTU = 1
 	};
 
-	InstanceCfg() : 
+	InstanceCfg() :ServerID(""), 
 	SampleTime(1000),MODBUSServerIPAddress(""),MODBUSServerTCPPort(""),
 	context(TCP),SerialDevice(""), Baud(""), DataBits(""), StopBit(""), Parity("")
 	{
 	};
 
-	InstanceCfg(const InstanceCfg &m) : 
-
-	SampleTime(m.SampleTime),MODBUSServerIPAddress(m.MODBUSServerIPAddress),
-	MODBUSServerTCPPort(m.MODBUSServerTCPPort),
-	context(m.context),SerialDevice(m.SerialDevice), 
-	Baud(m.Baud), DataBits(m.DataBits), StopBit(m.StopBit), Parity(m.Parity)
-	{
-	};
+	InstanceCfg(const InstanceCfg &m) : ServerID(m.ServerID),
+		SampleTime(m.SampleTime),MODBUSServerIPAddress(m.MODBUSServerIPAddress),
+		MODBUSServerTCPPort(m.MODBUSServerTCPPort),
+		context(m.context),SerialDevice(m.SerialDevice), 
+		Baud(m.Baud), DataBits(m.DataBits), StopBit(m.StopBit), Parity(m.Parity)
+		{
+		};
 };
 
 

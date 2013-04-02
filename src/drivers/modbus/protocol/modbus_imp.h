@@ -106,7 +106,7 @@ class modbus_imp
     uint16_t *tab_rp_registers;
 	int nb_points;
 	////////////////////////////////////////////////
-	char lineNumber[80];
+	int lineNumber;
 	
 	modbus_imp(struct modbusContext* my_ctx, char* line_number, int polling_time);
 	~modbus_imp();

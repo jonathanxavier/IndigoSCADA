@@ -108,6 +108,8 @@ void Modbus_driverConfiguration::QueryResponse (QObject *p, const QString &c, in
 				QTextIStream is(&s); // extract the values
 				//
 				QString t;
+				QString MODBUSServerIPAddress;
+				QString MODBUSServerIPPort;
 				int n;
 				is >> n;
 				NItems->setValue(n);
@@ -115,10 +117,8 @@ void Modbus_driverConfiguration::QueryResponse (QObject *p, const QString &c, in
 				PollInterval->setValue(n);
 				is >> t;
 				ServerID->setText(t);
-				is >> t;
-				MODBUSServerIPAddressText->setText(t);
-				is >> t;
-				MODBUSServerIPPortText->setText(t);
+				is >> MODBUSServerIPAddress;
+				is >> MODBUSServerIPPort;
 				is >> t;
 				SerialDevice->setText(t);
 				is >> n;
@@ -130,15 +130,22 @@ void Modbus_driverConfiguration::QueryResponse (QObject *p, const QString &c, in
 				is >> t;
 				Parity->setText(t);
 
-                if(strlen((const char*)(SerialDevice->text())) == 0)
+				if(strlen((const char*)(SerialDevice->text())) == 0)
 				{
 					TCPButton->toggle();
 	                context = TCP;
+
+					MODBUSServerIPAddressText->setText(MODBUSServerIPAddress);
+					MODBUSServerIPPortText->setText(MODBUSServerIPPort);
+
 				}
 				else
 				{
 					RTUButton->toggle();
 	                context = RTU;
+
+					MODBUSServerIPAddressText->setText("");
+					MODBUSServerIPPortText->setText("");
 				}
 			}
 			else
@@ -150,7 +157,7 @@ void Modbus_driverConfiguration::QueryResponse (QObject *p, const QString &c, in
 				GetConfigureDb()->DoExec(0,cmd,0);
 				NItems->setValue(8);
 				PollInterval->setValue(1000);
-				ServerID->setText("");
+				ServerID->setText("1");
 				MODBUSServerIPAddressText->setText("");
 				MODBUSServerIPPortText->setText("");
 				SerialDevice->setText("COM1");
@@ -158,6 +165,7 @@ void Modbus_driverConfiguration::QueryResponse (QObject *p, const QString &c, in
 				DataBits->setValue(8);
 				StopBit->setValue(1);
 				Parity->setText("N");
+				RTUButton->toggle();
 			}
 		} 
 		break;

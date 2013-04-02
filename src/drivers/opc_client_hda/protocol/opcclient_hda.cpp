@@ -34,7 +34,7 @@ CComModule _Module;
 
 bool Opc_client_hda_imp::fExit = false;
 double Opc_client_hda_imp::dead_band_percent = 0.0;
-IOPCServer* Opc_client_hda_imp::g_pIOPCServer = NULL;
+IOPCHDA_Server* Opc_client_hda_imp::g_pIOPCHDAServer = NULL;
 
 int Opc_client_hda_imp::Update()
 {
@@ -120,7 +120,8 @@ int Opc_client_hda_imp::OpcStart(char* OpcServerProgID, char* OpcclassId, char* 
 	athn.dwAuthnSvc = RPC_C_AUTHN_WINNT;
 	athn.dwAuthzSvc = RPC_C_AUTHZ_NONE;
 	athn.dwCapabilities = EOAC_NONE;
-	athn.dwImpersonationLevel = RPC_C_IMP_LEVEL_IMPERSONATE;
+	//athn.dwImpersonationLevel = RPC_C_IMP_LEVEL_IMPERSONATE;
+	athn.dwImpersonationLevel = RPC_C_IMP_LEVEL_ANONYMOUS;
 	athn.pAuthIdentityData = NULL;
 	athn.pwszServerPrincName = NULL;
 
@@ -315,7 +316,8 @@ int Opc_client_hda_imp::OpcStart(char* OpcServerProgID, char* OpcclassId, char* 
 	athn.dwAuthnSvc = RPC_C_AUTHN_WINNT;
 	athn.dwAuthzSvc = RPC_C_AUTHZ_NONE;
 	athn.dwCapabilities = EOAC_NONE;
-	athn.dwImpersonationLevel = RPC_C_IMP_LEVEL_IMPERSONATE;
+	//athn.dwImpersonationLevel = RPC_C_IMP_LEVEL_IMPERSONATE;
+	athn.dwImpersonationLevel = RPC_C_IMP_LEVEL_ANONYMOUS;
 	athn.pAuthIdentityData = NULL;
 	athn.pwszServerPrincName = NULL;
 	
@@ -345,12 +347,12 @@ int Opc_client_hda_imp::OpcStart(char* OpcServerProgID, char* OpcclassId, char* 
 
 	/////end make Remote Object
 
-	hr = pIUnknown->QueryInterface(IID_CATID_OPCHDAServer10, (void**)&g_pIOPCServer);
+	hr = pIUnknown->QueryInterface(IID_IOPCHDA_Server, (void**)&g_pIOPCHDAServer);
 
 	if (FAILED(hr))
 	{
-		printf("OPC error:Failed to obtain IID_CATID_OPCHDAServer10 interface from server, %x\n", hr);
-		LogMessage(hr,"Failed to obtain IID_CATID_OPCHDAServer10 interface from server");
+		printf("OPC error:Failed to obtain IID_IOPCHDA_Server interface from server, %x\n", hr);
+		LogMessage(hr,"Failed to obtain IID_IOPCHDA_Server interface from server");
 		return 1;
 	}
 
@@ -375,7 +377,7 @@ int Opc_client_hda_imp::OpcStart(char* OpcServerProgID, char* OpcclassId, char* 
 		::CoTaskMemFree(pwsz);
 	}
 
-	hr = g_pIOPCServer->QueryInterface(IID_IOPCCommon, (void**)&g_pIOPCCommon);
+	hr = g_pIOPCHDAServer->QueryInterface(IID_IOPCCommon, (void**)&g_pIOPCCommon);
 
 	if(FAILED(hr))
 	{
@@ -386,40 +388,48 @@ int Opc_client_hda_imp::OpcStart(char* OpcServerProgID, char* OpcclassId, char* 
 		g_pIOPCCommon->SetClientName(L"IndigoSCADA OPC HDA Client");
 	}
 
-//	BOOL bActive;
-//	DWORD dwBufferTime;
-//	DWORD dwMaxSize;
-//	DWORD hClientSubscription;
-//	DWORD dwRevisedBufferTime;
-//	DWORD dwRevisedMaxSize;
+	VARIANT vFilter;
+	HRESULT *ppErrors = NULL;
+	OPCHDA_OPERATORCODES pOperator;
+	DWORD pdwAttrID;
+	DWORD dwCount = 1000;
+
+	hr = g_pIOPCHDAServer->CreateBrowse( 
+            /* [in] */ dwCount,
+            /* [size_is][in] */ &pdwAttrID,
+            /* [size_is][in] */ &pOperator,
+            /* [size_is][in] */ &vFilter,
+            /* [out] */ &g_pIOPCHDA_Browser,
+            /* [size_is][size_is][out] */ &ppErrors);
+
+	if(FAILED(hr))
+	{
+		LogMessage(hr,"QueryInterface(IID_IOPCHDA_Browser)");
+	}
+
+	BOOL bActive;
+	DWORD dwBufferTime;
+	
+	DWORD hClientSubscription;
+	DWORD dwRevisedBufferTime;
+	DWORD dwRevisedMaxSize;
 
 	CComCOPCHistoricDASink   *m_pSink = NULL;
 	CComCOPCShutdownRequest  *m_pShutdown = NULL;
 
-	//ATLTRY(m_pSink = new CComCOPCHistoricalDaSink);
+	ATLTRY(m_pSink = new CComCOPCHistoricDASink);
 
-	//if(m_pSink == NULL)
-	//{
-	//	LogMessage(E_OUTOFMEMORY,"new CComCOPCHistoricalDaSink");
-	//	return 1;
-	//}
-
-	//dwMaxSize = 1000; //The server can send upto 1000 events for each OnEvent call
-
-	//bActive = 1;
-
-	//server should check for maxsize of 0 however client should never pass it
-
-	//if(!dwMaxSize)
-	//{
-	//	dwMaxSize=1;
-	//}
+	if(m_pSink == NULL)
+	{
+		LogMessage(E_OUTOFMEMORY,"new CComCOPCHistoricDASink");
+		return 1;
+	}
 
 	//hClientSubscription = 1243272;
 	//dwBufferTime = 10000; //this is a parameter
 	//dwBufferTime = 0; //this is a parameter
 
-	//hr = g_pIOPCServer->CreateEventSubscription(bActive,
+	//hr = g_pIOPCHDAServer->CreateEventSubscription(bActive,
 	//					dwBufferTime,
 	//					dwMaxSize,
 	//					hClientSubscription,
@@ -448,23 +458,23 @@ int Opc_client_hda_imp::OpcStart(char* OpcServerProgID, char* OpcclassId, char* 
 //	CComObject<CComCOPCHistoricDASink>::CreateInstance(&m_pSink);
 //	m_dwCookie = 0xCDCDCDCD;
 
-//	IUnknown* pUnk;
+	IUnknown* pUnk;
 
-//	hr = m_pSink->_InternalQueryInterface( __uuidof(IUnknown), (void**)&pUnk );
+	hr = m_pSink->_InternalQueryInterface( __uuidof(IUnknown), (void**)&pUnk );
+
+	if(hr != S_OK)
+	{
+		printf("Failed m_pSink->_InternalQueryInterface\n");
+		return 1;
+	}
+
+//	hr = AtlAdvise(m_ISubMgt, pUnk, __uuidof(IOPCHDA_DataCallback), &m_dwCookie );
 
 //	if(hr != S_OK)
 //	{
-//		printf("Failed m_pSink->_InternalQueryInterface\n");
+//		printf("Failed AtlAdvise m_dwCookie\n");
 //		return 1;
 //	}
-
-	//hr = AtlAdvise(m_ISubMgt, pUnk, __uuidof(IOPCHDA_DataCallback), &m_dwCookie );
-
-	//if(hr != S_OK)
-	//{
-	//	printf("Failed AtlAdvise m_dwCookie\n");
-	//	return 1;
-	//}
 
 	//shutdown advise 
 	///////////////////////////////////////////////Shutdown/////////////////////////////
@@ -548,7 +558,7 @@ Here only for test, it works.
 /*
 	IOPCEventSubscriptionMgt2* ISubMgt2;
 
-	hr = g_pIOPCServer->QueryInterface(IID_IOPCEventSubscriptionMgt2, (void**)&ISubMgt2);
+	hr = g_pIOPCHDAServer->QueryInterface(IID_IOPCEventSubscriptionMgt2, (void**)&ISubMgt2);
 
 	if(FAILED(hr))
 	{
@@ -583,7 +593,7 @@ int Opc_client_hda_imp::OpcStop()
 //	}
 
 	// terminate server and it will clean up itself
-	if(g_pIOPCServer) while(g_pIOPCServer->Release()) ;
+	if(g_pIOPCHDAServer) while(g_pIOPCHDAServer->Release()) ;
 	::CoUninitialize();
 
 	printf("Server and all group interfaces terminated.\n");
@@ -626,25 +636,36 @@ int Opc_client_hda_imp::GetStatus(WORD *pwMav, WORD *pwMiv, WORD *pwB, LPWSTR *p
 	*pwB = 0;
 	*pszV = NULL;
 	OPCHDA_SERVERSTATUS *pStatus = NULL;
+	FILETIME *pftCurrentTime = NULL;
+	FILETIME *pftStartTime = NULL;
+	DWORD pdwMaxReturnValues;
+	LPWSTR ppszStatusString = NULL;
+	
 
-	if(g_pIOPCServer == NULL) return E_POINTER;
-
-	/*
-	HRESULT hr = g_pIOPCServer->GetHistorianStatus(&pStatus);
+	if(g_pIOPCHDAServer == NULL) return E_POINTER;
+	
+	HRESULT hr = g_pIOPCHDAServer->GetHistorianStatus(
+		pStatus,
+		&pftCurrentTime, 
+		&pftStartTime, 
+		pwMav, pwMiv, pwB, 
+		&pdwMaxReturnValues,
+		&ppszStatusString, 
+		pszV);
 
 	if(FAILED(hr) || (pStatus == NULL) )
 	{
 		if(FAILED(hr))	LogMessage(hr,"GetStatus()");
-		if(pStatus != NULL) ::CoTaskMemFree(pStatus);
+		//if(pStatus != NULL) ::CoTaskMemFree(pStatus);
 		return E_FAIL;
 	}
 
-	*pwMav = pStatus->wMajorVersion;
-	*pwMiv = pStatus->wMinorVersion;
-	*pwB = pStatus->wBuildNumber;
-	*pszV = pStatus->szVendorInfo;
-	::CoTaskMemFree(pStatus);
-	*/
+	//*pwMav = pStatus->wMajorVersion;
+	//*pwMiv = pStatus->wMinorVersion;
+	//*pwB = pStatus->wBuildNumber;
+	//*pszV = pStatus->szVendorInfo;
+	//::CoTaskMemFree(pStatus);
+	
 
 	return 0;
 }

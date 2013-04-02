@@ -110,7 +110,7 @@ ORTEPublication* modbus_imp::publisher = NULL;
 modbus_imp::modbus_imp(struct modbusContext* my_ctx, char* line_number, int polling_time):
 fExit(false),pollingTime(polling_time), general_interrogation(true), is_connected(false)
 {   
-	strcpy(lineNumber, line_number);
+	lineNumber = atoi(line_number);
 	my_modbus_context.use_context = my_ctx->use_context;
 	my_modbus_context.server_id = my_ctx->server_id;
 

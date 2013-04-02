@@ -243,11 +243,13 @@ int modbus_imp::AddItems(void)
 	sqlite3 *db;
 	char *zErrMsg = 0;
 	int rc;
-	//FILE* fp = NULL;
+	char line_number[10];
+
+	itoa(lineNumber, line_number, 10);
 
 	strcpy(database_name, "C:\\scada\\bin\\");
 	strcat(database_name, "modbus_database");
-	strcat(database_name, lineNumber);
+	strcat(database_name, line_number);
 	strcat(database_name, ".db");
 
 	rc = sqlite3_open(database_name, &db);
