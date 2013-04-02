@@ -529,9 +529,7 @@ int DNP3MasterApp::run(void)
 				{
 					fprintf(stderr,"dnp3 on line %d exiting...., due to lack of connection with server\n", lineNumber);
 					fflush(stderr);
-
-					//IT_COMMENT("modbus_imp exiting...., due to lack of connection with server");
-					
+										
 					//Send LOST message to parent (monitor.exe)
 					struct iec_item item_to_send;
 					struct cp56time2a actual_time;

@@ -29,6 +29,7 @@
 #include <conio.h>
 #include <atlbase.h>
 #include "opcda.h"	/* The OPC custom interface defintions */
+#include "opchda.h"
 #include "opccomn.h"
 #include "itrace.h"
 
@@ -73,6 +74,7 @@ class Opc_client_hda_imp
 		g_pIOPCBrowse = NULL;
 		g_pIGroupUnknown = NULL;
 		g_pIOPCCommon = NULL;
+		g_pIOPCHDA_Browser = NULL;
 		g_pIOPCAsyncIO2 = NULL;
 		g_pIOPCItemMgt = NULL;
 		g_pIOPCSyncIO  = NULL;
@@ -110,7 +112,8 @@ class Opc_client_hda_imp
 	 DWORD g_dwCancelID;
 	 DWORD g_dwReadTransID;
 	 OPCHANDLE g_hClientGroup;
-	 static IOPCServer *g_pIOPCServer;
+	 static IOPCHDA_Server *g_pIOPCHDAServer;
+	 IOPCHDA_Browser *g_pIOPCHDA_Browser;
 
 	 int nThreads;
 
@@ -128,6 +131,7 @@ class Opc_client_hda_imp
 	 IOPCItemMgt *g_pIOPCItemMgt;
 	 IOPCAsyncIO2 *g_pIOPCAsyncIO2;
 	 IOPCCommon *g_pIOPCCommon;
+	 
 	 IUnknown *g_pIGroupUnknown;
 	 IOPCBrowseServerAddressSpace *g_pIOPCBrowse;
 	 IOPCServerList *g_iCatInfo;

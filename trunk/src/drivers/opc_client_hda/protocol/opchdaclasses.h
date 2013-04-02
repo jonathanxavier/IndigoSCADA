@@ -38,12 +38,65 @@ END_COM_MAP()
             /* [size_is][in] */ OPCHDA_ITEM *pItemValues,
             /* [size_is][in] */ HRESULT *phrErrors) 
 	{
-		IT_IT("COPCHistoricDASink::OnDataChangeOnDataChange");
+		IT_IT("COPCHistoricDASink::OnDataChange");
 
 		//IMPORTANT NOTE: no blocking function may be called here
 	
 		return S_OK;
 	};
+
+	HRESULT STDMETHODCALLTYPE OnReadComplete( 
+            /* [in] */ DWORD dwTransactionID,
+            /* [in] */ HRESULT hrStatus,
+            /* [in] */ DWORD dwNumItems,
+            /* [size_is][in] */ OPCHDA_ITEM *pItemValues,
+            /* [size_is][in] */ HRESULT *phrErrors){ return S_OK;};
+        
+    HRESULT STDMETHODCALLTYPE OnReadModifiedComplete( 
+            /* [in] */ DWORD dwTransactionID,
+            /* [in] */ HRESULT hrStatus,
+            /* [in] */ DWORD dwNumItems,
+            /* [size_is][in] */ OPCHDA_MODIFIEDITEM *pItemValues,
+            /* [size_is][in] */ HRESULT *phrErrors){return S_OK;};
+        
+    HRESULT STDMETHODCALLTYPE OnReadAttributeComplete( 
+            /* [in] */ DWORD dwTransactionID,
+            /* [in] */ HRESULT hrStatus,
+            /* [in] */ OPCHANDLE hClient,
+            /* [in] */ DWORD dwNumItems,
+            /* [size_is][in] */ OPCHDA_ATTRIBUTE *pAttributeValues,
+            /* [size_is][in] */ HRESULT *phrErrors){return S_OK;};
+        
+    HRESULT STDMETHODCALLTYPE OnReadAnnotations( 
+            /* [in] */ DWORD dwTransactionID,
+            /* [in] */ HRESULT hrStatus,
+            /* [in] */ DWORD dwNumItems,
+            /* [size_is][in] */ OPCHDA_ANNOTATION *pAnnotationValues,
+            /* [size_is][in] */ HRESULT *phrErrors){return S_OK;};
+        
+    HRESULT STDMETHODCALLTYPE OnInsertAnnotations( 
+            /* [in] */ DWORD dwTransactionID,
+            /* [in] */ HRESULT hrStatus,
+            /* [in] */ DWORD dwCount,
+            /* [size_is][in] */ OPCHANDLE *phClients,
+            /* [size_is][in] */ HRESULT *phrErrors){return S_OK;};
+        
+    HRESULT STDMETHODCALLTYPE OnPlayback( 
+            /* [in] */ DWORD dwTransactionID,
+            /* [in] */ HRESULT hrStatus,
+            /* [in] */ DWORD dwNumItems,
+            /* [size_is][in] */ OPCHDA_ITEM **ppItemValues,
+            /* [size_is][in] */ HRESULT *phrErrors){return S_OK;};
+        
+        HRESULT STDMETHODCALLTYPE OnUpdateComplete( 
+            /* [in] */ DWORD dwTransactionID,
+            /* [in] */ HRESULT hrStatus,
+            /* [in] */ DWORD dwCount,
+            /* [size_is][in] */ OPCHANDLE *phClients,
+            /* [size_is][in] */ HRESULT *phrErrors){return S_OK;};
+        
+        HRESULT STDMETHODCALLTYPE OnCancelComplete( 
+		/* [in] */ DWORD dwCancelID){return S_OK;};
 };
 
 typedef CComObject<COPCHistoricDASink> CComCOPCHistoricDASink;
