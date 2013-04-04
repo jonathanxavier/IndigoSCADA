@@ -25,6 +25,7 @@
 #include "plcdnumber.h"
 #include "psinglepointled.h"
 #include "pdoublepointled.h"
+#include "elswitch.h"
 
 void HMI_manager::setParent( QDialog *parent )
 {
@@ -54,6 +55,48 @@ void HMI_manager::setParent( QDialog *parent )
 
 void HMI_manager::setInitialValuesAndLimits() 
 {
+	{
+		QObjectList *l = dialog_parent->queryList( "PSwitch" );
+
+		QObjectListIt it( *l ); // iterate over the buttons
+
+		QObject *obj;
+
+		while((obj = it.current()) != 0) 
+		{
+			// for each found object...
+			++it;
+
+			QString name = obj->name();
+			
+			((PSwitch*)obj)->setPSwitchValue(false);
+
+		}
+
+		delete l; // delete the list, not the objects
+	}
+
+	{
+		QObjectList *l = dialog_parent->queryList( "Breaker" );
+
+		QObjectListIt it( *l ); // iterate over the buttons
+
+		QObject *obj;
+
+		while((obj = it.current()) != 0) 
+		{
+			// for each found object...
+			++it;
+
+			QString name = obj->name();
+			
+			((Breaker*)obj)->setBreakerValue(false);
+
+		}
+
+		delete l; // delete the list, not the objects
+	}
+
 	{
 		QObjectList *l = dialog_parent->queryList( "QwtThermo" );
 
@@ -759,6 +802,58 @@ void HMI_manager::UpdateTags()
 			}
 
 			{
+				QObjectList *l = dialog_parent->queryList( "Breaker" );
+
+				QObjectListIt it( *l ); // iterate over the buttons
+
+				QObject *obj;
+
+				while((obj = it.current()) != 0) 
+				{
+					// for each found object...
+					++it;
+
+					QString name = obj->name();
+
+					// e.g. OPCPoint09
+
+					int idx = name.find('_');
+					name.truncate(idx);
+
+					if(name == s)
+					{
+						double v = atof((const char*)(GetCurrentDb()->GetString("VAL")));
+						
+						int i = (int)v;
+
+						switch(i)
+						{
+							case 0:
+							{
+								//Green means state off
+								((Breaker*)obj)->setBreakerValue(false);
+							}
+							break;
+							case 1:
+							{
+								//	Red means state on
+								((Breaker*)obj)->setBreakerValue(true);
+							}
+							break;
+							default:
+								//White means HMI state none or Invalid
+								((Breaker*)obj)->setBreakerValueInvalid(true);
+							break;
+						}
+						
+						break; // handle the next record
+					}
+				}
+
+				delete l; // delete the list, not the objects
+			}
+
+			{
 				QObjectList *l = dialog_parent->queryList( "PTank" );
 
 				QObjectListIt it( *l ); // iterate over the buttons
@@ -1120,6 +1215,58 @@ void HMI_manager::UpdateSamplePoint() // handle updated sample points
 				delete l; // delete the list, not the objects
 			}
 
+			{
+				QObjectList *l = dialog_parent->queryList( "Breaker" );
+
+				QObjectListIt it( *l ); // iterate over the buttons
+
+				QObject *obj;
+
+				while((obj = it.current()) != 0) 
+				{
+					// for each found object...
+					++it;
+
+					QString name = obj->name();
+
+					int idx = name.find('_');
+					name.truncate(idx);
+
+					if(name == s)
+					{
+						int state = GetCurrentDb()->GetInt("STATE");
+
+						int ack_flag = GetCurrentDb()->GetInt("ACKFLAG");
+
+						/*
+						if(ack_flag)
+						{
+							((PSwitch*)obj)->startFlash();
+						}
+						else
+						{
+							((PSwitch*)obj)->stopFlash();
+						}
+						*/
+
+						if(state == NoLevel)
+						{
+							//White means HMI state none or NO or Invalid
+							((Breaker*)obj)->setBreakerValueInvalid(false);
+						}
+
+						if(state == FailureLevel)
+						{   //Blue means Communication driver error state or Invalid
+							((Breaker*)obj)->setBreakerValueInvalid(false);
+						}
+						
+						break; // handle the next record
+					}
+				}
+
+				delete l; // delete the list, not the objects
+			}
+
 			lastName = s;
 		}
 	}
@@ -1290,7 +1437,7 @@ void HMI_manager::RightClicked(QString &class_name, QString &widget_name) // sho
 			return;
 		}
 	}
-	if(class_name == QString("PSwitch"))
+	else if(class_name == QString("PSwitch"))
 	{
 		QObjectList *l = dialog_parent->queryList("PSwitch");
 
@@ -1320,6 +1467,40 @@ void HMI_manager::RightClicked(QString &class_name, QString &widget_name) // sho
 		if(found)
 		{
 			InspectMenu((PSwitch*)obj, sample_point_name, ack);
+
+			return;
+		}
+	}
+	else if(class_name == QString("Breaker"))
+	{
+		QObjectList *l = dialog_parent->queryList("Breaker");
+
+		QObjectListIt it( *l ); // iterate over the switches
+
+		QObject *obj;
+
+		while((obj = it.current()) != 0) 
+		{
+			// for each found object...
+			++it;
+
+			if(widget_name == obj->name())
+			{
+				int idx = widget_name.find('_');
+				widget_name.truncate(idx);
+				sample_point_name = widget_name;
+				
+				found = true;
+
+				break;
+			}
+		}
+
+		delete l; // delete the list, not the objects
+
+		if(found)
+		{
+			InspectMenu((Breaker*)obj, sample_point_name, ack);
 
 			return;
 		}

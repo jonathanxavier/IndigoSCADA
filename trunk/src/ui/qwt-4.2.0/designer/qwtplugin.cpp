@@ -110,8 +110,8 @@ QwtPlugin::QwtPlugin()
         "pmetericon.png", "PMeter", "whatsthis"));
     vec.append(Entry("PLCDNumber", "plcdnumber.h",
         "plcdnumbericon.png", "PLCDNumber", "whatsthis"));
-	vec.append(Entry("ELSwitch", "elswitch.h",
-        "pswitchicon.png", "ELSwitch", "whatsthis"));
+	vec.append(Entry("Breaker", "elswitch.h",
+        "pswitchicon.png", "Breaker", "whatsthis"));
 
 }
 
@@ -155,8 +155,8 @@ QWidget* QwtPlugin::create(const QString &key,
         return new PThermometer(parent, name );
 	else if ( key == "PTank" )
         return new PTank(parent, name );
-	else if ( key == "ELSwitch" )
-        return new ELSwitch(parent, name );
+	else if ( key == "Breaker" )
+        return new Breaker(parent, name );
 	else if ( key == "PSwitch" )
         return new PSwitch(parent, name );
 	else if ( key == "PMeter" )
