@@ -25,19 +25,19 @@
   
 */
 
-class QWT_EXPORT ELSwitch: public QWidget
+class QWT_EXPORT Breaker: public QWidget
 {
     Q_OBJECT
-    Q_PROPERTY(bool switchValue READ getELSwitchValue WRITE setELSwitchValue);
+    Q_PROPERTY(bool switchValue READ getBreakerValue WRITE setBreakerValue);
     Q_PROPERTY(QString OnLabel READ getOnLabel WRITE setOnLabel);
     Q_PROPERTY(QString OffLabel READ getOffLabel WRITE setOffLabel);
 
 public:
-    ELSwitch(QWidget *parent=0,const char *name=0);
+    Breaker(QWidget *parent=0,const char *name=0);
     /*!
       \return current switch value
     */
-    bool getELSwitchValue() const
+    bool getBreakerValue() const
     {
         return value;
     }
@@ -79,8 +79,8 @@ public:
 public slots:
     void setOnLabel(QString);
     void setOffLabel(QString);
-    void setELSwitchValue(bool);
-	void setELSwitchValueInvalid(bool);
+    void setBreakerValue(bool);
+	void setBreakerValueInvalid(bool);
 
 signals:
     /*!
