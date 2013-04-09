@@ -29,7 +29,7 @@ void Iec61850DriverThread::run()
 	char line_number[50];
 	char polling_time[50];
 
-	strcpy(pipe_name, "\\\\.\\pipe\\iec61850master_namedpipe");
+	strcpy(pipe_name, "\\\\.\\pipe\\iec61850client_namedpipe");
 
 	itoa(instanceID + 1, line_number, 10);
 

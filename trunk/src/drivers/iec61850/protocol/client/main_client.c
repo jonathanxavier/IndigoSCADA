@@ -140,14 +140,14 @@ int main( int argc, char **argv )
 
 	if(strlen(iec61850ServerAddress) == 0)
 	{
-		fprintf(stderr,"DNP3 server IP address is not known\n");
+		fprintf(stderr,"IEC61850 server IP address is not known\n");
 		fflush(stderr);
 		return EXIT_FAILURE;
 	}
 
 	if(strlen(iec61850ServerPort) == 0)
 	{
-		fprintf(stderr,"DNP3 TCP port is not known\n");
+		fprintf(stderr,"IEC61850 TCP port is not known\n");
 		fflush(stderr);
 		return EXIT_FAILURE;
 	}
@@ -170,7 +170,7 @@ int main( int argc, char **argv )
 
 	pollingTime = atoi(polling_time);
 	
-	strcpy(NewConsoleTitle, "iec61850master IP ");
+	strcpy(NewConsoleTitle, "iec61850client IP ");
 	strcat(NewConsoleTitle, iec61850ServerAddress);
 	strcat(NewConsoleTitle, " PORT ");
 	strcat(NewConsoleTitle, iec61850ServerPort);
@@ -416,7 +416,7 @@ void PipeWorker(void* pParam)
 
     struct args* arg = (struct args*)pParam;
 
-	strcpy(pipe_name, "\\\\.\\pipe\\iec61850master_namedpipe");
+	strcpy(pipe_name, "\\\\.\\pipe\\iec61850client_namedpipe");
     strcat(pipe_name, arg->line_number);
 
 	for(i = 0; i < N_PIPES; i++)
