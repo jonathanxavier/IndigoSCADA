@@ -176,6 +176,15 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name designerlib
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name iec61850client
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name iec61850driver
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name iec61850server
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -347,6 +356,63 @@ Package=<5>
 
 Package=<4>
 {{{
+}}}
+
+###############################################################################
+
+Project: "iec61850client"=..\drivers\iec61850\protocol\iec61850client.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name iec61850lib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name librtps
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "iec61850driver"=..\drivers\iec61850\iec61850driver.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "iec61850lib"=..\drivers\iec61850\protocol\iec61850lib.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "iec61850server"=..\drivers\iec61850\protocol\iec61850server.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name iec61850lib
+    End Project Dependency
 }}}
 
 ###############################################################################
