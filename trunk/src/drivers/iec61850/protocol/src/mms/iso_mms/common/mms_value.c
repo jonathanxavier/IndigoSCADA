@@ -279,6 +279,8 @@ MmsValue_setUtcTime(MmsValue* value, uint32_t timeval)
 	uint8_t* timeArray = (uint8_t*) &timeval;
 	uint8_t* valueArray = value->value.utcTime;
 
+	value->type = MMS_UTC_TIME; //apa+++
+
 #ifdef ORDER_LITTLE_ENDIAN
 		memcpyReverseByteOrder(valueArray, timeArray, 4);
 #else
