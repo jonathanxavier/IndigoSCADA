@@ -22,6 +22,7 @@
 #include "mms_client_connection.h"
 #include "mms_types.h"
 
+
 #define SUPPLIER "@ enscada.com"
 #define APPLICATION "iec61850client.exe"
 
@@ -69,6 +70,8 @@ void usage(char** argv)
 	fflush(stderr);
 }
 
+void epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch_in_millisec);
+
 int main( int argc, char **argv )
 {
 	char version[100];
@@ -84,7 +87,7 @@ int main( int argc, char **argv )
 	int rc;
 	struct args arg;
 	int i;
-
+	
 	/////////////////////MMS//////////////////////
 	MmsValue* value;
 	LinkedList nameList;
@@ -94,6 +97,7 @@ int main( int argc, char **argv )
 	MmsConnection con;
 	int tcpPort = 102;
 	MmsTypeSpecification* typeSpec;
+	time_t now;
 	//////////////////////////////////////////////
 			
 	iec61850ServerAddress[0] = '\0';
@@ -363,30 +367,94 @@ int main( int argc, char **argv )
 
 		MmsConnection_writeVariable(con, "SampleIEDDevice1", "MMXU2$MX$TotW$mag$f", value);
 
-		MmsValue_delete(value);
+		MmsValue_delete(value); //delete after write
 
 		value = MmsConnection_readVariable(con, "SampleIEDDevice1", "MMXU2$MX$TotW$mag$f");
 
 		printf("Read variable with value: %f\n", MmsValue_toFloat(value));
 
-		MmsValue_delete(value);
-
-		value = MmsConnection_readVariable(con, "SampleIEDDevice1", "MMXU2$ST$Health$stVal");
+		value = MmsConnection_readVariable(con, "SampleIEDDevice1", "DGEN1$ST$OpTmsRs$stVal");
 
 		printf("Read integer variable with value: %d\n", MmsValue_toInt32(value));
 
 		MmsValue_setInt32(value, i);
 
-		MmsConnection_writeVariable(con, "SampleIEDDevice1", "MMXU2$ST$Health$stVal", value);
+		MmsConnection_writeVariable(con, "SampleIEDDevice1", "DGEN1$ST$OpTmsRs$stVal", value);
 
-		MmsValue_delete(value);
+		MmsValue_delete(value); //delete after write
 
-		value = MmsConnection_readVariable(con, "SampleIEDDevice1", "MMXU2$ST$Health$stVal");
+		value = MmsConnection_readVariable(con, "SampleIEDDevice1", "DGEN1$ST$OpTmsRs$stVal");
 
 		printf("Read integer variable with value: %d\n", MmsValue_toInt32(value));
 
-		MmsValue_delete(value);
+		value = MmsConnection_readVariable(con, "SampleIEDDevice1", "DGEN1$ST$OpTmsRs$t");
 
+		{
+			uint32_t epoc = MmsValue_toUnixTimestamp(value);
+			
+			signed __int64 epoc_mill = epoc;
+			cp56time2a cptime;
+
+			epoc_mill = 1000*epoc_mill;
+
+			epoch_to_cp56time2a(&cptime, epoc_mill);
+
+			fprintf(stderr,"UTC time: h:%i m:%i s:%i ms:%i %02i-%02i-%02i, iv %i, su %i\n",
+				cptime.hour,
+				cptime.min,
+				cptime.msec/1000,
+				cptime.msec%1000,
+				cptime.mday,
+				cptime.month,
+				cptime.year,
+				cptime.iv,
+				cptime.su);
+
+				fflush(stderr);
+		}
+
+		//////////////////////write//////////////////////////////////////////////////////////////
+		
+		if(i%5 == 0)
+			now = 0;
+		else
+			now = time(NULL);
+			
+
+		value = calloc(1, sizeof(MmsValue));
+
+		MmsValue_setUtcTime(value, now);
+
+		MmsConnection_writeVariable(con, "SampleIEDDevice1", "DGEN1$ST$OpTmsRs$t", value);
+
+		MmsValue_delete(value);
+		//////////////////////////////////////////////////////////////////////////////////////////
+
+		value = MmsConnection_readVariable(con, "SampleIEDDevice1", "DGEN1$ST$OpTmsRs$t");
+
+		{
+			uint32_t epoc = MmsValue_toUnixTimestamp(value);
+			
+			signed __int64 epoc_mill = epoc;
+			cp56time2a cptime;
+
+			epoc_mill = 1000*epoc_mill;
+
+			epoch_to_cp56time2a(&cptime, epoc_mill);
+
+			fprintf(stderr,"UTC time: h:%i m:%i s:%i ms:%i %02i-%02i-%02i, iv %i, su %i\n",
+				cptime.hour,
+				cptime.min,
+				cptime.msec/1000,
+				cptime.msec%1000,
+				cptime.mday,
+				cptime.month,
+				cptime.year,
+				cptime.iv,
+				cptime.su);
+
+				fflush(stderr);
+		}
 
 		Sleep(pollingTime);
 	}
@@ -395,6 +463,38 @@ exit:
 	MmsConnection_destroy(con);
 
 	return 0;
+}
+
+#include <time.h>
+#include <sys/timeb.h>
+
+void epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch_in_millisec)
+{
+	struct tm	*ptm;
+	int ms = (int)(epoch_in_millisec%1000);
+	time_t seconds;
+	
+	memset(time, 0x00,sizeof(cp56time2a));
+	seconds = (long)(epoch_in_millisec/1000);
+	ptm = localtime(&seconds);
+		
+    if(ptm)
+	{
+		time->hour = ptm->tm_hour;					//<0.23>
+		time->min = ptm->tm_min;					//<0..59>
+		time->msec = ptm->tm_sec*1000 + ms; //<0.. 59999>
+		time->mday = ptm->tm_mday; //<1..31>
+		time->wday = (ptm->tm_wday == 0) ? ptm->tm_wday + 7 : ptm->tm_wday; //<1..7>
+		time->month = ptm->tm_mon + 1; //<1..12>
+		if(ptm->tm_year > 100)
+			time->year = ptm->tm_year - 100; //<0.99>
+		else
+			time->year = ptm->tm_year; //<0.99>
+		time->iv = 0; //<0..1> Invalid: <0> is valid, <1> is invalid
+		time->su = (u_char)ptm->tm_isdst; //<0..1> SUmmer time: <0> is standard time, <1> is summer time
+	}
+
+    return;
 }
 
 ///////////////////////////////////Keep alive pipe management/////////////////////////////////////////////////////
@@ -543,3 +643,5 @@ void PipeWorker(void* pParam)
 		}
 	}
 }
+
+

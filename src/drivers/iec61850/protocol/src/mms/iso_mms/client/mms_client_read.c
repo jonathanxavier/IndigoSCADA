@@ -174,6 +174,9 @@ mmsClient_parseReadResponse(ByteBuffer* message, uint32_t* invokeId)
 
 				}
 				else if (presentType == AccessResult_PR_utctime) {
+
+						value = calloc(1, sizeof(MmsValue)); //apa+++
+
 						value->type = MMS_UTC_TIME;
 						memcpy(value->value.utcTime,
 								response->listOfAccessResult.list.array[i]->choice.utctime.buf, 8);
