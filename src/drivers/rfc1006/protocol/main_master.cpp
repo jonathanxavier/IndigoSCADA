@@ -389,14 +389,14 @@ void PipeWorker(void* pParam)
 		{
 			fprintf(stderr,"CreateNamedPipe for pipe %d failed with error %d\n", i, GetLastError());
 			fflush(stderr);
-			ExitProcess(0);
+			//ExitProcess(0);
 		}
 
 		if ((evnt[i] = CreateEvent(NULL, TRUE, FALSE, NULL)) == NULL)
 		{
 			fprintf(stderr,"CreateEvent for pipe %d failed with error %d\n",	i, GetLastError());
 			fflush(stderr);
-			ExitProcess(0);
+			//ExitProcess(0);
 		}
 
 		ZeroMemory(&ovrp[i], sizeof(OVERLAPPED));
@@ -411,7 +411,7 @@ void PipeWorker(void* pParam)
 				fflush(stderr);
 				
 				CloseHandle(pipeHnds[i]);
-				ExitProcess(0);
+				//ExitProcess(0);
 			}
 		}
 	}
@@ -422,7 +422,7 @@ void PipeWorker(void* pParam)
 		{
 			fprintf(stderr,"WaitForMultipleObjects failed with error %d\n", GetLastError());
 			fflush(stderr);
-			ExitProcess(0);
+			//ExitProcess(0);
 		}
 
 		pipe_id = rc - WAIT_OBJECT_0;
@@ -438,7 +438,7 @@ void PipeWorker(void* pParam)
 			{
 				fprintf(stderr,"DisconnectNamedPipe failed with error %d\n", GetLastError());
 				fflush(stderr);
-				ExitProcess(0);
+				//ExitProcess(0);
 			}
 
 			if(ConnectNamedPipe(pipeHnds[pipe_id],	&ovrp[pipe_id]) == 0)
@@ -486,7 +486,7 @@ void PipeWorker(void* pParam)
 				rc = clearCrc((unsigned char *)buf, sizeof(struct iec_item));
 				if(rc != 0)
 				{
-					ExitProcess(0);
+					//ExitProcess(0);
 				}
 
 				if(p_item->iec_obj.ioa == 4004)

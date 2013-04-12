@@ -211,7 +211,7 @@ int main( int argc, char **argv )
 
 	con = MmsConnection_create();
 
-	/* use authentication */
+	// use authentication
 	auth = calloc(1, sizeof(struct sAcseAuthenticationParameter));
 	auth->mechanism = AUTH_PASSWORD;
 	auth->value.password.string = "indigoscada";
@@ -240,7 +240,9 @@ int main( int argc, char **argv )
 	printf("Named variables for domain SampleIEDDevice1:\n--------------------------------------------\n");
 	nameList = MmsConnection_getDomainVariableNames(con, "SampleIEDDevice1");
 	//LinkedList_printStringList(nameList);
-	
+	//////////////////////////////////////////////////////////////
+	//DomainName; ItemID; ItemType; IOA; CASDU;  IEC104 Type	//
+	//////////////////////////////////////////////////////////////
 	{
 		LinkedList element = nameList;
 		int elementCount = 0;
@@ -387,6 +389,7 @@ int main( int argc, char **argv )
 
 		printf("Read integer variable with value: %d\n", MmsValue_toInt32(value));
 
+/*
 		value = MmsConnection_readVariable(con, "SampleIEDDevice1", "DGEN1$ST$OpTmsRs$t");
 
 		{
@@ -455,7 +458,7 @@ int main( int argc, char **argv )
 
 				fflush(stderr);
 		}
-
+*/
 		Sleep(pollingTime);
 	}
 
@@ -532,14 +535,14 @@ void PipeWorker(void* pParam)
 		{
 			fprintf(stderr,"CreateNamedPipe for pipe %d failed with error %d\n", i, GetLastError());
 			fflush(stderr);
-			ExitProcess(0);
+			//ExitProcess(0);
 		}
 
 		if ((evnt[i] = CreateEvent(NULL, TRUE, FALSE, NULL)) == NULL)
 		{
 			fprintf(stderr,"CreateEvent for pipe %d failed with error %d\n",	i, GetLastError());
 			fflush(stderr);
-			ExitProcess(0);
+			//ExitProcess(0);
 		}
 
 		ZeroMemory(&ovrp[i], sizeof(OVERLAPPED));
@@ -554,7 +557,7 @@ void PipeWorker(void* pParam)
 				fflush(stderr);
 				
 				CloseHandle(pipeHnds[i]);
-				ExitProcess(0);
+				//ExitProcess(0);
 			}
 		}
 	}
@@ -565,7 +568,7 @@ void PipeWorker(void* pParam)
 		{
 			fprintf(stderr,"WaitForMultipleObjects failed with error %d\n", GetLastError());
 			fflush(stderr);
-			ExitProcess(0);
+			//ExitProcess(0);
 		}
 
 		pipe_id = rc - WAIT_OBJECT_0;
@@ -581,7 +584,7 @@ void PipeWorker(void* pParam)
 			{
 				fprintf(stderr,"DisconnectNamedPipe failed with error %d\n", GetLastError());
 				fflush(stderr);
-				ExitProcess(0);
+				//ExitProcess(0);
 			}
 
 			if(ConnectNamedPipe(pipeHnds[pipe_id],	&ovrp[pipe_id]) == 0)
@@ -629,13 +632,13 @@ void PipeWorker(void* pParam)
 				rc = clearCrc((unsigned char *)buf, sizeof(struct iec_item));
 				if(rc != 0)
 				{
-					ExitProcess(0);
+					//ExitProcess(0);
 				}
 
 				if(p_item->iec_obj.ioa == 4004)
 				{ 
 					gl_timeout_connection_with_parent = 0;
-					//fprintf(stderr, "Receive keep alive # %d from front end\n", p_item->msg_id);
+					fprintf(stderr, "Receive keep alive # %d from front end\n", p_item->msg_id);
                     fprintf(stderr, "wdg %d\r", p_item->msg_id);
 				    fflush(stderr);
 				}
