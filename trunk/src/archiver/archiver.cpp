@@ -13,7 +13,7 @@
 /*
 *Header For: Archiver engine 
 */
-
+#include "qplatformdefs.h"
 #include "common.h"
 #include "archiver.h"
 #include "messages.h"

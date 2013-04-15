@@ -53,7 +53,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386
-# ADD LINK32 advapi32.lib user32.lib snmpapi.lib utilities.lib wsock32.lib realtimedbase.lib qt-mtnc$(QTVER).lib /nologo /subsystem:console /pdb:"Release/rtsqlserver.pdb" /debug /machine:I386 /out:"C:\scada\bin/rtsqlserver.exe" /libpath:"$(QTDIR)\lib" /libpath:"c:\scada\lib"
+# ADD LINK32 advapi32.lib user32.lib snmpapi.lib utilities.lib wsock32.lib realtimedbase.lib qt-mt3.lib /nologo /subsystem:console /pdb:"Release/rtsqlserver.pdb" /debug /machine:I386 /out:"C:\scada\bin/rtsqlserver.exe" /libpath:"$(QTDIR)\lib" /libpath:"c:\scada\lib"
 # SUBTRACT LINK32 /pdb:none
 
 !ELSEIF  "$(CFG)" == "realtimesqlserver - Win32 Debug"
@@ -78,7 +78,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 advapi32.lib user32.lib snmpapi.lib utilitiesd.lib wsock32.lib realtimedbased.lib qt-mtnc$(QTVER).lib /nologo /subsystem:console /incremental:no /pdb:"Debug/realtimesqlserver.pdb" /debug /machine:I386 /out:"c:\scada\bin/rtsqlserver.exe" /pdbtype:sept /libpath:"$(QTDIR)\lib" /libpath:"c:\scada\lib"
+# ADD LINK32 advapi32.lib user32.lib snmpapi.lib utilitiesd.lib wsock32.lib realtimedbased.lib qt-mt3.lib /nologo /subsystem:console /incremental:no /pdb:"Debug/realtimesqlserver.pdb" /debug /machine:I386 /out:"c:\scada\bin/rtsqlserver.exe" /pdbtype:sept /libpath:"$(QTDIR)\lib" /libpath:"c:\scada\lib"
 # SUBTRACT LINK32 /pdb:none
 
 !ENDIF 

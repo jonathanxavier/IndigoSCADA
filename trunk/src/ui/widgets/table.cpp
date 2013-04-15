@@ -287,7 +287,11 @@ void Table::resizeEvent( QResizeEvent *e )
 	{
 		fs -= 2;
 		QFont f(font()); // set the font to the correct size - we hope
-		f.setPixelSize(fs);
+		#if QT_VERSION > 337
+			f.setPixelSize(fs+120);
+		#else
+			f.setPixelSize(fs);
+		#endif
 		setFont(f);
 		fTextDrawable = true;
 	}
@@ -394,7 +398,11 @@ void Table::resizeTable(int r, int c)
 	if(fs > CELL_MIN_FS)
 	{
 		QFont f(font()); // set the font to the correct size - we hope
-		f.setPixelSize(fs-1);
+		#if QT_VERSION > 337
+			f.setPixelSize(fs-1+120);
+		#else
+			f.setPixelSize(fs-1);
+		#endif
 		setFont(f);
 		fTextDrawable = true;
 	}

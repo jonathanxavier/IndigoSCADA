@@ -13,6 +13,7 @@
 *Purpose: this manages the data acquisition side of things
 */
 
+#include "qplatformdefs.h"
 #include "common.h"
 #include "monitor.h"
 #include "messages.h"
@@ -1346,7 +1347,7 @@ int main(int argc, char **argv)
 	//
 	//
 	//
-	if(!chdir(QSFilename(""))) // change directory   
+	if(!QT_CHDIR(QSFilename(""))) // change directory   
 	{
 	#ifndef MONITOR_CAN_RUN_AS_ROOT
 		#ifdef UNIX

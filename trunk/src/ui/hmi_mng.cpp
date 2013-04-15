@@ -221,7 +221,7 @@ void HMI_manager::setInitialValuesAndLimits()
 	}
 
 	{
-		QObjectList *l = dialog_parent->queryList( "QButton" );
+		QObjectList *l = dialog_parent->queryList( "QPushButton" );
 
 		QObjectListIt it( *l ); // iterate over the buttons
 
@@ -235,7 +235,7 @@ void HMI_manager::setInitialValuesAndLimits()
 			QString name = obj->name();
 
 			//By default commands are not enabled
-			((QButton*)obj)->setEnabled( FALSE );
+			((QPushButton*)obj)->setEnabled( FALSE );
 			
 		}
 
@@ -1275,7 +1275,7 @@ void HMI_manager::UpdateSamplePoint() // handle updated sample points
 
 void HMI_manager::sendCommand() 
 {
-	QObjectList *l = dialog_parent->queryList("QwtPushButton");
+	QObjectList *l = dialog_parent->queryList("QPushButton");
 
 	QObjectListIt it( *l ); // iterate over the buttons
 
@@ -1286,7 +1286,7 @@ void HMI_manager::sendCommand()
 		// for each found object...
 		++it;
 
-		if(((QButton*)obj)->isDown())
+		if(((QPushButton*)obj)->isDown())
 		{
 			Sleep(100);
 			QString name = obj->name();
@@ -1989,7 +1989,7 @@ void HMI_manager::ReceivedNotify(int ntf, const char * data)
 	{
 		case NotificationEvent::CMD_LOGOUT:
 		{
-			QObjectList *l = dialog_parent->queryList( "QButton" );
+			QObjectList *l = dialog_parent->queryList( "QPushButton" );
 
 			QObjectListIt it( *l ); // iterate over the buttons
 
@@ -2002,7 +2002,7 @@ void HMI_manager::ReceivedNotify(int ntf, const char * data)
 
 				QString name = obj->name();
 
-				((QButton*)obj)->setEnabled( FALSE );
+				((QPushButton*)obj)->setEnabled( FALSE );
 			}
 
 			delete l; // delete the list, not the objects
@@ -2010,7 +2010,7 @@ void HMI_manager::ReceivedNotify(int ntf, const char * data)
 		break;
 		case NotificationEvent::CMD_LOGON:
 		{
-			QObjectList *l = dialog_parent->queryList( "QButton" );
+			QObjectList *l = dialog_parent->queryList( "QPushButton" );
 
 			QObjectListIt it( *l ); // iterate over the buttons
 
@@ -2025,11 +2025,11 @@ void HMI_manager::ReceivedNotify(int ntf, const char * data)
 
 				if(GetUserDetails().privs & PRIVS_ACK_ALARMS)
 				{
-					((QButton*)obj)->setEnabled(TRUE);
+					((QPushButton*)obj)->setEnabled(TRUE);
 				}
 				else
 				{
-					((QButton*)obj)->setEnabled( FALSE );
+					((QPushButton*)obj)->setEnabled( FALSE );
 				}
 			}
 
