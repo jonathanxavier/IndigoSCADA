@@ -9,6 +9,7 @@
  *   for full copyright notice and license terms. 
  *
  */
+
 #include <qt.h>
 #include "IndentedTrace.h"
 #include "general_defines.h"

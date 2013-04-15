@@ -50,7 +50,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /machine:IX86
-# ADD LINK32 "qt-mtnc321.lib" "qtmain.lib" "kernel32.lib" "user32.lib" "gdi32.lib" "comdlg32.lib" "advapi32.lib" "shell32.lib" "ole32.lib" "oleaut32.lib" "uuid.lib" "imm32.lib" "winmm.lib" "wsock32.lib" "winspool.lib" "designerlib.lib" "kernel32.lib" "user32.lib" "gdi32.lib" "comdlg32.lib" "advapi32.lib" "shell32.lib" "ole32.lib" "oleaut32.lib" "uuid.lib" "imm32.lib" "winmm.lib" "wsock32.lib" "winspool.lib" "opengl32.lib" "glu32.lib" "delayimp.lib" "qassistantclient.lib" "qui.lib" "designerlib.lib" /nologo /subsystem:windows /machine:IX86 /out:"c:\scada\bin\hmi_designer.exe" /libpath:"$(QTDIR)\lib" /libpath:"C:\scada\lib" /DELAYLOAD:comdlg32.dll /DELAYLOAD:oleaut32.dll /DELAYLOAD:winmm.dll /DELAYLOAD:wsock32.dll /DELAYLOAD:winspool.dll
+# ADD LINK32 "qt-mt3.lib" "qtmain.lib" "kernel32.lib" "user32.lib" "gdi32.lib" "comdlg32.lib" "advapi32.lib" "shell32.lib" "ole32.lib" "oleaut32.lib" "uuid.lib" "imm32.lib" "winmm.lib" "wsock32.lib" "winspool.lib" "designerlib.lib" "kernel32.lib" "user32.lib" "gdi32.lib" "comdlg32.lib" "advapi32.lib" "shell32.lib" "ole32.lib" "oleaut32.lib" "uuid.lib" "imm32.lib" "winmm.lib" "wsock32.lib" "winspool.lib" "opengl32.lib" "glu32.lib" "delayimp.lib" "qassistantclient.lib" "qui.lib" "designerlib.lib" /nologo /subsystem:windows /machine:IX86 /out:"c:\scada\bin\hmi_designer.exe" /libpath:"$(QTDIR)\lib" /libpath:"C:\scada\lib" /DELAYLOAD:comdlg32.dll /DELAYLOAD:oleaut32.dll /DELAYLOAD:winmm.dll /DELAYLOAD:wsock32.dll /DELAYLOAD:winspool.dll
 # SUBTRACT LINK32 /pdb:none
 
 !ELSEIF  "$(CFG)" == "designer - Win32 Debug"
@@ -74,7 +74,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /machine:IX86
-# ADD LINK32 "qt-mtnc321.lib" "qtmain.lib" "kernel32.lib" "user32.lib" "gdi32.lib" "comdlg32.lib" "advapi32.lib" "shell32.lib" "ole32.lib" "oleaut32.lib" "uuid.lib" "imm32.lib" "winmm.lib" "wsock32.lib" "winspool.lib" "kernel32.lib" "user32.lib" "gdi32.lib" "comdlg32.lib" "advapi32.lib" "shell32.lib" "ole32.lib" "oleaut32.lib" "uuid.lib" "imm32.lib" "winmm.lib" "wsock32.lib" "winspool.lib" "opengl32.lib" "glu32.lib" "delayimp.lib" "qassistantclient.lib" "qui.lib" "designerlib.lib" /nologo /subsystem:windows /debug /machine:IX86 /out:"c:\scada\bin\hmi_designer.exe" /pdbtype:sept /libpath:"$(QTDIR)\lib" /libpath:"C:\scada\lib"
+# ADD LINK32 "qt-mt3.lib" "qtmain.lib" "kernel32.lib" "user32.lib" "gdi32.lib" "comdlg32.lib" "advapi32.lib" "shell32.lib" "ole32.lib" "oleaut32.lib" "uuid.lib" "imm32.lib" "winmm.lib" "wsock32.lib" "winspool.lib" "kernel32.lib" "user32.lib" "gdi32.lib" "comdlg32.lib" "advapi32.lib" "shell32.lib" "ole32.lib" "oleaut32.lib" "uuid.lib" "imm32.lib" "winmm.lib" "wsock32.lib" "winspool.lib" "opengl32.lib" "glu32.lib" "delayimp.lib" "qassistantclient.lib" "qui.lib" "designerlib.lib" /nologo /subsystem:windows /debug /machine:IX86 /out:"c:\scada\bin\hmi_designer.exe" /pdbtype:sept /libpath:"$(QTDIR)\lib" /libpath:"C:\scada\lib"
 
 !ENDIF 
 

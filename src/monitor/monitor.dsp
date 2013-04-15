@@ -54,7 +54,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib WSOCK32.LIB scada.lib snmpapi.lib utilities.lib qt-mtnc$(QTVER).lib eic.lib /nologo /subsystem:console /pdb:"Release/monitor.pdb" /debug /machine:I386 /libpath:"$(QTDIR)\lib" /libpath:"c:\scada\lib" /libpath:"..\softlogic\EiC-4.4.2\src"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib WSOCK32.LIB scada.lib snmpapi.lib utilities.lib qt-mt3.lib eic.lib /nologo /subsystem:console /pdb:"Release/monitor.pdb" /debug /machine:I386 /libpath:"$(QTDIR)\lib" /libpath:"c:\scada\lib" /libpath:"..\softlogic\EiC-4.4.2\src"
 # SUBTRACT LINK32 /pdb:none
 
 !ELSEIF  "$(CFG)" == "monitor - Win32 Debug"
@@ -80,7 +80,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib WSOCK32.LIB scadad.lib snmpapi.lib utilitiesd.lib qt-mtnc$(QTVER).lib /nologo /subsystem:console /incremental:no /pdb:"Debug/monitor.pdb" /debug /machine:I386 /nodefaultlib:"libcmt.lib" /pdbtype:sept /libpath:"$(QTDIR)\lib" /libpath:"c:\scada\lib" /libpath:"..\softlogic\EiC-4.4.2\src"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib WSOCK32.LIB scadad.lib snmpapi.lib utilitiesd.lib qt-mt3.lib /nologo /subsystem:console /incremental:no /pdb:"Debug/monitor.pdb" /debug /machine:I386 /nodefaultlib:"libcmt.lib" /pdbtype:sept /libpath:"$(QTDIR)\lib" /libpath:"c:\scada\lib" /libpath:"..\softlogic\EiC-4.4.2\src"
 # SUBTRACT LINK32 /pdb:none
 
 !ENDIF 

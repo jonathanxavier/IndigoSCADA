@@ -51,11 +51,11 @@ void Breaker::mouseReleaseEvent(QMouseEvent * e)
 
 		emit RightClicked(QString("Breaker"), name);
 	}
-	else
-	{
-		toggleValueManually();
-		update();
-	}
+	//else
+	//{
+	//	toggleValueManually();
+	//	update();
+	//}
 }
 
 /*!
@@ -63,13 +63,13 @@ void Breaker::mouseReleaseEvent(QMouseEvent * e)
 */
 void Breaker::keyReleaseEvent(QKeyEvent *e)
 {
-    int keyPressed=e->key();
+//    int keyPressed=e->key();
 
-    if(keyPressed==Qt::Key_Return || keyPressed==Qt::Key_Space)
-    {
-        toggleValueManually();
-        update();
-    }
+//    if(keyPressed==Qt::Key_Return || keyPressed==Qt::Key_Space)
+//    {
+//        toggleValueManually();
+//        update();
+//    }
 }
 
 #include "breaker_closed.xpm"
