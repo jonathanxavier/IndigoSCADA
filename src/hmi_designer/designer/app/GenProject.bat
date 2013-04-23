@@ -1,1 +1,0 @@
-qmake -Wnone -tp vc
