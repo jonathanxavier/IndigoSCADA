@@ -38,7 +38,7 @@ RSC=rc.exe
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 0
 # PROP Output_Dir "C:\scada/lib"
-# PROP Intermediate_Dir "."
+# PROP Intermediate_Dir "tmp/obj/release-shared-mt"
 # PROP Target_Dir ""
 # ADD CPP /nologo /MD /W3 /GR /GX /O1 /I "..\shared" /I "..\uilib" /I "$(QTDIR)\include" /I "." /I "tmp\moc\release-shared-mt" /I "C:\Qt\3.3.8\mkspecs\win32-msvc" /FI"designer_pch.h" /D "WIN32" /D "NDEBUG" /D "_LIB" /D "UNICODE" /D "DESIGNER" /D "QT_INTERNAL_XML" /D "QT_INTERNAL_WORKSPACE" /D "QT_INTERNAL_ICONVIEW" /D "QT_INTERNAL_TABLE" /D QM_TEMPLATE_EXTERN_TABLE=extern /D "QT_DLL" /D "QT_THREAD_SUPPORT" /D "QT_ACCESSIBILITY_SUPPORT" /D "QT_TABLET_SUPPORT" /D "QT_NO_DEBUG" /Yu"designer_pch.h" /FD -Zm200 /c
 # ADD BASE RSC /l 0x409
@@ -80,6 +80,13 @@ LIB32=link.exe -lib
 # Begin Source File
 
 SOURCE=actiondnd.cpp
+
+!IF  "$(CFG)" == "designerlib - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "designerlib - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
@@ -220,6 +227,14 @@ SOURCE=menubareditor.cpp
 # Begin Source File
 
 SOURCE=metadatabase.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\moc_actiondnd.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\moc_actioneditor.cpp
 # End Source File
 # Begin Source File
 
@@ -375,23 +390,60 @@ SOURCE=actiondnd.h
 
 !IF  "$(CFG)" == "designerlib - Win32 Release"
 
-USERDEP__ACTIO=""$(QTDIR)\bin\moc.exe""	
-# Begin Custom Build - Moc'ing actiondnd.h...
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - MOCing actiondnd.h...
+InputDir=.
 InputPath=actiondnd.h
+InputName=actiondnd
 
-"tmp\moc\release-shared-mt\moc_actiondnd.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc actiondnd.h -o tmp\moc\release-shared-mt\moc_actiondnd.cpp
+"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	%qtdir%\bin\moc.exe $(InputDir)\$(InputName).h -o $(InputDir)\moc_$(InputName).cpp
 
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "designerlib - Win32 Debug"
 
-USERDEP__ACTIO=""$(QTDIR)\bin\moc.exe""	
-# Begin Custom Build - Moc'ing actiondnd.h...
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - MOCing actiondnd.h...
+InputDir=.
 InputPath=actiondnd.h
+InputName=actiondnd
 
-"tmp\moc\release-shared-mt\moc_actiondnd.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc actiondnd.h -o tmp\moc\release-shared-mt\moc_actiondnd.cpp
+"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	%qtdir%\bin\moc.exe $(InputDir)\$(InputName).h -o $(InputDir)\moc_$(InputName).cpp
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=actioneditor.h
+
+!IF  "$(CFG)" == "designerlib - Win32 Release"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - MOCing actioneditor.h...
+InputDir=.
+InputPath=actioneditor.h
+InputName=actioneditor
+
+"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	%qtdir%\bin\moc.exe $(InputDir)\$(InputName).h -o $(InputDir)\moc_$(InputName).cpp
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "designerlib - Win32 Debug"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - MOCing actioneditor.h...
+InputDir=.
+InputPath=actioneditor.h
+InputName=actioneditor
+
+"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	%qtdir%\bin\moc.exe $(InputDir)\$(InputName).h -o $(InputDir)\moc_$(InputName).cpp
 
 # End Custom Build
 
@@ -404,7 +456,7 @@ SOURCE=actioneditorimpl.h
 
 !IF  "$(CFG)" == "designerlib - Win32 Release"
 
-USERDEP__ACTION=""$(QTDIR)\bin\moc.exe""	
+USERDEP__ACTIO=""$(QTDIR)\bin\moc.exe""	
 # Begin Custom Build - Moc'ing actioneditorimpl.h...
 InputPath=actioneditorimpl.h
 
@@ -415,7 +467,7 @@ InputPath=actioneditorimpl.h
 
 !ELSEIF  "$(CFG)" == "designerlib - Win32 Debug"
 
-USERDEP__ACTION=""$(QTDIR)\bin\moc.exe""	
+USERDEP__ACTIO=""$(QTDIR)\bin\moc.exe""	
 # Begin Custom Build - Moc'ing actioneditorimpl.h...
 InputPath=actioneditorimpl.h
 
@@ -437,7 +489,7 @@ SOURCE=actionlistview.h
 
 !IF  "$(CFG)" == "designerlib - Win32 Release"
 
-USERDEP__ACTIONL=""$(QTDIR)\bin\moc.exe""	
+USERDEP__ACTION=""$(QTDIR)\bin\moc.exe""	
 # Begin Custom Build - Moc'ing actionlistview.h...
 InputPath=actionlistview.h
 
@@ -448,7 +500,7 @@ InputPath=actionlistview.h
 
 !ELSEIF  "$(CFG)" == "designerlib - Win32 Debug"
 
-USERDEP__ACTIONL=""$(QTDIR)\bin\moc.exe""	
+USERDEP__ACTION=""$(QTDIR)\bin\moc.exe""	
 # Begin Custom Build - Moc'ing actionlistview.h...
 InputPath=actionlistview.h
 
@@ -705,7 +757,7 @@ SOURCE=designer_pch.h
 USERDEP__DESIG="..\..\..\include\private\qucomextra_p.h"	"..\..\..\include\qaction.h"	"..\..\..\include\qapplication.h"	"..\..\..\include\qcheckbox.h"	"..\..\..\include\qcombobox.h"	"..\..\..\include\qdialog.h"	"..\..\..\include\qheader.h"	"..\..\..\include\qlabel.h"	"..\..\..\include\qlayout.h"	"..\..\..\include\qlineedit.h"	"..\..\..\include\qlistbox.h"	"..\..\..\include\qlistview.h"	"..\..\..\include\qmap.h"	"..\..\..\include\qmessagebox.h"	"..\..\..\include\qmetaobject.h"	"..\..\..\include\qobjectlist.h"	"..\..\..\include\qpainter.h"	"..\..\..\include\qpixmap.h"	"..\..\..\include\qpushbutton.h"	"..\..\..\include\qspinbox.h"	"..\..\..\include\qstring.h"	"..\..\..\include\qtooltip.h"	"..\..\..\include\qvariant.h"	"..\..\..\include\qwhatsthis.h"	"..\..\..\include\qwidget.h"	"command.h"	"formwindow.h"	"mainwindow.h"	"metadatabase.h"	"project.h"	"widgetfactory.h"	"..\..\..\include\private\qucom_p.h"	"..\..\..\include\quuid.h"	"..\..\..\include\qcstring.h"	"..\..\..\include\qwinexport.h"	"..\..\..\include\qmemarray.h"	"..\..\..\include\qgarray.h"	"..\..\..\include\qshared.h"	"..\..\..\include\qglobal.h"	"..\..\..\include\qconfig-minimal.h"	"..\..\..\include\qconfig-small.h"\
 	"..\..\..\include\qconfig-medium.h"	"..\..\..\include\qconfig-large.h"	"..\..\..\include\qconfig.h"	"..\..\..\include\qmodules.h"	"..\..\..\include\qfeatures.h"	"..\..\..\include\qobject.h"	"..\..\..\include\qiconset.h"	"..\..\..\include\qkeysequence.h"	"..\..\..\include\qobjectdefs.h"	"..\..\..\include\qwindowdefs.h"	"..\..\..\include\qevent.h"	"..\..\..\include\qnamespace.h"	"..\..\..\include\qwindowdefs_win.h"	"..\..\..\include\qregion.h"	"..\..\..\include\qmime.h"	"..\..\..\include\qpair.h"	"..\..\..\include\qrect.h"	"..\..\..\include\qsize.h"	"..\..\..\include\qpoint.h"	"..\..\..\include\qptrlist.h"	"..\..\..\include\qdatastream.h"	"..\..\..\include\qvaluelist.h"	"..\..\..\include\qiodevice.h"	"..\..\..\include\qtl.h"	"..\..\..\include\qtextstream.h"	"..\..\..\include\qglist.h"	"..\..\..\include\qptrcollection.h"	"..\..\..\include\qpa"	
 # Begin Custom Build - Creating PCH cpp from designer_pch.h...
-IntDir=.\.
+IntDir=.\tmp/obj/release-shared-mt
 InputPath=designer_pch.h
 
 "$(IntDir)\designerlib.pch" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
@@ -4535,40 +4587,7 @@ SOURCE=about.h
 # End Source File
 # Begin Source File
 
-SOURCE="tmp\moc\release-shared-mt\actiondnd.moc"
-
-!IF  "$(CFG)" == "designerlib - Win32 Release"
-
-USERDEP__ACTIOND=".\actiondnd.cpp"	"$(QTDIR)\bin\moc.exe"	
-# Begin Custom Build - Moc'ing actiondnd.cpp...
-InputPath=tmp\moc\release-shared-mt\actiondnd.moc
-
-"tmp\moc\release-shared-mt\actiondnd.moc" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc actiondnd.cpp -o tmp\moc\release-shared-mt\actiondnd.moc
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "designerlib - Win32 Debug"
-
-USERDEP__ACTIOND=".\actiondnd.cpp"	"$(QTDIR)\bin\moc.exe"	
-# Begin Custom Build - Moc'ing actiondnd.cpp...
-InputPath=tmp\moc\release-shared-mt\actiondnd.moc
-
-"tmp\moc\release-shared-mt\actiondnd.moc" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc actiondnd.cpp -o tmp\moc\release-shared-mt\actiondnd.moc
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=actioneditor.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=actioneditor.h
+SOURCE=.\actioneditor.cpp
 # End Source File
 # Begin Source File
 
@@ -4693,14 +4712,6 @@ SOURCE=listvieweditor.h
 # Begin Source File
 
 SOURCE="tmp\moc\release-shared-mt\moc_about.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="tmp\moc\release-shared-mt\moc_actiondnd.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE="tmp\moc\release-shared-mt\moc_actioneditor.cpp"
 # End Source File
 # Begin Source File
 

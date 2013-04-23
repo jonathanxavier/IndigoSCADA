@@ -129,17 +129,6 @@ void QDesignerAction::remove()
     widgetToInsert->reparent( 0, QPoint( 0, 0 ), FALSE );
 }
 
-class QDesignerIndicatorWidget : public QWidget
-{
-    Q_OBJECT
-
-public:
-    QDesignerIndicatorWidget( QWidget *p )
-	: QWidget( p, "qt_dockwidget_internal" ) {
-	    setBackgroundColor( red );
-    }
-
-};
 
 QDesignerToolBarSeparator::QDesignerToolBarSeparator(Orientation o , QToolBar *parent,
                                      const char* name )
@@ -733,4 +722,4 @@ void QDesignerToolBar::installEventFilters( QWidget *w )
     delete l;
 }
 
-#include "actiondnd.moc"
+//#include "moc_actiondnd.cpp"

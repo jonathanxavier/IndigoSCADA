@@ -39,7 +39,21 @@
 #include "../shared/widgetdatabase.h"
 
 //class QDesignerPopupMenu;
-class QDesignerIndicatorWidget;
+//class QDesignerIndicatorWidget;
+
+class QDesignerIndicatorWidget : public QWidget
+{
+    Q_OBJECT
+
+public:
+    QDesignerIndicatorWidget( QWidget *p )
+	: QWidget( p, "qt_dockwidget_internal" ) {
+	    setBackgroundColor( red );
+    }
+
+};
+
+
 class FormWindow;
 class QPopupMenu;
 

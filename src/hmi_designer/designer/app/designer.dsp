@@ -38,7 +38,7 @@ RSC=rc.exe
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 0
-# PROP Output_Dir "C:\Qt\3.3.8/bin"
+# PROP Output_Dir "c:\scada\bin"
 # PROP Intermediate_Dir "tmp/obj/release-shared-mt"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""

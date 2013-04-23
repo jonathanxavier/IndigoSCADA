@@ -900,7 +900,7 @@ void Modbus_driver_Instance::Command(const QString & name, BYTE cmd, LPVOID lpPa
 	QString value_for_command;
 	value_for_command.sprintf("%lf", (params->res[0]).value);
 	// 
-	GetConfigureDb()->DoExec(this, pc, tGetIOAfromSamplePointName, value_for_command);
+	GetConfigureDb()->DoExec(this, pc, tGetIOAfromSamplePointName, value_for_command, sample_point_name);
 }
 
 
