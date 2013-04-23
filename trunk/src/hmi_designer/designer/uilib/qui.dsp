@@ -13,7 +13,7 @@ CFG=qui - Win32 Release
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "qui.mak" CFG="qui - Win32 Debug"
+!MESSAGE NMAKE /f "qui.mak" CFG="qui - Win32 Release"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
@@ -37,16 +37,16 @@ RSC=rc.exe
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 0
-# PROP Output_Dir "../../../lib"
+# PROP Output_Dir "C:\scada\lib"
 # PROP Intermediate_Dir "tmp/obj/release-shared-mt"
 # PROP Target_Dir ""
-# ADD CPP -MD /W3 /I "..\shared" /I "$(QTDIR)\include" /I "." /I "tmp\moc\release-shared-mt" /I "C:\Qt\3.3.8\mkspecs\win32-msvc" /D "WIN32" /D "NDEBUG" /D "_LIB" /D UNICODE /D QT_INTERNAL_XML /D Q_TEMPLATE_EXTERN=extern /D RESOURCE /D QT_DLL /D QT_THREAD_SUPPORT /D QT_ACCESSIBILITY_SUPPORT /D QT_TABLET_SUPPORT /D "QT_NO_DEBUG" /FD /c -nologo -Zm200 -GX -GX -GR -O1 
+# ADD CPP /nologo /MD /W3 /GR /GX /O1 /I "..\shared" /I "$(QTDIR)\include" /I "." /I "tmp\moc\release-shared-mt" /I "C:\Qt\3.3.8\mkspecs\win32-msvc" /D "WIN32" /D "NDEBUG" /D "_LIB" /D "UNICODE" /D "QT_INTERNAL_XML" /D Q_TEMPLATE_EXTERN=extern /D "RESOURCE" /D "QT_DLL" /D "QT_THREAD_SUPPORT" /D "QT_ACCESSIBILITY_SUPPORT" /D "QT_TABLET_SUPPORT" /D "QT_NO_DEBUG" /FD -Zm200 /c
+# ADD BASE RSC /l 0x410
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LIB32=link.exe -lib
-# ADD LIB32 /nologo /out:"..\..\..\lib\qui.lib" 
-
+# ADD LIB32 /nologo
 
 !ELSEIF  "$(CFG)" == "qui - Win32 Debug"
 
@@ -60,13 +60,13 @@ LIB32=link.exe -lib
 # PROP Output_Dir "Debug"
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
-# ADD CPP -MDd /W3 /GZ /ZI /Od /I "..\shared" /I "$(QTDIR)\include" /I "." /I "tmp\moc\release-shared-mt" /I "C:\Qt\3.3.8\mkspecs\win32-msvc" /D "WIN32" /D "_DEBUG" /D "_LIB" /D UNICODE /D QT_INTERNAL_XML /D Q_TEMPLATE_EXTERN=extern /D RESOURCE /D QT_DLL /D QT_THREAD_SUPPORT /D QT_ACCESSIBILITY_SUPPORT /D QT_TABLET_SUPPORT /FD /c -nologo -Zm200 -GX -GX -GR  -Zi  
+# ADD CPP /nologo /MDd /W3 /GR /GX /Zi /Od /I "..\shared" /I "$(QTDIR)\include" /I "." /I "tmp\moc\release-shared-mt" /I "C:\Qt\3.3.8\mkspecs\win32-msvc" /D "WIN32" /D "_DEBUG" /D "_LIB" /D "UNICODE" /D "QT_INTERNAL_XML" /D Q_TEMPLATE_EXTERN=extern /D "RESOURCE" /D "QT_DLL" /D "QT_THREAD_SUPPORT" /D "QT_ACCESSIBILITY_SUPPORT" /D "QT_TABLET_SUPPORT" /FD /GZ -Zm200 /c
+# ADD BASE RSC /l 0x410
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LIB32=link.exe -lib
-# ADD LIB32 /nologo /out:"..\..\..\lib\qui.lib" 
-
+# ADD LIB32 /nologo /out:"..\..\..\lib\qui.lib"
 
 !ENDIF 
 
@@ -79,7 +79,7 @@ LIB32=link.exe -lib
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
-SOURCE=qwidgetfactory.cpp
+SOURCE=..\designer\database.cpp
 # End Source File
 # Begin Source File
 
@@ -87,89 +87,65 @@ SOURCE=..\shared\domtool.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\shared\uib.cpp
+SOURCE=qwidgetfactory.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\designer\database.cpp
+SOURCE=..\shared\uib.cpp
 # End Source File
-
 # End Group
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
-SOURCE=..\shared\domtool.h
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\shared\uib.h
-
-# End Source File
-# Begin Source File
-
 SOURCE=..\designer\database2.h
-
-USERDEP_=""$(QTDIR)\bin\moc.exe""
 
 !IF  "$(CFG)" == "qui - Win32 Release"
 
+USERDEP__DATAB=""$(QTDIR)\bin\moc.exe""	
 # Begin Custom Build - Moc'ing ..\designer\database2.h...
-InputPath=.\..\designer\database2.h
-
-
-BuildCmds= \
-	$(QTDIR)\bin\moc ..\designer\database2.h -o tmp\moc\release-shared-mt\moc_database2.cpp \
+InputPath=..\designer\database2.h
 
 "tmp\moc\release-shared-mt\moc_database2.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-   $(BuildCmds)
+	$(QTDIR)\bin\moc ..\designer\database2.h -o tmp\moc\release-shared-mt\moc_database2.cpp
 
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "qui - Win32 Debug"
 
+USERDEP__DATAB=""$(QTDIR)\bin\moc.exe""	
 # Begin Custom Build - Moc'ing ..\designer\database2.h...
-InputPath=.\..\designer\database2.h
-
-
-BuildCmds= \
-	$(QTDIR)\bin\moc ..\designer\database2.h -o tmp\moc\release-shared-mt\moc_database2.cpp \
+InputPath=..\designer\database2.h
 
 "tmp\moc\release-shared-mt\moc_database2.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-   $(BuildCmds)
+	$(QTDIR)\bin\moc ..\designer\database2.h -o tmp\moc\release-shared-mt\moc_database2.cpp
 
 # End Custom Build
 
 !ENDIF 
 
 # End Source File
+# Begin Source File
 
+SOURCE=..\shared\domtool.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\shared\uib.h
+# End Source File
 # End Group
 # Begin Group "Resource Files"
 
 # PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 # End Group
-
-
-
-
-
-
-
 # Begin Group "Generated"
+
+# PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=tmp\moc\release-shared-mt\moc_database2.cpp
+SOURCE="tmp\moc\release-shared-mt\moc_database2.cpp"
 # End Source File
-
-
-
-
-
-# Prop Default_Filter "moc"
 # End Group
 # End Target
 # End Project
-
