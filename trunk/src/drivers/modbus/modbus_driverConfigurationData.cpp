@@ -1,8 +1,8 @@
 /****************************************************************************
 ** Form implementation generated from reading ui file 'modbus_driver_configuration.ui'
 **
-** Created: Sat Mar 16 15:33:42 2013
-**      by: The User Interface Compiler ($Id: qt/main.cpp   3.2.1   edited May 19 14:22 $)
+** Created: Tue Sep 24 09:32:09 2013
+**      by: The User Interface Compiler ($Id: main.cpp 2051 2007-02-21 10:04:20Z chehrlic $)
 **
 ** WARNING! All changes made in this file will be lost!
 ****************************************************************************/
@@ -62,6 +62,8 @@ Modbus_driverConfigurationData::Modbus_driverConfigurationData( QWidget* parent,
 
     Parity = new QLineEdit( this, "Parity" );
     Parity->setGeometry( QRect( 170, 430, 200, 20 ) );
+    Parity->setFrameShape( QLineEdit::LineEditPanel );
+    Parity->setFrameShadow( QLineEdit::Sunken );
 
     SerialDevice = new QLineEdit( this, "SerialDevice" );
     SerialDevice->setGeometry( QRect( 170, 270, 200, 20 ) );
@@ -96,10 +98,6 @@ Modbus_driverConfigurationData::Modbus_driverConfigurationData( QWidget* parent,
     DataBits->setGeometry( QRect( 170, 350, 200, 20 ) );
     DataBits->setMaxValue( 8 );
 
-    StopBit = new QSpinBox( this, "StopBit" );
-    StopBit->setGeometry( QRect( 170, 390, 200, 20 ) );
-    StopBit->setMaxValue( 1 );
-
     NItems = new QSpinBox( this, "NItems" );
     NItems->setGeometry( QRect( 170, 480, 100, 20 ) );
     NItems->setMaxValue( 1000 );
@@ -125,6 +123,10 @@ Modbus_driverConfigurationData::Modbus_driverConfigurationData( QWidget* parent,
 
     OkButton = new QPushButton( this, "OkButton" );
     OkButton->setGeometry( QRect( 50, 550, 82, 26 ) );
+
+    StopBit = new QSpinBox( this, "StopBit" );
+    StopBit->setGeometry( QRect( 170, 390, 200, 20 ) );
+    StopBit->setMaxValue( 2 );
     languageChange();
     resize( QSize(429, 610).expandedTo(minimumSizeHint()) );
     clearWState( WState_Polished );

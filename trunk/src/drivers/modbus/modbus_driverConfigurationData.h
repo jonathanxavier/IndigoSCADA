@@ -1,8 +1,8 @@
 /****************************************************************************
 ** Form interface generated from reading ui file 'modbus_driver_configuration.ui'
 **
-** Created: Sat Mar 16 15:33:40 2013
-**      by: The User Interface Compiler ($Id: qt/main.cpp   3.2.1   edited May 19 14:22 $)
+** Created: Tue Sep 24 09:31:59 2013
+**      by: The User Interface Compiler ($Id: main.cpp 2051 2007-02-21 10:04:20Z chehrlic $)
 **
 ** WARNING! All changes made in this file will be lost!
 ****************************************************************************/
@@ -16,6 +16,7 @@
 class QVBoxLayout;
 class QHBoxLayout;
 class QGridLayout;
+class QSpacerItem;
 class QLabel;
 class QLineEdit;
 class QSpinBox;
@@ -50,7 +51,6 @@ public:
     QSpinBox* PollInterval;
     QSpinBox* Baud;
     QSpinBox* DataBits;
-    QSpinBox* StopBit;
     QSpinBox* NItems;
     QButtonGroup* buttonGroup1;
     QRadioButton* TCPButton;
@@ -59,6 +59,7 @@ public:
     QPushButton* HelpButton;
     QPushButton* CancelButton;
     QPushButton* OkButton;
+    QSpinBox* StopBit;
 
 public slots:
     virtual void Help();
