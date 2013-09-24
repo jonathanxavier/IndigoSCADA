@@ -1,4 +1,4 @@
-<!DOCTYPE UI><UI version="3.2" stdsetdef="1">
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
 <class>Modbus_driverConfigurationData</class>
 <widget class="QDialog">
     <property name="name">
@@ -171,6 +171,12 @@
                 <height>20</height>
             </rect>
         </property>
+        <property name="frameShape">
+            <enum>LineEditPanel</enum>
+        </property>
+        <property name="frameShadow">
+            <enum>Sunken</enum>
+        </property>
     </widget>
     <widget class="QLineEdit">
         <property name="name">
@@ -312,22 +318,6 @@
     </widget>
     <widget class="QSpinBox">
         <property name="name">
-            <cstring>StopBit</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>170</x>
-                <y>390</y>
-                <width>200</width>
-                <height>20</height>
-            </rect>
-        </property>
-        <property name="maxValue">
-            <number>1</number>
-        </property>
-    </widget>
-    <widget class="QSpinBox">
-        <property name="name">
             <cstring>NItems</cstring>
         </property>
         <property name="geometry">
@@ -455,6 +445,22 @@
         </property>
         <property name="text">
             <string>Ok</string>
+        </property>
+    </widget>
+    <widget class="QSpinBox">
+        <property name="name">
+            <cstring>StopBit</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>170</x>
+                <y>390</y>
+                <width>200</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property name="maxValue">
+            <number>2</number>
         </property>
     </widget>
 </widget>
