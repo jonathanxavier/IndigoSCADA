@@ -543,7 +543,7 @@ int modbus_imp::PollItems(void)
 			{
 				bit_size = 1;
 
-				int address = Config_db[rowNumber].modbus_start_address + Config_db[rowNumber].offset;
+				int address = Config_db[rowNumber].modbus_start_address;
 
 				rc = modbus_read_bits(ctx, address, bit_size, tab_rp_bits);
 
@@ -596,7 +596,7 @@ int modbus_imp::PollItems(void)
 			{
 				bit_size = 1;
 
-				int address = Config_db[rowNumber].modbus_start_address + Config_db[rowNumber].offset;
+				int address = Config_db[rowNumber].modbus_start_address;
 
 				rc = modbus_read_input_bits(ctx, address, bit_size, tab_rp_bits);
 
@@ -648,7 +648,7 @@ int modbus_imp::PollItems(void)
 			{
 				int registers = 2; //read 32 bits
 
-				int address = Config_db[rowNumber].modbus_start_address + Config_db[rowNumber].offset;
+				int address = Config_db[rowNumber].modbus_start_address;
 
 				rc = modbus_read_registers(ctx, address, registers, tab_rp_registers);
 
@@ -727,7 +727,7 @@ int modbus_imp::PollItems(void)
 			{
 				int registers = 1; //read 16 bits
 
-				int address = Config_db[rowNumber].modbus_start_address + Config_db[rowNumber].offset;
+				int address = Config_db[rowNumber].modbus_start_address;
 
 				rc = modbus_read_registers(ctx, address, registers, tab_rp_registers);
 				printf("modbus_read_registers: ");
@@ -768,6 +768,43 @@ int modbus_imp::PollItems(void)
 					item_to_send.iec_obj.o.type35.mv = integer16;
 					item_to_send.iec_obj.o.type35.time = actual_time;
 					item_to_send.iec_obj.o.type35.iv = 0;
+
+				}
+				else if(item_to_send.iec_type = M_SP_TB_1)
+				{
+					short integer16;
+					integer16 = tab_rp_registers[0];
+
+					//uint8_t value = get_bit_from_word(integer16, Config_db[rowNumber].offset);				
+					//get a bit value from a word
+					uint8_t value = integer16&(1 << Config_db[rowNumber].offset)  ? 1 : 0;				
+					
+					printf("get bit from word: value = %d\n", (int)value);
+
+					if(Config_db[rowNumber].last_value.a != value)
+					{
+						Config_db[rowNumber].last_value.a = value;
+
+						send_item = true;
+					}
+					else
+					{
+						send_item = false;
+					}
+					
+					item_to_send.iec_obj.ioa = Config_db[rowNumber].ioa_control_center;
+
+					item_to_send.cause = 0x03;
+				
+					item_to_send.iec_type = M_SP_TB_1;
+					
+					get_utc_host_time(&actual_time);
+
+					item_to_send.iec_obj.o.type30.sp = value;
+					item_to_send.iec_obj.o.type30.time = actual_time;
+					item_to_send.iec_obj.o.type30.iv = 0;
+					
+					IT_COMMENT1("Value = %d", value);
 				}
 			}
 			else
@@ -1311,7 +1348,7 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 								// Single
 								int rc;
 
-								int address = Config_db[rowNumber].modbus_start_address + Config_db[rowNumber].offset;
+								int address = Config_db[rowNumber].modbus_start_address;
 								
 								rc = modbus_write_bit(ctx, address, cmd_val.v);
 
@@ -1329,6 +1366,71 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 								printf("Modbus type %d not supported with FC_WRITE_SINGLE_COIL", Config_db[rowNumber].modbus_type);
 							}
 						}
+						else if(Config_db[rowNumber].modbus_function_write == FC_WRITE_MULTIPLE_REGISTERS)
+						{
+							//0x10
+
+							if(Config_db[rowNumber].modbus_type == VT_I2)
+							{
+								int registers = 1; //read 16 bits
+
+								int address = Config_db[rowNumber].modbus_start_address;
+
+								int rc;
+								rc = modbus_read_registers(ctx, address, registers, tab_rp_registers);
+								printf("modbus_read_registers: ");
+
+								if (rc == registers) 
+								{
+									printf("OK\n");
+								} 
+								else 
+								{
+									printf("FAILED\n");
+									//error
+								}
+
+								short integer16;
+								integer16 = tab_rp_registers[0];
+																
+								
+								short int_val = (short)cmd_val.f;
+
+								//write int_val at Config_db[rowNumber].offset
+
+								if(int_val == 1)
+								{
+									integer16 = integer16|(1 << Config_db[rowNumber].offset);
+								}
+								else if(int_val == 0)
+								{
+									integer16 = integer16&(~(1 << Config_db[rowNumber].offset));
+								}
+
+								tab_rp_registers[0] = integer16;
+																
+
+								// Many registers
+								
+								rc = modbus_write_registers(ctx, address, registers, tab_rp_registers);
+
+								printf("modbus_write_registers: ");
+
+								if (rc == registers) 
+								{
+									printf("OK\n");
+								} 
+								else 
+								{
+									printf("FAILED\n");
+									//error
+								}
+							}
+							else
+							{
+								printf("Modbus type %d not supported with FC_WRITE_MULTIPLE_REGISTERS", Config_db[rowNumber].modbus_type);
+							}
+						}
 					}
 					break;
 					case C_SE_TC_1:
@@ -1343,7 +1445,7 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 
 								int registers = 2; //we write 32 bits
 
-								int address = Config_db[rowNumber].modbus_start_address + Config_db[rowNumber].offset;
+								int address = Config_db[rowNumber].modbus_start_address;
 
 								// Many registers
 								int rc;
@@ -1381,7 +1483,7 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 								
 								int registers = 2; //we write 32 bits
 
-								int address = Config_db[rowNumber].modbus_start_address + Config_db[rowNumber].offset;
+								int address = Config_db[rowNumber].modbus_start_address;
 
 								// Many registers
 								int rc;
@@ -1419,7 +1521,7 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 								
 								int registers = 1; //we write 16 bits
 
-								int address = Config_db[rowNumber].modbus_start_address + Config_db[rowNumber].offset;
+								int address = Config_db[rowNumber].modbus_start_address;
 
 								// Many registers
 								int rc;
