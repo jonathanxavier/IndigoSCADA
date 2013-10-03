@@ -1383,42 +1383,45 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 								if (rc == registers) 
 								{
 									printf("OK\n");
-								} 
-								else 
-								{
-									printf("FAILED\n");
-									//error
-								}
 
-								short integer16;
-								integer16 = tab_rp_registers[0];
-																
-								
-								short int_val = (short)cmd_val.f;
+									short integer16;
+									integer16 = tab_rp_registers[0];
 
-								//write int_val at Config_db[rowNumber].offset
+									//printf("read integer16 = %x\n",integer16);
+									
+									short int_val = (short)cmd_val.f;
 
-								if(int_val == 1)
-								{
-									integer16 = integer16|(1 << Config_db[rowNumber].offset);
-								}
-								else if(int_val == 0)
-								{
-									integer16 = integer16&(~(1 << Config_db[rowNumber].offset));
-								}
+									//write int_val at Config_db[rowNumber].offset
 
-								tab_rp_registers[0] = integer16;
-																
+									if(int_val == 1)
+									{
+										integer16 = integer16|(1 << Config_db[rowNumber].offset);
+									}
+									else if(int_val == 0)
+									{
+										integer16 = integer16&(~(1 << Config_db[rowNumber].offset));
+									}
 
-								// Many registers
-								
-								rc = modbus_write_registers(ctx, address, registers, tab_rp_registers);
+									//printf("write integer16 = %x\n", integer16);
 
-								printf("modbus_write_registers: ");
+									tab_rp_registers[0] = integer16;
+																	
 
-								if (rc == registers) 
-								{
-									printf("OK\n");
+									// Many registers
+									
+									rc = modbus_write_registers(ctx, address, registers, tab_rp_registers);
+
+									printf("modbus_write_registers: ");
+
+									if (rc == registers) 
+									{
+										printf("OK\n");
+									} 
+									else 
+									{
+										printf("FAILED\n");
+										//error
+									}
 								} 
 								else 
 								{
