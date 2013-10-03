@@ -1225,405 +1225,46 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 			fprintf(stderr,"Aged delta time= %d\n", delta);
 			fflush(stderr);
 
-			if(delta < MAX_COMMAND_SEND_TIME && delta >= 0)
-			{
-				union {
-					unsigned int v;
-					float f;
-				} cmd_val;
-
-				switch(queued_item->iec_type)
-				{
-					case C_SC_TA_1:
-					{
-						cmd_val.v = queued_item->iec_obj.o.type58.scs;
-					}
-					break;
-					case C_DC_TA_1:
-					{
-						cmd_val.f = (float)queued_item->iec_obj.o.type59.dcs;
-					}
-					break;
-					case C_SE_TA_1:
-					{
-						//double Vmin = Item[hClient - 1].min_measure;
-						//double Vmax = Item[hClient - 1].max_measure;
-						//double A = (double)queued_item->iec_obj.o.type61.sv;
-						//int error = 0;
-
-						//cmd_val = rescale_value_inv(A, Vmin, Vmax, &error);
-						//if(error){ return;}
-					}
-					break;
-					case C_SE_TB_1:
-					{
-						//double Vmin = Item[hClient - 1].min_measure;
-						//double Vmax = Item[hClient - 1].max_measure;
-						//double A = (double)queued_item->iec_obj.o.type62.sv;
-						//int error = 0;
-
-						//cmd_val = rescale_value_inv(A, Vmin, Vmax, &error);
-						//if(error){ return;}
-					}
-					break;
-					case C_SE_TC_1:
-					{
-						cmd_val.f = queued_item->iec_obj.o.type63.sv;
-					}
-					break;
-					case C_BO_TA_1:
-					{
-						memcpy(&(cmd_val.v), &(queued_item->iec_obj.o.type64.stcd), sizeof(struct iec_stcd));
-					}
-					break;
-					case C_SC_NA_1:
-					{
-						cmd_val.f = (float)queued_item->iec_obj.o.type45.scs;
-					}
-					break;
-					case C_DC_NA_1:
-					{
-						cmd_val.f = (float)queued_item->iec_obj.o.type46.dcs;
-					}
-					break;
-					case C_SE_NA_1:
-					{
-						//double Vmin = Item[hClient - 1].min_measure;
-						//double Vmax = Item[hClient - 1].max_measure;
-						//double A = (double)queued_item->iec_obj.o.type48.sv;
-						//int error = 0;
-
-						//cmd_val = rescale_value_inv(A, Vmin, Vmax, &error);
-						//if(error){ return;}
-					}
-					break;
-					case C_SE_NB_1:
-					{
-						//double Vmin = Item[hClient - 1].min_measure;
-						//double Vmax = Item[hClient - 1].max_measure;
-						//double A = (double)queued_item->iec_obj.o.type49.sv;
-						//int error = 0;
-
-						//cmd_val = rescale_value_inv(A, Vmin, Vmax, &error);
-						//if(error){ return;}
-					}
-					break;
-					case C_SE_NC_1:
-					{
-						cmd_val.f = queued_item->iec_obj.o.type50.sv;
-					}
-					break;
-					case C_BO_NA_1:
-					{
-						memcpy(&(cmd_val.v), &(queued_item->iec_obj.o.type51.stcd), sizeof(struct iec_stcd));
-					}
-					break;
-					default:
-					{
-						//error
-						//fprintf(stderr,"Error %d, %s\n",__LINE__, __FILE__);
-						//fflush(stderr);
-
-						char show_msg[200];
-						sprintf(show_msg, "Error %d, %s\n",__LINE__, __FILE__);
-						modbus_imp::LogMessage(0, show_msg);
-						
-						return;
-					}
-					break;
-				}
-
-				switch(Config_db[rowNumber].iec_type_write)
-				{
-					case C_SC_TA_1:
-					{
-						if(Config_db[rowNumber].modbus_function_write == FC_WRITE_SINGLE_COIL)
-						{
-							if(Config_db[rowNumber].modbus_type == VT_BOOL)
-							{
-								//0x05
-
-								//COIL BITS
-
-								// Single
-								int rc;
-
-								int address = Config_db[rowNumber].modbus_start_address;
-								
-								rc = modbus_write_bit(ctx, address, cmd_val.v);
-
-								printf("modbus_write_bit: ");
-
-								if (rc == 1) {
-									printf("OK\n");
-								} else {
-									printf("FAILED\n");
-									//error
-								}
-							}
-							else
-							{
-								printf("Modbus type %d not supported with FC_WRITE_SINGLE_COIL", Config_db[rowNumber].modbus_type);
-							}
-						}
-						else if(Config_db[rowNumber].modbus_function_write == FC_WRITE_MULTIPLE_REGISTERS)
-						{
-							//0x10
-
-							if(Config_db[rowNumber].modbus_type == VT_I2)
-							{
-								int registers = 1; //read 16 bits
-
-								int address = Config_db[rowNumber].modbus_start_address;
-
-								int rc;
-								rc = modbus_read_registers(ctx, address, registers, tab_rp_registers);
-								printf("modbus_read_registers: ");
-
-								if (rc == registers) 
-								{
-									printf("OK\n");
-
-									short integer16;
-									integer16 = tab_rp_registers[0];
-
-									//printf("read integer16 = %x\n",integer16);
-									
-									short int_val = (short)cmd_val.f;
-
-									//write int_val at Config_db[rowNumber].offset
-
-									if(int_val == 1)
-									{
-										integer16 = integer16|(1 << Config_db[rowNumber].offset);
-									}
-									else if(int_val == 0)
-									{
-										integer16 = integer16&(~(1 << Config_db[rowNumber].offset));
-									}
-
-									//printf("write integer16 = %x\n", integer16);
-
-									tab_rp_registers[0] = integer16;
-																	
-
-									// Many registers
-									
-									rc = modbus_write_registers(ctx, address, registers, tab_rp_registers);
-
-									printf("modbus_write_registers: ");
-
-									if (rc == registers) 
-									{
-										printf("OK\n");
-									} 
-									else 
-									{
-										printf("FAILED\n");
-										//error
-									}
-								} 
-								else 
-								{
-									printf("FAILED\n");
-									//error
-								}
-							}
-							else
-							{
-								printf("Modbus type %d not supported with FC_WRITE_MULTIPLE_REGISTERS", Config_db[rowNumber].modbus_type);
-							}
-						}
-					}
-					break;
-					case C_SE_TC_1:
-					{
-						if(Config_db[rowNumber].modbus_function_write == FC_WRITE_MULTIPLE_REGISTERS)
-						{
-							//0x10
-
-							if(Config_db[rowNumber].modbus_type == VT_R4)
-							{
-								modbus_set_float(cmd_val.f, tab_rp_registers);
-
-								int registers = 2; //we write 32 bits
-
-								int address = Config_db[rowNumber].modbus_start_address;
-
-								// Many registers
-								int rc;
-								rc = modbus_write_registers(ctx, address, registers, tab_rp_registers);
-
-								printf("modbus_write_registers: ");
-
-								if (rc == registers) 
-								{
-									printf("OK\n");
-								} 
-								else 
-								{
-									printf("FAILED\n");
-									//error
-								}
-							}
-							else
-							{
-								printf("Modbus type %d not supported with FC_WRITE_MULTIPLE_REGISTERS", Config_db[rowNumber].modbus_type);
-							}
-						}
-					}
-					break;
-					case C_BO_TA_1:
-					{
-						if(Config_db[rowNumber].modbus_function_write == FC_WRITE_MULTIPLE_REGISTERS)
-						{
-							//0x10
-
-							if(Config_db[rowNumber].modbus_type == VT_I4)
-							{
-								int int_val = (int)cmd_val.f;
-								modbus_set_int(int_val, tab_rp_registers);
-								
-								int registers = 2; //we write 32 bits
-
-								int address = Config_db[rowNumber].modbus_start_address;
-
-								// Many registers
-								int rc;
-								rc = modbus_write_registers(ctx, address, registers, tab_rp_registers);
-
-								printf("modbus_write_registers: ");
-
-								if (rc == registers) 
-								{
-									printf("OK\n");
-								} 
-								else 
-								{
-									printf("FAILED\n");
-									//error
-								}
-							}
-							else
-							{
-								printf("Modbus type %d not supported with FC_WRITE_MULTIPLE_REGISTERS", Config_db[rowNumber].modbus_type);
-							}
-						}
-					}
-					break;
-					case C_SE_TB_1:
-					{
-						if(Config_db[rowNumber].modbus_function_write == FC_WRITE_MULTIPLE_REGISTERS)
-						{
-							//0x10
-
-							if(Config_db[rowNumber].modbus_type == VT_I2)
-							{
-								short int_val = (short)cmd_val.f;
-								tab_rp_registers[0] = int_val;
-								
-								int registers = 1; //we write 16 bits
-
-								int address = Config_db[rowNumber].modbus_start_address;
-
-								// Many registers
-								int rc;
-								rc = modbus_write_registers(ctx, address, registers, tab_rp_registers);
-
-								printf("modbus_write_registers: ");
-
-								if (rc == registers) 
-								{
-									printf("OK\n");
-								} 
-								else 
-								{
-									printf("FAILED\n");
-									//error
-								}
-							}
-							else
-							{
-								printf("Modbus type %d not supported with FC_WRITE_MULTIPLE_REGISTERS", Config_db[rowNumber].modbus_type);
-							}
-						}
-					}
-					break;
-					default:
-					break;
-				}
-			}
-		}
-		else if(queued_item->iec_type == C_EX_IT_1)
-		{
-			//Receiving EXIT process command from monitor.exe
-			//exit the thread, and stop the process
-			fExit = true;
-		}
-		else if(queued_item->iec_type == C_IC_NA_1)
-		{
-			//Receiving general interrogation command from monitor.exe
-			IT_COMMENT("Receiving general interrogation command from monitor.exe");
-			fprintf(stderr,"Receiving general interrogation command from monitor.exe\n");
-			fflush(stderr);
-
-			////////////General interrogation condition//////////////
-			general_interrogation = true;
-			loops = 0;
-			//////////////////////////////////////////////////////////
-		}
-	}
-
-	return;
-}
-
-/*
-		MODBUS FUNCTIONS NOT USED
-		
-		if(Config_db[i].modbus_function_write == FC_WRITE_SINGLE_REGISTER)
-		{
-			//0x06
-
-			//Single register
-			rc = modbus_write_register(ctx, Config_db[i].modbus_start_address, 0x1234);
-			printf("1/2 modbus_write_register: ");
-			if (rc == 1) {
-				printf("OK\n");
-			} else {
-				printf("FAILED\n");
-				//error
-			}
-		}
-		else if(Config_db[i].modbus_function_write == FC_WRITE_MULTIPLE_COILS)
-		{
-			//0x0F
-
-			//uint8_t tab_value[UT_BITS_NB];
-			uint8_t tab_value[0x25];
-
-			modbus_set_bits_from_bytes(tab_value, 0, Config_db[i].block_size, UT_BITS_TAB);
-
-			rc = modbus_write_bits(ctx, Config_db[i].modbus_start_address, Config_db[i].block_size, tab_value);
-
-			printf("1/2 modbus_write_bits: ");
-
-			if (rc == Config_db[i].block_size) 
-			{
-				printf("OK\n");
-			} else {
-				printf("FAILED\n");
-				//error
-			}
-		}
-*/
-
-
-void modbus_imp::alloc_command_resources(void)
-{
-
-}
-
-void modbus_imp::free_command_resources(void)
-{
-
-}
+			if(delta < MAX_COMMAND_SEND_TIME && de   ;
+tÿ×‹D$TÆ„$t  ‹J‰‹…Éu¡ˆB‹L$T;tÿ×‹D$Æ„$t  ‹J‰‹…Éu‹ˆB‹L$;
+tÿ×‹D$Ç„$t  ÿÿÿÿ‹J‰‹…É…½  ‹L$¡ˆB;„¬  ÿ„Bé¡  ‹ˆB‹…Àuÿ¸B‰D$‹A‰‹Ex»   ;ÃÇ„$t  )   |U¿X   ‹M|h ÏÿC‹u|3À÷T$$R‰F8‰F<ˆF@ÿŒC‹ƒÄ‰NHN‹PÆFP ‹‰VLÿP‹ExCƒÇX;Ø~°‹IÿÓ‹‹Èÿ’    ‹=¼B‹5„B…À‰D$ ÇD$    ‚  h¸L$8ÿ×Æ„$t  *ÿÓ‹L$4j Q‹Èÿ’   ‹ğ‹D$4Æ„$t  )‹J‰‹…Éu‹ˆB‹L$4;
+tÿ„B…ö·   ;ux®   hüŒ$    ÿ×Æ„$t  +ÿÓ‹Œ$œ   QŒ$Ä   Q‹Èÿ’ˆ   ‹M|¶PÆ„$x  ,VÁÿˆA‹„$À   Æ„$t  +‹J‰‹…Éu‹ˆB‹Œ$À   ;
+tÿ„B‹„$œ   Æ„$t  )‹J‰‹…Éu¡ˆB‹Œ$œ   ;tÿ„B‹D$…Àth´L$ÿˆChüL$hÿ×Æ„$t  -ÿÓ‹L$dQŒ$ä   Q‹Èÿ’ˆ   P”$ğ   h°RÆ„$€  .ÿ$Ch°P„$ø   Æ„$ˆ  /Pÿ,CƒÄPL$Æ„$x  0ÿ@C‹„$ä   Æ„$t  /‹J‰‹…Éu‹ˆB‹Œ$ä   ;
+t
+‹5„BÿÖë‹5„B‹„$ì   Æ„$t  .‹J‰‹…Éu¡ˆB‹Œ$ì   ;tÿÖ‹„$à   Æ„$t  -‹J‰‹…Éu‹ˆB‹Œ$à   ;
+tÿÖ‹D$dÆ„$t  )‹J‰‹…Éu¡ˆB‹L$d;tÿÖ‹t$F‰t$ÿÓ‹‹Èÿ’Ô   ;t$ Œ„ıÿÿ‹5„BD$Œ$Ğ   PhtQÿ$Ch¸T$$PRÆ„$Œ  1ÿ,CƒÄ‹„$Ğ   Æ„$t  3‹J‰‹…Éu¡ˆB‹Œ$Ğ   ;tÿÖh L$Dÿ×h L$<Æ„$x  4ÿ×h L$pÆ„$x  5ÿ×h Œ$ˆ   Æ„$x  6ÿ×Æ„$t  7ÿÓL$@‹QL$<QL$tQŒ$   QL$$jQU‹ÈÿRx‹„$„   Æ„$t  6‹J‰‹…Éu‹ˆB‹Œ$„   ;
+tÿÖ‹D$lÆ„$t  5‹J‰‹…Éu¡ˆB‹L$l;tÿÖ‹D$8Æ„$t  4‹J‰‹…Éu‹ˆB‹L$8;
+tÿÖ‹D$@Æ„$t  3‹J‰‹…Éu¡ˆB‹L$@;tÿÖ‹D$Æ„$t  )‹J‰‹…Éu‹ˆB‹L$;
+tÿÖ‹D$Ç„$t  ÿÿÿÿ‹J‰‹…É…ª  ¡ˆB‹L$;„™  ÿÖé’  ‹=Iÿ×‹‹Èÿ’    …Àx  ‰D$‹Mx¸   ;È‰D$ŒË   ¾X   hlL$Tÿ¼BÇ„$t  8   ÿ×‹L$PQŒ$ô   Q‹Èÿ’ˆ   ‹U|PÖÆ„$x  9Rÿ„CŠØ‹„$ø   ƒÄÆ„$t  8‹J‰‹…Éu¡ˆB‹Œ$ğ   ;tÿ„B‹D$PÇ„$t  ÿÿÿÿ‹J‰‹…Éu‹ˆB‹L$P;
+tÿ„B„Ûu‹D$‹Mx@ƒÆX;Á‰D$:ÿÿÿÿ×‹‹Èÿ’Ô   ‹D$H‰D$…ÿÿÿéu
+  ‹=Iÿ×‹‹Èÿ’    …À†[
+  ‹5¼BhdL$\ÿÖÇ„$t  :   ÿ×‹L$XQŒ$Ü   Q‹Èÿ’ˆ   T$PRÆ„$|  ;ÿ(IƒÄ‹„$Ø   ‹=„BÆ„$t  >‹J‰‹…Éu¡ˆB‹Œ$Ø   ;tÿ×‹D$XÆ„$t  =‹J‰‹…Éu‹ˆB‹L$X;
+tÿ×D$jPŒ$D  ÿ€C‹|C‰Œ$<  ExŒ$<  PÆ„$x  ?ÿxC…¬   Œ$<  PÿtC‹=pC•ˆ   RŒ$@  ÿ×…   Œ$<  Pÿ×”   QŒ$@  ÿ×˜   Œ$<  Sÿ×•œ   Œ$<  Rÿ×…    Œ$<  Pÿ×¤   QŒ$@  ÿ×•¨   Œ$<  Rÿ×‹ËÿC‹øƒÉÿ3Àò®÷ÑIu‰…Œ   ë
+Ç…Œ      ‹E|3Û;ÃÇEh   t ‹HüxühĞ9 QjXPè‹—  Wè—  ƒÄ‰]|‹}xG¿WÅ   Qè ˜  ƒÄ‰D$$;ÃÆ„$t  @thĞ9 hp‘ XWjXS‰8è˜  ŠE5Æ„$t  ?„À‰]|t
+Ç…¬   è  ‹Íèd  „À…L  j ”$¸   h<Rè8±ÿÿ‹ø‹,ID$0WPÆ„$ˆ  AƒÅ(ÿÓƒÄŒ$    hÄ	  Q‹ÈÆ„$|  BÿlC‰D$”$ü   URÆ„$|  CÿÓƒÄŒ$  hÄ	  Q‹ÈÆ„$|  DÿlC‹Ø”$  Æ„$t  ERÿ0IP„$  h PÆ„$„  Fÿ$ChŒ$  PQÆ„$  Gÿ,CS”$,  PRÆ„$œ  Hÿ(ChdP„$4  Æ„$¤  IPÿ,C‹L$P”$,  QPRÆ„$´  Jÿ(CƒÄ@hPD$Æ„$|  KPÿ,CƒÄŒ$ø   Æ„$t  Vÿ¨BŒ$  Æ„$t  Uÿ¨BŒ$  Æ„$t  Tÿ¨BŒ$   Æ„$t  Sÿ¨BŒ$  Æ„$t  Rÿ¨BŒ$  Æ„$t  Qÿ¨BŒ$  Æ„$t  Pÿ¨BŒ$ü   Æ„$t  Oÿ¨BŒ$    Æ„$t  Nÿ¨B³ML$$ˆœ$t  ÿ¨Bh L$ ÿÖh L$4Æ„$x  WÿÖh L$0Æ„$x  XÿÖh L$Æ„$x  YÿÖÆ„$t  Zÿ4IL$‹QL$4QL$4QL$Qj L$(Qj ‹ÈÿRxL$Æ„$t  Yÿ¨BL$,Æ„$t  Xÿ¨BL$0Æ„$t  Wÿ¨BL$ˆœ$t  ÿ¨BÿTI…À„½   h L$ÿÖh L$0Æ„$x  [ÿÖh L$4Æ„$x  \ÿÖh L$ Æ„$x  ]ÿÖÆ„$t  ^ÿTIL$‹QL$0QL$8QL$(QL$$j Qj ‹ÈÿRxL$Æ„$t  ]ÿ¨BL$0Æ„$t  \ÿ¨BL$,Æ„$t  [ÿ¨BL$ˆœ$t  ÿ¨BhT$ URÿ,CWPD$4Æ„$ˆ  _Pÿ(CƒÄL$Æ„$t  aÿ¨BÿXI‹ğj j L$(‹>ÿCPjx‹ÎÿWXL$ ˆœ$t  ÿ¨BL$Æ„$t  Aÿ¨B‹„$´   Æ„$t  ?‹J‰‹…Éu‹ˆB‹Œ$´   ;
+tÿ„BŒ$<  Æ„$t  =ÿhC‹D$Ç„$t  ÿÿÿÿ‹J‰‹…É…  ‹L$éÜòÿÿ‹5IÿÖ‹‹Èÿ’Ì   ‰D$ ÿÖ‹‹Èÿ’    …À†k  hüL$dÿ¼BÇ„$t  b   ÿÖ‹L$`QŒ$À   Q‹Èÿ’ˆ   T$PRÆ„$|  cÿ(IƒÄ‹„$¼   ‹5„BÆ„$t  f‹J‰‹…Éu¡ˆB‹Œ$¼   ;tÿÖ‹D$`Æ„$t  e‹J‰‹…Éu‹ˆB‹L$`;
+tÿÖ‹D$ ‹5CÇD$$    ÇD$(    X‹ËÿÖ‹øƒÉÿ3Àò®÷ÑItp‹ËÿÖPÿt@İ\$(ƒÄL$hhdÿ¼B‹L$(‹T$$QD$lRL$PQ‹ÍÆ„$„  gÿ\I‹D$hÆ„$t  e‹J‰‹…Éu‹ˆB‹L$h;
+tÿ„BL$ÿÖ‹L$$‹T$ ‹ø‹D$(PQJÿÖPWhàÿh@‹D$$ƒÄÇ„$t  ÿÿÿÿ‹J‰‹…É…à  ‹L$éñÿÿ‹5IÿÖ‹‹Èÿ’Ì   ‰D$ÿÖ‹‹Èÿ’    …À†­  hÜL$tÿ¼BÇ„$t  h   ÿÖ‹L$pj Q‹Èÿ’   ‹ğ‹D$pÇ„$t  ÿÿÿÿ‹J‰‹…Éu‹ˆB‹L$p;
+tÿ„B‹D$‹CÇ„$        Ç„$¤       HÿÓ‹øƒÉÿ3Àò®÷ÑIt‹L$ƒÁÿÓPÿt@İœ$¤   ƒÄ‹”$¤   ‹„$    ‹L$RPVƒÁÿÓPh´ÿh@İ„$´   ¹   3À¼$,  ƒÄó«T$$‹Íf«Ùœ$  RÆ„$  ?‰´$  è.  ‹D$$f‹L$(‰„$"  ‹…„   ŠT$*‰„$.  @j"‰…„   „$  Pf‰Œ$.  ˆ”$0  è8†ÿÿ•È   ŠØ¹	   3À‹ú´$!  ó«ŠŒ$   ‹…À   ˆ
+‹”$6  ½É   ¹   ˆœ$A  Pó¥‰•à   ˆë   è”  ƒÄ‹Œ$l  _^][d‰    Äh  Â ¼† € Ÿ… x œ Z jÿhé/d¡    Pd‰%    Q¡ˆBV‹ñ‹ ‰t$…Àuÿ¸B‰‹A‰‹„INÇD$    ‰ÿI‹L$ÇFH    ÇFL    ‹Æ^d‰    ƒÄÃVW‹|$‹ñ‹Gƒèt!Hu.GN(PQè   ƒÄ‹ÎWÿèH_^Â WF(RPè   ƒÄW‹ÎÿèH_^Â jÿh½0d¡    Pd‰%    ƒì<SU‹l$XV‹5,IWD$4UPÿÖƒÄ‹=lCL$0hÄ	  Q‹ÈÇD$\    ÿ×‹Ø‹T$\D$,RPÆD$\ÿÖƒÄL$(hÄ	  Q‹ÈÆD$\ÿ×‹ğT$$ÆD$TRÿ0IPD$(h PÆD$dÿ$ChL$0PQÆD$pÿ,CVT$8PRÆD$|ÿ(ChdPD$DÆ„$„   Pÿ,CSL$HPQÆ„$”   ÿ(CƒÄ@hÆD$X	PT$hRÿ,CƒÄ‹D$‹5„BÆD$T‹J‰‹…Éu¡ˆB‹L$;tÿÖ‹D$ÆD$T‹J‰‹…Éu‹ˆB‹L$;
+tÿÖ‹D$ÆD$T‹J‰‹…Éu¡ˆB‹L$;tÿÖ‹D$ÆD$T‹J‰‹…Éu‹ˆB‹L$;
+tÿÖ‹D$ ÆD$T‹J‰‹…Éu¡ˆB‹L$ ;tÿÖ‹D$$ÆD$T‹J‰‹…Éu‹ˆB‹L$$;
+tÿÖ‹D$(ÆD$T‹J‰‹…Éu¡ˆB‹L$(;tÿÖ‹D$,ÆD$T‹J‰‹…Éu‹ˆB‹L$,;
+tÿÖ‹D$0ÆD$T‹J‰‹…Éu¡ˆB‹L$0;tÿÖ‹D$4³ˆ\$T‹J‰‹…Éu‹ˆB‹L$4;
+tÿÖ‹5¼Bh L$HÿÖh L$DÆD$XÿÖh L$@ÆD$XÿÖh L$<ÆD$XÿÖÆD$Tÿ4IL$D‹QL$DQL$DQL$DQL$pj Qj ‹ÈÿRxL$8ÆD$Tÿ¨BL$<ÆD$Tÿ¨BL$@ÆD$Tÿ¨BL$Dˆ\$Tÿ¨B‹=TIÿ×…À„¡   h L$<ÿÖh L$@ÆD$XÿÖh L$DÆD$XÿÖh L$HÆD$XÿÖÆD$Tÿ×L$8‹QL$@QL$HQL$PQL$pj Qj ‹ÈÿRxL$DÆD$Tÿ¨BL$@ÆD$Tÿ¨BL$<ÆD$Tÿ¨BL$8ˆ\$Tÿ¨B‹T$\hD$`RPÿ,CUL$XPQÆD$lÿ(CƒÄL$\ÆD$Tÿ¨BÿXI‹ğj j L$P‹>ÿCPjx‹ÎÿWXL$Hˆ\$Tÿ¨BL$`ÇD$Tÿÿÿÿÿ¨B‹L$L_^][d‰    ƒÄHÃjÿh1d¡    Pd‰%    ƒì<SU‹l$XV‹5,IWD$4UPÿÖƒÄ‹=lCL$0hÄ	  Q‹ÈÇD$\    ÿ×‹Ø‹T$\D$,RPÆD$\ÿÖƒÄL$(hÄ	  Q‹ÈÆD$\ÿ×‹ğT$$ÆD$TRÿ0IPD$(htPÆD$dÿ$ChL$0PQÆD$pÿ,CVT$8PRÆD$|ÿ(ChdPD$DÆ„$„   Pÿ,CSL$HPQÆ„$”   ÿ(CƒÄ@hÆD$X	PT$hRÿ,CƒÄ‹D$‹5„BÆD$T‹J‰‹…Éu¡ˆB‹L$;tÿÖ‹D$ÆD$T‹J‰‹…Éu‹ˆB‹L$;
+tÿÖ‹D$ÆD$T‹J‰‹…Éu¡ˆB‹L$;tÿÖ‹D$ÆD$T‹J‰‹…Éu‹ˆB‹L$;
+tÿÖ‹D$ ÆD$T‹J‰‹…Éu¡ˆB‹L$ ;tÿÖ‹D$$ÆD$T‹J‰‹…Éu‹ˆB‹L$$;
+tÿÖ‹D$(ÆD$T‹J‰‹…Éu¡ˆB‹L$(;tÿÖ‹D$,ÆD$T‹J‰‹…Éu‹ˆB‹L$,;
+tÿÖ‹D$0ÆD$T‹J‰‹…Éu¡ˆB‹L$0;tÿÖ‹D$4³ˆ\$T‹J‰‹…Éu‹ˆB‹L$4;
+tÿÖ‹5¼Bh L$HÿÖh L$DÆD$XÿÖh L$@ÆD$XÿÖh L$<ÆD$XÿÖÆD$Tÿ4IL$D‹QL$DQL$DQL$DQL$pj Qj ‹ÈÿRxL$8ÆD$Tÿ¨BL$<ÆD$Tÿ¨BL$@ÆD$Tÿ¨BL$Dˆ\$Tÿ¨B‹=TIÿ×…À„¡   h L$<ÿÖh L$@ÆD$XÿÖh L$DÆD$XÿÖh L$HÆD$XÿÖÆD$Tÿ×L$8‹QL$@QL$HQL$PQL$pj Qj ‹ÈÿRxL$DÆD$Tÿ¨BL$@ÆD$Tÿ¨BL$<ÆD$Tÿ¨BL$8ˆ\$Tÿ¨B‹T$\hD$`RPÿ,CUL$XPQÆD$lÿ(CƒÄL$\ÆD$Tÿ¨BÿXI‹ğj j L$P‹>ÿCPj{‹ÎÿWXL$Hˆ\$Tÿ¨BL$`ÇD$Tÿÿÿÿÿ¨B‹L$L_^][d‰    ƒÄHÃ‹A8Vq8‹Îÿ…Àt+‹v…öt‹6‹D$‹NL^;È”ÀÂ ‹D$3ö‹NL^;È”ÀÂ 2À^Â VW‹ù‹G8w8‹Îÿ…Àv‹Îÿ˜Cj ‹Îÿ”C‹GX‹H‹Î‰GXÿ_^Ã‹T$SUVW‹úƒÉÿ3Àò®‹t$÷ÑI‹ş‹Ù‹L$‹éÁéó«‹Íƒáóª3É…Û~Š< tˆFA;Ë|ñ_^][Ãƒì$S‹Ù‹ClHƒø‡Á   ÿ$…¼œ ÇCl   [ƒÄ$ÃVW¹   3À|$j"ó«f«‹ƒ„   ÆD$d‰D$&@‰ƒ„   D$PÇD$    ÆD$èÊzÿÿ³È   ŠĞ¹	   3À‹şˆT$5ó«ŠL$‹D$*ˆ»É   ¹   t$ó¥‹‹À   ‰ƒà   Qˆ“ë   è2ƒ  ƒÄÇCl   _^[ƒÄ$ÃÇCl   [ƒÄ$Ã‹Ëè   [ƒÄ$ÃI ú› œ ¡œ ­œ ­œ U‹ìƒäøjÿhä2d¡    Pd‰%    ì¨   SUV‹ñWj‹  D$Pj"PQÇD$4    èº‚  ƒÄ…ÀŒ
+  ‹0C‹=ÔHƒ~l…Á  €|$LÉ„¶  ‹ˆB‹…Àuÿ¸B‰D$‹(E‰(‹†¸   L$@Ç„$À       PhìQÿÓƒÄT$‹Îj RÿĞHhäL$<ÿ¼Bj „$œ   hÌPÆ„$Ì   ÿ×‹èj Œ$ˆ   hÄQÆ„$Ø   ÿ×N(”$ˆ   QPRÆ„$ä   ÿ(CUP„$à   Æ„$ì   Pÿ(CL$HT$xQPRÆ„$ü   ÿ(CPD$xPÆ„$  èôÿÿ‹„$Œ   ƒÄDÆ„$À   ‹J‰‹…Éu‹ˆB‹L$H;
+tÿ„BŒ$´   Æ„$À   ÿ¨BL$pÆ„$À   ÿ¨BL$xÆ„$À   ÿ¨BŒ$˜   Æ„$À   ÿ¨BL$8Æ„$À    ÿ¨BŠF4„À„ø   j „$”   hÌPÿ×‹èj Œ$°   hÄQÆ„$Ø   ÿ×N(”$    QPRÆ„$ä   ÿ(CUP„$Ô   Æ„$ì   	Pÿ(CL$H”$°   QPRÆ„$ü   
+ÿ(CƒÄ<P‹ÎÆ„$Ä   ÿäHŒ$€   Æ„$À   
+ÿ¨BŒ$¨   Æ„$À   	ÿ¨BŒ$ˆ   Æ„$À   ÿ¨BŒ$    Æ„$À   ÿ¨BŒ$   Æ„$À    ÿ¨B‹D$ÇFl   Ç„$À   ÿÿÿÿ‹J‰‹…Éu¡ˆB‹L$;tÿ„B‹¸   ‹T$b‹-h@AQRh”ÿÕD$Xj"PèôvÿÿƒÄ„Àtjÿ@‹ˆB‹…Àuÿ¸B‰D$‹A‰‹T$LÇ„$À      âÿ   Bÿ=È   ‡¨  3ÉŠˆh§ ÿ$8§ ŠT$QD$ƒâRhTPé˜  ŠL$QT$ƒáQhTRé  ¿D$QPél  ÙD$QƒìL$İ$hTQÿÓƒÄé]  ¿T$QRD$hTPéC  ÙD$QƒìL$İ$hQÿÓƒÄé*  ‹T$U‹D$QRPL$hŒQÿÓƒÄé  ‹T$QD$RhTPéó  hlÿÕƒÄéé  ƒ~l„ß  ‹¸   AQh(ÿÕ‹ˆBƒÄ‹…Àuÿ¸B‰D$‹(E‰(‹†¸   L$@Æ„$À   PhäQÿÓƒÄT$‹ÎjRÿĞHhäL$Dÿ¼Bj „$ˆ   hÔPÆ„$Ì   ÿ×‹èj Œ$Œ   hÄQÆ„$Ø   ÿ×N(”$Œ   QPRÆ„$ä   ÿ(CUP„$Ü   Æ„$ì   Pÿ(CL$LT$`QPRÆ„$ü   ÿ(CP„$€   PÆ„$  èãïÿÿ‹D$tƒÄDÆ„$À   ‹J‰‹…Éu‹ˆB‹L$0;
+tÿ„BŒ$°   Æ„$À   ÿ¨BL$tÆ„$À   ÿ¨BL$|Æ„$À   ÿ¨BŒ$„   Æ„$À   ÿ¨BL$@Æ„$À   ÿ¨BŠF4„À„ø   j „$°   hÔPÿ×‹èj Œ$´   hÄQÆ„$Ø   ÿ×N(”$´   QPRÆ„$ä   ÿ(CUP„$À   Æ„$ì   Pÿ(CL$L”$¼   QPRÆ„$ü   ÿ(CƒÄ<P‹ÎÆ„$Ä   ÿäHŒ$Œ   Æ„$À   ÿ¨BŒ$”   Æ„$À   ÿ¨BŒ$œ   Æ„$À   ÿ¨BŒ$¤   Æ„$À   ÿ¨BŒ$¬   Æ„$À   ÿ¨B‹D$ÇFl   Æ„$À   ‹J‰‹…Éu0¡ˆB‹L$;t#ÿ„BëhÀÿÕƒÄj L$hTQÿÓƒÄ‹ˆB‹…Àuÿ¸B‰D$‹B‰‹D$ML$PhTQÆ„$Ì   ÿÓT$ D$PRhœPÿ$ChL$XPQÆ„$ä   ÿ,CN(T$XQPRÆ„$ğ   ÿ(ChlPD$XÆ„$ø   Pÿ,CƒÄ<‹D$4Æ„$À    ‹J‰‹…Éu‹ˆB‹L$4;
+t
+‹-„BÿÕë‹-„B‹D$<Æ„$À   ‹J‰‹…Éu¡ˆB‹L$<;tÿÕ‹D$DÆ„$À   ‹J‰‹…Éu‹ˆB‹L$D;
+tÿÕ‹-¼Bh L$0ÿÕh L$,Æ„$Ä   !ÿÕÆ„$À   "ÿIL$,‹QL$,QL$QL$QL$0jQV‹ÈÿRx‹D$(Æ„$À   !‹J‰‹…Éu‹ˆB‹L$(;
+t
+‹-„BÿÕë‹-„B‹D$,Æ„$À   ‹J‰‹…Éu¡ˆB‹L$,;tÿÕ‹D$$Æ„$À   ƒø2‹D$ ‹¨   J‰‹…Éu‹ˆB‹L$ ;
+tÿÕ‹D$Æ
