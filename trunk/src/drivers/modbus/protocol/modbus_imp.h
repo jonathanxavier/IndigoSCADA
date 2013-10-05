@@ -104,6 +104,7 @@ class modbus_imp
 	modbus_t *ctx; //context
 	uint8_t *tab_rp_bits;
     uint16_t *tab_rp_registers;
+	uint16_t *stored_tab_rp_registers;
 	int nb_points;
 	////////////////////////////////////////////////
 	int lineNumber;

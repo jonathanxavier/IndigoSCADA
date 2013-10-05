@@ -266,8 +266,10 @@ int modbus_imp::PollServer(void)
 	nb_points = MAX_REGISTERS_IN_MEMORY_BLOCK;
 
 	tab_rp_registers = (uint16_t *) malloc(nb_points * sizeof(uint16_t));
-
 	memset(tab_rp_registers, 0x00, nb_points * sizeof(uint16_t));
+
+	stored_tab_rp_registers = (uint16_t *) malloc(nb_points * sizeof(uint16_t));
+	memset(stored_tab_rp_registers, 0x00, nb_points * sizeof(uint16_t));
 
 	////////////General interrogation condition//////////////
 	general_interrogation = true;
@@ -526,6 +528,8 @@ int modbus_imp::PollItems(void)
     	
     comm_error_counter = 0;
 
+	int stored_address = 0;
+
 	for(int rowNumber = 0; rowNumber < db_n_rows; rowNumber++)
 	{
 		memset(&item_to_send,0x00, sizeof(struct iec_item));
@@ -728,19 +732,19 @@ int modbus_imp::PollItems(void)
 				int registers = 1; //read 16 bits
 
 				int address = Config_db[rowNumber].modbus_start_address;
-
-				rc = modbus_read_registers(ctx, address, registers, tab_rp_registers);
-				printf("modbus_read_registers: ");
-
-				if (rc != registers) 
-				{
-                    comm_error_counter++;
-					
-                    continue;
-				}
-
+				
 				if(Config_db[rowNumber].iec_type_read == M_ME_TE_1)
 				{
+					rc = modbus_read_registers(ctx, address, registers, tab_rp_registers);
+					printf("modbus_read_registers: ");
+
+					if (rc != registers) 
+					{
+						comm_error_counter++;
+						
+						continue;
+					}
+					
 					short integer16;
 					integer16 = tab_rp_registers[0];
 
@@ -772,6 +776,26 @@ int modbus_imp::PollItems(void)
 				}
 				else if(item_to_send.iec_type = M_SP_TB_1)
 				{
+					if(stored_address == 0 || stored_address != address)
+					{
+						stored_address = address;
+						rc = modbus_read_registers(ctx, address, registers, tab_rp_registers);
+						printf("modbus_read_registers: ");
+
+						if (rc != registers) 
+						{
+							comm_error_counter++;
+							
+							continue;
+						}
+
+						memcpy(stored_tab_rp_registers, tab_rp_registers, nb_points * sizeof(uint16_t));
+					}
+					else
+					{
+						memcpy(tab_rp_registers, stored_tab_rp_registers, nb_points * sizeof(uint16_t));
+					}
+					
 					short integer16;
 					integer16 = tab_rp_registers[0];
 
@@ -779,7 +803,7 @@ int modbus_imp::PollItems(void)
 					//get a bit value from a word
 					uint8_t value = integer16&(1 << Config_db[rowNumber].offset)  ? 1 : 0;				
 					
-					printf("get bit from word: value = %d\n", (int)value);
+					printf("get bit %d from word: value = %d\n", Config_db[rowNumber].offset, (int)value);
 
 					if(Config_db[rowNumber].last_value.a != value)
 					{
