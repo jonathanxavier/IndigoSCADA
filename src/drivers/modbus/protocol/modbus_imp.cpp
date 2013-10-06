@@ -547,7 +547,7 @@ int modbus_imp::PollItems(void)
 			{
 				bit_size = 1;
 
-				int address = Config_db[rowNumber].modbus_start_address;
+				int address = Config_db[rowNumber].modbus_address;
 
 				rc = modbus_read_bits(ctx, address, bit_size, tab_rp_bits);
 
@@ -600,7 +600,7 @@ int modbus_imp::PollItems(void)
 			{
 				bit_size = 1;
 
-				int address = Config_db[rowNumber].modbus_start_address;
+				int address = Config_db[rowNumber].modbus_address;
 
 				rc = modbus_read_input_bits(ctx, address, bit_size, tab_rp_bits);
 
@@ -652,7 +652,7 @@ int modbus_imp::PollItems(void)
 			{
 				int registers = 2; //read 32 bits
 
-				int address = Config_db[rowNumber].modbus_start_address;
+				int address = Config_db[rowNumber].modbus_address;
 
 				rc = modbus_read_registers(ctx, address, registers, tab_rp_registers);
 
@@ -731,7 +731,7 @@ int modbus_imp::PollItems(void)
 			{
 				int registers = 1; //read 16 bits
 
-				int address = Config_db[rowNumber].modbus_start_address;
+				int address = Config_db[rowNumber].modbus_address;
 				
 				if(Config_db[rowNumber].iec_type_read == M_ME_TE_1)
 				{
@@ -799,11 +799,11 @@ int modbus_imp::PollItems(void)
 					short integer16;
 					integer16 = tab_rp_registers[0];
 
-					//uint8_t value = get_bit_from_word(integer16, Config_db[rowNumber].offset);				
+					//uint8_t value = get_bit_from_word(integer16, Config_db[rowNumber].offset_bit);				
 					//get a bit value from a word
-					uint8_t value = integer16&(1 << Config_db[rowNumber].offset)  ? 1 : 0;				
+					uint8_t value = integer16&(1 << Config_db[rowNumber].offset_bit)  ? 1 : 0;				
 					
-					printf("get bit %d from word: value = %d\n", Config_db[rowNumber].offset, (int)value);
+					printf("get bit %d from word: value = %d\n", Config_db[rowNumber].offset_bit, (int)value);
 
 					if(Config_db[rowNumber].last_value.a != value)
 					{
@@ -1372,7 +1372,7 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 								// Single
 								int rc;
 
-								int address = Config_db[rowNumber].modbus_start_address;
+								int address = Config_db[rowNumber].modbus_address;
 								
 								rc = modbus_write_bit(ctx, address, cmd_val.v);
 
@@ -1398,7 +1398,7 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 							{
 								int registers = 1; //read 16 bits
 
-								int address = Config_db[rowNumber].modbus_start_address;
+								int address = Config_db[rowNumber].modbus_address;
 
 								int rc;
 								rc = modbus_read_registers(ctx, address, registers, tab_rp_registers);
@@ -1415,15 +1415,15 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 									
 									short int_val = (short)cmd_val.f;
 
-									//write int_val at Config_db[rowNumber].offset
+									//write int_val at Config_db[rowNumber].offset_bit
 
 									if(int_val >= 1)
 									{
-										integer16 = integer16|(1 << Config_db[rowNumber].offset);
+										integer16 = integer16|(1 << Config_db[rowNumber].offset_bit);
 									}
 									else if(int_val == 0)
 									{
-										integer16 = integer16&(~(1 << Config_db[rowNumber].offset));
+										integer16 = integer16&(~(1 << Config_db[rowNumber].offset_bit));
 									}
 
 									//printf("write integer16 = %x\n", integer16);
@@ -1471,7 +1471,7 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 
 								int registers = 2; //we write 32 bits
 
-								int address = Config_db[rowNumber].modbus_start_address;
+								int address = Config_db[rowNumber].modbus_address;
 
 								// Many registers
 								int rc;
@@ -1509,7 +1509,7 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 								
 								int registers = 2; //we write 32 bits
 
-								int address = Config_db[rowNumber].modbus_start_address;
+								int address = Config_db[rowNumber].modbus_address;
 
 								// Many registers
 								int rc;
@@ -1547,7 +1547,7 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 								
 								int registers = 1; //we write 16 bits
 
-								int address = Config_db[rowNumber].modbus_start_address;
+								int address = Config_db[rowNumber].modbus_address;
 
 								// Many registers
 								int rc;
@@ -1608,7 +1608,7 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 			//0x06
 
 			//Single register
-			rc = modbus_write_register(ctx, Config_db[i].modbus_start_address, 0x1234);
+			rc = modbus_write_register(ctx, Config_db[i].modbus_address, 0x1234);
 			printf("1/2 modbus_write_register: ");
 			if (rc == 1) {
 				printf("OK\n");
@@ -1626,7 +1626,7 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 
 			modbus_set_bits_from_bytes(tab_value, 0, Config_db[i].block_size, UT_BITS_TAB);
 
-			rc = modbus_write_bits(ctx, Config_db[i].modbus_start_address, Config_db[i].block_size, tab_value);
+			rc = modbus_write_bits(ctx, Config_db[i].modbus_address, Config_db[i].block_size, tab_value);
 
 			printf("1/2 modbus_write_bits: ");
 
