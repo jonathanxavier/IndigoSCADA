@@ -33,11 +33,10 @@ enum MODBUS_TYPE {
 struct modbusItem
 {
 	//////////////////MODBUS RTU part/////////////////////////////////////////
-	char name[100];				//Item ID is an unique name identifing it
 	int modbus_function_read;	//modbus funtion to read
 	int modbus_function_write;	//modbus funtion to write
-	int modbus_start_address;	//start address of the memory to fetch
-	int offset; //offset in bits or word into the memory to fetch (to sum with start address in order to find the address of interested data)
+	int modbus_address;	//address of the memory to fetch
+	int offset_bit; //offset bit
 	int modbus_type; //modbus type expressed like an OPC type, eg. VT_BOOL
 	//////////////control center part/////////////////////////////////////////
 	unsigned int ioa_control_center; //unique inside CASDU
