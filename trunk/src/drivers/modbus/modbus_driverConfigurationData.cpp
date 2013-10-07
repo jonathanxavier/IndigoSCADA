@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Form implementation generated from reading ui file 'modbus_driver_configuration.ui'
 **
-** Created: Tue Sep 24 09:32:09 2013
+** Created: Mon Oct 7 10:35:05 2013
 **      by: The User Interface Compiler ($Id: main.cpp 2051 2007-02-21 10:04:20Z chehrlic $)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -36,9 +36,6 @@ Modbus_driverConfigurationData::Modbus_driverConfigurationData( QWidget* parent,
     textLabel1 = new QLabel( this, "textLabel1" );
     textLabel1->setGeometry( QRect( 40, 110, 49, 20 ) );
 
-    textLabel5 = new QLabel( this, "textLabel5" );
-    textLabel5->setGeometry( QRect( 40, 480, 49, 20 ) );
-
     textLabel4 = new QLabel( this, "textLabel4" );
     textLabel4->setGeometry( QRect( 40, 230, 90, 20 ) );
 
@@ -56,9 +53,6 @@ Modbus_driverConfigurationData::Modbus_driverConfigurationData( QWidget* parent,
 
     textLabel11 = new QLabel( this, "textLabel11" );
     textLabel11->setGeometry( QRect( 40, 430, 55, 20 ) );
-
-    textLabel6 = new QLabel( this, "textLabel6" );
-    textLabel6->setGeometry( QRect( 40, 510, 80, 20 ) );
 
     Parity = new QLineEdit( this, "Parity" );
     Parity->setGeometry( QRect( 170, 430, 200, 20 ) );
@@ -86,10 +80,6 @@ Modbus_driverConfigurationData::Modbus_driverConfigurationData( QWidget* parent,
     textLabel2 = new QLabel( this, "textLabel2" );
     textLabel2->setGeometry( QRect( 40, 150, 90, 20 ) );
 
-    PollInterval = new QSpinBox( this, "PollInterval" );
-    PollInterval->setGeometry( QRect( 170, 510, 100, 20 ) );
-    PollInterval->setMaxValue( 10000 );
-
     Baud = new QSpinBox( this, "Baud" );
     Baud->setGeometry( QRect( 170, 310, 200, 20 ) );
     Baud->setMaxValue( 200000 );
@@ -97,10 +87,6 @@ Modbus_driverConfigurationData::Modbus_driverConfigurationData( QWidget* parent,
     DataBits = new QSpinBox( this, "DataBits" );
     DataBits->setGeometry( QRect( 170, 350, 200, 20 ) );
     DataBits->setMaxValue( 8 );
-
-    NItems = new QSpinBox( this, "NItems" );
-    NItems->setGeometry( QRect( 170, 480, 100, 20 ) );
-    NItems->setMaxValue( 1000 );
 
     buttonGroup1 = new QButtonGroup( this, "buttonGroup1" );
     buttonGroup1->setGeometry( QRect( 30, 30, 360, 51 ) );
@@ -127,6 +113,20 @@ Modbus_driverConfigurationData::Modbus_driverConfigurationData( QWidget* parent,
     StopBit = new QSpinBox( this, "StopBit" );
     StopBit->setGeometry( QRect( 170, 390, 200, 20 ) );
     StopBit->setMaxValue( 2 );
+
+    PollInterval = new QSpinBox( this, "PollInterval" );
+    PollInterval->setGeometry( QRect( 230, 510, 100, 20 ) );
+    PollInterval->setMaxValue( 60000 );
+
+    NItems = new QSpinBox( this, "NItems" );
+    NItems->setGeometry( QRect( 230, 480, 100, 20 ) );
+    NItems->setMaxValue( 1000 );
+
+    textLabel5 = new QLabel( this, "textLabel5" );
+    textLabel5->setGeometry( QRect( 40, 480, 49, 20 ) );
+
+    textLabel6 = new QLabel( this, "textLabel6" );
+    textLabel6->setGeometry( QRect( 40, 510, 110, 20 ) );
     languageChange();
     resize( QSize(429, 610).expandedTo(minimumSizeHint()) );
     clearWState( WState_Polished );
@@ -155,14 +155,12 @@ void Modbus_driverConfigurationData::languageChange()
 {
     setCaption( tr( "Form1" ) );
     textLabel1->setText( tr( "Name" ) );
-    textLabel5->setText( tr( "N Items" ) );
     textLabel4->setText( tr( "TCP port" ) );
     textLabel7->setText( tr( "Serial device" ) );
     textLabel8->setText( tr( "Baud" ) );
     textLabel9->setText( tr( "Data bits" ) );
     textLabel10->setText( tr( "Stop bit" ) );
     textLabel11->setText( tr( "Parity" ) );
-    textLabel6->setText( tr( "Poll interval" ) );
     textLabel2->setText( tr( "Server ID" ) );
     buttonGroup1->setTitle( tr( "MODBUS Context" ) );
     TCPButton->setText( tr( "TCP" ) );
@@ -171,6 +169,8 @@ void Modbus_driverConfigurationData::languageChange()
     HelpButton->setText( tr( "Help" ) );
     CancelButton->setText( tr( "Cancel" ) );
     OkButton->setText( tr( "Ok" ) );
+    textLabel5->setText( tr( "N Items" ) );
+    textLabel6->setText( tr( "Poll interval (ms)" ) );
 }
 
 void Modbus_driverConfigurationData::Help()
