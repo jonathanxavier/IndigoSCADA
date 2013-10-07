@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Form interface generated from reading ui file 'modbus_driver_configuration.ui'
 **
-** Created: Tue Sep 24 09:31:59 2013
+** Created: Mon Oct 7 10:35:01 2013
 **      by: The User Interface Compiler ($Id: main.cpp 2051 2007-02-21 10:04:20Z chehrlic $)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -33,14 +33,12 @@ public:
     ~Modbus_driverConfigurationData();
 
     QLabel* textLabel1;
-    QLabel* textLabel5;
     QLabel* textLabel4;
     QLabel* textLabel7;
     QLabel* textLabel8;
     QLabel* textLabel9;
     QLabel* textLabel10;
     QLabel* textLabel11;
-    QLabel* textLabel6;
     QLineEdit* Parity;
     QLineEdit* SerialDevice;
     QLineEdit* MODBUSServerIPPortText;
@@ -48,10 +46,8 @@ public:
     QLineEdit* ServerID;
     QLineEdit* Name;
     QLabel* textLabel2;
-    QSpinBox* PollInterval;
     QSpinBox* Baud;
     QSpinBox* DataBits;
-    QSpinBox* NItems;
     QButtonGroup* buttonGroup1;
     QRadioButton* TCPButton;
     QRadioButton* RTUButton;
@@ -60,6 +56,10 @@ public:
     QPushButton* CancelButton;
     QPushButton* OkButton;
     QSpinBox* StopBit;
+    QSpinBox* PollInterval;
+    QSpinBox* NItems;
+    QLabel* textLabel5;
+    QLabel* textLabel6;
 
 public slots:
     virtual void Help();

@@ -33,22 +33,6 @@
     </widget>
     <widget class="QLabel">
         <property name="name">
-            <cstring>textLabel5</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>40</x>
-                <y>480</y>
-                <width>49</width>
-                <height>20</height>
-            </rect>
-        </property>
-        <property name="text">
-            <string>N Items</string>
-        </property>
-    </widget>
-    <widget class="QLabel">
-        <property name="name">
             <cstring>textLabel4</cstring>
         </property>
         <property name="geometry">
@@ -141,22 +125,6 @@
         </property>
         <property name="text">
             <string>Parity</string>
-        </property>
-    </widget>
-    <widget class="QLabel">
-        <property name="name">
-            <cstring>textLabel6</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>40</x>
-                <y>510</y>
-                <width>80</width>
-                <height>20</height>
-            </rect>
-        </property>
-        <property name="text">
-            <string>Poll interval</string>
         </property>
     </widget>
     <widget class="QLineEdit">
@@ -270,22 +238,6 @@
     </widget>
     <widget class="QSpinBox">
         <property name="name">
-            <cstring>PollInterval</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>170</x>
-                <y>510</y>
-                <width>100</width>
-                <height>20</height>
-            </rect>
-        </property>
-        <property name="maxValue">
-            <number>10000</number>
-        </property>
-    </widget>
-    <widget class="QSpinBox">
-        <property name="name">
             <cstring>Baud</cstring>
         </property>
         <property name="geometry">
@@ -314,22 +266,6 @@
         </property>
         <property name="maxValue">
             <number>8</number>
-        </property>
-    </widget>
-    <widget class="QSpinBox">
-        <property name="name">
-            <cstring>NItems</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>170</x>
-                <y>480</y>
-                <width>100</width>
-                <height>20</height>
-            </rect>
-        </property>
-        <property name="maxValue">
-            <number>1000</number>
         </property>
     </widget>
     <widget class="QButtonGroup">
@@ -461,6 +397,70 @@
         </property>
         <property name="maxValue">
             <number>2</number>
+        </property>
+    </widget>
+    <widget class="QSpinBox">
+        <property name="name">
+            <cstring>PollInterval</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>230</x>
+                <y>510</y>
+                <width>100</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property name="maxValue">
+            <number>60000</number>
+        </property>
+    </widget>
+    <widget class="QSpinBox">
+        <property name="name">
+            <cstring>NItems</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>230</x>
+                <y>480</y>
+                <width>100</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property name="maxValue">
+            <number>1000</number>
+        </property>
+    </widget>
+    <widget class="QLabel">
+        <property name="name">
+            <cstring>textLabel5</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>40</x>
+                <y>480</y>
+                <width>49</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>N Items</string>
+        </property>
+    </widget>
+    <widget class="QLabel">
+        <property name="name">
+            <cstring>textLabel6</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>40</x>
+                <y>510</y>
+                <width>110</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property name="text">
+            <string>Poll interval (ms)</string>
         </property>
     </widget>
 </widget>
