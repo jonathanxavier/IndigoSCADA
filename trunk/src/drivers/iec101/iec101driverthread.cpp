@@ -38,8 +38,9 @@ void Iec101DriverThread::run()
 
     //fprintf(stderr, "pipe_name = %s\n", pipe_name);
     //fflush(stderr);
-			
-	strcpy(pCommandLine, "C:\\scada\\bin\\iec101master.exe -a ");
+		
+	strcpy(pCommandLine, GetScadaHomeDirectory());
+	strcat(pCommandLine, "\\bin\\iec101master.exe -a ");
 	strcat(pCommandLine, ((Iec101driver_Instance*)Parent)->Cfg.IEC101LinkAddress);
 	strcat(pCommandLine, " -c ");
 	strcat(pCommandLine, ((Iec101driver_Instance*)Parent)->Cfg.IEC101CASDU);
@@ -50,7 +51,8 @@ void Iec101DriverThread::run()
 	strcat(pCommandLine, " -n ");
 	strcat(pCommandLine, ((Iec101driver_Instance*)Parent)->Cfg.COMPortName);
 		
-	strcpy(pWorkingDir,"C:\\scada\\bin");
+	strcpy(pWorkingDir, GetScadaHomeDirectory());
+	strcat(pWorkingDir,"\\bin");
   	
 	if(StartProcess(pCommandLine, pWorkingDir))
 	{

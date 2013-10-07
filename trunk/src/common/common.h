@@ -159,7 +159,6 @@
 	#define QSTRANS_DIR QSDefaultFilename("Translations")
 	#define QSBIN_DIR QSDefaultFilename("bin") 
 	#define QSTEMPLATE_DIR QSDefaultFilename("Template")
-	#define QSMAPS_DIR QSDefaultFilename("Maps")
 	#define QSBMP_DIR QSDefaultFilename("Bitmaps")
 
 	#ifdef UNIX

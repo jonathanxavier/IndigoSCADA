@@ -97,7 +97,16 @@ int Opc_client_hda_imp::load_database(void)
 	int rc, n_rows, m_columns;
 
 	char db_name[100];
-	strcpy(db_name, "C:\\scada\\bin\\");
+
+	#ifdef WIN32
+	if(GetModuleFileName(NULL, db_name, _MAX_PATH))
+	{
+		*(strrchr(db_name, '\\')) = '\0';        // Strip \\filename.exe off path
+		*(strrchr(db_name, '\\')) = '\0';        // Strip \\bin off path
+	}
+	#endif
+
+	strcat(db_name, "\\project\\");
 	strcat(db_name, opc_server_prog_id);
 	strcat(db_name, ".db");
 

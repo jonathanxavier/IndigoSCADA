@@ -385,7 +385,10 @@ void UserFrameWork::SetTabs()
 
 		///////////////Create an HMI dictionary//////////////////////////////////
 		//Dinamic dialog loading from .ui designer file//////////////////////////////////////////
-		QApplication::addLibraryPath("C:\\scada\\plugins"); //apa+++ 21-07-2012 So we can load qwtplugin.dll from directory C:\scada\plugins\designer
+		char library_path[MAX_PATH];
+		strcpy(library_path, (const char*)GetScadaHomeDirectory());
+		strcat(library_path,"\\plugins");
+		QApplication::addLibraryPath(library_path); //apa+++ 21-07-2012 So we can load qwtplugin.dll from directory C:\scada\plugins\designer
 		
 		int n = MAX_HMI_WINDOWS;
 		QString hmi_index;
@@ -403,7 +406,7 @@ void UserFrameWork::SetTabs()
 			hmi_mng = (*it).second;
 		
 			QWidgetFactory::loadImages("../Bitmaps");
-			QString map_path = QString("../Maps/") + (*it).first;
+			QString map_path = QString("../project/") + (*it).first;
 			QDialog *designerHMI = (QDialog *)QWidgetFactory::create(map_path, hmi_mng);
 
 			if(designerHMI)
@@ -776,7 +779,7 @@ void UserFrameWork::configureHMI()
 	#endif
 
 	#ifdef WIN32
-	QString cmd = "C:\\scada\\bin\\hmi_designer.exe";
+	QString cmd = GetScadaHomeDirectory() + "\\bin\\hmi_designer.exe";
 	
 	// create new process
 	STARTUPINFO startup_information;
@@ -821,7 +824,7 @@ void UserFrameWork::configureProtocol()
 	#endif
 
 	#ifdef WIN32
-	QString cmd = "C:\\scada\\bin\\protocol_configurator.exe";
+	QString cmd = GetScadaHomeDirectory() + "\\bin\\protocol_configurator.exe";
 	
 	// create new process
 	STARTUPINFO startup_information;

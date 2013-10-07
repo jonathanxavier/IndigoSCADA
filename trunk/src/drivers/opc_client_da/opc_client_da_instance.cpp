@@ -542,7 +542,8 @@ void Opc_client_da_Instance::Tick()
 
 			char db_name[100];
 
-			strcpy(db_name, "C:\\scada\\bin\\");
+			strcpy(db_name, GetScadaHomeDirectory());
+			strcat(db_name, "\\project\\");
 			strcat(db_name, Cfg.OpcServerProgID);
 			strcat(db_name, ".db");
 			

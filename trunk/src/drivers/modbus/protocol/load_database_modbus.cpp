@@ -238,8 +238,16 @@ int modbus_imp::AddItems(void)
 	char line_number[10];
 
 	itoa(lineNumber, line_number, 10);
+	
+	#ifdef WIN32
+	if(GetModuleFileName(NULL, database_name, _MAX_PATH))
+	{
+		*(strrchr(database_name, '\\')) = '\0';        // Strip \\filename.exe off path
+		*(strrchr(database_name, '\\')) = '\0';        // Strip \\bin off path
+	}
+	#endif
 
-	strcpy(database_name, "C:\\scada\\bin\\");
+	strcat(database_name, "\\project\\");
 	strcat(database_name, "modbus_database");
 	strcat(database_name, line_number);
 	strcat(database_name, ".db");

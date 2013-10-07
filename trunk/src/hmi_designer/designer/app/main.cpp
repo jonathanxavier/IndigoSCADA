@@ -195,7 +195,7 @@ int main( int argc, char *argv[] )
     if (pluginPaths.count())
 	QApplication::setLibraryPaths(pluginPaths);
 	
-	QApplication::addLibraryPath("C:\\scada\\plugins");
+	QApplication::addLibraryPath("../plugins");
 
     QSplashScreen *splash = a.showSplash();
 

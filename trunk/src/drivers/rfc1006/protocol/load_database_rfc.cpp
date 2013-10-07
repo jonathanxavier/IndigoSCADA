@@ -155,10 +155,18 @@ int rfc1006_imp::AddItems(void)
 	int rc;
 	int n_rows = 0;
 	int m_columns = 0;
-	//FILE* fp = NULL;
 
 	char db_name[100];
-	strcpy(db_name, "C:\\scada\\bin\\");
+
+	#ifdef WIN32
+	if(GetModuleFileName(NULL, db_name, _MAX_PATH))
+	{
+		*(strrchr(db_name, '\\')) = '\0';        // Strip \\filename.exe off path
+		*(strrchr(db_name, '\\')) = '\0';        // Strip \\bin off path
+	}
+	#endif
+
+	strcat(db_name, "\\project\\");
 	strcat(db_name, plc_server_prog_id);
 	strcat(db_name, ".db");
 
@@ -236,8 +244,7 @@ void rfc1006_imp::CreateSqlConfigurationFile(char* sql_file_name, char* opc_path
 
 	strcpy(sql_file_path, program_path);
 
-	//TODO: "\\bin\\" will be changed to "\\cfg\\"
-	strcat(sql_file_path, "\\bin\\"); 
+	strcat(sql_file_path, "\\project\\"); 
 
 	strcat(sql_file_path, sql_file_name);
 	
