@@ -2328,7 +2328,7 @@ bool dbServer::put_db_online(dbSession* session, char_t * msg) //put_db_online i
 		}
 		#endif
 
-		strcat(dbName, "\\bin\\");
+		strcat(dbName, "\\project\\");
 		strcat(dbName, buf);
 		strcat(dbName, ".dbs");
 				

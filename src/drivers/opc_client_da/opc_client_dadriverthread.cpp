@@ -36,8 +36,9 @@ void Opc_client_da_DriverThread::run()
     strcat(pipe_name, line_number);
 
 	itoa(((Opc_client_da_Instance*)Parent)->Cfg.SampleTime, polling_time, 10);
-		
-	strcpy(pCommandLine, "C:\\scada\\bin\\opc_client_da.exe -a ");
+
+	strcpy(pCommandLine, GetScadaHomeDirectory());
+	strcat(pCommandLine, "\\bin\\opc_client_da.exe -a ");
 	strcat(pCommandLine, ((Opc_client_da_Instance*)Parent)->Cfg.OpcServerIPAddress);
 	strcat(pCommandLine, " -p ");
 	strcat(pCommandLine, ((Opc_client_da_Instance*)Parent)->Cfg.OpcServerProgID);
@@ -48,7 +49,8 @@ void Opc_client_da_DriverThread::run()
 	strcat(pCommandLine, " -t ");
 	strcat(pCommandLine, polling_time);
 		
-	strcpy(pWorkingDir,"C:\\scada\\bin");
+	strcpy(pWorkingDir, GetScadaHomeDirectory());
+	strcat(pWorkingDir,"\\bin");
 		
 	if(StartProcess(pCommandLine, pWorkingDir))
 	{

@@ -38,7 +38,8 @@ void Iec61850DriverThread::run()
 	itoa(((Iec61850driver_Instance*)Parent)->Cfg.SampleTime, polling_time, 10);
 
 	//IEC61850 TCP
-	strcpy(pCommandLine, "C:\\scada\\bin\\iec61850client.exe -a ");
+	strcpy(pCommandLine, GetScadaHomeDirectory());
+	strcat(pCommandLine, "\\bin\\iec61850client.exe -a ");
 	strcat(pCommandLine, ((Iec61850driver_Instance*)Parent)->Cfg.IEC61850ServerIPAddress);
 	strcat(pCommandLine, " -p ");
 	strcat(pCommandLine, ((Iec61850driver_Instance*)Parent)->Cfg.IEC61850ServerTCPPort);
@@ -47,7 +48,8 @@ void Iec61850DriverThread::run()
 	strcat(pCommandLine, " -t ");
 	strcat(pCommandLine, polling_time);
 			
-	strcpy(pWorkingDir,"C:\\scada\\bin");
+	strcpy(pWorkingDir, GetScadaHomeDirectory());
+	strcat(pWorkingDir,"\\bin");
 		
 	if(StartProcess(pCommandLine, pWorkingDir))
 	{

@@ -36,8 +36,9 @@ void Rfc1006DriverThread::run()
 
     //fprintf(stderr, "pipe_name = %s\n", pipe_name);
     //fflush(stderr);
-			
-	strcpy(pCommandLine, "C:\\scada\\bin\\rfc1006client.exe -a ");
+
+	strcpy(pCommandLine, GetScadaHomeDirectory());
+	strcat(pCommandLine, "\\bin\\rfc1006client.exe -a ");
 	strcat(pCommandLine, ((Rfc1006driver_Instance*)Parent)->Cfg.RFC1006ServerIPAddress);
 	strcat(pCommandLine, " -p ");
 	strcat(pCommandLine, ((Rfc1006driver_Instance*)Parent)->Cfg.RFC1006ServerIPPort);
@@ -48,7 +49,8 @@ void Rfc1006DriverThread::run()
 	strcat(pCommandLine, " -l ");
 	strcat(pCommandLine, line_number);
 		
-	strcpy(pWorkingDir,"C:\\scada\\bin");
+	strcpy(pWorkingDir, GetScadaHomeDirectory());
+	strcat(pWorkingDir,"\\bin");
 	
 	if(StartProcess(pCommandLine, pWorkingDir))
 	{

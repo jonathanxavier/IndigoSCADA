@@ -2122,7 +2122,7 @@ bool dbServer::put_db_online(dbSession* session, char_t * msg) //put_db_online i
 		}
 		#endif
 
-		strcat(dbFileName, "\\bin\\");
+		strcat(dbFileName, "\\project\\");
 		strcat(dbFileName, buf);
 		strcat(dbFileName, ".fdb");
 				

@@ -40,7 +40,8 @@ void Modbus_DriverThread::run()
 	if(((Modbus_driver_Instance*)Parent)->Cfg.context == InstanceCfg::TCP)
 	{
 		//MODBUS TCP
-		strcpy(pCommandLine, "C:\\scada\\bin\\modbus_master.exe -a ");
+		strcpy(pCommandLine, GetScadaHomeDirectory());
+		strcat(pCommandLine, "\\bin\\modbus_master.exe -a ");
 		strcat(pCommandLine, ((Modbus_driver_Instance*)Parent)->Cfg.MODBUSServerIPAddress);
 		strcat(pCommandLine, " -p ");
 		strcat(pCommandLine, ((Modbus_driver_Instance*)Parent)->Cfg.MODBUSServerTCPPort);
@@ -54,7 +55,8 @@ void Modbus_DriverThread::run()
 	else if(((Modbus_driver_Instance*)Parent)->Cfg.context == InstanceCfg::RTU)
 	{
 		//MODBUS RTU
-		strcpy(pCommandLine, "C:\\scada\\bin\\modbus_master.exe -d ");
+		strcpy(pCommandLine, GetScadaHomeDirectory());
+		strcat(pCommandLine, "\\bin\\modbus_master.exe -d ");
 		strcat(pCommandLine, ((Modbus_driver_Instance*)Parent)->Cfg.SerialDevice);
 		strcat(pCommandLine, " -b ");
 		strcat(pCommandLine, ((Modbus_driver_Instance*)Parent)->Cfg.Baud);
@@ -72,7 +74,8 @@ void Modbus_DriverThread::run()
 		strcat(pCommandLine, ((Modbus_driver_Instance*)Parent)->Cfg.ServerID);
 	}
 		
-	strcpy(pWorkingDir,"C:\\scada\\bin");
+	strcpy(pWorkingDir, GetScadaHomeDirectory());
+	strcat(pWorkingDir,"\\bin");
 		
 	if(StartProcess(pCommandLine, pWorkingDir))
 	{

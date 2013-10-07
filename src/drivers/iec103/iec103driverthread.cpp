@@ -36,8 +36,9 @@ void Iec103DriverThread::run()
     strcat(pipe_name, line_number);
 
 	itoa(((Iec103driver_Instance*)Parent)->Cfg.SampleTime, polling_time, 10);
-			
-	strcpy(pCommandLine, "C:\\scada\\bin\\iec103master.exe -a ");
+		
+	strcpy(pCommandLine, GetScadaHomeDirectory());
+	strcat(pCommandLine, "\\bin\\iec103master.exe -a ");
 	strcat(pCommandLine, ((Iec103driver_Instance*)Parent)->Cfg.IEC103LinkAddress);
 	strcat(pCommandLine, " -l ");
 	strcat(pCommandLine, line_number);
@@ -46,7 +47,8 @@ void Iec103DriverThread::run()
 	strcat(pCommandLine, " -n ");
 	strcat(pCommandLine, ((Iec103driver_Instance*)Parent)->Cfg.COMPortName);
 		
-	strcpy(pWorkingDir,"C:\\scada\\bin");
+	strcpy(pWorkingDir, GetScadaHomeDirectory());
+	strcat(pWorkingDir,"\\bin");
   	
 	if(StartProcess(pCommandLine, pWorkingDir))
 	{

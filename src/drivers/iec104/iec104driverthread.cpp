@@ -36,8 +36,9 @@ void Iec104DriverThread::run()
 
     //fprintf(stderr, "pipe_name = %s\n", pipe_name);
     //fflush(stderr);
-			
-	strcpy(pCommandLine, "C:\\scada\\bin\\iec104master.exe -a ");
+		
+	strcpy(pCommandLine, GetScadaHomeDirectory());
+	strcat(pCommandLine, "\\bin\\iec104master.exe -a ");
 	strcat(pCommandLine, ((Iec104driver_Instance*)Parent)->Cfg.IEC104ServerIPAddress);
 	strcat(pCommandLine, " -p ");
 	strcat(pCommandLine, ((Iec104driver_Instance*)Parent)->Cfg.IEC104ServerIPPort);
@@ -46,7 +47,8 @@ void Iec104DriverThread::run()
 	strcat(pCommandLine, " -l ");
 	strcat(pCommandLine, line_number);
 		
-	strcpy(pWorkingDir,"C:\\scada\\bin");
+	strcpy(pWorkingDir, GetScadaHomeDirectory());
+	strcat(pWorkingDir,"\\bin");
 	
 	if(StartProcess(pCommandLine, pWorkingDir))
 	{

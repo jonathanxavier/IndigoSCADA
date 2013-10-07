@@ -37,7 +37,8 @@ void Dnp3DriverThread::run()
 
 	itoa(((Dnp3driver_Instance*)Parent)->Cfg.SampleTime, polling_time, 10);
 		
-	strcpy(pCommandLine, "C:\\scada\\bin\\dnp3master.exe -a ");
+	strcpy(pCommandLine, GetScadaHomeDirectory());
+	strcat(pCommandLine, "\\bin\\dnp3master.exe -a ");
 	strcat(pCommandLine, ((Dnp3driver_Instance*)Parent)->Cfg.DNP3ServerIPAddress);
 	strcat(pCommandLine, " -p ");
 	strcat(pCommandLine, ((Dnp3driver_Instance*)Parent)->Cfg.DNP3ServerIPPort);
@@ -59,7 +60,8 @@ void Dnp3DriverThread::run()
 	strcat(pCommandLine, ((Dnp3driver_Instance*)Parent)->Cfg.serverID);
 
 	
-	strcpy(pWorkingDir,"C:\\scada\\bin");
+	strcpy(pWorkingDir, GetScadaHomeDirectory());
+	strcat(pWorkingDir,"\\bin");
 		
 	if(StartProcess(pCommandLine, pWorkingDir))
 	{
