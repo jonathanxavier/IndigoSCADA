@@ -46,7 +46,7 @@ Iec103driverConfigurationData::Iec103driverConfigurationData(QWidget *parent, co
 	Name->setMargin( 0 );
 
 	IEC103LinkAddressText = new QLineEdit(this, "LineEdit_7");
-	IEC103LinkAddressText->setGeometry(200, 80, 100, 30);
+	IEC103LinkAddressText->setGeometry(200, 40, 100, 30);
 	IEC103LinkAddressText->setMinimumSize(0, 0);
 	IEC103LinkAddressText->setMaximumSize(32767, 32767);
 	IEC103LinkAddressText->setFocusPolicy(QWidget::StrongFocus);
@@ -61,7 +61,7 @@ Iec103driverConfigurationData::Iec103driverConfigurationData(QWidget *parent, co
 	IEC103LinkAddressText->setFrame( TRUE );
 	IEC103LinkAddressText->setAlignment( AlignLeft );
 	QLabel *qtarch_Label_22 = new QLabel(this, "Label_21");
-	qtarch_Label_22->setGeometry(10, 80, 150, 30);
+	qtarch_Label_22->setGeometry(10, 40, 150, 30);
 	qtarch_Label_22->setMinimumSize(0, 0);
 	qtarch_Label_22->setMaximumSize(32767, 32767);
 	qtarch_Label_22->setFocusPolicy(QWidget::NoFocus);
@@ -74,14 +74,80 @@ Iec103driverConfigurationData::Iec103driverConfigurationData(QWidget *parent, co
 	qtarch_Label_22->setLineWidth( 1 );
 	qtarch_Label_22->setMidLineWidth( 0 );
 	qtarch_Label_22->QFrame::setMargin( 0 );
-	qtarch_Label_22->setText( tr( "IEC 103 Link address of slave" ) );
+	qtarch_Label_22->setText( tr( "Link address of slave" ) );
 	qtarch_Label_22->setAlignment( AlignLeft|AlignVCenter|ExpandTabs );
 	qtarch_Label_22->setMargin( 0 );
+
+	IEC103CASDUText = new QLineEdit(this, "LineEdit_7");
+	IEC103CASDUText->setGeometry(200, 80, 100, 30);
+	IEC103CASDUText->setMinimumSize(0, 0);
+	IEC103CASDUText->setMaximumSize(32767, 32767);
+	IEC103CASDUText->setFocusPolicy(QWidget::StrongFocus);
+	IEC103CASDUText->setBackgroundMode(QWidget::PaletteBase);
+#if QT_VERSION < 300
+	IEC103CASDUText->setFontPropagation(QWidget::SameFont);
+	IEC103CASDUText->setPalettePropagation(QWidget::SameFont);
+	#endif
+	IEC103CASDUText->setText( tr( "" ) );
+	IEC103CASDUText->setMaxLength( 100 );
+	IEC103CASDUText->setFrame( QLineEdit::Normal );
+	IEC103CASDUText->setFrame( TRUE );
+	IEC103CASDUText->setAlignment( AlignLeft );
+	QLabel *qtarch_Label_23 = new QLabel(this, "Label_21");
+	qtarch_Label_23->setGeometry(10, 80, 150, 30);
+	qtarch_Label_23->setMinimumSize(0, 0);
+	qtarch_Label_23->setMaximumSize(32767, 32767);
+	qtarch_Label_23->setFocusPolicy(QWidget::NoFocus);
+	qtarch_Label_23->setBackgroundMode(QWidget::PaletteBackground);
+	#if QT_VERSION < 300
+	qtarch_Label_23->setFontPropagation(QWidget::SameFont);
+	qtarch_Label_23->setPalettePropagation(QWidget::SameFont);
+	#endif
+	qtarch_Label_23->setFrameStyle( 0 );
+	qtarch_Label_23->setLineWidth( 1 );
+	qtarch_Label_23->setMidLineWidth( 0 );
+	qtarch_Label_23->QFrame::setMargin( 0 );
+	qtarch_Label_23->setText( tr( "CASDU of slave" ) );
+	qtarch_Label_23->setAlignment( AlignLeft|AlignVCenter|ExpandTabs );
+	qtarch_Label_23->setMargin( 0 );
+
+	COMPortNameText = new QLineEdit(this, "LineEdit_7");
+	COMPortNameText->setGeometry(200, 120, 100, 30);
+	COMPortNameText->setMinimumSize(0, 0);
+	COMPortNameText->setMaximumSize(32767, 32767);
+	COMPortNameText->setFocusPolicy(QWidget::StrongFocus);
+	COMPortNameText->setBackgroundMode(QWidget::PaletteBase);
+#if QT_VERSION < 300
+	COMPortNameText->setFontPropagation(QWidget::SameFont);
+	COMPortNameText->setPalettePropagation(QWidget::SameFont);
+	#endif
+	COMPortNameText->setText( tr( "" ) );
+	COMPortNameText->setMaxLength( 100 );
+	COMPortNameText->setFrame( QLineEdit::Normal );
+	COMPortNameText->setFrame( TRUE );
+	COMPortNameText->setAlignment( AlignLeft );
+	QLabel *qtarch_Label_24 = new QLabel(this, "Label_21");
+	qtarch_Label_24->setGeometry(10, 120, 150, 30);
+	qtarch_Label_24->setMinimumSize(0, 0);
+	qtarch_Label_24->setMaximumSize(32767, 32767);
+	qtarch_Label_24->setFocusPolicy(QWidget::NoFocus);
+	qtarch_Label_24->setBackgroundMode(QWidget::PaletteBackground);
+	#if QT_VERSION < 300
+	qtarch_Label_24->setFontPropagation(QWidget::SameFont);
+	qtarch_Label_24->setPalettePropagation(QWidget::SameFont);
+	#endif
+	qtarch_Label_24->setFrameStyle( 0 );
+	qtarch_Label_24->setLineWidth( 1 );
+	qtarch_Label_24->setMidLineWidth( 0 );
+	qtarch_Label_24->QFrame::setMargin( 0 );
+	qtarch_Label_24->setText( tr( "COM" ) );
+	qtarch_Label_24->setAlignment( AlignLeft|AlignVCenter|ExpandTabs );
+	qtarch_Label_24->setMargin( 0 );
 /////////////////////////////////////////////////////////////////////////
 	
 /////////////////////////////////////////////////////////////////////////
 	QLabel *qtarch_Label_10 = new QLabel(this, "Label_10");
-	qtarch_Label_10->setGeometry(10, 130, 100, 30);
+	qtarch_Label_10->setGeometry(10, 160, 100, 30);
 	qtarch_Label_10->setMinimumSize(0, 0);
 	qtarch_Label_10->setMaximumSize(32767, 32767);
 	qtarch_Label_10->setFocusPolicy(QWidget::NoFocus);
@@ -99,7 +165,7 @@ Iec103driverConfigurationData::Iec103driverConfigurationData(QWidget *parent, co
 	qtarch_Label_10->setMargin( 0 );
 
 	NItems = new QSpinBox(this, "SpinBox_3");
-	NItems->setGeometry(200, 130, 100, 30);
+	NItems->setGeometry(200, 160, 100, 30);
 	NItems->setMinimumSize(0, 0);
 	NItems->setMaximumSize(32767, 32767);
 	NItems->setFocusPolicy(QWidget::StrongFocus);
@@ -121,7 +187,7 @@ Iec103driverConfigurationData::Iec103driverConfigurationData(QWidget *parent, co
 ///////////////////////////////////////////////////////////////////////////
 	
 	QLabel *qtarch_Label_11 = new QLabel(this, "Label_11");
-	qtarch_Label_11->setGeometry(10, 180, 200, 30);
+	qtarch_Label_11->setGeometry(10, 200, 200, 30);
 	qtarch_Label_11->setMinimumSize(0, 0);
 	qtarch_Label_11->setMaximumSize(32767, 32767);
 	qtarch_Label_11->setFocusPolicy(QWidget::NoFocus);
@@ -139,7 +205,7 @@ Iec103driverConfigurationData::Iec103driverConfigurationData(QWidget *parent, co
 	qtarch_Label_11->setMargin( 0 );
 
 	PollInterval = new QSpinBox(this, "SpinBox_4");
-	PollInterval->setGeometry(200, 180, 50, 30);
+	PollInterval->setGeometry(200, 200, 50, 30);
 	PollInterval->setMinimumSize(0, 0);
 	PollInterval->setMaximumSize(32767, 32767);
 	PollInterval->setFocusPolicy(QWidget::StrongFocus);
@@ -162,7 +228,7 @@ Iec103driverConfigurationData::Iec103driverConfigurationData(QWidget *parent, co
 	///////////////////////////////////////////////////////////////////////////
 
 	QPushButton *qtarch_PushButton_1 = new QPushButton(this, "PushButton_1");
-	qtarch_PushButton_1->setGeometry(20, 230, 100, 30);
+	qtarch_PushButton_1->setGeometry(20, 240, 100, 30);
 	qtarch_PushButton_1->setMinimumSize(0, 0);
 	qtarch_PushButton_1->setMaximumSize(32767, 32767);
 	qtarch_PushButton_1->setFocusPolicy(QWidget::TabFocus);
@@ -180,7 +246,7 @@ Iec103driverConfigurationData::Iec103driverConfigurationData(QWidget *parent, co
 	qtarch_PushButton_1->setIsMenuButton( FALSE );
 	connect(qtarch_PushButton_1, SIGNAL(clicked()), SLOT(OkClicked()));
 	QPushButton *qtarch_PushButton_2 = new QPushButton(this, "PushButton_2");
-	qtarch_PushButton_2->setGeometry(210, 230, 100, 30);
+	qtarch_PushButton_2->setGeometry(210, 240, 100, 30);
 	qtarch_PushButton_2->setMinimumSize(0, 0);
 	qtarch_PushButton_2->setMaximumSize(32767, 32767);
 	qtarch_PushButton_2->setFocusPolicy(QWidget::TabFocus);
@@ -198,7 +264,7 @@ Iec103driverConfigurationData::Iec103driverConfigurationData(QWidget *parent, co
 	qtarch_PushButton_2->setIsMenuButton( FALSE );
 	connect(qtarch_PushButton_2, SIGNAL(clicked()), SLOT(Help()));
 	QPushButton *qtarch_PushButton_3 = new QPushButton(this, "PushButton_3");
-	qtarch_PushButton_3->setGeometry(360, 230, 100, 30);
+	qtarch_PushButton_3->setGeometry(360, 240, 100, 30);
 	qtarch_PushButton_3->setMinimumSize(0, 0);
 	qtarch_PushButton_3->setMaximumSize(32767, 32767);
 	qtarch_PushButton_3->setFocusPolicy(QWidget::TabFocus);

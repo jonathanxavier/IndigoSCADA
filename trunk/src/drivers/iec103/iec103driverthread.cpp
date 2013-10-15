@@ -26,20 +26,24 @@ void Iec103DriverThread::run()
 	IT_COMMENT("Iec103DriverThread Running");
 
     ///////////////////start child process iec103master.exe////////////////////
-    char line_number[50];
-	char polling_time[50];
+	char line_number[50];
+    char polling_time[50];
 
 	strcpy(pipe_name, "\\\\.\\pipe\\iec103master_namedpipe");
 
 	itoa(instanceID + 1, line_number, 10);
+	itoa(((Iec103driver_Instance*)Parent)->Cfg.SampleTime, polling_time, 10);
 
     strcat(pipe_name, line_number);
 
-	itoa(((Iec103driver_Instance*)Parent)->Cfg.SampleTime, polling_time, 10);
+    //fprintf(stderr, "pipe_name = %s\n", pipe_name);
+    //fflush(stderr);
 		
 	strcpy(pCommandLine, GetScadaHomeDirectory());
 	strcat(pCommandLine, "\\bin\\iec103master.exe -a ");
 	strcat(pCommandLine, ((Iec103driver_Instance*)Parent)->Cfg.IEC103LinkAddress);
+	strcat(pCommandLine, " -c ");
+	strcat(pCommandLine, ((Iec103driver_Instance*)Parent)->Cfg.IEC103CASDU);
 	strcat(pCommandLine, " -l ");
 	strcat(pCommandLine, line_number);
 	strcat(pCommandLine, " -t ");
@@ -69,7 +73,7 @@ void Iec103DriverThread::run()
             break;
         }
 
-        restart_count++;
+		restart_count++;
 
 		if(restart_count%10 == 0) //Check every 10 seconds
 		{
