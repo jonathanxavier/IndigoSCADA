@@ -46,7 +46,7 @@ class IEC_103_DRIVERDRV Iec103driver_Instance : public DriverInstance
 	QTimer *pTimer; // timer object for driving state machine
 	int Retry; // the retry count
 	int Countdown; // the countdown track
-	int State; // the state machine's state
+	int State; // the state machine's state 
 	
 	//  
 	int Sp; //Current sample point index under measurement
@@ -93,7 +93,7 @@ class IEC_103_DRIVERDRV Iec103driver_Instance : public DriverInstance
 	DriverInstance(parent,name),fFail(0), Countdown(1),
 	State(STATE_RESET),InTick(0),Retry(0),Sp(0),IecItems(1), Values(NULL),
 	ParentDriver(parent),msg_sent_in_control_direction(0), instanceID(instance_id),
-    pConnect(0)
+    pConnect(NULL)
 	{
 		IT_IT("Iec103driver_Instance::Iec103driver_Instance");
 		connect (GetConfigureDb (),
@@ -154,7 +154,7 @@ class IEC_103_DRIVERDRV Iec103driver_Instance : public DriverInstance
 	bool DoExec(SendRecePacket *t);
 	bool expect(unsigned int cmd);
 	void removeTransaction();
-    //
+	//
 	public slots:
 	//
 	virtual void Start(); // start everything under this driver's control

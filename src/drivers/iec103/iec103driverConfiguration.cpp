@@ -48,8 +48,9 @@ Inherited( parent, name ),Receipe(receipe)
 	if(Receipe != "(default)")
 	{
 		NItems->setEnabled(false);
-		//OpcServerProgIDText->setEnabled(false);
 		IEC103LinkAddressText->setEnabled(false);
+		IEC103CASDUText->setEnabled(false);
+		COMPortNameText->setEnabled(false);
 	};
 }
 Iec103driverConfiguration::~Iec103driverConfiguration()
@@ -69,8 +70,8 @@ void Iec103driverConfiguration::OkClicked()
 	GetConfigureDb()->DoExec(0,cmd,0); // delete the old value
 	//
 	cmd = "insert into PROPS values('"+Name->text() +"','" + Receipe + "','" + 
-	//NItems->text() + " " + PollInterval->text() + " " + OpcServerProgIDText->text() + " " + IEC103LinkAddressText->text() +"');";
-	NItems->text() + " " + PollInterval->text() + " " + IEC103LinkAddressText->text() +"');";
+	NItems->text() + " " + PollInterval->text() + " " + IEC103LinkAddressText->text() + " " + IEC103CASDUText->text() + " " + COMPortNameText->text() +"');";
+
 	GetConfigureDb()->DoExec(0,cmd,0);
 	QSAuditTrail(this,caption(), tr("Edited"));
 
@@ -101,10 +102,12 @@ void Iec103driverConfiguration::QueryResponse (QObject *p, const QString &c, int
 				NItems->setValue(n);
 				is >> n;
 				PollInterval->setValue(n);
-				//is >> t;
-				//OpcServerProgIDText->setText(t);
 				is >> t;
 				IEC103LinkAddressText->setText(t);
+				is >> t;
+				IEC103CASDUText->setText(t);
+				is >> t;
+				COMPortNameText->setText(t);
 			}
 			else
 			{
@@ -116,6 +119,8 @@ void Iec103driverConfiguration::QueryResponse (QObject *p, const QString &c, int
 				NItems->setValue(8);
 				PollInterval->setValue(1000);
 				IEC103LinkAddressText->setText("");
+				IEC103CASDUText->setText("");
+				COMPortNameText->setText("");
 			}
 		} 
 		break;

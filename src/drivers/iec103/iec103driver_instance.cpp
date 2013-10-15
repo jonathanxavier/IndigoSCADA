@@ -160,9 +160,11 @@ void Iec103driver_Instance::QueryResponse(QObject *p, const QString &c, int id, 
 				QString s = UndoEscapeSQLText(GetConfigureDb()->GetString("DVAL")); // the top one is either the receipe or (default)
 				QTextIStream is(&s); // extract the values
 				//
-				is >> IecItems;	  // how many IEC items there are in the RTU or PLC
+				is >> IecItems;	  // how many IEC items there are in the RTU
 				is >> Cfg.SampleTime; // how long we sample for in milliseconds
 				is >> Cfg.IEC103LinkAddress; // IEC 103 Link Address
+				is >> Cfg.IEC103CASDU; // IEC 103 CASDU
+				is >> Cfg.COMPortName; //serial  COM port name
 
 				Countdown = 1;
 
@@ -194,14 +196,13 @@ void Iec103driver_Instance::QueryResponse(QObject *p, const QString &c, int id, 
 
 			if(GetConfigureDb()->GetNumberResults() > 0)
 			{
-				// 
-				#ifdef DEPRECATED_IEC103_CONFIG
+
+                #ifdef DEPRECATED_IEC103_CONFIG
 				QString SamplePointName = UndoEscapeSQLText(GetConfigureDb()->GetString("IKEY"));
 				#else
 				QString SamplePointName = UndoEscapeSQLText(GetConfigureDb()->GetString("NAME"));
 				#endif
-
-
+				// 
 				double v = 0.0;
 
 				if(strlen((const char*)t.Data1) > 0)
@@ -221,20 +222,20 @@ void Iec103driver_Instance::QueryResponse(QObject *p, const QString &c, int id, 
 			if(GetConfigureDb()->GetNumberResults() > 0)
 			{
 				// 
-				#ifdef DEPRECATED_IEC103_CONFIG
+                #ifdef DEPRECATED_IEC103_CONFIG
 				QString IOACommand = UndoEscapeSQLText(GetConfigureDb()->GetString("DVAL"));
 				#else
 				int IOACommand = GetConfigureDb()->GetInt("IOA");
 				#endif
 				
 				int command_value = 0;
-
+				
 				if(strlen((const char*)t.Data1) > 0)
 				{
 					command_value = atoi((const char*)t.Data1);
 				}
 
-				printf("IOA command = %d, value = %d\n", IOACommand, command_value);
+				printf("Command from %s, IOA = %d, value = %d\n", (const char*)t.Data2, IOACommand, command_value);
 
 				//Send C_SC_NA_1//////////////////////////////////////////////////////////////////////////
 				struct iec_item item_to_send;
@@ -382,6 +383,7 @@ void Iec103driver_Instance::Tick()
 		p_item = (struct iec_item*)buf;
 			
 		//printf("Receiving %d th message \n", p_item->msg_id);
+		printf("Receiving %d th iec103 message from line = %d\n", p_item->msg_id, instanceID + 1);
 
 		//for (int j = 0; j < len; j++) 
 		//{ 
@@ -620,12 +622,12 @@ void Iec103driver_Instance::Tick()
 		QString ioa;
 		ioa.sprintf("%d", p_item->iec_obj.ioa);
 
-		#ifdef DEPRECATED_IEC103_CONFIG
+        #ifdef DEPRECATED_IEC103_CONFIG
 		QString cmd = "select IKEY from PROPS where DVAL='"+ ioa + "' and SKEY='SAMPLEPROPS';";
 		#else
 		QString cmd = "select NAME from TAGS where IOA="+ ioa + " and UNIT='"+ Name + "';";
 		#endif
-
+		
 		GetConfigureDb()->DoExec(this, cmd, tGetSamplePointNamefromIOA, value, ioa);
 
 		//printf("ioa %s, value %s\n", (const char*)ioa, (const char*)value);
@@ -790,6 +792,8 @@ bool  Iec103driver_Instance::Disconnect()
 	
 	InQueue.clear();
 
+    pConnect->TerminateProtocol();
+
 	if(pConnect) delete pConnect;
 	pConnect = NULL;
 
@@ -828,7 +832,7 @@ void Iec103driver_Instance::Command(const QString & name, BYTE cmd, LPVOID lpPa,
 
 	IT_COMMENT3("Received command for instance %s, sample point: %s, value: %lf", (const char*)name, (const char*)sample_point_name, (params->res[0]).value);
 
-	#ifdef DEPRECATED_IEC103_CONFIG
+    #ifdef DEPRECATED_IEC103_CONFIG
 	QString pc = "select * from PROPS where IKEY='" + sample_point_name + "';"; 
 	#else
 	QString pc = "select * from TAGS where NAME='" + sample_point_name + "';";
@@ -837,6 +841,6 @@ void Iec103driver_Instance::Command(const QString & name, BYTE cmd, LPVOID lpPa,
 	QString value_for_command;
 	value_for_command.sprintf("%lf", (params->res[0]).value);
 	// 
-	GetConfigureDb()->DoExec(this, pc, tGetIOAfromSamplePointName, value_for_command);
+	GetConfigureDb()->DoExec(this, pc, tGetIOAfromSamplePointName, value_for_command, sample_point_name);
 }
-	
+
