@@ -139,7 +139,7 @@ typedef void (*ORTETypeSerialize)(CDR_Codec *cdrCodec, void *instance);
 
 typedef void (*ORTETypeDeserialize)(CDR_Codec *cdrCodec, void *instance);
 
-typedef int (*ORTETypeGetMaxSize)(ORTEGetMaxSizeParam *gms);
+typedef int (*ORTETypeGetMaxSize)(ORTEGetMaxSizeParam *gms, int num);
 
 /**
  * struct ORTETypeRegister - registered data type

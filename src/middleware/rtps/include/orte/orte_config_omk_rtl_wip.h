@@ -157,19 +157,19 @@
 #define ORTE_PACKAGE_NAME "orte"
 
 /* Define to the full name and version of this package. */
-#define ORTE_PACKAGE_STRING "orte 0.3.2"
+#define ORTE_PACKAGE_STRING "orte 0.3.3"
 
 /* Define to the one symbol short name of this package. */
 #define ORTE_PACKAGE_TARNAME "orte"
 
 /* Define to the version of this package. */
-#define ORTE_PACKAGE_VERSION "0.3.2"
+#define ORTE_PACKAGE_VERSION "0.3.3"
 
 /* Define to 1 if you have the ANSI C header files. */
 /* #undef STDC_HEADERS */
 
 /* Version number of package */
-#define ORTE_VERSION "0.3.2"
+#define ORTE_VERSION "0.3.3"
 
 /* Define to 1 if your processor stores words with the most significant byte
    first (like Motorola and SPARC, unlike Intel and VAX). */

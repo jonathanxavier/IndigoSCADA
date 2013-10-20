@@ -13,7 +13,7 @@ typedef uint16_t  CORBA_unsigned_short;
 typedef uint32_t  CORBA_unsigned_long;
 typedef float     CORBA_float;
 typedef double    CORBA_double;
-typedef int8_t    CORBA_char;
+typedef char	  CORBA_char;
 typedef int16_t   CORBA_wchar;
 typedef uint8_t   CORBA_boolean;
 typedef uint8_t   CORBA_octet;

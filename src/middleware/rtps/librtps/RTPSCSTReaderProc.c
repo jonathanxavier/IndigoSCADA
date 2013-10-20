@@ -220,7 +220,7 @@ CSTReaderNewData(CSTRemoteWriter *cstRemoteWriter,
       gms.recv_size=csChange->cdrCodec.buf_len;
       gms.csize=0;
       if (cstRemoteWriter->cstReader->typeRegister->getMaxSize)
-        max_size=cstRemoteWriter->cstReader->typeRegister->getMaxSize(&gms);
+        max_size=cstRemoteWriter->cstReader->typeRegister->getMaxSize(&gms,1);
       else
         max_size=cstRemoteWriter->cstReader->typeRegister->maxSize;
       if (max_size>csChange->cdrCodec.buf_len)

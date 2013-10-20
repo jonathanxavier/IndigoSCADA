@@ -72,10 +72,6 @@ IPAddressToString(IPAddress ipAddress,char *buff) {
   return buff;
 }
 
-#ifdef _MSC_VER
-typedef unsigned long in_addr_t; //apa+++ 
-#endif
-
 /**********************************************************************************/
 IPAddress 
 StringToIPAddress(const char *string) {
@@ -83,7 +79,7 @@ StringToIPAddress(const char *string) {
 #ifdef CONFIG_ORTE_MINGW   
   unsigned long inetAddress = inet_addr(string);
 #else
-  in_addr_t inetAddress = inet_addr(string);
+  unsigned long inetAddress = inet_addr(string);
 #endif
   
   if(inetAddress!=INADDR_NONE) {

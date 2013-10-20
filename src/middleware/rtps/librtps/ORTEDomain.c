@@ -120,7 +120,9 @@ ORTEDomainPropDefaultGet(ORTEDomainProp *prop) {
 
   //IFProp
   sock_init_udp(&sock);
-  sock_bind(&sock,0,INADDR_ANY);
+  if (sock_bind(&sock,0,INADDR_ANY) == -1) {
+    return ORTE_FALSE;
+  }
   sock_get_local_interfaces(&sock,prop->IFProp, (char *)&prop->IFCount);
   sock_cleanup(&sock); 
 
@@ -185,7 +187,7 @@ ORTEDomainCreate(int domain, ORTEDomainProp *prop,
   char              sbuff[128];
   int               i;
   uint16_t          port=0;
-  Boolean           error=ORTE_FALSE;
+  int		    errno_save = 0;
 
   debug(30,2)  ("ORTEDomainCreate: %s compiled: %s,%s\n",
 		 ORTE_PACKAGE_STRING,__DATE__,__TIME__);
@@ -241,7 +243,9 @@ ORTEDomainCreate(int domain, ORTEDomainProp *prop,
   if (prop!=NULL) {
     memcpy(&d->domainProp,prop,sizeof(ORTEDomainProp));
   } else {
-    ORTEDomainPropDefaultGet(&d->domainProp);
+    if (!ORTEDomainPropDefaultGet(&d->domainProp)) {
+      goto err_domainProp;
+    }
   }
   
   //print local IP addresses
@@ -254,8 +258,7 @@ ORTEDomainCreate(int domain, ORTEDomainProp *prop,
     debug(30,2) ("ORTEDomainCreate: no active interface card\n");
     if (d->domainProp.multicast.enabled) {
        debug(30,0) ("ORTEDomainCreate: for multicast have to be active an interface\n");
-       FREE(d);
-       return NULL;
+       goto err_domainProp;
     }
   }
 
@@ -323,18 +326,24 @@ ORTEDomainCreate(int domain, ORTEDomainProp *prop,
 		  loop);
       
       //joint to multicast group
+      memset(&mreq, 0, sizeof(mreq));
       mreq.imr_multiaddr.s_addr=htonl(d->domainProp.multicast.ipAddress);
       mreq.imr_interface.s_addr=htonl(INADDR_ANY);
       if(sock_setsockopt(&d->taskRecvUnicastMetatraffic.sock,IPPROTO_IP,
   	  IP_ADD_MEMBERSHIP, (const char *)&mreq, sizeof(mreq))>=0) {
         debug(30,2) ("ORTEDomainCreate: joint to mgroup %s\n",
                       IPAddressToString(d->domainProp.multicast.ipAddress,sIPAddress));
-      }
+      } else
+	      goto err_sock;
     }
-    sock_bind(&d->taskRecvUnicastMetatraffic.sock,port,d->domainProp.listen);
+    if (sock_bind(&d->taskRecvUnicastMetatraffic.sock,port,d->domainProp.listen) == -1) {
+      goto err_sock;
+    }
   } else {
     /* give me receiving port (metatraffic) */
-      sock_bind(&d->taskRecvUnicastMetatraffic.sock,0,d->domainProp.listen);
+    if (sock_bind(&d->taskRecvUnicastMetatraffic.sock,0,d->domainProp.listen) == -1) {
+      goto err_sock;
+    }
   }
   debug(30,2) ("ORTEDomainCreate: bind on port(RecvUnicastMetatraffic): %u\n",
                d->taskRecvUnicastMetatraffic.sock.port);
@@ -371,7 +380,9 @@ ORTEDomainCreate(int domain, ORTEDomainProp *prop,
     
     /* receiving multicast port (metatraffic) */
     Domain2PortMulticastMetatraffic(d->domain,mport);
-    sock_bind(&d->taskRecvMulticastMetatraffic.sock,(uint16_t)mport,d->domainProp.listen);
+    if (sock_bind(&d->taskRecvMulticastMetatraffic.sock,(uint16_t)mport,d->domainProp.listen) == -1) {
+      goto err_sock;
+    }
     debug(30,2) ("ORTEDomainCreate: bind on port(RecvMulticastMetatraffic): %u\n",
                   d->taskRecvMulticastMetatraffic.sock.port);
   }
@@ -380,7 +391,9 @@ ORTEDomainCreate(int domain, ORTEDomainProp *prop,
   /* UserData */
   if (!manager) {
     /* give me receiving port (userdata) */
-    sock_bind(&d->taskRecvUnicastUserdata.sock,0,d->domainProp.listen);
+    if (sock_bind(&d->taskRecvUnicastUserdata.sock,0,d->domainProp.listen) == -1) {
+      goto err_sock;
+    }
     debug(30,2) ("ORTEDomainCreate: bind on port(RecvUnicatUserdata): %u\n",
                   d->taskRecvUnicastUserdata.sock.port);
 
@@ -403,7 +416,9 @@ ORTEDomainCreate(int domain, ORTEDomainProp *prop,
       
       /* receiving multicast port (userdata) */
       Domain2PortMulticastUserdata(d->domain,mport);
-      sock_bind(&d->taskRecvMulticastUserdata.sock,(uint16_t)mport,d->domainProp.listen);
+      if (sock_bind(&d->taskRecvMulticastUserdata.sock,(uint16_t)mport,d->domainProp.listen) == -1) {
+	goto err_sock;
+      }
       debug(30,2) ("ORTEDomainCreate: bind on port(RecvMulticastUserdata): %u\n",
                     d->taskRecvMulticastUserdata.sock.port);
     }
@@ -412,7 +427,9 @@ ORTEDomainCreate(int domain, ORTEDomainProp *prop,
   /************************************************************************/
   /* Send */
   /* give me sending port */
-  sock_bind(&d->taskSend.sock,0,d->domainProp.listen);
+  if (sock_bind(&d->taskSend.sock,0,d->domainProp.listen) == -1) {
+    goto err_sock;
+  }
   debug(30,2) ("ORTEDomainCreate: bind on port(Send): %u\n",
                d->taskSend.sock.port);
   if (d->domainProp.multicast.enabled) {
@@ -434,7 +451,7 @@ ORTEDomainCreate(int domain, ORTEDomainProp *prop,
       (d->domainProp.multicast.enabled && 
        (d->taskRecvMulticastMetatraffic.sock.fd<0))) {
     debug(30,0) ("ORTEDomainCreate: Error creating socket(s).\n");
-    error=ORTE_TRUE;
+    goto err_sock;
   }
 
   if ((!d->taskRecvUnicastMetatraffic.mb.cdrCodec.buffer) || 
@@ -446,22 +463,8 @@ ORTEDomainCreate(int domain, ORTEDomainProp *prop,
       (d->domainProp.multicast.enabled && !manager &&
        !d->taskRecvMulticastMetatraffic.mb.cdrCodec.buffer)) {    //no a memory
     debug(30,0) ("ORTEDomainCreate: Error creating buffer(s).\n");
-    error=ORTE_TRUE;
+    goto err_sock;
   } 
-  /* a problem occure with resources */
-  if (error) {
-    sock_cleanup(&d->taskRecvUnicastMetatraffic.sock);
-    sock_cleanup(&d->taskRecvMulticastMetatraffic.sock);
-    sock_cleanup(&d->taskRecvUnicastUserdata.sock);
-    sock_cleanup(&d->taskRecvMulticastUserdata.sock);
-    sock_cleanup(&d->taskSend.sock);
-    CDR_codec_release_buffer(&d->taskRecvUnicastMetatraffic.mb.cdrCodec);
-    CDR_codec_release_buffer(&d->taskRecvMulticastMetatraffic.mb.cdrCodec);
-    CDR_codec_release_buffer(&d->taskRecvUnicastUserdata.mb.cdrCodec);
-    CDR_codec_release_buffer(&d->taskRecvMulticastUserdata.mb.cdrCodec);
-    CDR_codec_release_buffer(&d->taskSend.mb.cdrCodec);
-    FREE(d);
-  }
 
   /************************************************************************/
   //Generates local GUID
@@ -486,6 +489,9 @@ ORTEDomainCreate(int domain, ORTEDomainProp *prop,
   
   //Self object data & fellow managers object data
   appParams=(AppParams*)MALLOC(sizeof(AppParams));
+  if (!appParams) {
+    goto err_sock;
+  }
   AppParamsInit(appParams);
   appParams->expirationTime=d->domainProp.baseProp.expirationTime;
   VENDOR_ID_OCERA(appParams->vendorId);
@@ -712,6 +718,40 @@ ORTEDomainCreate(int domain, ORTEDomainProp *prop,
 
   debug(30,10) ("ORTEDomainCreate: finished\n");
   return d;
+
+err:
+  if (!errno_save) errno_save = errno;
+  /* TODO */
+  FREE(appParams);
+err_sock:
+  if (!errno_save) errno_save = errno;
+  sock_cleanup(&d->taskRecvUnicastMetatraffic.sock);
+  sock_cleanup(&d->taskRecvMulticastMetatraffic.sock);
+  sock_cleanup(&d->taskRecvUnicastUserdata.sock);
+  sock_cleanup(&d->taskRecvMulticastUserdata.sock);
+  sock_cleanup(&d->taskSend.sock);
+  pthread_rwlock_destroy(&d->typeEntry.lock);
+  if (d->domainProp.multicast.enabled) {
+    CDR_codec_release_buffer(&d->taskRecvMulticastMetatraffic.mb.cdrCodec);
+    CDR_codec_release_buffer(&d->taskRecvMulticastUserdata.mb.cdrCodec);
+  }
+  if (!manager) {
+    CDR_codec_release_buffer(&d->taskRecvUnicastUserdata.mb.cdrCodec);
+  }
+  CDR_codec_release_buffer(&d->taskRecvUnicastMetatraffic.mb.cdrCodec);
+err_domainProp:
+  if (!errno_save) errno_save = errno;
+  pthread_rwlock_init(&d->patternEntry.lock,NULL);
+  pthread_rwlock_init(&d->psEntry.subscriptionsLock,NULL);
+  pthread_rwlock_destroy(&d->psEntry.publicationsLock);
+  pthread_rwlock_destroy(&d->subscriptions.lock);
+  pthread_rwlock_destroy(&d->publications.lock);
+  pthread_mutex_destroy(&d->objectEntry.htimSendMutex);
+  pthread_rwlock_destroy(&d->objectEntry.htimRootLock);
+  pthread_rwlock_destroy(&d->objectEntry.objRootLock);
+  FREE(d);
+  errno = errno_save;
+  return NULL;
 }
 
 /*****************************************************************************/

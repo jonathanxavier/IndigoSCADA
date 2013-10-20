@@ -245,6 +245,14 @@ ch_output_type_enum (IDL_tree       tree,
 
 //	ch_type_alloc_and_tc (tree, rinfo, ci, FALSE);
 
+	fprintf (ci->fh, "#define %s_serialize(codec, obj) CORBA_long_serialize((codec), (obj))\n", enumid);
+	fprintf (ci->fh,
+		 "static inline void\n"
+		 "%s_deserialize(CDR_Codec *codec, %s *object) {\n"
+		 "  CORBA_long_deserialize(codec, (CORBA_long*)object);\n"
+		 "}\n", enumid, enumid);
+	fprintf(ci->fh, "#define %s_get_max_size(x, num) CORBA_long_get_max_size((x), (num))\n", enumid);
+
 	fprintf (ci->fh, "#endif\n");
 
 	g_free (enumid);
@@ -283,17 +291,17 @@ ch_output_type_dcl(IDL_tree tree, OIDL_Run_Info *rinfo, OIDL_C_Info *ci)
 		switch (IDL_NODE_TYPE (ent)) {
 		case IDLN_IDENT:
 			fprintf (ci->fh, " %s;\n", ctmp);
-			fprintf (ci->fh, "#define %s_serialize(x) ", ctmp);
+			fprintf (ci->fh, "#define %s_serialize(codec, obj) ", ctmp);
 			orte_cbe_write_typespec (ci->fh, IDL_TYPE_DCL (tree).type_spec);
-			fprintf (ci->fh, "_serialize(x)\n");
+			fprintf (ci->fh, "_serialize(codec, obj)\n");
 
-			fprintf (ci->fh, "#define %s_deserialize(x) ", ctmp);
+			fprintf (ci->fh, "#define %s_deserialize(codec, obj) ", ctmp);
 			orte_cbe_write_typespec (ci->fh, IDL_TYPE_DCL (tree).type_spec);
-			fprintf (ci->fh, "_deserialize(x)\n");
+			fprintf (ci->fh, "_deserialize(codec, obj)\n");
 
-                        fprintf(ci->fh, "#define %s_get_max_size(x) ", ctmp);
+                        fprintf(ci->fh, "#define %s_get_max_size(x, num) ", ctmp);
 			orte_cbe_write_typespec (ci->fh, IDL_TYPE_DCL (tree).type_spec);
-			fprintf (ci->fh, "_get_max_size(x)\n");
+			fprintf (ci->fh, "_get_max_size(x, num)\n");
 			break;
 		case IDLN_TYPE_ARRAY: {
 			IDL_tree sub;
@@ -610,7 +618,7 @@ ch_output_decl(IDL_tree tree, OIDL_Run_Info *rinfo, OIDL_C_Info *ci)
     "_", 0);
   fprintf(ci->fh, "void %s_serialize(CDR_Codec *cdrCodec,%s *object);\n", id, id);
   fprintf(ci->fh, "void %s_deserialize(CDR_Codec *cdrCodec,%s *object);\n", id, id);
-  fprintf(ci->fh, "int %s_get_max_size(ORTEGetMaxSizeParam *gms);\n", id);
+  fprintf(ci->fh, "int %s_get_max_size(ORTEGetMaxSizeParam *gms, int num);\n", id);
   fprintf(ci->fh, "Boolean %s_type_register(ORTEDomain *d);\n", id);
   fprintf(ci->fh, "\n");
 

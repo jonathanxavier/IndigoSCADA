@@ -153,26 +153,26 @@ extern CORBA_boolean CDR_get_double(CDR_Codec *codec, CORBA_double *d);
 #define CORBA_string_deserialize(x,y)          CDR_get_string((x),(y))
 
 /* get_max_size functions */
-#define CORBA_short_get_max_size(x)            ((x)->csize=\
-	(unsigned long)ALIGN_ADDRESS((x)->csize,ORTE_ALIGNOF_CORBA_SHORT)+ORTE_ALIGNOF_CORBA_SHORT)
-#define CORBA_long_get_max_size(x)             ((x)->csize=\
-	(unsigned long)ALIGN_ADDRESS((x)->csize,ORTE_ALIGNOF_CORBA_LONG)+ORTE_ALIGNOF_CORBA_LONG)
-#define CORBA_unsigned_short_get_max_size(x)   ((x)->csize=\
-	(unsigned long)ALIGN_ADDRESS((x)->csize,ORTE_ALIGNOF_CORBA_SHORT)+ORTE_ALIGNOF_CORBA_SHORT)
-#define CORBA_unsigned_long_get_max_size(x)    ((x)->csize=\
-	(unsigned long)ALIGN_ADDRESS((x)->csize,ORTE_ALIGNOF_CORBA_LONG)+ORTE_ALIGNOF_CORBA_LONG)
-#define CORBA_float_get_max_size(x)            ((x)->csize=\
-	(unsigned long)ALIGN_ADDRESS((x)->csize,ORTE_ALIGNOF_CORBA_FLOAT)+ORTE_ALIGNOF_CORBA_FLOAT)
-#define CORBA_double_get_max_size(x)           ((x)->csize=\
-	(unsigned long)ALIGN_ADDRESS((x)->csize,ORTE_ALIGNOF_CORBA_DOUBLE)+ORTE_ALIGNOF_CORBA_DOUBLE)
-#define CORBA_char_get_max_size(x)             ((x)->csize=\
-	(unsigned long)ALIGN_ADDRESS((x)->csize,ORTE_ALIGNOF_CORBA_CHAR)+ORTE_ALIGNOF_CORBA_CHAR)
-#define CORBA_boolean_get_max_size(x)          ((x)->csize=\
-	(unsigned long)ALIGN_ADDRESS((x)->csize,ORTE_ALIGNOF_CORBA_BOOLEAN)+ORTE_ALIGNOF_CORBA_BOOLEAN)
-#define CORBA_octet_get_max_size(x)            ((x)->csize=\
-	(unsigned long)ALIGN_ADDRESS((x)->csize,ORTE_ALIGNOF_CORBA_OCTET)+ORTE_ALIGNOF_CORBA_OCTET)
-#define CORBA_long_double_get_max_size(x)      ((x)->csize=\
-	(unsigned long)ALIGN_ADDRESS((x)->csize,ORTE_ALIGNOF_CORBA_LONG_DOUBLE)+ORTE_ALIGNOF_CORBA_DOUBLE)
+#define CORBA_short_get_max_size(x, num)            ((x)->csize=\
+	(unsigned long)ALIGN_ADDRESS((x)->csize,ORTE_ALIGNOF_CORBA_SHORT)+(num)*ORTE_ALIGNOF_CORBA_SHORT)
+#define CORBA_long_get_max_size(x, num)             ((x)->csize=\
+	(unsigned long)ALIGN_ADDRESS((x)->csize,ORTE_ALIGNOF_CORBA_LONG)+(num)*ORTE_ALIGNOF_CORBA_LONG)
+#define CORBA_unsigned_short_get_max_size(x, num)   ((x)->csize=\
+	(unsigned long)ALIGN_ADDRESS((x)->csize,ORTE_ALIGNOF_CORBA_SHORT)+(num)*ORTE_ALIGNOF_CORBA_SHORT)
+#define CORBA_unsigned_long_get_max_size(x, num)    ((x)->csize=\
+	(unsigned long)ALIGN_ADDRESS((x)->csize,ORTE_ALIGNOF_CORBA_LONG)+(num)*ORTE_ALIGNOF_CORBA_LONG)
+#define CORBA_float_get_max_size(x, num)            ((x)->csize=\
+	(unsigned long)ALIGN_ADDRESS((x)->csize,ORTE_ALIGNOF_CORBA_FLOAT)+(num)*ORTE_ALIGNOF_CORBA_FLOAT)
+#define CORBA_double_get_max_size(x, num)           ((x)->csize=\
+	(unsigned long)ALIGN_ADDRESS((x)->csize,ORTE_ALIGNOF_CORBA_DOUBLE)+(num)*ORTE_ALIGNOF_CORBA_DOUBLE)
+#define CORBA_char_get_max_size(x, num)             ((x)->csize=\
+	(unsigned long)ALIGN_ADDRESS((x)->csize,ORTE_ALIGNOF_CORBA_CHAR)+(num)*ORTE_ALIGNOF_CORBA_CHAR)
+#define CORBA_boolean_get_max_size(x, num)          ((x)->csize=\
+	(unsigned long)ALIGN_ADDRESS((x)->csize,ORTE_ALIGNOF_CORBA_BOOLEAN)+(num)*ORTE_ALIGNOF_CORBA_BOOLEAN)
+#define CORBA_octet_get_max_size(x, num)            ((x)->csize=\
+	(unsigned long)ALIGN_ADDRESS((x)->csize,ORTE_ALIGNOF_CORBA_OCTET)+(num)*ORTE_ALIGNOF_CORBA_OCTET)
+#define CORBA_long_double_get_max_size(x, num)      ((x)->csize=\
+	(unsigned long)ALIGN_ADDRESS((x)->csize,ORTE_ALIGNOF_CORBA_LONG_DOUBLE)+(num)*ORTE_ALIGNOF_CORBA_DOUBLE)
 #define CORBA_string_get_max_size(x,y)         \
 	((x)->csize=(unsigned long)ALIGN_ADDRESS((x)->csize,ORTE_ALIGNOF_CORBA_LONG) + ORTE_ALIGNOF_CORBA_LONG + y + 1)
 

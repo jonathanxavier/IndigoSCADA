@@ -241,7 +241,7 @@ extern "C" {
   #include <win32/timeval.h>
   #include <win32/getopt.h>
   #define ioctl ioctlsocket
-  #define ORTE_PACKAGE_STRING "orte 0.3.2"
+  #define ORTE_PACKAGE_STRING "orte 0.3.3"
   #define CONFIG_ORTE_WIN
 #endif
 
