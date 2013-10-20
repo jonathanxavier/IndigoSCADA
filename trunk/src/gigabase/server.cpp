@@ -1812,7 +1812,7 @@ bool dbServer::authenticate(char* buf)
     }
 	#endif
 
-	strcat(ini_file, "\\bin\\historicdb.ini");
+	strcat(ini_file, "\\project\\historicdb.ini");
 
 	Inifile iniFile(ini_file);
 

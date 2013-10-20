@@ -41,7 +41,7 @@ RealTimeSqlServer::~RealTimeSqlServer()
     }
 	#endif
 	
-	strcat(ini_file, "\\bin\\realtimedb.ini");
+	strcat(ini_file, "\\project\\realtimedb.ini");
 	
 	Inifile iniFile(ini_file);
 
@@ -101,7 +101,7 @@ void RealTimeSqlServer::run(int argc, char* argv[])
     }
 	#endif
 
-	strcat(ini_file, "\\bin\\realtimedb.ini");
+	strcat(ini_file, "\\project\\realtimedb.ini");
 		
 	Inifile iniFile(ini_file);
 

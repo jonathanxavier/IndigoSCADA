@@ -42,7 +42,7 @@ SqlServer::~SqlServer()
     }
 	#endif
 	
-	strcat(ini_file, "\\bin\\historicdb.ini");
+	strcat(ini_file, "\\project\\historicdb.ini");
 	
 	Inifile iniFile(ini_file);
 
@@ -102,7 +102,7 @@ void SqlServer::run(int argc, char* argv[])
     }
 	#endif
 
-	strcat(ini_file, "\\bin\\historicdb.ini");
+	strcat(ini_file, "\\project\\historicdb.ini");
 		
 	Inifile iniFile(ini_file);
 

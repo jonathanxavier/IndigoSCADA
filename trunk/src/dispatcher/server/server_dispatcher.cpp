@@ -404,7 +404,7 @@ bool dispServer::authenticate(char* buf)
 	}
 	#endif
 	
-	strcat(ini_file, "\\bin\\dispatcher.ini");
+	strcat(ini_file, "\\project\\dispatcher.ini");
 	Inifile iniFile(ini_file);
 
 
