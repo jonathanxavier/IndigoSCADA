@@ -1,7 +1,7 @@
 /*
  *                         IndigoSCADA
  *
- *   This software and documentation are Copyright 2002 to 2009 Enscada 
+ *   This software and documentation are Copyright 2002 to 2013 Enscada 
  *   Limited and its licensees. All rights reserved. See file:
  *
  *                     $HOME/LICENSE 
@@ -138,6 +138,8 @@ lineNumber(atoi(line_number))
 	db.nIOA_BO = nIOA_BO;
 	db.nIOA_CI = nIOA_CI;
 	
+	received_command = -1;
+
 	/////////////////////Middleware/////////////////////////////////////////////////////////////////
 	received_command_callback = 0;
 
@@ -387,50 +389,8 @@ void DNP3MasterApp::check_for_commands(struct iec_item *queued_item)
 		{
 			Sleep(100); //Delay between one command and the next one
 
-			/////////Here we make the QUERY:////////////////////////////////////////// /////////////////////////////
-			//select from Item table hClient where ioa is equal to ioa of packet arriving (command) from monitor.exe
-			///////////////////////////////////////////////////////////////////////////////////////
-			int found = 0;
-			DWORD hClient = -1;
-/*
-			for(dw = 0; dw < g_dwNumItems; dw++) 
-			{ 
-				if(queued_item->iec_obj.ioa == Item[dw].ioa_control_center)
-				{
-					found = 1;
-					hClient = Item[dw].hClient;
-					break;
-				}
-			}
-
-			if(found == 0)
-			{
-				fprintf(stderr,"Error: Command with IOA %d not found in I/O list\n", queued_item->iec_obj.ioa);
-				fflush(stderr);
-				fprintf(stderr,"Command NOT executed\n");
-				fflush(stderr);
-				return;
-			}
-			/////////////////////////////////////////////////////////////////////
-
-			//check iec type of command
-			if(Item[hClient - 1].io_list_iec_type != queued_item->iec_type)
-			{
-				//error
-				fprintf(stderr,"Error: Command with IOA %d has iec_type %d, different from IO list type %d\n", queued_item->iec_obj.ioa, queued_item->iec_type, Item[hClient - 1].io_list_iec_type);
-				fflush(stderr);
-				fprintf(stderr,"Command NOT executed\n");
-				fflush(stderr);
-				return;
-			}
-*/
-			//Receive a write command
-								
-			fprintf(stderr,"Receiving command for hClient %d, ioa %d\n", hClient, queued_item->iec_obj.ioa);
-			fflush(stderr);
-			
-			//TODO: implement command execution
-			
+			//Command execution
+			received_command = queued_item->iec_type;
 		}
 		else if(queued_item->iec_type == C_EX_IT_1)
 		{
@@ -441,32 +401,7 @@ void DNP3MasterApp::check_for_commands(struct iec_item *queued_item)
 		else if(queued_item->iec_type == C_IC_NA_1)
 		{
 			//Do General Interrogation
-
-			/////////////General interrogation//////////////////////////////////////////
-			/*
-			if(master_p != NULL)
-			{
-				master_p->poll(Master::INTEGRITY);
-
-				char data_p[80];
-				int n_read;
-
-				n_read = tx_var->read(getSocket(), data_p, 1, 80, 15);
-
-				if(n_read > 0)
-				{
-					// put the char data into a Bytes container
-					Bytes bytes((unsigned char*)data_p, (unsigned char*)data_p + n_read);
-
-					master_p->rxData(&bytes, 0);
-				}
-				else
-				{
-					//error
-				}
-			}
-			*/
-			/////////////////////////////////////////////////////////////////////////////
+			received_command = queued_item->iec_type;
 		}
 	}
 
@@ -489,31 +424,36 @@ int DNP3MasterApp::run(void)
 	{
 		if(GetSockConnectStatus())
 		{  
-			/////////////General interrogation//////////////////////////////////////////
-			master_p->poll(Master::INTEGRITY);
-
 			char data_p[80];
 			int n_read;
 
-			n_read = tx_var->read(getSocket(), data_p, 1, 80, 15);
-
-			if(n_read > 0)
-			{
-				// put the char data into a Bytes container
-				Bytes bytes((unsigned char*)data_p, (unsigned char*)data_p + n_read);
-
-				master_p->rxData(&bytes, 0);
-			}
-			else
-			{
-				//error
-			}
-			/////////////////////////////////////////////////////////////////////////////
-
-			//master_p->poll(Master::EVENT);
-
 			for(;;)   
 			{   
+				if(received_command == C_IC_NA_1
+					|| received_command == -1)
+				{
+					received_command = 0;
+					/////////////General interrogation//////////////////////////////////////////
+					master_p->poll(Master::INTEGRITY);
+
+					n_read = tx_var->read(getSocket(), data_p, 1, 80, 15);
+
+					if(n_read > 0)
+					{
+						// put the char data into a Bytes container
+						Bytes bytes((unsigned char*)data_p, (unsigned char*)data_p + n_read);
+
+						master_p->rxData(&bytes, 0);
+					}
+					else
+					{
+						//error
+					}
+					/////////////////////////////////////////////////////////////////////////////
+				}
+			
+				//master_p->poll(Master::EVENT);
+
 				master_p->startNewTransaction();
 
 				n_read = tx_var->read(getSocket(), data_p, 1, 80, 15);
@@ -577,6 +517,28 @@ int DNP3MasterApp::run(void)
 					}
 
 					break; //exit inner loop
+				}
+
+				if(received_command == C_SC_TA_1
+				|| received_command == C_DC_TA_1
+				|| received_command == C_SE_TA_1
+				|| received_command == C_SE_TB_1
+				|| received_command == C_SE_TC_1
+				|| received_command == C_BO_TA_1
+				|| received_command == C_SC_NA_1
+				|| received_command == C_DC_NA_1
+				|| received_command == C_SE_NA_1 
+				|| received_command == C_SE_NB_1
+				|| received_command == C_SE_NC_1
+				|| received_command == C_BO_NA_1)
+				{
+					received_command = 0;
+					///////////////////////////////////////////////////////////////////
+					ControlOutputRelayBlock CORB = ControlOutputRelayBlock();
+
+					CORB.index = 1;
+					master_p->control(CORB); //Select
+					///////////////////////////////////////////////////////////////////
 				}
 
 				#define USE_KEEP_ALIVE_WATCH_DOG

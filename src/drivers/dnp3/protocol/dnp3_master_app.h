@@ -58,6 +58,8 @@ public:
 	ORTEDomainAppEvents     events;
 	///////////////////////////////////Middleware///////////
 	bool fExit;
+	int received_command;
+
 public: 
 	DNP3MasterApp(
 		char* dnp3server_address, 
