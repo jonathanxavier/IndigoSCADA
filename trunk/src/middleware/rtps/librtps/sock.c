@@ -86,11 +86,11 @@ sock_setsockopt(sock_t *sock,int level,int optname,const char *optval, int optle
   return 0;
 }
 
-#ifdef _MSC_VER
+/*********************************************************************/
+#ifndef socklen_t
 #define socklen_t unsigned int
 #endif
 
-/*********************************************************************/
 inline int
 sock_getsockopt(sock_t *sock,int level,int optname,char *optval, int *optlen) {
   if (getsockopt(sock->fd, level, optname,(void *)optval, (socklen_t *)optlen)) {

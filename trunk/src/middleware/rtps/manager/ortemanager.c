@@ -78,29 +78,12 @@ int managerStop(void) {
 
 #ifdef CONFIG_ORTE_UNIX
 //Unix daemon support
-pthread_mutex_t     mutex; //for wake up
-pthread_cond_t	    cond; //for wake up
-int		    cvalue;
-void sig_usr(int signo) {
-  if ((signo==SIGTERM) || (signo==SIGINT)) {
-    pthread_mutex_lock(&mutex);
-    cvalue=1;
-    pthread_cond_signal(&cond);
-    pthread_mutex_unlock(&mutex);
-  }
-}
 void waitForEndingCommand(void) {
-  pthread_mutex_init(&mutex, NULL);
-  pthread_cond_init(&cond, NULL);
-  cvalue=0;
-  signal(SIGTERM,sig_usr);
-  signal(SIGINT,sig_usr);
-  pthread_mutex_lock(&mutex);
-  while(cvalue==0)
-    pthread_cond_wait(&cond,&mutex);
-  pthread_mutex_unlock(&mutex);
-  pthread_mutex_destroy(&mutex);
-  pthread_cond_destroy(&cond);
+	sigset_t sigset;
+	sigemptyset(&sigset);
+	sigaddset(&sigset, SIGINT);
+	sigaddset(&sigset, SIGTERM);
+	sigwaitinfo(&sigset, NULL);
 }
 static int daemonInit(void) {
   pid_t pid;
@@ -258,8 +241,10 @@ int main(int argc,char *argv[]) {
   }
   
   d=ORTEDomainMgrCreate(domain,&dp,events,ORTE_TRUE);
-  if (!d)
+  if (!d) {
+    perror("ORTEDomainMgrCreate");
     exit(1);
+  }
 
   #ifdef CONFIG_ORTE_UNIX
   if (orteDaemon)

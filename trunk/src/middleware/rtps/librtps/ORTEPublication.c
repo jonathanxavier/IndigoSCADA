@@ -310,7 +310,7 @@ ORTEPublicationSendLocked(ORTEPublication *cstWriter,
     gms.recv_size=-1;
     gms.csize=0;
     if (cstWriter->typeRegister->getMaxSize)
-      max_size=cstWriter->typeRegister->getMaxSize(&gms);
+      max_size=cstWriter->typeRegister->getMaxSize(&gms,1);
     else
       max_size=cstWriter->typeRegister->maxSize;
     

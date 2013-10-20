@@ -41,7 +41,7 @@ ORTESleepMs(unsigned int ms) {
     Sleep(ms);
   #elif defined CONFIG_ORTE_RTAI
     rt_sleep(nano2count(ms*1000000));
-  #elif
+  #else
     #error "NOT DEFINED SLEEP FUNCTION!"
   #endif
 }
