@@ -308,7 +308,7 @@ ButtonsGroups::ButtonsGroups( QWidget *parent, const char *name )
 	*/
 
 	/////////////////////////////////////////////////////////////////////////////////
-
+	/*
 	char pModuleFile[501];
 
 	DWORD dwSize = GetModuleFileName(NULL,pModuleFile,nBufferSize);
@@ -327,6 +327,32 @@ ButtonsGroups::ButtonsGroups( QWidget *parent, const char *name )
 		printf("Invalid module file name: %s\r\n", pModuleFile);
 		return;
 	}
+	*/
+
+	pInitFile[0] = '\0';
+
+	#ifdef WIN32
+	if(GetModuleFileName(NULL, pInitFile, _MAX_PATH))
+	{
+		*(strrchr(pInitFile, '\\')) = '\0';        // Strip \\filename.exe off path
+		*(strrchr(pInitFile, '\\')) = '\0';        // Strip \\bin off path
+    }
+	#endif
+
+	strcat(pInitFile, "\\project\\manager.ini");
+		
+	pLogFile[0] = '\0';
+
+	#ifdef WIN32
+	if(GetModuleFileName(NULL, pLogFile, _MAX_PATH))
+	{
+		*(strrchr(pLogFile, '\\')) = '\0';        // Strip \\filename.exe off path
+		*(strrchr(pLogFile, '\\')) = '\0';        // Strip \\bin off path
+    }
+	#endif
+
+	strcat(pLogFile, "\\logs\\manager.log");
+
 
 	// start a worker thread to check for dead programs (and restart if necessary)
 	if(_beginthread(WorkerProc, 0, (void*)this)==-1)

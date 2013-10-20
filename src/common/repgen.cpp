@@ -574,7 +574,7 @@ void ReportGenerator::ConfigQueryResponse (QObject *p,const QString &, int id, Q
 								//
 								graphData.SetLogMode(GetConfigureDb()->GetInt("LOGMODE"));
 
-								QString ini_file = GetScadaHomeDirectory() + "\\bin\\scada.ini";
+								QString ini_file = GetScadaHomeDirectory() + "\\project\\scada.ini";
 								Inifile iniFile((const char*)ini_file);
 								
 								QString str;
@@ -773,7 +773,7 @@ void ReportGenerator::ConfigQueryResponse (QObject *p,const QString &, int id, Q
 			//cerr << "Report All Complete" << endl;
 			//qApp->quit(); // all done 
 
-			QString ini_file = GetScadaHomeDirectory() + "\\bin\\scada.ini";
+			QString ini_file = GetScadaHomeDirectory() + "\\project\\scada.ini";
 			Inifile iniFile((const char*)ini_file);
 
 			if(iniFile.find("path","internet_browser"))

@@ -134,7 +134,7 @@ void LogReportGenerator::ResultsQueryResponse(QObject *p,const QString &, int id
 				//
 			};
 
-			QString ini_file = GetScadaHomeDirectory() + "\\bin\\scada.ini";
+			QString ini_file = GetScadaHomeDirectory() + "\\project\\scada.ini";
 			Inifile iniFile((const char*)ini_file);
 
 			if(iniFile.find("path","internet_browser"))
