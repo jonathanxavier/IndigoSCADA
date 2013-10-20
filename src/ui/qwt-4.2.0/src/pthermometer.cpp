@@ -60,18 +60,18 @@ int PThermometer::setMinValue(double newMinValue)
 int PThermometer::setValue(double newValue)
 {
     int retCode=0;
-    if(newValue<dMin || newValue>dMax)
-    {
-        emit OutOfRange(newValue);
-        retCode=-1;
-    }
-    else
-    {
+//    if(newValue<dMin || newValue>dMax)
+//    {
+//        emit OutOfRange(newValue);
+//        retCode=-1;
+//    }
+//    else
+//    {
         if(dValue<dThreshold && newValue>=dThreshold)
             emit ThresholdEvent(newValue);
         dValue=newValue;
         update();
-    }
+//    }
     return (retCode);
 }
 
