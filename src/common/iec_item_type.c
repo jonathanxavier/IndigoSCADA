@@ -72,35 +72,35 @@ iec_item_type_deserialize(CDR_Codec *cdrCodec,iec_item_type *object) {
 }
 
 int
-iec_item_type_get_max_size(ORTEGetMaxSizeParam *gms) {
-  CORBA_octet_get_max_size(gms);
-  CORBA_octet_get_max_size(gms);
-  CORBA_octet_get_max_size(gms);
-  CORBA_octet_get_max_size(gms);
-  CORBA_octet_get_max_size(gms);
-  CORBA_octet_get_max_size(gms);
-  CORBA_octet_get_max_size(gms);
-  CORBA_octet_get_max_size(gms);
-  CORBA_octet_get_max_size(gms);
-  CORBA_octet_get_max_size(gms);
-  CORBA_octet_get_max_size(gms);
-  CORBA_octet_get_max_size(gms);
-  CORBA_octet_get_max_size(gms);
-  CORBA_octet_get_max_size(gms);
-  CORBA_octet_get_max_size(gms);
-  CORBA_octet_get_max_size(gms);
-  CORBA_octet_get_max_size(gms);
-  CORBA_octet_get_max_size(gms);
-  CORBA_octet_get_max_size(gms);
-  CORBA_octet_get_max_size(gms);
-  CORBA_octet_get_max_size(gms);
-  CORBA_octet_get_max_size(gms);
-  CORBA_octet_get_max_size(gms);
-  CORBA_unsigned_long_get_max_size(gms);
-  CORBA_long_get_max_size(gms);
-  CORBA_unsigned_short_get_max_size(gms);
-  CORBA_octet_get_max_size(gms);
-  CORBA_octet_get_max_size(gms);
+iec_item_type_get_max_size(ORTEGetMaxSizeParam *gms, int i) {
+  CORBA_octet_get_max_size(gms, i);
+  CORBA_octet_get_max_size(gms, i);
+  CORBA_octet_get_max_size(gms, i);
+  CORBA_octet_get_max_size(gms, i);
+  CORBA_octet_get_max_size(gms, i);
+  CORBA_octet_get_max_size(gms, i);
+  CORBA_octet_get_max_size(gms, i);
+  CORBA_octet_get_max_size(gms, i);
+  CORBA_octet_get_max_size(gms, i);
+  CORBA_octet_get_max_size(gms, i);
+  CORBA_octet_get_max_size(gms, i);
+  CORBA_octet_get_max_size(gms, i);
+  CORBA_octet_get_max_size(gms, i);
+  CORBA_octet_get_max_size(gms, i);
+  CORBA_octet_get_max_size(gms, i);
+  CORBA_octet_get_max_size(gms, i);
+  CORBA_octet_get_max_size(gms, i);
+  CORBA_octet_get_max_size(gms, i);
+  CORBA_octet_get_max_size(gms, i);
+  CORBA_octet_get_max_size(gms, i);
+  CORBA_octet_get_max_size(gms, i);
+  CORBA_octet_get_max_size(gms, i);
+  CORBA_octet_get_max_size(gms, i);
+  CORBA_unsigned_long_get_max_size(gms, i);
+  CORBA_long_get_max_size(gms, i);
+  CORBA_unsigned_short_get_max_size(gms, i);
+  CORBA_octet_get_max_size(gms, i);
+  CORBA_octet_get_max_size(gms, i);
   return gms->csize;
 }
 

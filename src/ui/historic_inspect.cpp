@@ -87,7 +87,7 @@ MoreRecentRecord(0)
 	
 	///////////////////////////////////////////////////////////////////
 
-	QString ini_file = GetScadaHomeDirectory() + "\\bin\\scada.ini";
+	QString ini_file = GetScadaHomeDirectory() + "\\project\\scada.ini";
 	Inifile iniFile((const char*)ini_file);
 
 	QValueList<int> l;
@@ -534,7 +534,7 @@ void HistoricInspect::Close()
 {
 	IT_IT("HistoricInspect::Close");
 
-	QString ini_file = GetScadaHomeDirectory() + "\\bin\\scada.ini";
+	QString ini_file = GetScadaHomeDirectory() + "\\project\\scada.ini";
 	Inifile iniFile((const char*)ini_file);
 
 	QValueList<int> vl;
