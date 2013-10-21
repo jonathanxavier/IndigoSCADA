@@ -75,7 +75,7 @@ QSplitter(parent)
 	
 	//////////////////////////////////////////////////////////////////////////////////////
 
-	QString ini_file = GetScadaHomeDirectory() + "\\bin\\scada.ini";
+	QString ini_file = GetScadaHomeDirectory() + "\\project\\scada.ini";
 	Inifile iniFile((const char*)ini_file);
 
 	QValueList<int> l;

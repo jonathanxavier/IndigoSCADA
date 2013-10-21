@@ -61,7 +61,7 @@ pChart(NULL),List(NULL),pSm(NULL)
 	pChart = new GraphPane(pSm); // line chart 
 	#endif
 
-	QString ini_file = GetScadaHomeDirectory() + "\\bin\\scada.ini";
+	QString ini_file = GetScadaHomeDirectory() + "\\project\\scada.ini";
 	Inifile iniFile((const char*)ini_file);
 
 	const char* str;

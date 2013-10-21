@@ -53,7 +53,7 @@ CORBA_octet checksum;
 /** impls declarations **/
 void iec_item_type_serialize(CDR_Codec *cdrCodec,iec_item_type *object);
 void iec_item_type_deserialize(CDR_Codec *cdrCodec,iec_item_type *object);
-int iec_item_type_get_max_size(ORTEGetMaxSizeParam *gms);
+int iec_item_type_get_max_size(ORTEGetMaxSizeParam *gms, int i);
 Boolean iec_item_type_type_register(ORTEDomain *d);
 
 
