@@ -70,11 +70,9 @@ double get_value_sp_value(SpValue &v)
 		case M_ME_TQ_1:
 		return (double)(v.v153_q.mv);
 		case M_ME_TR_1:
-		return (double)(v.v154_q.mv);
+		return (double)((__int64)v.v154_q.mv);
 		case M_ME_TS_1:
-		return (double)((__int64)(v.v155_q.mv));
-		case M_ME_TT_1:
-		return (double)(v.v156_q.mv);
+		return (double)(v.v155_q.mv);
 		default:
 		return (double)(v.v150_q.mv);
 	}
@@ -268,9 +266,6 @@ void set_value_sp_value(SpValue &v, double val)
 		break;
 		case M_ME_TS_1:
 		v.v155_q.mv = val;
-		break;
-		case M_ME_TT_1:
-		v.v156_q.mv = val;
 		break;
 		default:
 		v.v150_q.mv = val;
