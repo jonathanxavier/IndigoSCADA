@@ -743,7 +743,7 @@ void Modbus_driver_Instance::get_items_from_local_fifo(void)
 			break;
 			default:
 			{
-				printf("Not supported type\n");
+				printf("Not supported type%d \n", p_item->iec_type);
 				value.sprintf("%d", 0);
 			}
 			break;

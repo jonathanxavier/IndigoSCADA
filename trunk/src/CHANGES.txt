@@ -156,3 +156,6 @@ Modbus driver has been developed at the beta level
 -------------------------------------------------------------------------------------------------------
 22-06-2013
 New repository test
+-------------------------------------------------------------------------------------------------------
+21-10-2013
+Created project directory /scada/project with all project files: .ini .db .fdb .dbs .ui

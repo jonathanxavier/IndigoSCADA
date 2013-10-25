@@ -67,6 +67,18 @@
     #pragma pack(1)             /* Byte Alignment   */
 #endif
 
+#ifdef WIN32
+typedef unsigned __int64 u_int64; //MSVC 6.0 does not accept long long
+#elif
+typedef unsigned long long u_int64;
+#endif
+
+#ifdef WIN32
+typedef __int64 int64; //MSVC 6.0 does not accept long long
+#elif
+typedef long long int64;
+#endif
+
 /* 32-bit string state and change data unit */
 struct iec_stcd {
 	union {
@@ -500,7 +512,7 @@ typedef struct _iec_type126 {
 	cp56time2a	time; /*Creation time of the file*/
 }iec_type126;
 
-/////////////////////////IndigoSCADA types/////////////////////////////////////////
+/////////////////////NOT IEC TYPES///custom SCADA types////////
 
 /* M_ME_TN_1 - long floating point measurement value and time tag */
 typedef struct _is_type150 {
@@ -516,7 +528,7 @@ typedef struct _is_type150 {
 
 /* M_ME_TO_1 - 32 bit unsigned int measurement value and time tag */
 typedef struct _is_type151 {
-	u_int mv;
+	u_int		mv;
 	u_char		ov	:1; /* overflow/no overflow */
 	u_char		res	:3;
 	u_char		bl	:1; /* blocked/not blocked */
@@ -528,7 +540,7 @@ typedef struct _is_type151 {
 
 /* M_ME_TP_1 - 32 bit signed int measurement value and time tag */
 typedef struct _is_type152 {
-	int mv;
+	int			mv;
 	u_char		ov	:1; /* overflow/no overflow */
 	u_char		res	:3;
 	u_char		bl	:1; /* blocked/not blocked */
@@ -550,9 +562,9 @@ typedef struct _is_type153 {
 	cp56time2a	time;
 }is_type153;
 
-/* M_ME_TR_1 - 32 bit unsigned int measurement value and time tag */
+/* M_ME_TR_1 - 64 bit unsigned int measurement value and time tag */
 typedef struct _is_type154 {
-	u_int mv;
+    u_int64     mv;
 	u_char		ov	:1; /* overflow/no overflow */
 	u_char		res	:3;
 	u_char		bl	:1; /* blocked/not blocked */
@@ -562,9 +574,9 @@ typedef struct _is_type154 {
 	cp56time2a	time;
 }is_type154;
 
-/* M_ME_TS_1 - 64 bit unsigned int measurement value and time tag */
+/* M_ME_TS_1 - 64 bit signed int measurement value and time tag */
 typedef struct _is_type155 {
-	unsigned __int64 mv;
+    int64	    mv;
 	u_char		ov	:1; /* overflow/no overflow */
 	u_char		res	:3;
 	u_char		bl	:1; /* blocked/not blocked */
@@ -574,9 +586,9 @@ typedef struct _is_type155 {
 	cp56time2a	time;
 }is_type155;
 
-/* M_ME_TT_1 - 64 bit signed int measurement value and time tag */
+/* M_ME_TT_1 - null terminated C string (7 ascii chars + \0) and time tag */
 typedef struct _is_type156 {
-	__int64 mv;
+	char 		str[8];
 	u_char		ov	:1; /* overflow/no overflow */
 	u_char		res	:3;
 	u_char		bl	:1; /* blocked/not blocked */

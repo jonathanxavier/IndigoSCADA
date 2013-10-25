@@ -36,8 +36,8 @@ void Iec101DriverThread::run()
 
     strcat(pipe_name, line_number);
 
-    //fprintf(stderr, "pipe_name = %s\n", pipe_name);
-    //fflush(stderr);
+//    fprintf(stderr, "pipe_name = %s\n", pipe_name);
+//    fflush(stderr);
 		
 	strcpy(pCommandLine, GetScadaHomeDirectory());
 	strcat(pCommandLine, "\\bin\\iec101master.exe -a ");

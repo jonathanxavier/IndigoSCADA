@@ -608,7 +608,7 @@ void Iec104driver_Instance::Tick()
 			break;
 			default:
 			{
-				printf("Not supported type\n");
+				printf("Not supported type%d \n", p_item->iec_type);
 				value.sprintf("%d", 0);
 			}
 			break;
