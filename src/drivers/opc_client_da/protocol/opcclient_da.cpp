@@ -564,13 +564,13 @@ int Opc_client_da_imp::OpcStart(char* OpcServerProgID, char* OpcclassId, char* O
 		COAUTHINFO athn;
 		ZeroMemory(&athn, sizeof(COAUTHINFO));
 		// Set up the NULL security information
-		//athn.dwAuthnLevel = RPC_C_AUTHN_LEVEL_CONNECT;
-		athn.dwAuthnLevel = RPC_C_AUTHN_LEVEL_NONE;
+		athn.dwAuthnLevel = RPC_C_AUTHN_LEVEL_CONNECT;
+		//athn.dwAuthnLevel = RPC_C_AUTHN_LEVEL_NONE;
 		athn.dwAuthnSvc = RPC_C_AUTHN_WINNT;
 		athn.dwAuthzSvc = RPC_C_AUTHZ_NONE;
 		athn.dwCapabilities = EOAC_NONE;
-		//athn.dwImpersonationLevel = RPC_C_IMP_LEVEL_IMPERSONATE;
-		athn.dwImpersonationLevel = RPC_C_IMP_LEVEL_ANONYMOUS;
+		athn.dwImpersonationLevel = RPC_C_IMP_LEVEL_IMPERSONATE;
+		//athn.dwImpersonationLevel = RPC_C_IMP_LEVEL_ANONYMOUS;
 		athn.pAuthIdentityData = NULL;
 		athn.pwszServerPrincName = NULL;
 
@@ -778,13 +778,13 @@ int Opc_client_da_imp::OpcStart(char* OpcServerProgID, char* OpcclassId, char* O
 
 		ZeroMemory(&athn, sizeof(COAUTHINFO));
 		// Set up the NULL security information
-		//athn.dwAuthnLevel = RPC_C_AUTHN_LEVEL_CONNECT;
-		athn.dwAuthnLevel = RPC_C_AUTHN_LEVEL_NONE;
+		athn.dwAuthnLevel = RPC_C_AUTHN_LEVEL_CONNECT;
+		//athn.dwAuthnLevel = RPC_C_AUTHN_LEVEL_NONE;
 		athn.dwAuthnSvc = RPC_C_AUTHN_WINNT;
 		athn.dwAuthzSvc = RPC_C_AUTHZ_NONE;
 		athn.dwCapabilities = EOAC_NONE;
-		//athn.dwImpersonationLevel = RPC_C_IMP_LEVEL_IMPERSONATE;
-		athn.dwImpersonationLevel = RPC_C_IMP_LEVEL_ANONYMOUS;
+		athn.dwImpersonationLevel = RPC_C_IMP_LEVEL_IMPERSONATE;
+		//athn.dwImpersonationLevel = RPC_C_IMP_LEVEL_ANONYMOUS;
 		athn.pAuthIdentityData = NULL;
 		athn.pwszServerPrincName = NULL;
 		
