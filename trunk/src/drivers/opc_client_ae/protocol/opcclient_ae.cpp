@@ -245,8 +245,8 @@ int Opc_client_ae_imp::OpcStart(char* OpcServerProgID, char* OpcclassId, char* O
 	COAUTHINFO athn;
 	ZeroMemory(&athn, sizeof(COAUTHINFO));
 	// Set up the NULL security information
-	//athn.dwAuthnLevel = RPC_C_AUTHN_LEVEL_CONNECT;
-	athn.dwAuthnLevel = RPC_C_AUTHN_LEVEL_NONE;
+	athn.dwAuthnLevel = RPC_C_AUTHN_LEVEL_CONNECT;
+	//athn.dwAuthnLevel = RPC_C_AUTHN_LEVEL_NONE;
 	athn.dwAuthnSvc = RPC_C_AUTHN_WINNT;
 	athn.dwAuthzSvc = RPC_C_AUTHZ_NONE;
 	athn.dwCapabilities = EOAC_NONE;
@@ -459,8 +459,8 @@ int Opc_client_ae_imp::OpcStart(char* OpcServerProgID, char* OpcclassId, char* O
 
 	ZeroMemory(&athn, sizeof(COAUTHINFO));
 	// Set up the NULL security information
-	//athn.dwAuthnLevel = RPC_C_AUTHN_LEVEL_CONNECT;
-	athn.dwAuthnLevel = RPC_C_AUTHN_LEVEL_NONE;
+	athn.dwAuthnLevel = RPC_C_AUTHN_LEVEL_CONNECT;
+	//athn.dwAuthnLevel = RPC_C_AUTHN_LEVEL_NONE;
 	athn.dwAuthnSvc = RPC_C_AUTHN_WINNT;
 	athn.dwAuthzSvc = RPC_C_AUTHZ_NONE;
 	athn.dwCapabilities = EOAC_NONE;
