@@ -1,4 +1,4 @@
-<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<!DOCTYPE UI><UI version="3.2" stdsetdef="1">
 <class>Modbus_driverConfigurationData</class>
 <widget class="QDialog">
     <property name="name">
@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>429</width>
-            <height>610</height>
+            <height>613</height>
         </rect>
     </property>
     <property name="caption">
@@ -125,25 +125,6 @@
         </property>
         <property name="text">
             <string>Parity</string>
-        </property>
-    </widget>
-    <widget class="QLineEdit">
-        <property name="name">
-            <cstring>Parity</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>170</x>
-                <y>430</y>
-                <width>200</width>
-                <height>20</height>
-            </rect>
-        </property>
-        <property name="frameShape">
-            <enum>LineEditPanel</enum>
-        </property>
-        <property name="frameShadow">
-            <enum>Sunken</enum>
         </property>
     </widget>
     <widget class="QLineEdit">
@@ -461,6 +442,19 @@
         </property>
         <property name="text">
             <string>Poll interval (ms)</string>
+        </property>
+    </widget>
+    <widget class="QComboBox">
+        <property name="name">
+            <cstring>Parity</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>170</x>
+                <y>430</y>
+                <width>200</width>
+                <height>20</height>
+            </rect>
         </property>
     </widget>
 </widget>

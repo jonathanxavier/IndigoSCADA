@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Form interface generated from reading ui file 'modbus_driver_configuration.ui'
 **
-** Created: Mon Oct 7 10:35:01 2013
+** Created: lun 7. apr 17:08:45 2014
 **      by: The User Interface Compiler ($Id: main.cpp 2051 2007-02-21 10:04:20Z chehrlic $)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,6 +23,7 @@ class QSpinBox;
 class QButtonGroup;
 class QRadioButton;
 class QPushButton;
+class QComboBox;
 
 class Modbus_driverConfigurationData : public QDialog
 {
@@ -39,7 +40,6 @@ public:
     QLabel* textLabel9;
     QLabel* textLabel10;
     QLabel* textLabel11;
-    QLineEdit* Parity;
     QLineEdit* SerialDevice;
     QLineEdit* MODBUSServerIPPortText;
     QLineEdit* MODBUSServerIPAddressText;
@@ -60,6 +60,7 @@ public:
     QSpinBox* NItems;
     QLabel* textLabel5;
     QLabel* textLabel6;
+    QComboBox* Parity;
 
 public slots:
     virtual void Help();
