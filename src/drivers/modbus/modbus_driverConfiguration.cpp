@@ -51,6 +51,9 @@ Inherited( parent, name ),Receipe(receipe)
 		MODBUSServerIPAddressText->setEnabled(false);
 		MODBUSServerIPPortText->setEnabled(false);
 	};
+
+    static const char* items[] = { "N", "E", "O", 0 };
+    Parity->insertStrList( items );
 }
 Modbus_driverConfiguration::~Modbus_driverConfiguration()
 {
@@ -75,7 +78,7 @@ void Modbus_driverConfiguration::OkClicked()
 
 		cmd = "insert into PROPS values('"+Name->text() +"','" + Receipe + "','" + 
 		NItems->text() + " " + PollInterval->text() + " " + ServerID->text() +" "+ MODBUSServerIPAddressText->text() + " " + MODBUSServerIPPortText->text() +
-		" " + SerialDevice->text() + " " + Baud->text() + " " + DataBits->text() +" "+ StopBit->text() +" "+ Parity->text() +	"');";
+		" " + SerialDevice->text() + " " + Baud->text() + " " + DataBits->text() +" "+ StopBit->text() +" "+ Parity->currentText() +	"');";
 	}
 	else if(context == TCP)
 	{
@@ -128,7 +131,7 @@ void Modbus_driverConfiguration::QueryResponse (QObject *p, const QString &c, in
 				is >> n;
 				StopBit->setValue(n);
 				is >> t;
-				Parity->setText(t);
+				Parity->setCurrentText(t);
 
 				if(strlen((const char*)(SerialDevice->text())) == 0)
 				{
@@ -164,7 +167,7 @@ void Modbus_driverConfiguration::QueryResponse (QObject *p, const QString &c, in
 				Baud->setValue(9600);
 				DataBits->setValue(8);
 				StopBit->setValue(1);
-				Parity->setText("N");
+				Parity->setCurrentText("N");
 				RTUButton->toggle();
 			}
 		} 

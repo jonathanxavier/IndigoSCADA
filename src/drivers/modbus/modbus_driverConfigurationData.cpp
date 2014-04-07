@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Form implementation generated from reading ui file 'modbus_driver_configuration.ui'
 **
-** Created: Mon Oct 7 10:35:05 2013
+** Created: lun 7. apr 17:09:40 2014
 **      by: The User Interface Compiler ($Id: main.cpp 2051 2007-02-21 10:04:20Z chehrlic $)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -16,6 +16,7 @@
 #include <qbuttongroup.h>
 #include <qradiobutton.h>
 #include <qpushbutton.h>
+#include <qcombobox.h>
 #include <qlayout.h>
 #include <qtooltip.h>
 #include <qwhatsthis.h>
@@ -53,11 +54,6 @@ Modbus_driverConfigurationData::Modbus_driverConfigurationData( QWidget* parent,
 
     textLabel11 = new QLabel( this, "textLabel11" );
     textLabel11->setGeometry( QRect( 40, 430, 55, 20 ) );
-
-    Parity = new QLineEdit( this, "Parity" );
-    Parity->setGeometry( QRect( 170, 430, 200, 20 ) );
-    Parity->setFrameShape( QLineEdit::LineEditPanel );
-    Parity->setFrameShadow( QLineEdit::Sunken );
 
     SerialDevice = new QLineEdit( this, "SerialDevice" );
     SerialDevice->setGeometry( QRect( 170, 270, 200, 20 ) );
@@ -127,8 +123,11 @@ Modbus_driverConfigurationData::Modbus_driverConfigurationData( QWidget* parent,
 
     textLabel6 = new QLabel( this, "textLabel6" );
     textLabel6->setGeometry( QRect( 40, 510, 110, 20 ) );
+
+    Parity = new QComboBox( FALSE, this, "Parity" );
+    Parity->setGeometry( QRect( 170, 430, 200, 20 ) );
     languageChange();
-    resize( QSize(429, 610).expandedTo(minimumSizeHint()) );
+    resize( QSize(429, 613).expandedTo(minimumSizeHint()) );
     clearWState( WState_Polished );
 
     // signals and slots connections
