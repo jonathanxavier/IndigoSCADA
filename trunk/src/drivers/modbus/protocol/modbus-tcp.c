@@ -16,10 +16,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-/*
-Some modifications are Copyright (C) 2011 Enscada Limited http://www.enscada.com
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -34,7 +30,6 @@ Some modifications are Copyright (C) 2011 Enscada Limited http://www.enscada.com
 # define OS_WIN32
 /* ws2_32.dll has getaddrinfo and freeaddrinfo on Windows XP and later.
  * minwg32 headers check WINVER before allowing the use of these */
-
 #if defined(_MSC_VER) && _MSC_VER < 1300
 	#define WIN32_LEAN_AND_MEAN
 	#include <windows.h>
@@ -106,12 +101,6 @@ static int _modbus_set_slave(modbus_t *ctx, int slave)
 
     return 0;
 }
-
-//start apa+++
-#ifndef UINT16_MAX
-#define UINT16_MAX 65535UL
-#endif
-//end apa+++
 
 /* Builds a TCP request header */
 int _modbus_tcp_build_request_basis(modbus_t *ctx, int function,
@@ -299,13 +288,21 @@ static int _modbus_tcp_connect(modbus_t *ctx)
 
 //start apa+++
 #ifndef HAVE_GETADDRINFO
+
+/* getaddrinfo constants */
+#define AI_PASSIVE	1
+#define AI_CANONNAME	2
+#define AI_NUMERICHOST	4
+
 struct addrinfo {
-	int ai_family;
-	int ai_socktype;
-	int ai_protocol;
-	size_t ai_addrlen;
-	struct sockaddr *ai_addr;
-	struct addrinfo *ai_next;
+	int     ai_flags;
+	int     ai_family;
+	int     ai_socktype;
+	int     ai_protocol;
+	size_t  ai_addrlen;
+	char   *ai_canonname;
+	struct sockaddr  *ai_addr;
+	struct addrinfo  *ai_next;
 };
 static int
 fake_getaddrinfo(const char *hostname, struct addrinfo *ai)
@@ -353,6 +350,12 @@ static int _modbus_tcp_pi_connect(modbus_t *ctx)
     struct addrinfo ai_hints;
     modbus_tcp_pi_t *ctx_tcp_pi = ctx->backend_data;
 
+#ifdef OS_WIN32
+    if (_modbus_tcp_init_win32() == -1) {
+        return -1;
+    }
+#endif
+
     memset(&ai_hints, 0, sizeof(ai_hints));
 #ifdef AI_ADDRCONFIG
     ai_hints.ai_flags |= AI_ADDRCONFIG;
@@ -360,27 +363,16 @@ static int _modbus_tcp_pi_connect(modbus_t *ctx)
     ai_hints.ai_family = AF_UNSPEC;
     ai_hints.ai_socktype = SOCK_STREAM;
     ai_hints.ai_addr = NULL;
-#ifdef HAVE_GETADDRINFO
     ai_hints.ai_canonname = NULL;
-#endif
     ai_hints.ai_next = NULL;
 
-#ifdef HAVE_GETADDRINFO
     ai_list = NULL;
+#ifdef HAVE_GETADDRINFO
     rc = getaddrinfo(ctx_tcp_pi->node, ctx_tcp_pi->service,
                      &ai_hints, &ai_list);
-
-	if (rc != 0)
-        return -1;
-
 #else
-	ai_list = NULL;
 	rc = fake_getaddrinfo(ctx_tcp_pi->node, ai_list); //apa+++ Test this!
-
-	if (rc != 0)
-        return -1;
 #endif
-
 
     if (rc != 0)
         return rc;
@@ -528,31 +520,25 @@ int modbus_tcp_pi_listen(modbus_t *ctx, int nb_connection)
         service = ctx_tcp_pi->service;
 
     memset(&ai_hints, 0, sizeof (ai_hints));
-#ifdef HAVE_GETADDRINFO
     ai_hints.ai_flags |= AI_PASSIVE;
-#endif
 #ifdef AI_ADDRCONFIG
     ai_hints.ai_flags |= AI_ADDRCONFIG;
 #endif
     ai_hints.ai_family = AF_UNSPEC;
     ai_hints.ai_socktype = SOCK_STREAM;
     ai_hints.ai_addr = NULL;
-#ifdef HAVE_GETADDRINFO
     ai_hints.ai_canonname = NULL;
-#endif
     ai_hints.ai_next = NULL;
 
-#ifdef HAVE_GETADDRINFO
     ai_list = NULL;
+#ifdef HAVE_GETADDRINFO
     rc = getaddrinfo(node, service, &ai_hints, &ai_list);
-    if (rc != 0)
-        return -1;
 #else
-	ai_list = NULL;
     rc = fake_getaddrinfo(node, ai_list); //apa+++ Test this!
+#endif
+
     if (rc != 0)
         return -1;
-#endif
 
     new_socket = -1;
     for (ai_ptr = ai_list; ai_ptr != NULL; ai_ptr = ai_ptr->ai_next) {
@@ -637,34 +623,30 @@ int modbus_tcp_accept(modbus_t *ctx, int *socket)
     return ctx->s;
 }
 
-#ifdef WIN32
-/*
- * Desired design of maximum size and alignment.
- * These are implementation specific.
- */
-#define _SS_MAXSIZE 128                  // Maximum size.
-#define _SS_ALIGNSIZE (sizeof(__int64))  // Desired alignment.
+//apa+++
+/* Portable IPv6/IPv4 version of sockaddr.  Based on RFC 2553.
+   Pad to force 8 byte alignment and maximum size of 128 bytes. */
 
+/*
+ * Desired design of maximum size and alignment
+ */
+#define _SS_MAXSIZE    128
+#define _SS_ALIGNSIZE  (sizeof (__int64)) 
 /*
  * Definitions used for sockaddr_storage structure paddings design.
  */
-#define _SS_PAD1SIZE (_SS_ALIGNSIZE - sizeof (short))
-#define _SS_PAD2SIZE (_SS_MAXSIZE - (sizeof (short) + _SS_PAD1SIZE \
-                                                    + _SS_ALIGNSIZE))
-
+#define _SS_PAD1SIZE   (_SS_ALIGNSIZE - sizeof (short))
+#define _SS_PAD2SIZE   (_SS_MAXSIZE - (sizeof (short) \
+				       + _SS_PAD1SIZE \
+				       + _SS_ALIGNSIZE))
 struct sockaddr_storage {
-    short ss_family;               // Address family.
-    char __ss_pad1[_SS_PAD1SIZE];  // 6 byte pad, this is to make
-                                   // implementation specific pad up to
-                                   // alignment field that follows explicit
-                                   // in the data structure.
-    __int64 __ss_align;            // Field to force desired structure.
-    char __ss_pad2[_SS_PAD2SIZE];  // 112 byte pad to achieve desired size;
-                                   // _SS_MAXSIZE value minus size of
-                                   // ss_family, __ss_pad1, and
-                                   // __ss_align fields is 112.
+    short ss_family;
+    char __ss_pad1[_SS_PAD1SIZE];  /* pad to 8 */
+    __int64 __ss_align;  	   /* force alignment */
+    char __ss_pad2[_SS_PAD2SIZE];  /*  pad to 128 */
 };
-#endif
+
+//end apa+++
 
 int modbus_tcp_pi_accept(modbus_t *ctx, int *socket)
 {
