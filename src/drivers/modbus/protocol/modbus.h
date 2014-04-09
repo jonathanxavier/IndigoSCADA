@@ -214,8 +214,9 @@ void modbus_set_bits_from_bytes(uint8_t *dest, int index, unsigned int nb_bits,
 uint8_t modbus_get_byte_from_bits(const uint8_t *src, int index, unsigned int nb_bits);
 float modbus_get_float(const uint16_t *src);
 void modbus_set_float(float f, uint16_t *dest);
-int modbus_get_int(const uint16_t *src);
-void modbus_set_int(int n, uint16_t *dest);
+int modbus_get_int(const uint16_t *src); //apa+++
+void modbus_set_int(int n, uint16_t *dest); //apa+++
+
 
 #include "modbus-tcp.h"
 #include "modbus-rtu.h"

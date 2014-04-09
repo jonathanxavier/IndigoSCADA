@@ -1,5 +1,5 @@
 /*
- * Copyright © 2010-2011 Stéphane Raimbault <stephane.raimbault@gmail.com>
+ * Copyright © 2010-2012 Stéphane Raimbault <stephane.raimbault@gmail.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,6 +25,7 @@
 #else
 # include "stdint.h"
 # include <time.h>
+typedef int ssize_t;
 #endif
 #include <sys/types.h>
 #include <config.h>
@@ -75,8 +76,6 @@ typedef struct _sft {
     int function;
     int t_id;
 } sft_t;
-
-typedef size_t ssize_t; //apa+++
 
 typedef struct _modbus_backend {
     unsigned int backend_type;

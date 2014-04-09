@@ -28,22 +28,4 @@
 /* Define to unsigned int if you dont have it */
 #define socklen_t unsigned int
 
-/* Define to `unsigned short' if <sys/types.h> does not define. */
-#define uint16_t unsigned short
 
-/* Define to `unsigned int' if <sys/types.h> does not define. */
-#define uint32_t unsigned int
-
-#define int32_t int
-
-#define int16_t short
-
-#define uint16_t unsigned short
-
-/* Define to `unsigned long long' if <sys/types.h> does not define. */
-#define uint64_t unsigned __int64 
-
-/* Define to `unsigned char' if <sys/types.h> does not define. */
-#define uint8_t unsigned char
-
-#define int8_t char
