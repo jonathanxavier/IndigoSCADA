@@ -327,9 +327,18 @@ void Simulator::SetTypeList(QComboBox *pCombo, const QString &unitname) // set t
 {
 	IT_IT("Simulator::SetTypeList");
 	
+	pCombo->insertItem(TYPE_M_SP_NA_1);
+	pCombo->insertItem(TYPE_M_DP_NA_1);
+	pCombo->insertItem(TYPE_M_ME_NA_1);
+	pCombo->insertItem(TYPE_M_ME_NB_1);
+	pCombo->insertItem(TYPE_M_ME_NC_1);
 	pCombo->insertItem(TYPE_M_IT_NA_1);
-	pCombo->insertItem(TYPE_M_ME_TC_1);
 	pCombo->insertItem(TYPE_M_SP_TB_1);
+	pCombo->insertItem(TYPE_M_DP_TB_1);
+	pCombo->insertItem(TYPE_M_ME_TD_1);
+	pCombo->insertItem(TYPE_M_ME_TE_1);
+	pCombo->insertItem(TYPE_M_ME_TF_1);
+	pCombo->insertItem(TYPE_M_IT_TB_1);
 };
 /*
 *Function: SetInputList

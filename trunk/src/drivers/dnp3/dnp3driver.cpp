@@ -73,10 +73,17 @@ void Dnp3driver::CommandDlg(QWidget *parent, const QString &name) // command dia
 void Dnp3driver::SetTypeList(QComboBox *pCombo, const QString &unitname) // set the type list for unit type
 {
 	pCombo->insertItem(TYPE_M_SP_NA_1);
-	pCombo->insertItem(TYPE_M_ME_TC_1);
-	pCombo->insertItem(TYPE_M_SP_TB_1);
+	pCombo->insertItem(TYPE_M_DP_NA_1);
+	pCombo->insertItem(TYPE_M_ME_NA_1);
 	pCombo->insertItem(TYPE_M_ME_NB_1);
-	pCombo->insertItem(TYPE_M_ME_TB_1);
+	pCombo->insertItem(TYPE_M_ME_NC_1);
+	pCombo->insertItem(TYPE_M_IT_NA_1);
+	pCombo->insertItem(TYPE_M_SP_TB_1);
+	pCombo->insertItem(TYPE_M_DP_TB_1);
+	pCombo->insertItem(TYPE_M_ME_TD_1);
+	pCombo->insertItem(TYPE_M_ME_TE_1);
+	pCombo->insertItem(TYPE_M_ME_TF_1);
+	pCombo->insertItem(TYPE_M_IT_TB_1);
 };
 /*
 *Function:GetInputList
@@ -86,19 +93,7 @@ void Dnp3driver::SetTypeList(QComboBox *pCombo, const QString &unitname) // set 
 */
 void Dnp3driver::GetInputList(const QString &type, QStringList &list,const QString &, const QString &) // set the permitted input IDs
 {
-/*
-	if(type == TYPE_M_ME_TC_1)
-	{
-		list << "01" << "02" << "03" << "04" << "05" << "06" << "07" << "08" 
-		<< "09" << "10" << "11" << "12" << "13" << "14" << "15" << "16";         
-	}
-
-	if(type == TYPE_M_SP_NA_1)
-	{
-		list << "01" << "02" << "03" << "04" << "05" << "06" << "07" << "08" 
-		<< "09" << "10" << "11" << "12" << "13" << "14" << "15" << "16";         
-	}
-*/
+	list.clear();
 };
 /*
 *Function:GetSpecificConfig
@@ -109,23 +104,8 @@ void Dnp3driver::GetInputList(const QString &type, QStringList &list,const QStri
 QWidget * Dnp3driver::GetSpecificConfig(QWidget *parent, const QString &spname, const QString &sptype) //specific config for sample point of type
 {
 	Dnp3driverInput * p;
-	if(sptype == TYPE_M_ME_TC_1)
-	{
-		p = new Dnp3driverInput(parent,spname);
-		return p;
-	}
-	else if (sptype == TYPE_M_SP_NA_1)
-	{
-		p = new Dnp3driverInput(parent,spname);
-		return p;
-	}
-	else if (sptype == TYPE_M_SP_TB_1)
-	{
-		p = new Dnp3driverInput(parent,spname);
-		return p;
-	}
-
-	return 0;
+	p = new Dnp3driverInput(parent,spname);
+	return p;
 };
 /*
 *Function:GetTagList

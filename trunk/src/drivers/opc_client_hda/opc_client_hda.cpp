@@ -74,10 +74,17 @@ void Opc_client_hda::CommandDlg(QWidget *parent, const QString &name) // command
 void Opc_client_hda::SetTypeList(QComboBox *pCombo, const QString &unitname) // set the type list for unit type
 {
 	pCombo->insertItem(TYPE_M_SP_NA_1);
-	pCombo->insertItem(TYPE_M_ME_TC_1);
-	pCombo->insertItem(TYPE_M_SP_TB_1);
+	pCombo->insertItem(TYPE_M_DP_NA_1);
+	pCombo->insertItem(TYPE_M_ME_NA_1);
 	pCombo->insertItem(TYPE_M_ME_NB_1);
-	pCombo->insertItem(TYPE_M_ME_TB_1);
+	pCombo->insertItem(TYPE_M_ME_NC_1);
+	pCombo->insertItem(TYPE_M_IT_NA_1);
+	pCombo->insertItem(TYPE_M_SP_TB_1);
+	pCombo->insertItem(TYPE_M_DP_TB_1);
+	pCombo->insertItem(TYPE_M_ME_TD_1);
+	pCombo->insertItem(TYPE_M_ME_TE_1);
+	pCombo->insertItem(TYPE_M_ME_TF_1);
+	pCombo->insertItem(TYPE_M_IT_TB_1);
 };
 /*
 *Function:GetInputList
@@ -87,19 +94,7 @@ void Opc_client_hda::SetTypeList(QComboBox *pCombo, const QString &unitname) // 
 */
 void Opc_client_hda::GetInputList(const QString &type, QStringList &list,const QString &, const QString &) // set the permitted input IDs
 {
-/*
-	if(type == TYPE_M_ME_TC_1)
-	{
-		list << "01" << "02" << "03" << "04" << "05" << "06" << "07" << "08" 
-		<< "09" << "10" << "11" << "12" << "13" << "14" << "15" << "16";         
-	}
-
-	if(type == TYPE_M_SP_NA_1)
-	{
-		list << "01" << "02" << "03" << "04" << "05" << "06" << "07" << "08" 
-		<< "09" << "10" << "11" << "12" << "13" << "14" << "15" << "16";         
-	}
-*/
+	list.clear();
 };
 /*
 *Function:GetSpecificConfig
@@ -110,18 +105,8 @@ void Opc_client_hda::GetInputList(const QString &type, QStringList &list,const Q
 QWidget * Opc_client_hda::GetSpecificConfig(QWidget *parent, const QString &spname, const QString &sptype) //specific config for sample point of type
 {
 	Opc_client_hdaInput * p;
-	if(sptype == TYPE_M_ME_TC_1)
-	{
-		p = new Opc_client_hdaInput(parent,spname);
-		return p;
-	}
-	else if (sptype == TYPE_M_SP_NA_1)
-	{
-		p = new Opc_client_hdaInput(parent,spname);
-		return p;
-	}
-
-	return 0;
+	p = new Opc_client_hdaInput(parent,spname);
+	return p;
 };
 /*
 *Function:GetTagList
