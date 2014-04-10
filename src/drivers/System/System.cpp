@@ -58,7 +58,18 @@ void System::UnitConfigure(QWidget *parent, const QString &name, const QString &
 */
 void System::SetTypeList(QComboBox *pCombo, const QString &unitname) // set the type list for unit type
 {
-	pCombo->insertItem(TYPE_M_ME_TB_1);
+	pCombo->insertItem(TYPE_M_SP_NA_1);
+	pCombo->insertItem(TYPE_M_DP_NA_1);
+	pCombo->insertItem(TYPE_M_ME_NA_1);
+	pCombo->insertItem(TYPE_M_ME_NB_1);
+	pCombo->insertItem(TYPE_M_ME_NC_1);
+	pCombo->insertItem(TYPE_M_IT_NA_1);
+	pCombo->insertItem(TYPE_M_SP_TB_1);
+	pCombo->insertItem(TYPE_M_DP_TB_1);
+	pCombo->insertItem(TYPE_M_ME_TD_1);
+	pCombo->insertItem(TYPE_M_ME_TE_1);
+	pCombo->insertItem(TYPE_M_ME_TF_1);
+	pCombo->insertItem(TYPE_M_IT_TB_1);
 };
 /*
 *Function:GetInputList
@@ -89,12 +100,9 @@ QWidget * System::GetSpecificConfig(QWidget *parent, const QString &spname, cons
 */
 void System::GetTagList(const QString &type, QStringList &list,const QString &unit, const QString &) // returns the permitted tags for a given type for this unit
 {
-	if(type == TYPE_M_ME_TB_1)
-	{
-		list.clear();
-		list << "DiskUsed" <<"MemoryUsed" << "MonitorMemory" <<"MonitorKernelTime" <<"MonitorUserTime" 
-		<< "UIMemory";
-	}
+	list.clear();
+	list << "DiskUsed" <<"MemoryUsed" << "MonitorMemory" <<"MonitorKernelTime" <<"MonitorUserTime" 
+	<< "UIMemory";
 };
 /*
 *Function:CreateNewUnit

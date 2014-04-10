@@ -93,19 +93,7 @@ void Iec104driver::SetTypeList(QComboBox *pCombo, const QString &unitname) // se
 */
 void Iec104driver::GetInputList(const QString &type, QStringList &list,const QString &, const QString &) // set the permitted input IDs
 {
-/*
-	if(type == TYPE_M_ME_TC_1)
-	{
-		list << "01" << "02" << "03" << "04" << "05" << "06" << "07" << "08" 
-		<< "09" << "10" << "11" << "12" << "13" << "14" << "15" << "16";         
-	}
-
-	if(type == TYPE_M_SP_NA_1)
-	{
-		list << "01" << "02" << "03" << "04" << "05" << "06" << "07" << "08" 
-		<< "09" << "10" << "11" << "12" << "13" << "14" << "15" << "16";         
-	}
-*/
+	list.clear();
 };
 /*
 *Function:GetSpecificConfig
@@ -116,23 +104,8 @@ void Iec104driver::GetInputList(const QString &type, QStringList &list,const QSt
 QWidget * Iec104driver::GetSpecificConfig(QWidget *parent, const QString &spname, const QString &sptype) //specific config for sample point of type
 {
 	Iec104driverInput * p;
-	if(sptype == TYPE_M_ME_TC_1)
-	{
-		p = new Iec104driverInput(parent,spname);
-		return p;
-	}
-	else if (sptype == TYPE_M_SP_NA_1)
-	{
-		p = new Iec104driverInput(parent,spname);
-		return p;
-	}
-	else if (sptype == TYPE_M_SP_TB_1)
-	{
-		p = new Iec104driverInput(parent,spname);
-		return p;
-	}
-
-	return 0;
+	p = new Iec104driverInput(parent,spname);
+	return p;
 };
 /*
 *Function:GetTagList

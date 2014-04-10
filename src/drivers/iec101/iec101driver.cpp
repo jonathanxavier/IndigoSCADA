@@ -93,19 +93,7 @@ void Iec101driver::SetTypeList(QComboBox *pCombo, const QString &unitname) // se
 */
 void Iec101driver::GetInputList(const QString &type, QStringList &list,const QString &, const QString &) // set the permitted input IDs
 {
-/*
-	if(type == TYPE_M_ME_TC_1)
-	{
-		list << "01" << "02" << "03" << "04" << "05" << "06" << "07" << "08" 
-		<< "09" << "10" << "11" << "12" << "13" << "14" << "15" << "16";         
-	}
-
-	if(type == TYPE_M_SP_NA_1)
-	{
-		list << "01" << "02" << "03" << "04" << "05" << "06" << "07" << "08" 
-		<< "09" << "10" << "11" << "12" << "13" << "14" << "15" << "16";         
-	}
-*/
+	list.clear();
 };
 /*
 *Function:GetSpecificConfig
