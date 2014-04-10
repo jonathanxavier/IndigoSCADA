@@ -58,7 +58,7 @@ void System::UnitConfigure(QWidget *parent, const QString &name, const QString &
 */
 void System::SetTypeList(QComboBox *pCombo, const QString &unitname) // set the type list for unit type
 {
-	pCombo->insertItem(TYPE_M_ME_TA_1);
+	pCombo->insertItem(TYPE_M_ME_TB_1);
 };
 /*
 *Function:GetInputList
@@ -89,7 +89,7 @@ QWidget * System::GetSpecificConfig(QWidget *parent, const QString &spname, cons
 */
 void System::GetTagList(const QString &type, QStringList &list,const QString &unit, const QString &) // returns the permitted tags for a given type for this unit
 {
-	if(type == TYPE_M_ME_TA_1)
+	if(type == TYPE_M_ME_TB_1)
 	{
 		list.clear();
 		list << "DiskUsed" <<"MemoryUsed" << "MonitorMemory" <<"MonitorKernelTime" <<"MonitorUserTime" 
@@ -191,12 +191,12 @@ void System::QueryResponse (QObject *p, const QString &c, int id, QObject*caller
 				//
 				QString cmd = QString("insert into SAMPLE values('") + t.Data1 + 
 				QString("','System parameters','") +t.Data1+ 
-				QString("','"TYPE_M_ME_TA_1"','%',1,1,'01',0,0,0);");
+				QString("','"TYPE_M_ME_TB_1"','%',1,1,'01',0,0,0);");
 				// 
 				GetConfigureDb()->DoExec(0,cmd,0); // post it off
 
 				QStringList l;
-				GetTagList(TYPE_M_ME_TA_1,l,"",""); 
+				GetTagList(TYPE_M_ME_TB_1,l,"",""); 
 				
 				CreateSamplePoint(t.Data1, l,"");
 			}
@@ -388,14 +388,14 @@ void SystemInstance::Tick()
 
 	ValueList.clear();
 	
-	SpValue disk(taglist[0], &disk_used);
+	IECValue disk(taglist[0], &disk_used);
 	ValueList.insert(ValueList.end(),disk);
 
-	SpValue mem(taglist[1], &memoryLoad);
+	IECValue mem(taglist[1], &memoryLoad);
 	ValueList.insert(ValueList.end(),mem);
 	
 	double deltaMonmem = 100.0*(MonitorMemory - InitialMemory)/InitialMemory;
-	SpValue Monmem(taglist[2], &deltaMonmem);
+	IECValue Monmem(taglist[2], &deltaMonmem);
 	ValueList.insert(ValueList.end(), Monmem);
 	
 	double ElapsedTime = (double)ftElapsedTime;
@@ -404,14 +404,14 @@ void SystemInstance::Tick()
 
 	double f = 100.0*KernelTime/ElapsedTime;
 
-	SpValue kertime(taglist[3], &f);
+	IECValue kertime(taglist[3], &f);
 	ValueList.insert(ValueList.end(),kertime);
 
 	f = 100.0*UserTime/ElapsedTime;
-	SpValue usertime(taglist[4], &f);
+	IECValue usertime(taglist[4], &f);
 	ValueList.insert(ValueList.end(),usertime);
 	
-	SpValue UImem(taglist[5], &ui_mem_data);
+	IECValue UImem(taglist[5], &ui_mem_data);
 	ValueList.insert(ValueList.end(),UImem);
 
 	PostList(Name,ValueList); // post the list of values up

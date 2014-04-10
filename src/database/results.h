@@ -66,7 +66,7 @@ enum m_type
 };
 */
 
-struct SpValue // a measured result
+struct IECValue // a measured result
 {
 	QString tag; // the tag name eg value, 0.5
 	unsigned char type; //the type of measurement
@@ -106,7 +106,7 @@ struct SpValue // a measured result
 		*/
 	};
 
-	SpValue(const QString &s= "", void* v = NULL, unsigned char tp = 0) : tag(s), type(tp)
+	IECValue(const QString &s= "", void* v = NULL, unsigned char tp = 0) : tag(s), type(tp)
 	{
 		/*
 		memset(&v1_q, 0x00, sizeof(v1_q));
@@ -187,7 +187,7 @@ struct SpValue // a measured result
 		}
 	};
 
-	SpValue(const SpValue &s) : tag(s.tag), type(s.type) 
+	IECValue(const IECValue &s) : tag(s.tag), type(s.type) 
 	{
 		switch(s.type)
 		{
@@ -244,15 +244,15 @@ struct SpValue // a measured result
 extern "C"
 {
 	QSEXPORT double LookupCurrentValue(char *name, char *tag);
-	QSEXPORT double get_value_sp_value(SpValue &v);
-	QSEXPORT struct cp56time2a 	get_time_of_sp_value(SpValue &v);
-	QSEXPORT void set_value_sp_value(SpValue &v, double val);
+	QSEXPORT double get_value_iec_value(IECValue &v);
+	QSEXPORT struct cp56time2a 	get_time_of_iec_value(IECValue &v);
+	QSEXPORT void set_value_iec_value(IECValue &v, double val);
 	QSEXPORT __int64 Epoch_in_millisec_from_cp56time2a(const struct cp56time2a* time);
 };
 
 QSEXPORT QString GetIsoDateString_from_epoch_in_millisec(__int64 epoch_in_millisec);
 
-typedef std::vector<SpValue> SpValueList; 
+typedef std::vector<IECValue> IECValueList; 
 
 struct AlarmLimit // a tag's alarm limits
 {
@@ -262,17 +262,17 @@ struct AlarmLimit // a tag's alarm limits
 
 	AlarmLimit() : Enabled(0),Limit(0) {};
 
-	bool Check(SpValue v, bool dir = true) // true if upper, false if lower
+	bool Check(IECValue v, bool dir = true) // true if upper, false if lower
 	{
 		if(Enabled)
 		{
 			if(dir)
 			{
-				if(get_value_sp_value(v) > Limit) return true; 
+				if(get_value_iec_value(v) > Limit) return true; 
 			}
 			else
 			{
-				if(get_value_sp_value(v) < Limit) return true;
+				if(get_value_iec_value(v) < Limit) return true;
 			};
 		};
 		return false;
@@ -287,7 +287,7 @@ struct TagItem // current tag value
 	AlarmLimit LowerAlarm;
 	bool changed;  // set on a new value
 	//double value; // current value
-	SpValue value; //prova del 07-12-09
+	IECValue value; //prova del 07-12-09
 	int state; // current state
 	QDateTime updated; // when it was updated
 	SampleStatistic stats; // the stats
@@ -374,7 +374,7 @@ class QSEXPORT SamplePoint            // the sample point configuration - we nee
 	//
 	void Update(int state, bool ack = false, const QString &c=""); // mark a sample point as updated and ack triggered
 	
-	int UpdateTag(const QString &name, SpValue value, QString Type); 
+	int UpdateTag(const QString &name, IECValue value, QString Type); 
 };
 
 
@@ -394,7 +394,7 @@ class QSEXPORT Results : public QObject
 	//
 	//
 	void UpdateStart(const QString &name); //  start an update 
-	void Update(const QString &name, const QString &tag, SpValue &value); // update a sample point by tag
+	void Update(const QString &name, const QString &tag, IECValue &value); // update a sample point by tag
 	void UpdateEnd(const QString &name); // end an update on a sample point
 	//
 	public:
@@ -427,7 +427,7 @@ public:
 	//     
 	~Results() {};
 	// queue a new result packet for filing
-	void QueueResult(const QString &name, SpValueList &pL); //queue a result
+	void QueueResult(const QString &name, IECValueList &pL); //queue a result
 	static void Lock()
 	{
 		ResultLock.lock(); // lock it		

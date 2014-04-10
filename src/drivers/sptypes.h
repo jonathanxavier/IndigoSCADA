@@ -18,22 +18,15 @@
 #define include_sptypes_h 
 
 #define TYPE_M_SP_NA_1 "M_SP_NA_1"
-#define TYPE_M_SP_TA_1 "M_SP_TA_1"
 #define TYPE_M_DP_NA_1 "M_DP_NA_1"
-#define TYPE_M_DP_TA_1 "M_DP_TA_1"
 #define TYPE_M_ST_NA_1 "M_ST_NA_1"
-#define TYPE_M_ST_TA_1 "M_ST_TA_1"
 #define TYPE_M_BO_NA_1 "M_BO_NA_1"
-#define TYPE_M_BO_TA_1 "M_BO_TA_1"
 #define TYPE_M_ME_NA_1 "M_ME_NA_1"
-#define TYPE_M_ME_TA_1 "M_ME_TA_1"
 #define TYPE_M_ME_NB_1 "M_ME_NB_1"
 #define TYPE_M_ME_TB_1 "M_ME_TB_1"
 #define TYPE_M_ME_NC_1 "M_ME_NC_1"
 #define TYPE_M_ME_TC_1 "M_ME_TC_1"
 #define TYPE_M_IT_NA_1 "M_IT_NA_1"
-#define TYPE_M_IT_TA_1 "M_IT_TA_1"
-#define TYPE_M_EP_TA_1 "M_EP_TA_1"
 #define TYPE_M_EP_TB_1 "M_EP_TB_1"
 #define TYPE_M_EP_TC_1 "M_EP_TC_1"
 #define TYPE_M_PS_NA_1 "M_PS_NA_1"
@@ -74,13 +67,6 @@
 #define TYPE_P_ME_NC_1 "P_ME_NC_1"
 #define TYPE_P_AC_NA_1 "P_AC_NA_1"
 
-#define TYPE_F_FR_NA_1 "F_FR_NA_1"
-#define TYPE_F_SR_NA_1 "F_SR_NA_1"
-#define TYPE_F_SC_NA_1 "F_SC_NA_1"
-#define TYPE_F_LS_NA_1 "F_LS_NA_1"
-#define TYPE_F_AF_NA_1 "F_AF_NA_1"
-#define TYPE_F_SG_NA_1 "F_SG_NA_1"
-#define TYPE_F_DR_TA_1 "F_DR_TA_1"
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //IndigoSCADA types: Enscada custom defined types
 

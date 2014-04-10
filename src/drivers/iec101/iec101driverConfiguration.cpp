@@ -51,6 +51,8 @@ Inherited( parent, name ),Receipe(receipe)
 		IEC101LinkAddressText->setEnabled(false);
 		IEC101CASDUText->setEnabled(false);
 		COMPortNameText->setEnabled(false);
+		baud_rateText->setEnabled(false);
+		read_timeout_ms->setEnabled(false);
 	};
 }
 Iec101driverConfiguration::~Iec101driverConfiguration()
@@ -70,7 +72,7 @@ void Iec101driverConfiguration::OkClicked()
 	GetConfigureDb()->DoExec(0,cmd,0); // delete the old value
 	//
 	cmd = "insert into PROPS values('"+Name->text() +"','" + Receipe + "','" + 
-	NItems->text() + " " + PollInterval->text() + " " + IEC101LinkAddressText->text() + " " + IEC101CASDUText->text() + " " + COMPortNameText->text() +"');";
+	NItems->text() + " " + PollInterval->text() + " " + IEC101LinkAddressText->text() + " " + IEC101CASDUText->text() + " " + COMPortNameText->text() + " " + baud_rateText->text() + " " + read_timeout_ms->text() +"');";
 
 	GetConfigureDb()->DoExec(0,cmd,0);
 	QSAuditTrail(this,caption(), tr("Edited"));
@@ -108,6 +110,10 @@ void Iec101driverConfiguration::QueryResponse (QObject *p, const QString &c, int
 				IEC101CASDUText->setText(t);
 				is >> t;
 				COMPortNameText->setText(t);
+				is >> t;
+				baud_rateText->setText(t);
+				is >> n;
+				read_timeout_ms->setValue(n);
 			}
 			else
 			{
@@ -121,6 +127,8 @@ void Iec101driverConfiguration::QueryResponse (QObject *p, const QString &c, int
 				IEC101LinkAddressText->setText("");
 				IEC101CASDUText->setText("");
 				COMPortNameText->setText("");
+				baud_rateText->setText("9600");
+				read_timeout_ms->setValue(1000);
 			}
 		} 
 		break;

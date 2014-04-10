@@ -27,17 +27,26 @@ void Iec101DriverThread::run()
 
     ///////////////////start child process iec101master.exe////////////////////
 	char line_number[50];
-    char polling_time[50];
+    char polling_time_ms[50];
+	char baud_rate[50];
+	char read_timeout_ms[50];
 
 	strcpy(pipe_name, "\\\\.\\pipe\\iec101master_namedpipe");
 
 	itoa(instanceID + 1, line_number, 10);
-	itoa(((Iec101driver_Instance*)Parent)->Cfg.SampleTime, polling_time, 10);
+	
+	itoa(((Iec101driver_Instance*)Parent)->Cfg.SampleTime, polling_time_ms, 10);
+
+	itoa(((Iec101driver_Instance*)Parent)->Cfg.baud_rate, baud_rate, 10);
+
+	itoa(((Iec101driver_Instance*)Parent)->Cfg.read_timeout_ms, read_timeout_ms, 10);
 
     strcat(pipe_name, line_number);
 
 //    fprintf(stderr, "pipe_name = %s\n", pipe_name);
 //    fflush(stderr);
+
+//#define RUNTIME_USAGE "Run time usage: %s -a link_address -c CADSU -n serial_COM_port -s baud_rate -l line_number -t polling_time_ms -m read_timeout_ms -f log_file_name\n"
 		
 	strcpy(pCommandLine, GetScadaHomeDirectory());
 	strcat(pCommandLine, "\\bin\\iec101master.exe -a ");
@@ -47,10 +56,14 @@ void Iec101DriverThread::run()
 	strcat(pCommandLine, " -l ");
 	strcat(pCommandLine, line_number);
 	strcat(pCommandLine, " -t ");
-	strcat(pCommandLine, polling_time);
+	strcat(pCommandLine, polling_time_ms);
 	strcat(pCommandLine, " -n ");
 	strcat(pCommandLine, ((Iec101driver_Instance*)Parent)->Cfg.COMPortName);
-		
+	strcat(pCommandLine, " -m ");
+	strcat(pCommandLine, read_timeout_ms);
+	strcat(pCommandLine, " -s ");
+	strcat(pCommandLine, baud_rate);
+			
 	strcpy(pWorkingDir, GetScadaHomeDirectory());
 	strcat(pWorkingDir,"\\bin");
   	

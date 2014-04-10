@@ -74,7 +74,7 @@ void Dnp3driver::SetTypeList(QComboBox *pCombo, const QString &unitname) // set 
 {
 	pCombo->insertItem(TYPE_M_SP_NA_1);
 	pCombo->insertItem(TYPE_M_ME_TC_1);
-	pCombo->insertItem(TYPE_M_SP_TA_1);
+	pCombo->insertItem(TYPE_M_SP_TB_1);
 	pCombo->insertItem(TYPE_M_ME_NB_1);
 	pCombo->insertItem(TYPE_M_ME_TB_1);
 };
@@ -119,7 +119,7 @@ QWidget * Dnp3driver::GetSpecificConfig(QWidget *parent, const QString &spname, 
 		p = new Dnp3driverInput(parent,spname);
 		return p;
 	}
-	else if (sptype == TYPE_M_SP_TA_1)
+	else if (sptype == TYPE_M_SP_TB_1)
 	{
 		p = new Dnp3driverInput(parent,spname);
 		return p;

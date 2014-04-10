@@ -743,7 +743,7 @@ void Opc_client_da_Instance::get_items_from_local_fifo(void)
 
 				iec_type1 var = p_item->iec_obj.o.type1;
 				
-				SpValue v(VALUE_TAG, &var, M_SP_NA_1);
+				IECValue v(VALUE_TAG, &var, M_SP_NA_1);
 				TODO:05-07-2011 Get name here
 				post_val(v, name);
 
@@ -761,7 +761,7 @@ void Opc_client_da_Instance::get_items_from_local_fifo(void)
 
 				iec_type3 var = p_item->iec_obj.o.type3;
 				
-				SpValue v(VALUE_TAG, &var, M_DP_NA_1);
+				IECValue v(VALUE_TAG, &var, M_DP_NA_1);
 				TODO:05-07-2011 Get name here
 				post_val(v, name);
 
@@ -782,7 +782,7 @@ void Opc_client_da_Instance::get_items_from_local_fifo(void)
 
 				iec_type9 var = p_item->iec_obj.o.type9;
 				
-				SpValue v(VALUE_TAG, &var, M_ME_NA_1);
+				IECValue v(VALUE_TAG, &var, M_ME_NA_1);
 				TODO:05-07-2011 Get name here
 				post_val(v, name);
 
@@ -800,7 +800,7 @@ void Opc_client_da_Instance::get_items_from_local_fifo(void)
 
 				iec_type11 var = p_item->iec_obj.o.type11;
 				
-				SpValue v(VALUE_TAG, &var, M_ME_NB_1);
+				IECValue v(VALUE_TAG, &var, M_ME_NB_1);
 				TODO:05-07-2011 Get name here
 				post_val(v, name);
 
@@ -817,7 +817,7 @@ void Opc_client_da_Instance::get_items_from_local_fifo(void)
 
 				iec_type13 var = p_item->iec_obj.o.type13;
 				
-				SpValue v(VALUE_TAG, &var, M_ME_NC_1);
+				IECValue v(VALUE_TAG, &var, M_ME_NC_1);
 				TODO:05-07-2011 Get name here
 				post_val(v, name);
 
@@ -834,7 +834,7 @@ void Opc_client_da_Instance::get_items_from_local_fifo(void)
 
 				iec_type30 var = p_item->iec_obj.o.type30;
 				
-				SpValue v(VALUE_TAG, &var, M_SP_TB_1);
+				IECValue v(VALUE_TAG, &var, M_SP_TB_1);
 				TODO:05-07-2011 Get name here
 				post_val(v, name);
 
@@ -851,7 +851,7 @@ void Opc_client_da_Instance::get_items_from_local_fifo(void)
 
 				iec_type31 var = p_item->iec_obj.o.type31;
 				
-				SpValue v(VALUE_TAG, &var, M_DP_TB_1);
+				IECValue v(VALUE_TAG, &var, M_DP_TB_1);
 				TODO:05-07-2011 Get name here
 				post_val(v, name);
 
@@ -873,7 +873,7 @@ void Opc_client_da_Instance::get_items_from_local_fifo(void)
 
 				iec_type34 var = p_item->iec_obj.o.type34;
 				
-				SpValue v(VALUE_TAG, &var, M_ME_TD_1);
+				IECValue v(VALUE_TAG, &var, M_ME_TD_1);
 				TODO:05-07-2011 Get name here
 				post_val(v, name);
 
@@ -890,7 +890,7 @@ void Opc_client_da_Instance::get_items_from_local_fifo(void)
 
 				iec_type35 var = p_item->iec_obj.o.type35;
 				
-				SpValue v(VALUE_TAG, &var, M_ME_TE_1);
+				IECValue v(VALUE_TAG, &var, M_ME_TE_1);
 				TODO:05-07-2011 Get name here
 				post_val(v, name);
 
@@ -907,7 +907,7 @@ void Opc_client_da_Instance::get_items_from_local_fifo(void)
 
 				iec_type36 var = p_item->iec_obj.o.type36;
 				
-				SpValue v(VALUE_TAG, &var, M_ME_TF_1);
+				IECValue v(VALUE_TAG, &var, M_ME_TF_1);
 				TODO:05-07-2011 Get name here
 				post_val(v, name);
 
@@ -924,7 +924,7 @@ void Opc_client_da_Instance::get_items_from_local_fifo(void)
 
 				iec_type150 var = p_item->iec_obj.o.type150;
 				
-				SpValue v(VALUE_TAG, &var, M_ME_TN_1);
+				IECValue v(VALUE_TAG, &var, M_ME_TN_1);
 				TODO:05-07-2011 Get name here
 				post_val(v, name);
 
@@ -941,7 +941,7 @@ void Opc_client_da_Instance::get_items_from_local_fifo(void)
 
 				iec_type37 var = p_item->iec_obj.o.type37;
 				
-				SpValue v(VALUE_TAG, &var, M_ME_TN_1);
+				IECValue v(VALUE_TAG, &var, M_ME_TN_1);
 				TODO:05-07-2011 Get name here
 				post_val(v, name);
 

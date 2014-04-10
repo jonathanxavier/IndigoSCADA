@@ -1570,6 +1570,80 @@ InputName=TagCfgData
 # End Source File
 # Begin Source File
 
+SOURCE=.\sysdialogs\TagCfgDigital.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\sysdialogs\TagCfgDigital.h
+
+!IF  "$(CFG)" == "ui - Win32 Debug"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - MOCing TagCfgDigital.h...
+InputDir=.\sysdialogs
+InputPath=.\sysdialogs\TagCfgDigital.h
+InputName=TagCfgDigital
+
+"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	"%qtdir%\bin\moc.exe" "$(InputDir)\$(InputName).h" -o "$(InputDir)\moc_$(InputName).cpp"
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "ui - Win32 Release"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - MOCing TagCfgDigital.h...
+InputDir=.\sysdialogs
+InputPath=.\sysdialogs\TagCfgDigital.h
+InputName=TagCfgDigital
+
+"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	"%qtdir%\bin\moc.exe" "$(InputDir)\$(InputName).h" -o "$(InputDir)\moc_$(InputName).cpp"
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\sysdialogs\TagCfgDigitalData.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\sysdialogs\TagCfgDigitalData.h
+
+!IF  "$(CFG)" == "ui - Win32 Debug"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - MOCing TagCfgDigitalData.h...
+InputDir=.\sysdialogs
+InputPath=.\sysdialogs\TagCfgDigitalData.h
+InputName=TagCfgDigitalData
+
+"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	"%qtdir%\bin\moc.exe" "$(InputDir)\$(InputName).h" -o "$(InputDir)\moc_$(InputName).cpp"
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "ui - Win32 Release"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - MOCing TagCfgDigitalData.h...
+InputDir=.\sysdialogs
+InputPath=.\sysdialogs\TagCfgDigitalData.h
+InputName=TagCfgDigitalData
+
+"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	"%qtdir%\bin\moc.exe" "$(InputDir)\$(InputName).h" -o "$(InputDir)\moc_$(InputName).cpp"
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\sysdialogs\UnitCfg.cpp
 # End Source File
 # Begin Source File
@@ -2707,6 +2781,14 @@ SOURCE=.\sysdialogs\moc_TagCfg.cpp
 # Begin Source File
 
 SOURCE=.\sysdialogs\moc_TagCfgData.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\sysdialogs\moc_TagCfgDigital.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\sysdialogs\moc_TagCfgDigitalData.cpp
 # End Source File
 # Begin Source File
 

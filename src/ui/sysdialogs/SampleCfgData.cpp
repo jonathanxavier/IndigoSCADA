@@ -308,8 +308,10 @@ SampleCfgData::SampleCfgData(QWidget *parent, const char *name)
 	Units->setInsertionPolicy( QComboBox::AtBottom );
 	Units->setSizeLimit( 10 );
 	Units->setAutoResize( FALSE );
-	Units->insertItem( tr( "g/l" ) );
+	Units->insertItem( tr( "spi" ) );
+	Units->insertItem( tr( "dpi" ) );
 	Units->insertItem( tr( "mA" ) );
+	Units->insertItem( tr( "A" ) );
 	Units->insertItem( tr( "Volts" ) );
 	Units->insertItem( tr( "N/cuft" ) );
 	Units->insertItem( tr( "N/m3" ) );
@@ -318,6 +320,8 @@ SampleCfgData::SampleCfgData(QWidget *parent, const char *name)
 	Units->insertItem( tr( "F" ) );
 	Units->insertItem( tr( "%" ) );
 	Units->insertItem( tr( "m/s" ) );
+	Units->insertItem( tr( "g/l" ) );
+	Units->insertItem( tr( "l" ) );
 	Units->insertItem( tr( "" ) ); //Nessuna unita' di misura
 	Units->setMaxCount( 2147483647 );
 	Units->setAutoCompletion( TRUE );

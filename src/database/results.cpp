@@ -31,9 +31,9 @@ double LookupCurrentValue(char *name, char *tag)
 	return Results::LookupValue(name,tag);
 }
 
-double get_value_sp_value(SpValue &v)
+double get_value_iec_value(IECValue &v)
 {
-	IT_IT("get_value_sp_value");
+	IT_IT("get_value_iec_value");
 
 	switch(v.type)
 	{
@@ -78,9 +78,9 @@ double get_value_sp_value(SpValue &v)
 	}
 }
 
-struct cp56time2a get_time_of_sp_value(SpValue &v)
+struct cp56time2a get_time_of_iec_value(IECValue &v)
 {
-	IT_IT("get_time_of_sp_value");
+	IT_IT("get_time_of_iec_value");
 
 	struct cp56time2a t;
 
@@ -131,9 +131,9 @@ struct cp56time2a get_time_of_sp_value(SpValue &v)
 	}
 }
 
-int get_quality_of_sp_value(SpValue &v)
+int get_quality_of_iec_value(IECValue &v)
 {
-	IT_IT("get_quality_of_sp_value");
+	IT_IT("get_quality_of_iec_value");
 
 //	printf("v.type = %d\n", v.type);
 	int quality = 0;
@@ -207,9 +207,9 @@ int get_quality_of_sp_value(SpValue &v)
 	return quality;
 }
 
-void set_value_sp_value(SpValue &v, double val)
+void set_value_iec_value(IECValue &v, double val)
 {
-	IT_IT("set_value_sp_value");	
+	IT_IT("set_value_iec_value");	
 
 	switch(v.type)
 	{
@@ -322,14 +322,14 @@ Results::Results(QObject *parent) : QObject(parent,"Results")
 */
 
 //Realtime method
-void Results::QueueResult(const QString &name, SpValueList &List)
+void Results::QueueResult(const QString &name, IECValueList &List)
 {
 	IT_IT("Results::QueueResult");
 	
 	//Lock(); // lock for results update //was commented
 	UpdateStart(name); // begin the update
 
-	SpValueList::iterator i = List.begin();
+	IECValueList::iterator i = List.begin();
 
 	for(; i != List.end();i++)
 	{
@@ -490,20 +490,20 @@ void Results::UpdateStart(const QString &name) //  start an update
 */
 
 //Realtime method
-void Results::Update(const QString &name, const QString &tag, SpValue &value) // update a sample point by tag
+void Results::Update(const QString &name, const QString &tag, IECValue &value) // update a sample point by tag
 {
 	IT_IT("Results::Update");
 	
 	SamplePointDictWrap::iterator i =  EnabledPoints.find(name);
 	if(!(i == EnabledPoints.end()))
 	{
-		IT_COMMENT3("update Sample %s tag %s : %lf",(const char *) name,(const char *)tag, get_value_sp_value(value));
+		IT_COMMENT3("update Sample %s tag %s : %lf",(const char *) name,(const char *)tag, get_value_iec_value(value));
 
 		if(mut)
 		{
 			ins_mutex_acquire(mut);
 			//scada_db[(*i).second.db_idx].previous_value = scada_db[(*i).second.db_idx].current_value;
-			scada_db[(*i).second.db_idx].current_value = get_value_sp_value(value);
+			scada_db[(*i).second.db_idx].current_value = get_value_iec_value(value);
 			ins_mutex_release(mut);
 		}
 		//
@@ -617,7 +617,7 @@ void Results::UpdateEnd(const QString &name)
 				{
 					if((*j).second.enabled)
 					{
-						cmd += "," + QString::number(get_value_sp_value((*j).second.value));
+						cmd += "," + QString::number(get_value_iec_value((*j).second.value));
 					}
 					else
 					{
@@ -662,7 +662,7 @@ double Results::LookupValue(const char *name, const char *tag)
 		SamplePoint::TagDict::iterator j = (*i).second.Tags.find(tag);
 		if(!(j == (*i).second.Tags.end()))
 		{
-			ret = get_value_sp_value((*j).second.value); // found the value
+			ret = get_value_iec_value((*j).second.value); // found the value
 		};
 	};
 	//
@@ -773,7 +773,7 @@ void SamplePoint::Update(int state, bool ack, const QString &c) // mark a sample
 		};
 };
 
-int SamplePoint::UpdateTag(const QString &name, SpValue value, QString Type) 
+int SamplePoint::UpdateTag(const QString &name, IECValue value, QString Type) 
 {
 		//IT_IT("SamplePoint::UpdateTag");
 		
@@ -803,7 +803,7 @@ int SamplePoint::UpdateTag(const QString &name, SpValue value, QString Type)
 				{
 					// log the alarm
 					QSLogAlarm(Name, QObject::tr("Upper Threshold Alarm ") + name + " " + 
-					QString::number(get_value_sp_value(value)) + 
+					QString::number(get_value_iec_value(value)) + 
 
 					QObject::tr(":Limit:") + QString::number((*i).second.UpperAlarm.Limit));
 				}
@@ -821,7 +821,7 @@ int SamplePoint::UpdateTag(const QString &name, SpValue value, QString Type)
 				{
 					// log the alarm
 					QSLogAlarm(Name, QObject::tr("Lower Threshold Alarm ") + name + " " +
-					QString::number(get_value_sp_value(value)) + 
+					QString::number(get_value_iec_value(value)) + 
 					QObject::tr(":Limit:") + QString::number((*i).second.LowerAlarm.Limit));
 				} 
 				
@@ -832,21 +832,48 @@ int SamplePoint::UpdateTag(const QString &name, SpValue value, QString Type)
 				state = WarningLevel;
 			}
 		}
-		else if(Type == TYPE_M_SP_TA_1) //Digital
+		else if(Type == TYPE_M_SP_TB_1 || Type == TYPE_M_SP_NA_1) //Digital single point
 		{
-			if(get_value_sp_value(value) == 1)
+			if((*i).second.UpperAlarm.Enabled)
 			{
-				state = AlarmLevel;
+				if(get_value_iec_value(value) == (*i).second.UpperAlarm.Limit)
+				{
+					state = AlarmLevel;
+
+					// log the alarm
+					QSLogAlarm(Name, QObject::tr("Alarm ") + name + " " + 
+					QString::number(get_value_iec_value(value)) + 
+					QObject::tr(":Alarm for:") + QString::number((*i).second.UpperAlarm.Limit));
+				}
+				else
+				{
+					state = OkLevel;
+				}
 			}
-			else
+		}
+		else if(Type == TYPE_M_DP_TB_1 || Type == TYPE_M_DP_NA_1) //Digital double point
+		{
+			if((*i).second.UpperAlarm.Enabled)
 			{
-				state = OkLevel;
+				if(get_value_iec_value(value) == (*i).second.UpperAlarm.Limit)
+				{
+					state = AlarmLevel;
+
+					// log the alarm
+					QSLogAlarm(Name, QObject::tr("Alarm ") + name + " " + 
+					QString::number(get_value_iec_value(value)) + 
+					QObject::tr(":Alarm for:") + QString::number((*i).second.UpperAlarm.Limit));
+				}
+				else
+				{
+					state = OkLevel;
+				}
 			}
 		}
 		//
 		//
 		(*i).second.value   = value;   // update the entry
-		(*i).second.stats  += get_value_sp_value(value);  // update the stats
+		(*i).second.stats  += get_value_iec_value(value);  // update the stats
 		
 		if(fOvState)
 		{
@@ -858,7 +885,7 @@ int SamplePoint::UpdateTag(const QString &name, SpValue value, QString Type)
 		else
 		{
 			//////////////31-10-2010///quality code management added//////////
-			if(get_quality_of_sp_value(value))
+			if(get_quality_of_iec_value(value))
 			{
 				state = FailureLevel;
 			}
@@ -874,7 +901,7 @@ int SamplePoint::UpdateTag(const QString &name, SpValue value, QString Type)
 
 		memset(&t1, 0x00, sizeof(struct cp56time2a));
 
-		t2 = get_time_of_sp_value(value);
+		t2 = get_time_of_iec_value(value);
 
 		int rc;
 		rc = memcmp(&t2, &t1, sizeof(struct cp56time2a));

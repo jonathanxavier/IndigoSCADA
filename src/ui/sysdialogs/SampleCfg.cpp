@@ -12,6 +12,7 @@ are several inter dependent relationships to be handled.
 #include "common.h"
 #include "NewDlg.h"
 #include "TagCfg.h"
+#include "TagCfgDigital.h"
 #include "driver.h"
 #include "ActionConfigure.h"
 #include "sptypes.h"
@@ -81,10 +82,22 @@ void SampleCfg::SelChanged (int)
 void SampleCfg::Limits ()
 {
 	IT_IT("SampleCfg::Limits");
-	
-	// edit the tag table
-	TagCfg dlg (this, Name->text (),Type->currentText(),unit_type,"(default)",Unit->currentText());	// edit the limits
-	dlg.exec ();
+
+	QString Ty;
+	Ty = Type->currentText();
+
+	if(Ty == TYPE_M_SP_TB_1 || Ty == TYPE_M_SP_NA_1 || Ty == TYPE_M_DP_TB_1 || Ty == TYPE_M_DP_NA_1)
+	{
+		//Digital single or double point
+		TagCfgDigital dlg (this, Name->text (),Type->currentText(),unit_type,"(default)",Unit->currentText());	// edit the alarm limits
+		dlg.exec ();
+	}
+	else //Analog type
+	{
+		// edit the tag table
+		TagCfg dlg (this, Name->text (),Type->currentText(),unit_type,"(default)",Unit->currentText());	// edit the alarm limits
+		dlg.exec ();
+	}
 }
 void SampleCfg::RemoveConfig()
 {

@@ -165,6 +165,8 @@ void Iec101driver_Instance::QueryResponse(QObject *p, const QString &c, int id, 
 				is >> Cfg.IEC101LinkAddress; // IEC 101 Link Address
 				is >> Cfg.IEC101CASDU; // IEC 101 CASDU
 				is >> Cfg.COMPortName; //serial  COM port name
+				is >> Cfg.baud_rate; //serial speed in bit/s
+				is >> Cfg.read_timeout_ms; //serial read timeout in ms
 
 				Countdown = 1;
 
@@ -414,7 +416,7 @@ void Iec101driver_Instance::Tick()
 
 				iec_type1 var = p_item->iec_obj.o.type1;
 				
-				SpValue v(VALUE_TAG, &var, M_SP_NA_1);
+				IECValue v(VALUE_TAG, &var, M_SP_NA_1);
 				TODO:05-07-2011 Get name here
 				post_val(v, name);
 
@@ -432,7 +434,7 @@ void Iec101driver_Instance::Tick()
 
 				iec_type3 var = p_item->iec_obj.o.type3;
 				
-				SpValue v(VALUE_TAG, &var, M_DP_NA_1);
+				IECValue v(VALUE_TAG, &var, M_DP_NA_1);
 				TODO:05-07-2011 Get name here
 				post_val(v, name);
 
@@ -453,7 +455,7 @@ void Iec101driver_Instance::Tick()
 
 				iec_type9 var = p_item->iec_obj.o.type9;
 				
-				SpValue v(VALUE_TAG, &var, M_ME_NA_1);
+				IECValue v(VALUE_TAG, &var, M_ME_NA_1);
 				TODO:05-07-2011 Get name here
 				post_val(v, name);
 
@@ -471,7 +473,7 @@ void Iec101driver_Instance::Tick()
 
 				iec_type11 var = p_item->iec_obj.o.type11;
 				
-				SpValue v(VALUE_TAG, &var, M_ME_NB_1);
+				IECValue v(VALUE_TAG, &var, M_ME_NB_1);
 				TODO:05-07-2011 Get name here
 				post_val(v, name);
 
@@ -488,7 +490,7 @@ void Iec101driver_Instance::Tick()
 
 				iec_type13 var = p_item->iec_obj.o.type13;
 				
-				SpValue v(VALUE_TAG, &var, M_ME_NC_1);
+				IECValue v(VALUE_TAG, &var, M_ME_NC_1);
 				TODO:05-07-2011 Get name here
 				post_val(v, name);
 
@@ -505,7 +507,7 @@ void Iec101driver_Instance::Tick()
 
 				iec_type30 var = p_item->iec_obj.o.type30;
 				
-				SpValue v(VALUE_TAG, &var, M_SP_TB_1);
+				IECValue v(VALUE_TAG, &var, M_SP_TB_1);
 				TODO:05-07-2011 Get name here
 				post_val(v, name);
 
@@ -522,7 +524,7 @@ void Iec101driver_Instance::Tick()
 
 				iec_type31 var = p_item->iec_obj.o.type31;
 				
-				SpValue v(VALUE_TAG, &var, M_DP_TB_1);
+				IECValue v(VALUE_TAG, &var, M_DP_TB_1);
 				TODO:05-07-2011 Get name here
 				post_val(v, name);
 
@@ -544,7 +546,7 @@ void Iec101driver_Instance::Tick()
 
 				iec_type34 var = p_item->iec_obj.o.type34;
 				
-				SpValue v(VALUE_TAG, &var, M_ME_TD_1);
+				IECValue v(VALUE_TAG, &var, M_ME_TD_1);
 				TODO:05-07-2011 Get name here
 				post_val(v, name);
 
@@ -561,7 +563,7 @@ void Iec101driver_Instance::Tick()
 
 				iec_type35 var = p_item->iec_obj.o.type35;
 				
-				SpValue v(VALUE_TAG, &var, M_ME_TE_1);
+				IECValue v(VALUE_TAG, &var, M_ME_TE_1);
 				TODO:05-07-2011 Get name here
 				post_val(v, name);
 
@@ -578,7 +580,7 @@ void Iec101driver_Instance::Tick()
 
 				iec_type36 var = p_item->iec_obj.o.type36;
 				
-				SpValue v(VALUE_TAG, &var, M_ME_TF_1);
+				IECValue v(VALUE_TAG, &var, M_ME_TF_1);
 				TODO:05-07-2011 Get name here
 				post_val(v, name);
 
@@ -595,7 +597,7 @@ void Iec101driver_Instance::Tick()
 
 				iec_type37 var = p_item->iec_obj.o.type37;
 				
-				SpValue v(VALUE_TAG, &var, M_ME_TN_1);
+				IECValue v(VALUE_TAG, &var, M_ME_TN_1);
 				TODO:05-07-2011 Get name here
 				post_val(v, name);
 

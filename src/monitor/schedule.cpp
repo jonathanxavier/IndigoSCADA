@@ -229,16 +229,16 @@ void Schedule::ConfigQueryResponse (QObject *p,const QString &c, int id, QObject
 								switch( GetConfigureDb()->GetInt("RELOP"))
 								{
 									case 0: // >
-									fTriggered = (get_value_sp_value((*j).second.value) > GetConfigureDb()->GetDouble("TRIGGERVAL"));
+									fTriggered = (get_value_iec_value((*j).second.value) > GetConfigureDb()->GetDouble("TRIGGERVAL"));
 									break;
 									case 1: // <
-									fTriggered = (get_value_sp_value((*j).second.value) < GetConfigureDb()->GetDouble("TRIGGERVAL"));
+									fTriggered = (get_value_iec_value((*j).second.value) < GetConfigureDb()->GetDouble("TRIGGERVAL"));
 									break;
 									case 2: // =
-									fTriggered = (get_value_sp_value((*j).second.value) == GetConfigureDb()->GetDouble("TRIGGERVAL"));
+									fTriggered = (get_value_iec_value((*j).second.value) == GetConfigureDb()->GetDouble("TRIGGERVAL"));
 									break;
 									case 3: // !=
-									fTriggered = (get_value_sp_value((*j).second.value) != GetConfigureDb()->GetDouble("TRIGGERVAL"));
+									fTriggered = (get_value_iec_value((*j).second.value) != GetConfigureDb()->GetDouble("TRIGGERVAL"));
 									break;        
 									default: // something wrong - will skip by default
 									break;                        
