@@ -88,15 +88,15 @@ void SimulatorInstance::Tick() // one second timer tick
 						//
 						//counts - generate 4 tags
 						//
-						SpValueList list;
+						IECValueList list;
 						//
-						SpValue v0("t03",&v);
+						IECValue v0("t03",&v);
 						double f = v/2.0;
-						SpValue v1("t05",&f);
+						IECValue v1("t05",&f);
 						f = v/4.0;
-						SpValue v2("t10",&f);
+						IECValue v2("t10",&f);
 						f = v/16.0;
-						SpValue v3("t50",&f);
+						IECValue v3("t50",&f);
 						//
 						list.insert(list.end(),v0);
 						list.insert(list.end(),v1);
@@ -222,7 +222,7 @@ void SimulatorInstance::QueryResponse (QObject *p, const QString &c, int id, QOb
 				{
 					sp.type = 1;
 				}
-				else if(GetConfigureDb()->GetString("QTYPE") == TYPE_M_SP_TA_1)
+				else if(GetConfigureDb()->GetString("QTYPE") == TYPE_M_SP_TB_1)
 				{
 					sp.type = 2;
 				}
@@ -329,7 +329,7 @@ void Simulator::SetTypeList(QComboBox *pCombo, const QString &unitname) // set t
 	
 	pCombo->insertItem(TYPE_M_IT_NA_1);
 	pCombo->insertItem(TYPE_M_ME_TC_1);
-	pCombo->insertItem(TYPE_M_SP_TA_1);
+	pCombo->insertItem(TYPE_M_SP_TB_1);
 };
 /*
 *Function: SetInputList
@@ -354,7 +354,7 @@ void Simulator::GetInputList(const QString &type, QStringList &list,const QStrin
 	{
 		list << "01" << "02" << "03" << "04" << "05" << "06" << "07" << "08";         
 	}
-	else if(type == TYPE_M_SP_TA_1)
+	else if(type == TYPE_M_SP_TB_1)
 	{
 		list << "01" << "02" << "03" << "04" << "05" << "06" << "07" << "08";         
 	}
@@ -374,7 +374,7 @@ void Simulator::GetTagList(const QString &type, QStringList &list,const QString 
 	{
 		list << VALUE_TAG;
 	}
-	else if(type == TYPE_M_SP_TA_1)
+	else if(type == TYPE_M_SP_TB_1)
 	{
 		list << VALUE_TAG;
 	}
@@ -397,7 +397,7 @@ QWidget * Simulator::GetSpecificConfig(QWidget *parent, const QString &spname, c
 	{
 		return new SimulatorAnalog(parent,spname);
 	}
-	else if(sptype == TYPE_M_SP_TA_1)
+	else if(sptype == TYPE_M_SP_TB_1)
 	{
 		return new SimulatorDigital(parent,spname);
 	}
@@ -561,11 +561,11 @@ void Simulator::CreateNewUnit(QWidget *parent, const QString &name, int n_inputs
 		//
 		QString spname = name+"Dig"+n;
 		QString cmd = "insert into SAMPLE values('"+spname+"','Simulated Digital Input Number "+ n + 
-		"','"+name+"','"TYPE_M_SP_TA_1"','',1,1,'"+n+"',0,0,0);" ;
+		"','"+name+"','"TYPE_M_SP_TB_1"','spi',1,1,'"+n+"',0,0,0);" ;
 		GetConfigureDb()->DoExec(0,cmd,0); // post it off
 		//
 		QStringList l;
-		GetTagList(TYPE_M_SP_TA_1,l,"",""); 
+		GetTagList(TYPE_M_SP_TB_1,l,"",""); 
 		CreateSamplePoint(spname, l,"00:01:00 100 20");
 	}
 };

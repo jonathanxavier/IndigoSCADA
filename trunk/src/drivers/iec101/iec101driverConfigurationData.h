@@ -26,6 +26,8 @@ class Iec101driverConfigurationData : public QDialog
 	QLineEdit *IEC101LinkAddressText;
 	QLineEdit *IEC101CASDUText;
 	QLineEdit *COMPortNameText;
+	QLineEdit *baud_rateText;
+	QSpinBox *read_timeout_ms;
 };
 #endif // Iec101driverConfigurationData_included
 

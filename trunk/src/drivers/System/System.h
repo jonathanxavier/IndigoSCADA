@@ -81,7 +81,7 @@ class SYSTEMDRV SystemInstance : public DriverInstance // the unit interface
 	//
 	QString Name;
 	QStringList taglist;
-	SpValueList ValueList;
+	IECValueList ValueList;
 	
 	int MinDiskSpace; // min disk space in mega bytes
 	QString Drive; // the drive (partition) with the database on it
@@ -106,7 +106,7 @@ class SYSTEMDRV SystemInstance : public DriverInstance // the unit interface
 		SIGNAL (ReceivedNotify(int, const char *)), this,
 		SLOT (ReceivedNotify(int, const char *)));
 		
-		((System*)parent)->GetTagList(TYPE_M_ME_TA_1,taglist,"",""); 
+		((System*)parent)->GetTagList(TYPE_M_ME_TB_1,taglist,"",""); 
 	};
 	~SystemInstance()
 	{    

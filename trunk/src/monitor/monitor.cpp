@@ -180,13 +180,13 @@ void Monitor::UpdateCurrentValue( const QString &name, SamplePoint &sp)
 
 			cmd += updated;
 
-			if(IsNAN_Double(get_value_sp_value((*i).second.value)))
+			if(IsNAN_Double(get_value_iec_value((*i).second.value)))
 			{
 				cmd += ",VAL="+QString::number(0);
 			}
 			else
 			{
-				cmd += ",VAL="+QString::number(get_value_sp_value((*i).second.value));
+				cmd += ",VAL="+QString::number(get_value_iec_value((*i).second.value));
 			}
 
 			if(IsNAN_Double((*i).second.stats.Min()))
@@ -1129,7 +1129,7 @@ void Monitor::CurrentQueryResponse (QObject *p,const QString &c, int id, QObject
 						{
 							if((*j).second.enabled)
 							{
-								set_value_sp_value((*j).second.value, CurDb->GetDouble("VAL")); // current value
+								set_value_iec_value((*j).second.value, CurDb->GetDouble("VAL")); // current value
 								(*j).second.state = CurDb->GetInt("STATE"); // current state
 								(*j).second.updated =  CurDb->GetDateTime("UPDTIME"); // when it was updated
 								(*j).second.stats.reset();

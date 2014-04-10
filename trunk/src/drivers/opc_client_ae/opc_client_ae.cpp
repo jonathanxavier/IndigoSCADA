@@ -75,7 +75,7 @@ void Opc_client_ae::SetTypeList(QComboBox *pCombo, const QString &unitname) // s
 {
 	pCombo->insertItem(TYPE_M_SP_NA_1);
 	pCombo->insertItem(TYPE_M_ME_TC_1);
-	pCombo->insertItem(TYPE_M_SP_TA_1);
+	pCombo->insertItem(TYPE_M_SP_TB_1);
 	pCombo->insertItem(TYPE_M_ME_NB_1);
 	pCombo->insertItem(TYPE_M_ME_TB_1);
 };

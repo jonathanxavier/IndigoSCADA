@@ -284,7 +284,7 @@ void DriverInstance::driverEvent(DriverEvent *p)
 		break;
 		case DriverEvent::OpPostList:
 		{
-			SpValueList *sp = (SpValueList *)(p->Pointer()); 
+			IECValueList *sp = (IECValueList *)(p->Pointer()); 
 			if(sp)
 			{
 				PostList(p->text(), *sp);
@@ -318,9 +318,9 @@ void DriverInstance::PostValue(const QString &name, const QString &tag, double v
 {
 	IT_IT("DriverInstance::PostValue");
 	
-	SpValue v(tag,&value);
+	IECValue v(tag,&value);
 
-	SpValueList l;
+	IECValueList l;
 
 	l.insert(l.end(),v);
 
@@ -334,7 +334,7 @@ void DriverInstance::PostValue(const QString &name, const QString &tag, double v
 */
 
 //Realtime method
-void DriverInstance::PostList(const QString &name, SpValueList &list)
+void DriverInstance::PostList(const QString &name, IECValueList &list)
 {
 	IT_IT("DriverInstance::PostList");
 	
@@ -342,7 +342,7 @@ void DriverInstance::PostList(const QString &name, SpValueList &list)
 	{
 		for(unsigned i = 0; i < list.size(); i++)
 		{
-			Trace(tr("Post Value:") + name +  " [" + list[i].tag + "] Value " + get_value_sp_value(list[i]));
+			Trace(tr("Post Value:") + name +  " [" + list[i].tag + "] Value " + get_value_iec_value(list[i]));
 		};
 	};
 
@@ -685,11 +685,11 @@ void  DriverThread::Terminating() // the thread wants to terminate - fatal type 
 *Outputs:none
 *Returns:none
 */
-void DriverThread::PostList(const QString &name, SpValueList &list) // send a list of values to the results database
+void DriverThread::PostList(const QString &name, IECValueList &list) // send a list of values to the results database
 {
 	IT_IT("DriverThread::PostList");
 	
-	SpValueList * l = new SpValueList;
+	IECValueList * l = new IECValueList;
 
 	*l = list;
 	//
@@ -697,7 +697,7 @@ void DriverThread::PostList(const QString &name, SpValueList &list) // send a li
 
 	d->SetPointer((void *)l); // set the data
 
-	postEvent(Parent,d); // parent must delete SpValueList
+	postEvent(Parent,d); // parent must delete IECValueList
 	//
 };
 /*
@@ -710,13 +710,13 @@ void DriverThread::PostValue(const QString &name, const QString &tag, double val
 {
 	IT_IT("DriverThread::PostValue");
 	
-	SpValue v(tag,&value);
-	SpValueList * l = new SpValueList;
+	IECValue v(tag,&value);
+	IECValueList * l = new IECValueList;
 	l->insert(l->end(),v);
 	//
 	DriverEvent * d = new DriverEvent(this,DriverEvent::OpPostList,0,name);
 	d->SetPointer((void *)l); // set the data
-	postEvent(Parent,d); // parent must delete data SpValueList
+	postEvent(Parent,d); // parent must delete data IECValueList
 	//
 };
 

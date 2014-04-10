@@ -40,17 +40,21 @@ struct InstanceCfg // friend to anyone
 	QString IEC101LinkAddress;  // IEC 101 Link address of slave
 	QString IEC101CASDU;  // IEC 101 CASDU of slave
 	QString COMPortName;  //serial port name
-	unsigned SampleTime;  // sampleing time 
+	unsigned int SampleTime;  // sampleing time in ms
+	unsigned int read_timeout_ms; //serial read timeout in ms
+	unsigned int baud_rate; //serial speed in bit/s
 
 	InstanceCfg() : 
-	SampleTime(1000),IEC101LinkAddress(""),IEC101CASDU(""),COMPortName("")
+	SampleTime(1000),IEC101LinkAddress(""),IEC101CASDU(""),COMPortName(""),
+	read_timeout_ms(1000),baud_rate(9600) 
 	{
 	};
 
 	InstanceCfg(const InstanceCfg &m) : 
 
 	SampleTime(m.SampleTime),IEC101LinkAddress(m.IEC101LinkAddress),
-	IEC101CASDU(m.IEC101CASDU),COMPortName(m.COMPortName)
+	IEC101CASDU(m.IEC101CASDU),COMPortName(m.COMPortName),
+	read_timeout_ms(m.read_timeout_ms),baud_rate(m.baud_rate)
 	{
 	};
 };

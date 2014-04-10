@@ -149,7 +149,7 @@ class QSEXPORT DriverInstance : public QObject // the actual driver bits
 	DriverInstance(Driver *parent, const QString &name);
 	virtual ~DriverInstance(); 
 	//
-	void PostList(const QString &name, SpValueList &list); // send a list of values to the results database
+	void PostList(const QString &name, IECValueList &list); // send a list of values to the results database
 	void PostValue(const QString &name, const QString &tag, double value); // post a single value to the results database
 	//
 	// find a sample point given the unit name, the type and input index (ie we donot know the name)
@@ -474,7 +474,7 @@ class QSEXPORT DriverThread : public QThread // some base functions for a driver
 	void SampleFail(const QString &name, const QString &s); // a sample point has failed
 	void SampleUnFail(const QString &name, const QString &s); // a sample point has stopped failing
 	void Terminating(); // the thread wants to terminate - fatal type of error - by the time the parent receives this the thread has exited
-	void PostList(const QString &name, SpValueList &list); // send a list of values to the results database
+	void PostList(const QString &name, IECValueList &list); // send a list of values to the results database
 	void PostValue(const QString &name, const QString &tag, double value); // post a single value to the results database
 
 };

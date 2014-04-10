@@ -74,7 +74,7 @@ void Iec103driver::SetTypeList(QComboBox *pCombo, const QString &unitname) // se
 {
 	pCombo->insertItem(TYPE_M_SP_NA_1);
 	pCombo->insertItem(TYPE_M_ME_TC_1);
-	pCombo->insertItem(TYPE_M_SP_TA_1);
+	pCombo->insertItem(TYPE_M_SP_TB_1);
 	pCombo->insertItem(TYPE_M_ME_NB_1);
 	pCombo->insertItem(TYPE_M_ME_TB_1);
 };
@@ -119,7 +119,7 @@ QWidget * Iec103driver::GetSpecificConfig(QWidget *parent, const QString &spname
 		p = new Iec103driverInput(parent,spname);
 		return p;
 	}
-	else if (sptype == TYPE_M_SP_TA_1)
+	else if (sptype == TYPE_M_SP_TB_1)
 	{
 		p = new Iec103driverInput(parent,spname);
 		return p;
@@ -256,12 +256,12 @@ void Iec103driver::QueryResponse (QObject *p, const QString &, int id, QObject*c
 					QString cmd = 
 					QString("insert into SAMPLE values('") + spname + 
 					QString("',' Point Number ")  + n + "','" + iec_unit_name + 
-					QString("','"TYPE_M_SP_TA_1"','sp',1,1,'") + n + "',0,0,0);";
+					QString("','"TYPE_M_SP_TB_1"','spi',1,1,'") + n + "',0,0,0);";
 					// 
 					GetConfigureDb()->DoExec(0,cmd,0); // post it off
 
 					QStringList l;
-					GetTagList(TYPE_M_SP_TA_1,l,"","");
+					GetTagList(TYPE_M_SP_TB_1,l,"","");
 
 					QString m;
 					m.sprintf("%d",i);

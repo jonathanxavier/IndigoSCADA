@@ -83,11 +83,11 @@ struct QSEXPORT NotificationData{
 #define END_WRITE_NOTIF 737
 #define END_WAIT_NOTIF 773
 
-typedef struct SpValueToDispatch // a measured result
+typedef struct IECValueToDispatch // a measured result
 {
 	char tag[30]; // the tag name eg value, 0.5
 	double value; // the value
-}SpValueToDispatch;
+}IECValueToDispatch;
 
 typedef struct _dispatcher_extra_params{
 	QObject *Client;
@@ -95,7 +95,7 @@ typedef struct _dispatcher_extra_params{
 	char string2[30];
 	char string3[30];
 	char string4[30];
-	SpValueToDispatch res[MAX_NUM_OF_TAGS_FOR_SAMPLE_POINT];
+	IECValueToDispatch res[MAX_NUM_OF_TAGS_FOR_SAMPLE_POINT];
 	int int_val[MAX_NUM_OF_TAGS_FOR_SAMPLE_POINT];
 	DWORD Operation;
 }dispatcher_extra_params;
