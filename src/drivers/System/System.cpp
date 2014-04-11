@@ -199,12 +199,12 @@ void System::QueryResponse (QObject *p, const QString &c, int id, QObject*caller
 				//
 				QString cmd = QString("insert into SAMPLE values('") + t.Data1 + 
 				QString("','System parameters','") +t.Data1+ 
-				QString("','"TYPE_M_ME_TB_1"','%',1,1,'01',0,0,0);");
+				QString("','"TYPE_M_ME_TF_1"','%',1,1,'01',0,0,0);");
 				// 
 				GetConfigureDb()->DoExec(0,cmd,0); // post it off
 
 				QStringList l;
-				GetTagList(TYPE_M_ME_TB_1,l,"",""); 
+				GetTagList(TYPE_M_ME_TF_1,l,"",""); 
 				
 				CreateSamplePoint(t.Data1, l,"");
 			}

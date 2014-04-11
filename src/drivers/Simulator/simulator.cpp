@@ -218,7 +218,7 @@ void SimulatorInstance::QueryResponse (QObject *p, const QString &c, int id, QOb
 				//
 				QString name = GetConfigureDb()->GetString("NAME");
 				SimulatorSP sp; // the sample point
-				if(GetConfigureDb()->GetString("QTYPE") == TYPE_M_ME_TC_1)
+				if(GetConfigureDb()->GetString("QTYPE") == TYPE_M_ME_TF_1)
 				{
 					sp.type = 1;
 				}
@@ -359,7 +359,7 @@ void Simulator::GetInputList(const QString &type, QStringList &list,const QStrin
 		list << "01" << "02" << "03" << "04" << "05" << "06" << "07" << "08" 
 		<< "09" << "10" << "11" << "12" << "13" << "14" << "15" << "16";         
 	}
-	else if(type == TYPE_M_ME_TC_1)
+	else if(type == TYPE_M_ME_TF_1)
 	{
 		list << "01" << "02" << "03" << "04" << "05" << "06" << "07" << "08";         
 	}
@@ -379,7 +379,7 @@ void Simulator::GetTagList(const QString &type, QStringList &list,const QString 
 	{
 		list << "t03" << "t05" << "t10" << "t50";
 	}
-	else if(type == TYPE_M_ME_TC_1 || type == TYPE_M_ME_NB_1 || type == TYPE_M_ME_TB_1)
+	else if(type == TYPE_M_ME_TF_1 || type == TYPE_M_ME_NB_1)
 	{
 		list << VALUE_TAG;
 	}
@@ -402,7 +402,7 @@ QWidget * Simulator::GetSpecificConfig(QWidget *parent, const QString &spname, c
 	{
 		return new SimulatorCounts(parent,spname);
 	}
-	else if(sptype == TYPE_M_ME_TC_1)
+	else if(sptype == TYPE_M_ME_TF_1)
 	{
 		return new SimulatorAnalog(parent,spname);
 	}
@@ -555,11 +555,11 @@ void Simulator::CreateNewUnit(QWidget *parent, const QString &name, int n_inputs
 		//
 		QString spname = name+"Adc"+n;
 		QString cmd = "insert into SAMPLE values('"+spname+"','Simulated Analogue Input Number "+ n + 
-		"','"+name+"','"TYPE_M_ME_TC_1"','V',1,1,'"+n+"',0,0,0);" ;
+		"','"+name+"','"TYPE_M_ME_TF_1"','V',1,1,'"+n+"',0,0,0);" ;
 		GetConfigureDb()->DoExec(0,cmd,0); // post it off
 		//
 		QStringList l;
-		GetTagList(TYPE_M_ME_TC_1,l,"",""); 
+		GetTagList(TYPE_M_ME_TF_1,l,"",""); 
 		CreateSamplePoint(spname, l,"00:01:00 100 20");
 	}
 

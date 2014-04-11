@@ -107,11 +107,11 @@ void Calculated::CreateNewUnit(QWidget *parent, const QString &name) // create a
 	//
 	QString spname = name+"point"+n;
 	QString cmd = "insert into SAMPLE values('"+spname+"','calculated point "+ n + 
-	"','"+name+"','"TYPE_M_ME_TC_1"','V',1,1,'"+n+"',0,0,0);" ;
+	"','"+name+"','"TYPE_M_ME_TF_1"','V',1,1,'"+n+"',0,0,0);" ;
 	GetConfigureDb()->DoExec(0,cmd,0); // post it off
 	//
 	QStringList l;
-	GetTagList(TYPE_M_ME_TC_1,l,"",""); 
+	GetTagList(TYPE_M_ME_TF_1,l,"",""); 
 	CreateSamplePoint(spname, l,"");
 
 };
