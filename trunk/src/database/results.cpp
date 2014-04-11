@@ -795,7 +795,14 @@ int SamplePoint::UpdateTag(const QString &name, IECValue value, QString Type)
 
 		//set alarm state
 
-		if(Type == QString(TYPE_M_ME_TC_1) || Type == QString(TYPE_M_IT_NA_1)) //Analog or Counter
+		if(Type == QString(TYPE_M_ME_NA_1) ||
+			Type == QString(TYPE_M_ME_NB_1) ||
+			Type == QString(TYPE_M_ME_NC_1) ||
+			Type == QString(TYPE_M_ME_TD_1) ||
+			Type == QString(TYPE_M_ME_TE_1) ||
+			Type == QString(TYPE_M_ME_TF_1) ||
+			Type == QString(TYPE_M_IT_NA_1) ||
+			Type == QString(TYPE_M_IT_TB_1)	) //Analog or Counter
 		{
 			if((*i).second.UpperAlarm.Check(value,true))
 			{
@@ -832,26 +839,8 @@ int SamplePoint::UpdateTag(const QString &name, IECValue value, QString Type)
 				state = WarningLevel;
 			}
 		}
-		else if(Type == TYPE_M_SP_TB_1 || Type == TYPE_M_SP_NA_1) //Digital single point
-		{
-			if((*i).second.UpperAlarm.Enabled)
-			{
-				if(get_value_iec_value(value) == (*i).second.UpperAlarm.Limit)
-				{
-					state = AlarmLevel;
-
-					// log the alarm
-					QSLogAlarm(Name, QObject::tr("Alarm ") + name + " " + 
-					QString::number(get_value_iec_value(value)) + 
-					QObject::tr(":Alarm for:") + QString::number((*i).second.UpperAlarm.Limit));
-				}
-				else
-				{
-					state = OkLevel;
-				}
-			}
-		}
-		else if(Type == TYPE_M_DP_TB_1 || Type == TYPE_M_DP_NA_1) //Digital double point
+		else if(Type == TYPE_M_SP_TB_1 || Type == TYPE_M_SP_NA_1 || 
+			    Type == TYPE_M_DP_TB_1 || Type == TYPE_M_DP_NA_1) //Digital single point or Double point
 		{
 			if((*i).second.UpperAlarm.Enabled)
 			{

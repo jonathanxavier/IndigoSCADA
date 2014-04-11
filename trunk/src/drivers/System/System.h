@@ -106,7 +106,7 @@ class SYSTEMDRV SystemInstance : public DriverInstance // the unit interface
 		SIGNAL (ReceivedNotify(int, const char *)), this,
 		SLOT (ReceivedNotify(int, const char *)));
 		
-		((System*)parent)->GetTagList(TYPE_M_ME_TB_1,taglist,"",""); 
+		((System*)parent)->GetTagList(TYPE_M_ME_TF_1,taglist,"",""); 
 	};
 	~SystemInstance()
 	{    

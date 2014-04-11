@@ -236,12 +236,12 @@ void Opc_client_da::QueryResponse (QObject *p, const QString &, int id, QObject*
 					QString cmd = 
 					QString("insert into SAMPLE values('") + spname + 
 					QString("',' Point Number ")  + n + "','" + opc_unit_name + 
-					QString("','"TYPE_M_ME_TC_1"','V',1,1,'") + n + "',0,0,0);";
+					QString("','"TYPE_M_ME_TF_1"','V',1,1,'") + n + "',0,0,0);";
 					// 
 					GetConfigureDb()->DoExec(0,cmd,0); // post it off
 
 					QStringList l;
-					GetTagList(TYPE_M_ME_TC_1,l,"",""); 
+					GetTagList(TYPE_M_ME_TF_1,l,"",""); 
 
 					QString m;
 					m.sprintf("%d",i);
