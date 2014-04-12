@@ -108,3 +108,15 @@ void DoublePointLed::stopFlash()
 	  on();
    }
 }
+
+/*!
+  \brief Mouse Release Event management
+*/
+void DoublePointLed::mouseReleaseEvent(QMouseEvent * e)
+{
+	if(e->button() == Qt::RightButton)
+	{
+		QString name = this->name();
+		emit RightClicked(QString("DoublePointLed"), name);
+	}
+}

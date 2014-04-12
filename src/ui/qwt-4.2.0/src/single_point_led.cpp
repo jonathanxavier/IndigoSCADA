@@ -108,3 +108,15 @@ void SinglePointLed::stopFlash()
 	  on();
    }
 }
+
+/*!
+  \brief Mouse Release Event management
+*/
+void SinglePointLed::mouseReleaseEvent(QMouseEvent * e)
+{
+	if(e->button() == Qt::RightButton)
+	{
+		QString name = this->name();
+		emit RightClicked(QString("SinglePointLed"), name);
+	}
+}
