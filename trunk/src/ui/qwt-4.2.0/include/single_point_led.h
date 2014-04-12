@@ -70,6 +70,7 @@ public:
  
  protected:
    void drawContents(QPainter *);
+   void mouseReleaseEvent(QMouseEvent *);
  
  private:
    const int lwidth;
@@ -85,7 +86,11 @@ public:
    QTimer *timer;
    QColor color;
    QString text;
-   signals:
+ signals:
+    /*!
+      \brief This signal reports when the led is right clicked
+    */
+	void RightClicked(QString &class_name, QString &name);
    
 };
 
