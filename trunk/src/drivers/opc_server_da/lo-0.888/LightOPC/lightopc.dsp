@@ -72,7 +72,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 LIB32=link.exe -lib
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /c
-# ADD CPP /nologo /G4 /MDd /W3 /Zi /Od /I "..\unilog" /I "..\opc" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /FD /TP /c
+# ADD CPP /nologo /GB /MDd /W3 /Zi /Od /I "..\unilog" /I "..\opc" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /FD /TP /c
 # ADD BASE MTL /nologo /D "_DEBUG" /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "_DEBUG"

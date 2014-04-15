@@ -65,7 +65,7 @@ LIB32=link.exe -lib
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I ".\src\hal\thread" /I ".\src\hal\socket" /I ".\inc" /I ".\src\common" /I ".\src\model" /I ".\src\mms\iso_mms\server" /I ".\src\hal" /I ".\src\mms\iso_acse\asn1c" /I ".\src\mms\iso_presentation\asn1c" /I ".\src\mms\iso_mms\common" /I ".\src\mms\asn1" /I ".\src\mms\iso_acse" /I ".\src\mms\iso_cotp" /I ".\src\mms\iso_session" /I ".\src\mms\iso_presentation" /I ".\src\mms\iso_client" /I ".\src\mms\iso_mms\asn1c" /I ".\src\mms\iso_server" /I ".\src\mms\iso_mms\client" /I ".\src\mms_mapping" /I ".\src\api" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /FD /GZ /c
+# ADD CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I ".\src\hal\thread" /I ".\src\hal\socket" /I ".\inc" /I ".\src\common" /I ".\src\model" /I ".\src\mms\iso_mms\server" /I ".\src\hal" /I ".\src\mms\iso_acse\asn1c" /I ".\src\mms\iso_presentation\asn1c" /I ".\src\mms\iso_mms\common" /I ".\src\mms\asn1" /I ".\src\mms\iso_acse" /I ".\src\mms\iso_cotp" /I ".\src\mms\iso_session" /I ".\src\mms\iso_presentation" /I ".\src\mms\iso_client" /I ".\src\mms\iso_mms\asn1c" /I ".\src\mms\iso_server" /I ".\src\mms\iso_mms\client" /I ".\src\mms_mapping" /I ".\src\api" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /FD /GZ /c
 # SUBTRACT CPP /YX
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
