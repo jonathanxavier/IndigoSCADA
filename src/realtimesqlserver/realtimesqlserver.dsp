@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /I "$(QTDIR)\include" /I "$(QTDIR)\mkspecs\win32-msvc" /I "." /I "..\fastdb\inc" /I "..\dispatcher\client" /I "..\dispatcher\server" /I "..\trace" /I "..\utilities" /D "_CONSOLE" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "QT_THREAD_SUPPORT" /D "USE_LOCALE_SETTINGS" /D "SECURE_SERVER" /D "QT_DLL" /D "QT_H_CPP" /YX /FD /c
+# ADD CPP /nologo /MD /W3 /GX /O2 /I "$(QTDIR)\include" /I "$(QTDIR)\mkspecs\win32-msvc" /I "." /I "..\fastdb\inc" /I "..\dispatcher\client" /I "..\dispatcher\server" /I "..\trace" /I "..\utilities" /D "_CONSOLE" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "QT_THREAD_SUPPORT" /D "USE_LOCALE_SETTINGS" /D "SECURE_SERVER" /D "QT_DLL" /D "QT_H_CPP" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x410 /d "NDEBUG"
@@ -53,8 +53,8 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386
-# ADD LINK32 advapi32.lib user32.lib snmpapi.lib utilities.lib wsock32.lib realtimedbase.lib qt-mt3.lib /nologo /subsystem:console /pdb:"Release/rtsqlserver.pdb" /debug /machine:I386 /out:"C:\scada\bin/rtsqlserver.exe" /libpath:"$(QTDIR)\lib" /libpath:"c:\scada\lib"
-# SUBTRACT LINK32 /pdb:none
+# ADD LINK32 advapi32.lib user32.lib snmpapi.lib utilities.lib wsock32.lib realtimedbase.lib qt-mt3.lib /nologo /subsystem:console /pdb:"Release/rtsqlserver.pdb" /machine:I386 /out:"C:\scada\bin/rtsqlserver.exe" /libpath:"$(QTDIR)\lib" /libpath:"c:\scada\lib"
+# SUBTRACT LINK32 /pdb:none /debug
 
 !ELSEIF  "$(CFG)" == "realtimesqlserver - Win32 Debug"
 
@@ -70,7 +70,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /GX /Zi /Od /I "$(QTDIR)\mkspecs\win32-msvc" /I "." /I "..\fastdb\inc" /I "..\trace" /I "..\utilities" /I "$(QTDIR)\include" /D "_CONSOLE" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "QT_THREAD_SUPPORT" /D "USE_LOCALE_SETTINGS" /D "SECURE_SERVER" /D "QT_DLL" /D "QT_H_CPP" /c
+# ADD CPP /nologo /MDd /W3 /GX /Zi /Od /I "$(QTDIR)\mkspecs\win32-msvc" /I "." /I "..\fastdb\inc" /I "..\trace" /I "..\utilities" /I "$(QTDIR)\include" /D "_CONSOLE" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "QT_THREAD_SUPPORT" /D "USE_LOCALE_SETTINGS" /D "SECURE_SERVER" /D "QT_DLL" /D "QT_H_CPP" /c
 # ADD BASE RSC /l 0x410 /d "_DEBUG"
 # ADD RSC /l 0x410 /d "_DEBUG"
 BSC32=bscmake.exe
