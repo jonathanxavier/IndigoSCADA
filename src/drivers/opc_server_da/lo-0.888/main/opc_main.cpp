@@ -773,7 +773,8 @@ void poll_device(void)
     LeaveCriticalSection(&lk_values);
   }
   
-  Sleep(1000);
+  //Sleep(1000);
+  Sleep(10000);
 
 }
 
