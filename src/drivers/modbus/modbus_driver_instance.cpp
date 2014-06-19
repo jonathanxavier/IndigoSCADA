@@ -238,11 +238,7 @@ void Modbus_driver_Instance::QueryResponse(QObject *p, const QString &c, int id,
 			if(GetConfigureDb()->GetNumberResults() > 0)
 			{
 				// 
-				#ifdef DEPRECATED_MODBUS_MASTER_CONFIG
-				QString IOACommand = UndoEscapeSQLText(GetConfigureDb()->GetString("DVAL"));
-				#else
 				int IOACommand = GetConfigureDb()->GetInt("IOA");
-				#endif
 				
 				double command_value = 0.0;
 
@@ -250,6 +246,14 @@ void Modbus_driver_Instance::QueryResponse(QObject *p, const QString &c, int id,
 				{
 					command_value = atof((const char*)t.Data1);
 				}
+
+				QString cmd_time_stamp = t.Data3;
+
+				__int64 epoch_in_millisec = _atoi64((const char*)cmd_time_stamp);
+
+				struct cp56time2a iec_cmd_time;
+				
+				epoch_to_cp56time2a(&iec_cmd_time, epoch_in_millisec);
 
 				printf("Command from %s, IOA = %d, value = %lf\n", (const char*)t.Data2, IOACommand, command_value);
 
@@ -259,10 +263,8 @@ void Modbus_driver_Instance::QueryResponse(QObject *p, const QString &c, int id,
 				item_to_send.iec_type = C_SE_TC_1;
 				item_to_send.iec_obj.ioa = IOACommand;
 				item_to_send.iec_obj.o.type63.sv = (float)command_value;
-
-				struct cp56time2a actual_time;
-				get_utc_host_time(&actual_time);
-				item_to_send.iec_obj.o.type63.time = actual_time;
+				
+				item_to_send.iec_obj.o.type63.time = iec_cmd_time;
 
 				item_to_send.msg_id = msg_sent_in_control_direction++;
 				item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
@@ -885,22 +887,29 @@ void Modbus_driver_Instance::Command(const QString & name, BYTE cmd, LPVOID lpPa
 {
 	IT_IT("Modbus_driver_Instance::Command");
 
-	dispatcher_extra_params* params = (dispatcher_extra_params *)lpPa;
+	if(pConnect)
+	{
+		dispatcher_extra_params* params = (dispatcher_extra_params *)lpPa;
 
-	QString sample_point_name = QString(params->string2);
+		QString sample_point_name = QString(params->string2);
 
-	IT_COMMENT3("Received command for instance %s, sample point: %s, value: %lf", (const char*)name, (const char*)sample_point_name, (params->res[0]).value);
+		IT_COMMENT3("Received command for instance %s, sample point: %s, value: %lf", (const char*)name, (const char*)sample_point_name, params->value);
 
-	#ifdef DEPRECATED_MODBUS_CONFIG
-	QString pc = "select * from PROPS where IKEY='" + sample_point_name + "';"; 
-	#else
-	QString pc = "select * from TAGS where NAME='" + sample_point_name + "';";
-	#endif
+		QString pc = "select * from TAGS where NAME='" + sample_point_name + "';";
 
-	QString value_for_command;
-	value_for_command.sprintf("%lf", (params->res[0]).value);
-	// 
-	GetConfigureDb()->DoExec(this, pc, tGetIOAfromSamplePointName, value_for_command, sample_point_name);
+		QString value_for_command;
+		value_for_command.sprintf("%lf", params->value);
+
+		/////////////////////////////////command time stamp/////////////////////////////////////////////////
+		__int64 command_arrive_time_in_ms = Epoch_in_millisec_from_cp56time2a(&(params->time_stamp));
+
+		char buffer[20];
+		_i64toa(command_arrive_time_in_ms, buffer, 10);
+		QString cmd_epoch_in_ms = QString(buffer);
+		////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		GetConfigureDb()->DoExec(this, pc, tGetIOAfromSamplePointName, value_for_command, sample_point_name, cmd_epoch_in_ms);
+	}
 }
 
 
@@ -1076,4 +1085,30 @@ void iec_call_exit_handler(int line, char* file, char* reason)
 	ExitProcess(0);
 
 	IT_EXIT;
+}
+
+void Modbus_driver_Instance::epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch_in_millisec)
+{
+	struct tm	*ptm;
+	int ms = (int)(epoch_in_millisec%1000);
+	time_t seconds;
+	
+	memset(time, 0x00,sizeof(cp56time2a));
+	seconds = (long)(epoch_in_millisec/1000);
+	ptm = localtime(&seconds);
+		
+    if(ptm)
+	{
+		time->hour = ptm->tm_hour;					//<0.23>
+		time->min = ptm->tm_min;					//<0..59>
+		time->msec = ptm->tm_sec*1000 + ms; //<0.. 59999>
+		time->mday = ptm->tm_mday; //<1..31>
+		time->wday = (ptm->tm_wday == 0) ? ptm->tm_wday + 7 : ptm->tm_wday; //<1..7>
+		time->month = ptm->tm_mon + 1; //<1..12>
+		time->year = ptm->tm_year - 100; //<0.99>
+		time->iv = 0; //<0..1> Invalid: <0> is valid, <1> is invalid
+		time->su = (u_char)ptm->tm_isdst; //<0..1> SUmmer time: <0> is standard time, <1> is summer time
+	}
+
+    return;
 }

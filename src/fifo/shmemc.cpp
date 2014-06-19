@@ -34,14 +34,9 @@ SHMEM_DLL_ENTRY void* shmem_realloc(shmem_h hnd, void* ptr, size_t size)
     return ((shared_memory*)hnd)->reallocate(ptr, size);
 }
 
-SHMEM_DLL_ENTRY void shmem_free(void* ptr)
+SHMEM_DLL_ENTRY void shmem_free(shmem_h hnd, void* ptr)
 {
-    shared_memory* shmem = shared_memory::find_storage(ptr);
-    if (shmem != NULL) { 
-        shmem->free(ptr);
-    } else { 
-        free(ptr);
-    }    
+	((shared_memory*)hnd)->deallocate(ptr);
 }
 
 SHMEM_DLL_ENTRY shmem_status_t shmem_close(shmem_h hnd)

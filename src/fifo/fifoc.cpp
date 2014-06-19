@@ -12,7 +12,7 @@
 #include "fifo.h"
 #include "fifoc.h"
 
-SHMEM_DLL_ENTRY fifo_h fifo_open(char const* name, size_t max_size, p_call_exit_handler f_log_arg)
+FIFO_DLL_ENTRY fifo_h fifo_open(char const* name, size_t max_size, p_call_exit_handler f_log_arg)
 {
     fifo_obj* fifo = new fifo_obj();
 
@@ -30,7 +30,7 @@ SHMEM_DLL_ENTRY fifo_h fifo_open(char const* name, size_t max_size, p_call_exit_
     return NULL;
 }
         
-SHMEM_DLL_ENTRY void fifo_put(fifo_h hnd, char* message, int length)
+FIFO_DLL_ENTRY void fifo_put(fifo_h hnd, char* message, int length)
 {
     if(hnd)
     {
@@ -38,7 +38,7 @@ SHMEM_DLL_ENTRY void fifo_put(fifo_h hnd, char* message, int length)
     }
 }
 
-SHMEM_DLL_ENTRY int fifo_get(fifo_h hnd, char* buf, int buf_size, unsigned msec)
+FIFO_DLL_ENTRY int fifo_get(fifo_h hnd, char* buf, int buf_size, unsigned msec)
 {
     if(hnd)
     {
@@ -50,7 +50,7 @@ SHMEM_DLL_ENTRY int fifo_get(fifo_h hnd, char* buf, int buf_size, unsigned msec)
     }
 }
 
-SHMEM_DLL_ENTRY void fifo_close(fifo_h hnd)
+FIFO_DLL_ENTRY void fifo_close(fifo_h hnd)
 {
     if(hnd)
     {

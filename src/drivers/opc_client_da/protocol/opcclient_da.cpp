@@ -249,7 +249,7 @@ int Opc_client_da_imp::Async2Update()
 
 		gl_timeout_connection_with_parent++;
 
-		if(gl_timeout_connection_with_parent > 1000*20/(int)g_dwSleepInLoop)
+		if(gl_timeout_connection_with_parent > 60)
 		{
 			break; //exit loop for timeout of connection with parent
 		}

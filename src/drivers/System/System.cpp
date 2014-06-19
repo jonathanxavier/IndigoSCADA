@@ -441,7 +441,7 @@ void SystemInstance::ReceivedNotify(int ntf, const char * data)
 		case NotificationEvent::UI_EXE_DATA:
 		{
 			dispatcher_extra_params* params = (dispatcher_extra_params *) data;
-			ui_mem_data = (params->res[0]).value;
+			ui_mem_data = params->value;
 		}
 		break;
 		default:

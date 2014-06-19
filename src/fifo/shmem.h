@@ -15,13 +15,13 @@
 #include <string.h>
 #include <assert.h>
 
-#if defined(BUILDING_DLL)
-    #define SHMEM_DLL_ENTRY __declspec( dllexport )
-#elif defined(USING_DLL)
-    #define SHMEM_DLL_ENTRY __declspec( dllimport )
-#else
+//#if defined(BUILDING_DLL)
+//    #define SHMEM_DLL_ENTRY __declspec( dllexport )
+//#elif defined(USING_DLL)
+//    #define SHMEM_DLL_ENTRY __declspec( dllimport )
+//#else
     #define SHMEM_DLL_ENTRY
-#endif
+//#endif
 
 #ifdef _WIN32
 #include <windows.h>
@@ -35,21 +35,18 @@ typedef void (*p_call_exit_handler)(int line, char* file, char* reason);
 extern p_call_exit_handler global_func_log;
 
 #ifdef USE_BASED_POINTERS
-//extern SHMEM_DLL_ENTRY void* shared_memory_base_pointer;
-extern void* shared_memory_base_pointer;
+extern SHMEM_DLL_ENTRY void* shared_memory_base_pointer;
 #define REF(type) type __based(shared_memory_base_pointer)* 
 #else
 #define REF(type) type*
 #endif
 
-//class SHMEM_DLL_ENTRY shared_memory {
-class shared_memory {
+class SHMEM_DLL_ENTRY shared_memory {
   public:
     enum lck_t { lck_shared, lck_exclusive };
     enum open_mode { read_only, read_write };
     
-    //class SHMEM_DLL_ENTRY lock_descriptor { 
-	class lock_descriptor { 
+    class SHMEM_DLL_ENTRY lock_descriptor { 
 		friend class shared_memory;
 		  public:
 		const lck_t mode;
@@ -66,11 +63,6 @@ class shared_memory {
 	timeout_expired = -1,
     };
     //
-    // Find storage containing specified object
-    //
-    static shared_memory* find_storage(void* obj);
-
-    //
     // Lock stotorage either in shared either in exclusive mode.
     // Several processes can lock storage in shared mode, while only
     // one in exclusive. Parameter "msec" specifies timeout for 
@@ -85,18 +77,9 @@ class shared_memory {
     void*  reallocate(void* ptr, size_t size, bool initialize_by_zero = true);
     void   free(void* ptr);
 
-    // Find storage containing specified object and free it
-    static void deallocate(void* obj) { 
-		shared_memory* shmem = find_storage(obj);
-		//assert(shmem != NULL);
-
-		if(!(shmem != NULL))
-			global_func_log(__LINE__,__FILE__, NULL);
-
-		if(shmem)
-		{
-			shmem->free(obj);
-		}
+    void deallocate(void* obj) 
+	{ 
+		free(obj);
     }
 
     status open(const char* file_name, const char* shared_name,
@@ -115,8 +98,6 @@ class shared_memory {
     shared_memory();
 
   protected:
-    shared_memory* next; 
-    static shared_memory* chain; // L1-list of opened shared memory section
     
     struct allocation_block {
 	// Offsets to next and previous object. If objects is not free
@@ -195,8 +176,7 @@ class shared_memory {
 //
 // Convinient locking mechanism, based on C++ local objects
 //
-//class SHMEM_DLL_ENTRY exclusive_lock : shared_memory::lock_descriptor {
-class exclusive_lock : shared_memory::lock_descriptor {
+class SHMEM_DLL_ENTRY exclusive_lock : shared_memory::lock_descriptor {
   protected:
     shared_memory& shmem;
   public:
@@ -244,8 +224,7 @@ class shared_lock : shared_memory::lock_descriptor {
 // System independent indetrface for synchronization primitives
 //
 
-//class SHMEM_DLL_ENTRY semaphore { // classical sempahore
-class semaphore { // classical sempahore
+class SHMEM_DLL_ENTRY semaphore { // classical sempahore
   public:    
     bool wait(unsigned msec = INFINITE);
     void signal(unsigned inc = 1);
@@ -260,8 +239,7 @@ class semaphore { // classical sempahore
 #endif
 };
 
-//class SHMEM_DLL_ENTRY event { // event with manual reset
-class event { // event with manual reset
+class SHMEM_DLL_ENTRY event { // event with manual reset
   public:    
     bool wait(unsigned msec = INFINITE);
     void signal();

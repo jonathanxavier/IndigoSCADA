@@ -16,7 +16,7 @@
 #include "dbase.h"
 #include "IndentedTrace.h" //APA added
 
-#define EMPTY_DATABASE "Empty_database"
+#define DB_NOT_CONNECTED "Database_not_connected"
 
 class Giga_Thread;
 class QSGigabase  : public QSDatabase

@@ -60,12 +60,16 @@ void Dnp3driverCommand::QueryResponse (QObject *p, const QString &c, int id, QOb
 
 				memset(parametri, 0, sizeof(dispatcher_extra_params));
 							
-				(params->res[0]).value = atof((const char*)Value->text());
+				params->value = atof((const char*)Value->text());
 				
 				QString unit_name = GetConfigureDb()->GetString("UNIT");
 				strcpy(params->string1, (const char *)unit_name); //driver instance
 				strcpy(params->string2, (const char *)samplePointName);
 				strcpy(params->string3, (const char *)Value->text()); //For writing the string
+
+				struct cp56time2a actual_time;
+				get_utc_host_time(&actual_time);
+				params->time_stamp = actual_time;
 				
 				//Generate IEC command
 				
@@ -79,4 +83,29 @@ void Dnp3driverCommand::QueryResponse (QObject *p, const QString &c, int id, QOb
 		break;
 	};
 };
+
+#include <time.h>
+#include <sys/timeb.h>
+
+void Dnp3driverCommand::get_utc_host_time(struct cp56time2a* time)
+{
+	struct timeb tb;
+	struct tm	*ptm;
+
+    ftime (&tb);
+	ptm = gmtime(&tb.time);
+		
+	time->hour = ptm->tm_hour;					//<0..23>
+	time->min = ptm->tm_min;					//<0..59>
+	time->msec = ptm->tm_sec*1000 + tb.millitm; //<0..59999>
+	time->mday = ptm->tm_mday; //<1..31>
+	time->wday = (ptm->tm_wday == 0) ? ptm->tm_wday + 7 : ptm->tm_wday; //<1..7>
+	time->month = ptm->tm_mon + 1; //<1..12>
+	time->year = ptm->tm_year - 100; //<0..99>
+	time->iv = 0; //<0..1> Invalid: <0> is valid, <1> is invalid
+	time->su = (u_char)tb.dstflag; //<0..1> SUmmer time: <0> is standard time, <1> is summer time
+
+    return;
+}
+
 

@@ -251,7 +251,8 @@ void Monitor::UpdateCurrentValue( const QString &name, SamplePoint &sp)
 	};
 	cmd += ",SEQNO="+QString::number(SequenceNumber);
 	cmd += " where NAME='"+name+"';";
-	CurDb->DoExec(this,cmd,tUpdateDone,name);
+	//CurDb->DoExec(this,cmd,tUpdateDone,name); //apa--- 16-06-2014
+	CurDb->DoExec(this,cmd,tUpdateDone, QString::number(SequenceNumber)); //apa+++ 16-06-2014
 	//
 	sp.fChanged = 0; // mark as not changed
 	//
@@ -1059,9 +1060,12 @@ void Monitor::CurrentQueryResponse (QObject *p,const QString &c, int id, QObject
 	{
 		case tUpdateDone:
 		{
+			#define USE_UPDATE_NOTIFY 1
+			#ifdef USE_UPDATE_NOTIFY
 			QSTransaction &t = CurDb->CurrentTransaction();
 			//broadcast
 			dispatcher->DoExec(NotificationEvent::UPDATE_NOTIFY,(const char*) t.Data1);
+			#endif
 		}
 		break;
 		case tAllUpdated: // post a notification to update alarm and current values

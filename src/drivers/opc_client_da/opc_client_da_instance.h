@@ -1,7 +1,7 @@
 /*
  *                         IndigoSCADA
  *
- *   This software and documentation are Copyright 2002 to 2009 Enscada 
+ *   This software and documentation are Copyright 2002 to 2014 Enscada 
  *   Limited and its licensees. All rights reserved. See file:
  *
  *                     $HOME/LICENSE 
@@ -31,6 +31,8 @@ extern void iec_call_exit_handler(int line, char* file, char* reason);
 #define MAX_FIFO_SIZE 65535
 ////////////////////////////////////////////////////////////////////////
 
+typedef QMap<int, QString> IOANameMap;
+
 class Opc_client_da_DriverThread;
 
 class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance 
@@ -40,7 +42,8 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 	enum
 	{
 		tUnitProperties = 1,tList, tSamplePointProperties, tListUnits,
-		tGetSamplePointNamefromIOA, tGetIOAfromSamplePointName, tSetTAgsParams
+		tGetIOAfromSamplePointName, tSetTAgsParams,
+		tSetSamplePointNamefromIOA
 	};
 	
 	bool fFail;
@@ -52,6 +55,10 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 	int Sp; //Current sample point index under measurement
 	bool InTick; //tick sentinal
 	int OpcItems;
+	int n_rows; //sqlite_rows
+	int m_columns;//sqlite_columns
+	struct local_structItem* Config_db;
+	IOANameMap ioa_name_map;
 	
 	struct  Track
 	{
@@ -90,7 +97,7 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 	unsigned int msg_sent_in_control_direction;
 	//
 	Opc_client_da_Instance(Driver *parent, const QString &name, int instance_id) : 
-	DriverInstance(parent,name),fFail(0), Countdown(1), pConnect(NULL),
+	DriverInstance(parent,name),fFail(0), Countdown(1), pConnect(NULL),Config_db(NULL),
 	State(STATE_RESET),InTick(0),Retry(0),Sp(0),OpcItems(1), Values(NULL),
 	ParentDriver(parent),msg_sent_in_control_direction(0), instanceID(instance_id)
 	{
@@ -101,7 +108,8 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 
 		pTimer = new QTimer(this);
 		connect(pTimer,SIGNAL(timeout()),this,SLOT(Tick()));
-		pTimer->start(1000); // start with a 1 second timer
+		//pTimer->start(1000); // start with a 1 second timer
+		pTimer->start(100); // start with a 100 ms timer
 
 		char fifo_control_name[150];
 		char str_instance_id[20];
@@ -195,6 +203,11 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 		ORTEDomainAppDestroy(domain);
         domain = NULL;
 		///////////////////////////////////Middleware//////////////////////////////////////////////////
+
+		if(Config_db)
+		{
+			free(Config_db);
+		}
 	};
 
 	void Fail(const QString &s)
@@ -229,6 +242,7 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 	void removeTransaction();
 	//////Middleware//////////////////////////////////////
 	void get_utc_host_time(struct cp56time2a* time);
+	void epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch_in_millisec);
 	//////////////////////////////////////////////////////
 	////////////////local fifo////////////////////////////
 	void get_items_from_local_fifo(void);

@@ -248,7 +248,7 @@ Iec101driverConfigurationData::Iec101driverConfigurationData(QWidget *parent, co
 	PollInterval->setMidLineWidth( 0 );
 	PollInterval->QFrame::setMargin( 0 );
 	#endif
-	PollInterval->setRange(0, 5000);
+	PollInterval->setRange(0, 60000);
 	PollInterval->setSteps(1, 0);
 	PollInterval->setPrefix( "" );
 	PollInterval->setSuffix( "" );

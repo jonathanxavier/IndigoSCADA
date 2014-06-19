@@ -38,9 +38,9 @@ class fifo_obj {
 			return shmem.allocate(fixed_size + varying_size - 4);
 		}
 
-		void operator delete(void* p) 
+		void __delete(void* p, shared_memory& shmem) 
 		{
-			shared_memory::deallocate(p);
+			shmem.deallocate(p);
 		}
 
 		void store(char* message, int message_length) 
@@ -67,9 +67,9 @@ class fifo_obj {
 			return shmem.allocate(size);
 		}
 
-		void operator delete(void* p) 
+		void __delete(void* p, shared_memory& shmem) 
 		{
-			shared_memory::deallocate(p);
+			shmem.deallocate(p);
 		}
 
 		header() 
@@ -113,7 +113,7 @@ class fifo_obj {
 			head = head->next;
 			int length = ip->length < buf_size ? ip->length : buf_size;
 			memcpy(buf, ip->buffer, length);
-			delete ip;
+			__delete(ip, shmem);
 			return length;
 		}
     };

@@ -29,12 +29,11 @@ class ReportGenerator;
 class RIntro;
 class HMI_manager;
 
-//typedef QMap<int, class HMI_manager> indexHMI;
-
 #ifdef USE_STD_MAP
 typedef std::map<QString, HMI_manager*, std::less<QString> > HMIDict; // the HMI dictionary 26-11-2012
 #endif
 
+#define USE_STATUS_TAB
 
 class UserFrameWork : public QMainWindow
 {
@@ -43,7 +42,9 @@ class UserFrameWork : public QMainWindow
 	QToolBar       *pToolBar; // the current tool bar
 	QToolBar       *pToolBarLogo; // the current tool bar logo
 	AlarmDisplay   *pAlarms; // the alarms window
+	#ifdef USE_STATUS_TAB
 	StatusDisplay  *pStatus; // the status window
+	#endif	
 	SysMgrFrameWork *pSys;   // system manager framework
 	//
 	unsigned AutoLogoffTime; // number of seconds to wait before forcing a log off
@@ -76,11 +77,6 @@ class UserFrameWork : public QMainWindow
 	QString firmAddress;
 	QString iscadaAddress;
 	/////////////////////////////////////////////////////////
-	//Semaphore interaface
-	#ifdef WIN32
-	DCB Config;
-	HANDLE fd; 
-	#endif
 
 	//Intro widget
 	RIntro*       intro;
@@ -92,6 +88,14 @@ class UserFrameWork : public QMainWindow
 	int MaxRetryReconnectToSpareDispatcher;
 	int MaxRetryReconnectToSpareRealTimeDb;
 	////////////////////////////////////////////////////////////
+
+	int statusBar_state;
+
+	enum{
+	 GREEN_STATE,
+	 RED_STATE,
+	 WHITE_STATE
+	};
 
 	public:
 	UserFrameWork();
@@ -132,7 +136,6 @@ class UserFrameWork : public QMainWindow
 	void printReport(); // print an existing report
 	void batches(); // manage batches
 	void ackAllAlarms(); // acknowledge all alarms
-	void OpenMap();
 	//
 	void QueryResponse (QObject *,const QString &, int, QObject*); //database responses
 	void ReceivedNotify(int, const char *);

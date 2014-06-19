@@ -2306,7 +2306,7 @@ void Giga_Thread::run()
 						{
 							pT = new QStringList;
 							pLastResult->Tuples.insert(0, pT);
-							*pT << QString(EMPTY_DATABASE);
+							*pT << QString(DB_NOT_CONNECTED);
 						}
 					}
 					break;

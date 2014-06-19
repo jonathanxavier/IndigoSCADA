@@ -143,6 +143,7 @@ class RFC1006DRIVERDRV Rfc1006driver_Instance : public DriverInstance
 	bool Connect();					//connect to the DriverThread
 	bool Disconnect();              //disconnect from the DriverThread
 	bool DoExec(SendRecePacket *t);
+	void epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch_in_millisec);
 	bool expect(unsigned int cmd);
 	void removeTransaction();
 

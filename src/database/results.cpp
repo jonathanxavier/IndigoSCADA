@@ -25,12 +25,6 @@ SamplePointDictWrap Results::EnabledPoints; //<------crash on exit of Monitor ap
 QMutex Results::ResultLock; // the results mutex
 //
 
-/* C interface for yacc / lex */
-double LookupCurrentValue(char *name, char *tag)
-{
-	return Results::LookupValue(name,tag);
-}
-
 double get_value_iec_value(IECValue &v)
 {
 	IT_IT("get_value_iec_value");
@@ -499,13 +493,13 @@ void Results::Update(const QString &name, const QString &tag, IECValue &value) /
 	{
 		IT_COMMENT3("update Sample %s tag %s : %lf",(const char *) name,(const char *)tag, get_value_iec_value(value));
 
-		if(mut)
-		{
-			ins_mutex_acquire(mut);
+		//if(mut)
+		//{
+		//	ins_mutex_acquire(mut);
 			//scada_db[(*i).second.db_idx].previous_value = scada_db[(*i).second.db_idx].current_value;
-			scada_db[(*i).second.db_idx].current_value = get_value_iec_value(value);
-			ins_mutex_release(mut);
-		}
+		//	scada_db[(*i).second.db_idx].current_value = get_value_iec_value(value);
+		//	ins_mutex_release(mut);
+		//}
 		//
 		int state = (*i).second.UpdateTag(tag,value, (*i).second.Type); // update the tags
 		int laststate = state; // track exit from alarm condition
@@ -552,6 +546,8 @@ void Results::UpdateEnd(const QString &name)
 		{
 			(*i).second.AlarmEvents = 0; // reset the track
 		};
+
+		/*
 		//
 		// trigger a measure action
 		// 
@@ -585,6 +581,7 @@ void Results::UpdateEnd(const QString &name)
 				(*i).second.alarmtime = QDateTime::currentDateTime();
 			};
 		};
+		*/
 		//
 		//
 		//
@@ -642,32 +639,6 @@ void Results::UpdateEnd(const QString &name)
 		UpdateSamplePointAlarmGroup(name, (*i).second.AlarmState, (*i).second.fAckTriggered); 
 		//
 	}
-};
-/*
-*Function:LookupValue
-*Inputs:sample point name, tag name
-*Outputs:none
-*Returns:tag value or 0 if not found
-*/
-double Results::LookupValue(const char *name, const char *tag)
-{
-	IT_IT("Results::LookupValue");
-	
-	//Lock();//was commented
-	//
-	double ret = 0.0;
-	SamplePointDictWrap::iterator i =  EnabledPoints.find(QString(name));
-	if(!(i == EnabledPoints.end()))
-	{
-		SamplePoint::TagDict::iterator j = (*i).second.Tags.find(tag);
-		if(!(j == (*i).second.Tags.end()))
-		{
-			ret = get_value_iec_value((*j).second.value); // found the value
-		};
-	};
-	//
-	//Unlock(); //was commented
-	return ret;
 };
 
 __int64 Epoch_in_millisec_from_cp56time2a(const struct cp56time2a* time)
