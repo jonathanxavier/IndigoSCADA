@@ -678,6 +678,7 @@ void HMI_manager::UpdateTags()
 		doUpdateTags(s, v, QLCDNumber_dictionary);
 		doUpdateTags(s, v, PLCDNumber_dictionary);
 		doUpdateTags(s, v, SinglePointLed_dictionary);
+		doUpdateTags(s, v, DoublePointLed_dictionary);
 		doUpdateTags(s, v, PSinglePointLed_dictionary);
 		doUpdateTags(s, v, PDoublePointLed_dictionary);
 		doUpdateTags(s, v, PSwitch_dictionary);
