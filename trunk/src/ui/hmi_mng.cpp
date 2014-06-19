@@ -1,7 +1,7 @@
 /*
  *                         IndigoSCADA
  *
- *   This software and documentation are Copyright 2002 to 2012 Enscada 
+ *   This software and documentation are Copyright 2002 to 2014 Enscada 
  *   Limited and its licensees. All rights reserved. See file:
  *
  *                     $HOME/LICENSE 
@@ -58,7 +58,7 @@ void HMI_manager::setInitialValuesAndLimits()
 	{
 		QObjectList *l = dialog_parent->queryList( "PSwitch" );
 
-		QObjectListIt it( *l ); // iterate over the buttons
+		QObjectListIt it( *l ); // iterate
 
 		QObject *obj;
 
@@ -71,6 +71,11 @@ void HMI_manager::setInitialValuesAndLimits()
 			
 			((PSwitch*)obj)->setPSwitchValue(false);
 
+			int idx = name.find('_');
+			name.truncate(idx);
+
+			WidgetDict::value_type pr(name, obj);
+			PSwitch_dictionary.insert(pr); // put in the dictionary
 		}
 
 		delete l; // delete the list, not the objects
@@ -79,7 +84,7 @@ void HMI_manager::setInitialValuesAndLimits()
 	{
 		QObjectList *l = dialog_parent->queryList( "Breaker" );
 
-		QObjectListIt it( *l ); // iterate over the buttons
+		QObjectListIt it( *l ); // iterate
 
 		QObject *obj;
 
@@ -92,6 +97,11 @@ void HMI_manager::setInitialValuesAndLimits()
 			
 			((Breaker*)obj)->setBreakerValue(false);
 
+			int idx = name.find('_');
+			name.truncate(idx);
+
+			WidgetDict::value_type pr(name, obj);
+			Breaker_dictionary.insert(pr); // put in the dictionary
 		}
 
 		delete l; // delete the list, not the objects
@@ -100,7 +110,7 @@ void HMI_manager::setInitialValuesAndLimits()
 	{
 		QObjectList *l = dialog_parent->queryList( "QwtThermo" );
 
-		QObjectListIt it( *l ); // iterate over the buttons
+		QObjectListIt it( *l ); // iterate
 
 		QObject *obj;
 
@@ -113,6 +123,9 @@ void HMI_manager::setInitialValuesAndLimits()
 
 			int idx = name.find('_');
 			name.truncate(idx);
+
+			WidgetDict::value_type pr(name, obj);
+			QwtThermo_dictionary.insert(pr); // put in the dictionary
 			
 			QString widget_type = "QwtThermo";
 
@@ -137,7 +150,7 @@ void HMI_manager::setInitialValuesAndLimits()
 	{
 		QObjectList *l = dialog_parent->queryList( "QLCDNumber" );
 
-		QObjectListIt it( *l ); // iterate over the buttons
+		QObjectListIt it( *l ); // iterate
 
 		QObject *obj;
 
@@ -151,6 +164,12 @@ void HMI_manager::setInitialValuesAndLimits()
 			double val = 0.0;
 
 			((QLCDNumber*)obj)->display(val);
+
+			int idx = name.find('_');
+			name.truncate(idx);
+
+			WidgetDict::value_type pr(name, obj);
+			QLCDNumber_dictionary.insert(pr); // put in the dictionary
 		}
 
 		delete l; // delete the list, not the objects
@@ -159,7 +178,7 @@ void HMI_manager::setInitialValuesAndLimits()
 	{
 		QObjectList *l = dialog_parent->queryList( "PLCDNumber" );
 
-		QObjectListIt it( *l ); // iterate over the buttons
+		QObjectListIt it( *l ); // iterate
 
 		QObject *obj;
 
@@ -173,6 +192,12 @@ void HMI_manager::setInitialValuesAndLimits()
 			double val = 0.0;
 
 			((PLCDNumber*)obj)->display(val);
+
+			int idx = name.find('_');
+			name.truncate(idx);
+
+			WidgetDict::value_type pr(name, obj);
+			PLCDNumber_dictionary.insert(pr); // put in the dictionary
 		}
 
 		delete l; // delete the list, not the objects
@@ -181,7 +206,7 @@ void HMI_manager::setInitialValuesAndLimits()
 	{
 		QObjectList *l = dialog_parent->queryList( "SinglePointLed" );
 
-		QObjectListIt it( *l ); // iterate over the buttons
+		QObjectListIt it( *l ); // iterate
 
 		QObject *obj;
 
@@ -194,6 +219,12 @@ void HMI_manager::setInitialValuesAndLimits()
 
 			((SinglePointLed*)obj)->setColor(Qt::white);
 			((SinglePointLed*)obj)->on();
+
+			int idx = name.find('_');
+			name.truncate(idx);
+
+			WidgetDict::value_type pr(name, obj);
+			SinglePointLed_dictionary.insert(pr); // put in the dictionary
 		}
 
 		delete l; // delete the list, not the objects
@@ -202,7 +233,7 @@ void HMI_manager::setInitialValuesAndLimits()
     {
 		QObjectList *l = dialog_parent->queryList( "DoublePointLed" );
 
-		QObjectListIt it( *l ); // iterate over the buttons
+		QObjectListIt it( *l ); // iterate
 
 		QObject *obj;
 
@@ -215,6 +246,12 @@ void HMI_manager::setInitialValuesAndLimits()
 
 			((DoublePointLed*)obj)->setColor(Qt::white);
 			((DoublePointLed*)obj)->on();
+
+			int idx = name.find('_');
+			name.truncate(idx);
+
+			WidgetDict::value_type pr(name, obj);
+			DoublePointLed_dictionary.insert(pr); // put in the dictionary
 		}
 
 		delete l; // delete the list, not the objects
@@ -236,7 +273,12 @@ void HMI_manager::setInitialValuesAndLimits()
 
 			//By default commands are not enabled
 			((QPushButton*)obj)->setEnabled( FALSE );
-			
+
+			int idx = name.find('_');
+			name.truncate(idx);
+
+			WidgetDict::value_type pr(name, obj);
+			QPushButton_dictionary.insert(pr); // put in the dictionary
 		}
 
 		delete l; // delete the list, not the objects
@@ -245,7 +287,7 @@ void HMI_manager::setInitialValuesAndLimits()
 	{
 		QObjectList *l = dialog_parent->queryList( "PTank" );
 
-		QObjectListIt it( *l ); // iterate over the buttons
+		QObjectListIt it( *l ); // iterate
 
 		QObject *obj;
 
@@ -258,6 +300,9 @@ void HMI_manager::setInitialValuesAndLimits()
 
 			int idx = name.find('_');
 			name.truncate(idx);
+
+			WidgetDict::value_type pr(name, obj);
+			PTank_dictionary.insert(pr); // put in the dictionary
 
 			QString widget_type = "PTank";
 
@@ -278,7 +323,7 @@ void HMI_manager::setInitialValuesAndLimits()
 	{
 		QObjectList *l = dialog_parent->queryList( "PThermometer" );
 
-		QObjectListIt it( *l ); // iterate over the buttons
+		QObjectListIt it( *l ); // iterate
 
 		QObject *obj;
 
@@ -291,6 +336,9 @@ void HMI_manager::setInitialValuesAndLimits()
 
 			int idx = name.find('_');
 			name.truncate(idx);
+
+			WidgetDict::value_type pr(name, obj);
+			PThermometer_dictionary.insert(pr); // put in the dictionary
 
 			QString widget_type = "PThermometer";
 
@@ -311,7 +359,7 @@ void HMI_manager::setInitialValuesAndLimits()
 	{
 		QObjectList *l = dialog_parent->queryList( "PSinglePointLed" );
 
-		QObjectListIt it( *l ); // iterate over the buttons
+		QObjectListIt it( *l ); // iterate
 
 		QObject *obj;
 
@@ -324,6 +372,12 @@ void HMI_manager::setInitialValuesAndLimits()
 
 			((PSinglePointLed*)obj)->on();
 			((PSinglePointLed*)obj)->setOnColor(white);
+
+			int idx = name.find('_');
+			name.truncate(idx);
+
+			WidgetDict::value_type pr(name, obj);
+			PSinglePointLed_dictionary.insert(pr); // put in the dictionary
 		}
 
 		delete l; // delete the list, not the objects
@@ -332,7 +386,7 @@ void HMI_manager::setInitialValuesAndLimits()
 	{
 		QObjectList *l = dialog_parent->queryList( "PDoublePointLed" );
 
-		QObjectListIt it( *l ); // iterate over the buttons
+		QObjectListIt it( *l ); // iterate
 
 		QObject *obj;
 
@@ -345,582 +399,443 @@ void HMI_manager::setInitialValuesAndLimits()
 
 			((PDoublePointLed*)obj)->on();
 			((PDoublePointLed*)obj)->setOnColor(white);
+
+			int idx = name.find('_');
+			name.truncate(idx);
+
+			WidgetDict::value_type pr(name, obj);
+			PDoublePointLed_dictionary.insert(pr); // put in the dictionary
 		}
 
 		delete l; // delete the list, not the objects
 	}
 }
 
-//TODO: put at startup the content of QObjectList in a Map and make tree search
+void HMI_manager::doUpdateTags(QString &s, double &v, WidgetDict &dict)
+{
+	WidgetDict::iterator j =  dict.find(s);
+
+	if(!(j == dict.end()))
+	{
+		QObject *obj = (*j).second;
+
+		if(obj->isA( "QwtThermo" ))
+		{
+			((QwtThermo*)obj)->setValue(v);
+		}
+		else if(obj->isA( "QLCDNumber" ))
+		{
+			((QLCDNumber*)obj)->display(v);
+		}
+		else if(obj->isA( "PLCDNumber" ))
+		{
+			((PLCDNumber*)obj)->display(v);
+		}
+		else if(obj->isA( "SinglePointLed" ))
+		{
+			int i = (int)v;
+
+			switch(i)
+			{
+				case 0:
+				{
+					//Green means state off
+					((SinglePointLed*)obj)->setColor(Qt::green);
+					((SinglePointLed*)obj)->on();
+				}
+				break;
+				case 1:
+				{
+					//	Red means state on
+					((SinglePointLed*)obj)->setColor(Qt::red);
+					((SinglePointLed*)obj)->on();
+				}
+				break;
+				case 2:
+				{
+					//Yellow is not used for Single point
+					((SinglePointLed*)obj)->setColor(Qt::yellow);
+					((SinglePointLed*)obj)->on();
+				}
+				break;
+				case 3:
+				{
+					//Yellow is not used for Single point
+					((SinglePointLed*)obj)->setColor(Qt::yellow);
+					((SinglePointLed*)obj)->on();
+				}
+				break;
+				default:
+					//White means HMI state none or Invalid
+					((SinglePointLed*)obj)->setColor(Qt::white);
+					((SinglePointLed*)obj)->on();
+				break;
+			}
+		}
+		else if(obj->isA( "DoublePointLed" ))
+		{
+			int i = (int)v;
+
+			switch(i)
+			{
+				case 0:
+				{
+					//Yellow means Indeterminate or Intermediate state
+					((DoublePointLed*)obj)->setColor(Qt::yellow);
+					((DoublePointLed*)obj)->on();
+				}
+				break;
+				case 1:
+				{
+					//Green means Determinate state off
+					((DoublePointLed*)obj)->setColor(Qt::green);
+					((DoublePointLed*)obj)->on();
+				}
+				break;
+				case 2:
+				{
+					//Red means Determinate state on
+					((DoublePointLed*)obj)->setColor(Qt::red);
+					((DoublePointLed*)obj)->on();
+				}
+				break;
+				case 3:
+				{
+					//Yellow means Indeterminate state
+					((DoublePointLed*)obj)->setColor(Qt::yellow);
+					((DoublePointLed*)obj)->on();
+				}
+				break;
+				default:
+					//White means HMI state none or Invalid
+					((DoublePointLed*)obj)->setColor(Qt::white);
+					((DoublePointLed*)obj)->on();
+				break;
+			}
+		}
+		else if(obj->isA( "PSinglePointLed" ))
+		{
+			int i = (int)v;
+
+			switch(i)
+			{
+				case 0:
+				{
+					//Green means state off
+					((PSinglePointLed*)obj)->on();
+					((PSinglePointLed*)obj)->setOnColor(green);
+				}
+				break;
+				case 1:
+				{
+					//	Red means state on
+					((PSinglePointLed*)obj)->on();
+					((PSinglePointLed*)obj)->setOnColor(red);
+				}
+				break;
+				case 2:
+				{
+					//Yellow is not used for Single point
+					((PSinglePointLed*)obj)->on();
+					((PSinglePointLed*)obj)->setOnColor(yellow);
+				}
+				break;
+				case 3:
+				{
+					//Yellow is not used for Single point
+					((PSinglePointLed*)obj)->on();
+					((PSinglePointLed*)obj)->setOnColor(yellow);
+				}
+				break;
+				default:
+					//White means HMI state none or Invalid
+					((PSinglePointLed*)obj)->on();
+					((PSinglePointLed*)obj)->setOnColor(white);
+				break;
+			}
+		}
+		else if(obj->isA( "PDoublePointLed" ))
+		{
+			int i = (int)v;
+
+			switch(i)
+			{
+				case 0:
+				{
+					//Yellow means Indeterminate or Intermediate state
+					((PDoublePointLed*)obj)->on();
+					((PDoublePointLed*)obj)->setOnColor(yellow);
+				}
+				break;
+				case 1:
+				{
+					//Green means Determinate state off
+
+					((PDoublePointLed*)obj)->on();
+					((PDoublePointLed*)obj)->setOnColor(green);
+				}
+				break;
+				case 2:
+				{
+					//Red means Determinate state on
+					((PDoublePointLed*)obj)->on();
+					((PDoublePointLed*)obj)->setOnColor(red);
+				}
+				break;
+				case 3:
+				{
+					//Yellow means Indeterminate state								
+					((PDoublePointLed*)obj)->on();
+					((PDoublePointLed*)obj)->setOnColor(yellow);
+				}
+				break;
+				default:
+					//White means HMI state none or Invalid
+					((PDoublePointLed*)obj)->on();
+					((PDoublePointLed*)obj)->setOnColor(white);
+				break;
+			}
+		}
+		else if(obj->isA( "PSwitch" ))
+		{
+			int i = (int)v;
+
+			switch(i)
+			{
+				case 0:
+				{
+					//Green means state off
+					((PSwitch*)obj)->setPSwitchValue(false);
+				}
+				break;
+				case 1:
+				{
+					//	Red means state on
+					((PSwitch*)obj)->setPSwitchValue(true);
+				}
+				break;
+				default:
+					//White means HMI state none or Invalid
+					((PSwitch*)obj)->setPSwitchValueInvalid(true);
+				break;
+			}
+		}
+		else if(obj->isA( "Breaker" ))
+		{
+			int i = (int)v;
+
+			switch(i)
+			{
+				case 0:
+				{
+					//Green means state off
+					((Breaker*)obj)->setBreakerValue(false);
+				}
+				break;
+				case 1:
+				{
+					//	Red means state on
+					((Breaker*)obj)->setBreakerValue(true);
+				}
+				break;
+				default:
+					//White means HMI state none or Invalid
+					((Breaker*)obj)->setBreakerValueInvalid(true);
+				break;
+			}
+		}
+		else if(obj->isA( "PTank" ))
+		{
+			((PTank*)obj)->setValue(v);
+		}
+		else if(obj->isA( "PThermometer" ))
+		{
+			((PThermometer*)obj)->setValue(v);
+		}
+		else
+		{
+			//error
+		}
+	}
+}
 
 void HMI_manager::UpdateTags()
 {
 	//IT_IT("HMI_manager::UpdateTags");
 
-	//Here we have set of records from TAGS_DB
+	//Here we have set of records from TAGS_DB table
 	//
 	int n = GetCurrentDb()->GetNumberResults();
 
 	GetCurrentDb()->GotoBegin();
-
 	//
-	QString lastName = "";
-
 	for(int i = 0; i < n ; i++,GetCurrentDb()->FetchNext())
 	{
 		QString s = GetCurrentDb()->GetString("NAME");
-
-		if(s != lastName)
-		{
-			{
-				QObjectList *l = dialog_parent->queryList( "QwtThermo" );
-
-				QObjectListIt it( *l ); // iterate over the buttons
-
-				QObject *obj;
-
-				while((obj = it.current()) != 0) 
-				{
-					// for each found object...
-					++it;
-
-					QString name = obj->name();
-
-					// e.g. OPCPoint09QwtThermo
-
-					int idx = name.find('_');
-					name.truncate(idx);
-
-					if(name == s)
-					{
-						double v = atof((const char*)(GetCurrentDb()->GetString("VAL")));
-
-						((QwtThermo*)obj)->setValue(v);
-						
-						break; // handle the next record
-					}
-				}
-
-				delete l; // delete the list, not the objects
-			}
-
-			{
-				QObjectList *l = dialog_parent->queryList( "QLCDNumber" );
-
-				QObjectListIt it( *l ); // iterate over the buttons
-
-				QObject *obj;
-
-				while((obj = it.current()) != 0) 
-				{
-					// for each found object...
-					++it;
-
-					QString name = obj->name();
-
-					// e.g. OPCPoint09
-
-					int idx = name.find('_');
-					name.truncate(idx);
-
-					if(name == s)
-					{
-						double v = atof((const char*)(GetCurrentDb()->GetString("VAL")));
-
-						((QLCDNumber*)obj)->display(v);
-						
-						break; // handle the next record
-					}
-				}
-
-				delete l; // delete the list, not the objects
-			}
-
-			{
-				QObjectList *l = dialog_parent->queryList( "PLCDNumber" );
-
-				QObjectListIt it( *l ); // iterate over the buttons
-
-				QObject *obj;
-
-				while((obj = it.current()) != 0) 
-				{
-					// for each found object...
-					++it;
-
-					QString name = obj->name();
-
-					// e.g. OPCPoint09
-
-					int idx = name.find('_');
-					name.truncate(idx);
-
-					if(name == s)
-					{
-						double v = atof((const char*)(GetCurrentDb()->GetString("VAL")));
-
-						((PLCDNumber*)obj)->display(v);
-						
-						break; // handle the next record
-					}
-				}
-
-				delete l; // delete the list, not the objects
-			}
-
-			{
-				QObjectList *l = dialog_parent->queryList( "SinglePointLed" );
-
-				QObjectListIt it( *l ); // iterate over the buttons
-
-				QObject *obj;
-
-				while((obj = it.current()) != 0) 
-				{
-					// for each found object...
-					++it;
-
-					QString name = obj->name();
-
-					// e.g. OPCPoint09
-
-					int idx = name.find('_');
-					name.truncate(idx);
-
-					if(name == s)
-					{
-						double v = atof((const char*)(GetCurrentDb()->GetString("VAL")));
-						
-						int i = (int)v;
-
-						switch(i)
-						{
-							case 0:
-							{
-								//Green means state off
-								((SinglePointLed*)obj)->setColor(Qt::green);
-								((SinglePointLed*)obj)->on();
-							}
-							break;
-							case 1:
-							{
-								//	Red means state on
-								((SinglePointLed*)obj)->setColor(Qt::red);
-								((SinglePointLed*)obj)->on();
-							}
-							break;
-							case 2:
-							{
-								//Yellow is not used for Single point
-								((SinglePointLed*)obj)->setColor(Qt::yellow);
-								((SinglePointLed*)obj)->on();
-							}
-							break;
-							case 3:
-							{
-								//Yellow is not used for Single point
-								((SinglePointLed*)obj)->setColor(Qt::yellow);
-								((SinglePointLed*)obj)->on();
-							}
-							break;
-							default:
-								//White means HMI state none or Invalid
-								((SinglePointLed*)obj)->setColor(Qt::white);
-								((SinglePointLed*)obj)->on();
-							break;
-						}
-						
-						break; // handle the next record
-					}
-				}
-
-				delete l; // delete the list, not the objects
-			}
-
-            {
-				QObjectList *l = dialog_parent->queryList( "DoublePointLed" );
-
-				QObjectListIt it( *l ); // iterate over the buttons
-
-				QObject *obj;
-
-				while((obj = it.current()) != 0) 
-				{
-					// for each found object...
-					++it;
-
-					QString name = obj->name();
-
-					// e.g. IEC104Point
-
-					int idx = name.find('_');
-					name.truncate(idx);
-
-					if(name == s)
-					{
-						double v = atof((const char*)(GetCurrentDb()->GetString("VAL")));
-						
-						int i = (int)v;
-
-						switch(i)
-						{
-							case 0:
-							{
-								//Yellow means Indeterminate or Intermediate state
-								((DoublePointLed*)obj)->setColor(Qt::yellow);
-								((DoublePointLed*)obj)->on();
-							}
-							break;
-							case 1:
-							{
-								//Green means Determinate state off
-								((DoublePointLed*)obj)->setColor(Qt::green);
-								((DoublePointLed*)obj)->on();
-							}
-							break;
-							case 2:
-							{
-								//Red means Determinate state on
-								((DoublePointLed*)obj)->setColor(Qt::red);
-								((DoublePointLed*)obj)->on();
-							}
-							break;
-							case 3:
-							{
-								//Yellow means Indeterminate state
-								((DoublePointLed*)obj)->setColor(Qt::yellow);
-								((DoublePointLed*)obj)->on();
-							}
-							break;
-							default:
-								//White means HMI state none or Invalid
-								((DoublePointLed*)obj)->setColor(Qt::white);
-								((DoublePointLed*)obj)->on();
-							break;
-						}
-						
-						break; // handle the next record
-					}
-				}
-
-				delete l; // delete the list, not the objects
-			}
-
-			{
-				QObjectList *l = dialog_parent->queryList( "PSinglePointLed" );
-
-				QObjectListIt it( *l ); // iterate over the buttons
-
-				QObject *obj;
-
-				while((obj = it.current()) != 0) 
-				{
-					// for each found object...
-					++it;
-
-					QString name = obj->name();
-
-					// e.g. OPCPoint09
-
-					int idx = name.find('_');
-
-					name.truncate(idx);
-
-					///////////////////////////////////////////////////////
-
-					//if(name == s + "PSinglePointLed")
-					if(name == s)
-					{
-						double v = atof((const char*)(GetCurrentDb()->GetString("VAL")));
-						
-						int i = (int)v;
-
-						switch(i)
-						{
-							case 0:
-							{
-								//Green means state off
-								((PSinglePointLed*)obj)->on();
-								((PSinglePointLed*)obj)->setOnColor(green);
-							}
-							break;
-							case 1:
-							{
-								//	Red means state on
-								((PSinglePointLed*)obj)->on();
-								((PSinglePointLed*)obj)->setOnColor(red);
-							}
-							break;
-							case 2:
-							{
-								//Yellow is not used for Single point
-								((PSinglePointLed*)obj)->on();
-								((PSinglePointLed*)obj)->setOnColor(yellow);
-							}
-							break;
-							case 3:
-							{
-								//Yellow is not used for Single point
-								((PSinglePointLed*)obj)->on();
-								((PSinglePointLed*)obj)->setOnColor(yellow);
-							}
-							break;
-							default:
-								//White means HMI state none or Invalid
-								((PSinglePointLed*)obj)->on();
-								((PSinglePointLed*)obj)->setOnColor(white);
-							break;
-						}
-						
-						break; // handle the next record
-					}
-				}
-
-				delete l; // delete the list, not the objects
-			}
-
-			{
-				QObjectList *l = dialog_parent->queryList( "PDoublePointLed" );
-
-				QObjectListIt it( *l ); // iterate over the buttons
-
-				QObject *obj;
-
-				while((obj = it.current()) != 0) 
-				{
-					// for each found object...
-					++it;
-
-					QString name = obj->name();
-
-					// e.g. OPCPoint09
-
-					int idx = name.find('_');
-					name.truncate(idx);
-
-					if(name == s)
-					{
-						double v = atof((const char*)(GetCurrentDb()->GetString("VAL")));
-						
-						int i = (int)v;
-
-						switch(i)
-						{
-							case 0:
-							{
-								//Yellow means Indeterminate or Intermediate state
-								((PDoublePointLed*)obj)->on();
-								((PDoublePointLed*)obj)->setOnColor(yellow);
-							}
-							break;
-							case 1:
-							{
-								//Green means Determinate state off
-
-								((PDoublePointLed*)obj)->on();
-								((PDoublePointLed*)obj)->setOnColor(green);
-							}
-							break;
-							case 2:
-							{
-								//Red means Determinate state on
-								((PDoublePointLed*)obj)->on();
-								((PDoublePointLed*)obj)->setOnColor(red);
-							}
-							break;
-							case 3:
-							{
-								//Yellow means Indeterminate state								
-								((PDoublePointLed*)obj)->on();
-								((PDoublePointLed*)obj)->setOnColor(yellow);
-							}
-							break;
-							default:
-								//White means HMI state none or Invalid
-								((PDoublePointLed*)obj)->on();
-								((PDoublePointLed*)obj)->setOnColor(white);
-							break;
-						}
-						
-						break; // handle the next record
-					}
-				}
-
-				delete l; // delete the list, not the objects
-			}
-			
-			{
-				QObjectList *l = dialog_parent->queryList( "PSwitch" );
-
-				QObjectListIt it( *l ); // iterate over the buttons
-
-				QObject *obj;
-
-				while((obj = it.current()) != 0) 
-				{
-					// for each found object...
-					++it;
-
-					QString name = obj->name();
-
-					// e.g. OPCPoint09
-
-					int idx = name.find('_');
-					name.truncate(idx);
-
-					if(name == s)
-					{
-						double v = atof((const char*)(GetCurrentDb()->GetString("VAL")));
-						
-						int i = (int)v;
-
-						switch(i)
-						{
-							case 0:
-							{
-								//Green means state off
-								((PSwitch*)obj)->setPSwitchValue(false);
-							}
-							break;
-							case 1:
-							{
-								//	Red means state on
-								((PSwitch*)obj)->setPSwitchValue(true);
-							}
-							break;
-							default:
-								//White means HMI state none or Invalid
-								((PSwitch*)obj)->setPSwitchValueInvalid(true);
-							break;
-						}
-						
-						break; // handle the next record
-					}
-				}
-
-				delete l; // delete the list, not the objects
-			}
-
-			{
-				QObjectList *l = dialog_parent->queryList( "Breaker" );
-
-				QObjectListIt it( *l ); // iterate over the buttons
-
-				QObject *obj;
-
-				while((obj = it.current()) != 0) 
-				{
-					// for each found object...
-					++it;
-
-					QString name = obj->name();
-
-					// e.g. OPCPoint09
-
-					int idx = name.find('_');
-					name.truncate(idx);
-
-					if(name == s)
-					{
-						double v = atof((const char*)(GetCurrentDb()->GetString("VAL")));
-						
-						int i = (int)v;
-
-						switch(i)
-						{
-							case 0:
-							{
-								//Green means state off
-								((Breaker*)obj)->setBreakerValue(false);
-							}
-							break;
-							case 1:
-							{
-								//	Red means state on
-								((Breaker*)obj)->setBreakerValue(true);
-							}
-							break;
-							default:
-								//White means HMI state none or Invalid
-								((Breaker*)obj)->setBreakerValueInvalid(true);
-							break;
-						}
-						
-						break; // handle the next record
-					}
-				}
-
-				delete l; // delete the list, not the objects
-			}
-
-			{
-				QObjectList *l = dialog_parent->queryList( "PTank" );
-
-				QObjectListIt it( *l ); // iterate over the buttons
-
-				QObject *obj;
-
-				while((obj = it.current()) != 0) 
-				{
-					// for each found object...
-					++it;
-
-					QString name = obj->name();
-
-					// e.g. OPCPoint09
-
-					int idx = name.find('_');
-					name.truncate(idx);
-
-					if(name == s)
-					{
-						double v = atof((const char*)(GetCurrentDb()->GetString("VAL")));
-
-						((PTank*)obj)->setValue(v);
-						
-						break; // handle the next record
-					}
-				}
-
-				delete l; // delete the list, not the objects
-			}
-
-			{
-				QObjectList *l = dialog_parent->queryList( "PThermometer" );
-
-				QObjectListIt it( *l ); // iterate over the buttons
-
-				QObject *obj;
-
-				while((obj = it.current()) != 0) 
-				{
-					// for each found object...
-					++it;
-
-					QString name = obj->name();
-
-					// e.g. OPCPoint09
-
-					int idx = name.find('_');
-					name.truncate(idx);
-
-					if(name == s)
-					{
-						double v = atof((const char*)(GetCurrentDb()->GetString("VAL")));
-
-						((PThermometer*)obj)->setValue(v);
-						
-						break; // handle the next record
-					}
-				}
-
-				delete l; // delete the list, not the objects
-			}
-
-			lastName = s;
-		}
+		double v = atof((const char*)(GetCurrentDb()->GetString("VAL")));
+
+		doUpdateTags(s, v, QwtThermo_dictionary);
+		doUpdateTags(s, v, QLCDNumber_dictionary);
+		doUpdateTags(s, v, PLCDNumber_dictionary);
+		doUpdateTags(s, v, SinglePointLed_dictionary);
+		doUpdateTags(s, v, PSinglePointLed_dictionary);
+		doUpdateTags(s, v, PDoublePointLed_dictionary);
+		doUpdateTags(s, v, PSwitch_dictionary);
+		doUpdateTags(s, v, Breaker_dictionary);
+		doUpdateTags(s, v, PTank_dictionary);
+		doUpdateTags(s, v, PThermometer_dictionary);
 	}
 };
+
+void HMI_manager::doUpdateSamplePoint(QString &s, int state, int ack_flag, WidgetDict &dict)
+{
+	WidgetDict::iterator j =  dict.find(s);
+
+	if(!(j == dict.end()))
+	{
+		QObject *obj = (*j).second;
+
+		if(obj->isA( "SinglePointLed" ))
+		{
+			if(ack_flag)
+			{
+				((SinglePointLed*)obj)->startFlash();
+			}
+			else
+			{
+				((SinglePointLed*)obj)->stopFlash();
+			}
+
+			if(state == NoLevel)
+			{
+				//White means HMI state none or NO or Invalid
+				((SinglePointLed*)obj)->setColor(Qt::white);
+				((SinglePointLed*)obj)->on(); 
+			}
+
+			if(state == FailureLevel)
+			{ //Blue means Communication driver error state or Invalid
+					((SinglePointLed*)obj)->setColor(Qt::blue);
+					((SinglePointLed*)obj)->on(); 
+			}
+		}
+		else if(obj->isA( "DoublePointLed" ))
+		{
+			if(ack_flag)
+			{
+				((DoublePointLed*)obj)->startFlash();
+			}
+			else
+			{
+				((DoublePointLed*)obj)->stopFlash();
+			}
+
+			if(state == NoLevel)
+			{
+				//White means HMI state none or NO or Invalid
+				((DoublePointLed*)obj)->setColor(Qt::white);
+				((DoublePointLed*)obj)->on(); 
+			}
+
+			if(state == FailureLevel)
+			{	    //Blue means Communication driver error state or Invalid
+					((DoublePointLed*)obj)->setColor(Qt::blue);
+					((DoublePointLed*)obj)->on(); 
+			}
+		}
+		else if(obj->isA( "PSinglePointLed" ))
+		{
+			if(ack_flag)
+			{
+				((PSinglePointLed*)obj)->startFlash();
+			}
+			else
+			{
+				((PSinglePointLed*)obj)->stopFlash();
+			}
+
+			if(state == NoLevel)
+			{
+				//White means HMI state none or NO or Invalid
+				((PSinglePointLed*)obj)->on();
+				((PSinglePointLed*)obj)->setOnColor(white);
+			}
+
+			if(state == FailureLevel)
+			{   //Blue means Communication driver error state or Invalid
+				((PSinglePointLed*)obj)->on();
+				((PSinglePointLed*)obj)->setOnColor(blue);
+			}
+		}
+		else if(obj->isA( "PDoublePointLed" ))
+		{
+			if(ack_flag)
+			{
+				((PDoublePointLed*)obj)->startFlash();
+			}
+			else
+			{
+				((PDoublePointLed*)obj)->stopFlash();
+			}
+
+			if(state == NoLevel)
+			{
+				//White means HMI state none or NO or Invalid
+				((PDoublePointLed*)obj)->on();
+				((PDoublePointLed*)obj)->setOnColor(white);
+			}
+
+			if(state == FailureLevel)
+			{   //Blue means Communication driver error state or Invalid
+				((PDoublePointLed*)obj)->on();
+				((PDoublePointLed*)obj)->setOnColor(blue);
+			}
+		}
+		else if(obj->isA( "PSwitch" ))
+		{
+			/*
+			if(ack_flag)
+			{
+				((PSwitch*)obj)->startFlash();
+			}
+			else
+			{
+				((PSwitch*)obj)->stopFlash();
+			}
+			*/
+
+			if(state == NoLevel)
+			{
+				//White means HMI state none or NO or Invalid
+				((PSwitch*)obj)->setPSwitchValueInvalid(false);
+			}
+
+			if(state == FailureLevel)
+			{   //Blue means Communication driver error state or Invalid
+				((PSwitch*)obj)->setPSwitchValueInvalid(false);
+			}
+		}
+		else if(obj->isA( "Breaker" ))
+		{
+			if(state == NoLevel)
+			{
+				//White means HMI state none or NO or Invalid
+				((Breaker*)obj)->setBreakerValueInvalid(false);
+			}
+
+			if(state == FailureLevel)
+			{   //Blue means Communication driver error state or Invalid
+				((Breaker*)obj)->setBreakerValueInvalid(false);
+			}
+		}
+		else
+		{
+			//error
+		}
+	}
+}
+
+
 
 /*
 *Function: Query Response - handle transactions with the current values database
@@ -932,343 +847,31 @@ void HMI_manager::UpdateSamplePoint() // handle updated sample points
 {
 //	IT_IT("HMI_manager::UpdateSamplePoint");
 
-	//Here we have a set of records from CVAL_DB
+	//Here we have a set of records from CVAL_DB table
 	
 	int n = GetCurrentDb()->GetNumberResults();
 
 	GetCurrentDb()->GotoBegin();
-
 	//
-	QString lastName = "";
-
 	for(int i = 0; i < n ; i++,GetCurrentDb()->FetchNext())
 	{
 		QString s = GetCurrentDb()->GetString("NAME");
 
-		if(s != lastName)
-		{
-			{
-				QObjectList *l = dialog_parent->queryList( "SinglePointLed" );
+		int state = GetCurrentDb()->GetInt("STATE");
 
-				QObjectListIt it( *l ); // iterate over the buttons
+		int ack_flag = GetCurrentDb()->GetInt("ACKFLAG");
 
-				QObject *obj;
+		doUpdateSamplePoint(s, state, ack_flag, SinglePointLed_dictionary);
 
-				while((obj = it.current()) != 0) 
-				{
-					// for each found object...
-					++it;
+		doUpdateSamplePoint(s, state, ack_flag, DoublePointLed_dictionary);
+		
+		doUpdateSamplePoint(s, state, ack_flag, PSinglePointLed_dictionary);
+			
+		doUpdateSamplePoint(s, state, ack_flag, PDoublePointLed_dictionary);
 
-					QString name = obj->name();
+		doUpdateSamplePoint(s, state, ack_flag, PSwitch_dictionary);
 
-					// e.g. OPCPoint09
-
-					int idx = name.find('_');
-					name.truncate(idx);
-
-					if(name == s)
-					{
-						int state = GetCurrentDb()->GetInt("STATE");
-
-						int ack_flag = GetCurrentDb()->GetInt("ACKFLAG");
-
-						if(ack_flag)
-						{
-							((SinglePointLed*)obj)->startFlash();
-						}
-						else
-						{
-							((SinglePointLed*)obj)->stopFlash();
-						}
-
-						if(state == NoLevel)
-						{
-							//White means HMI state none or NO or Invalid
-							((SinglePointLed*)obj)->setColor(Qt::white);
-							((SinglePointLed*)obj)->on(); 
-						}
-
-						if(state == FailureLevel)
-						{ //Blue means Communication driver error state or Invalid
-								((SinglePointLed*)obj)->setColor(Qt::blue);
-								((SinglePointLed*)obj)->on(); 
-						}
-						
-						break; // handle the next record
-					}
-				}
-
-				delete l; // delete the list, not the objects
-			}
-
-            {
-				QObjectList *l = dialog_parent->queryList( "DoublePointLed" );
-
-				QObjectListIt it( *l ); // iterate over the buttons
-
-				QObject *obj;
-
-				while((obj = it.current()) != 0) 
-				{
-					// for each found object...
-					++it;
-
-					QString name = obj->name();
-
-					// e.g. IEC104Point
-
-					int idx = name.find('_');
-					name.truncate(idx);
-
-					if(name == s)
-					{
-						int state = GetCurrentDb()->GetInt("STATE");
-
-						int ack_flag = GetCurrentDb()->GetInt("ACKFLAG");
-
-						if(ack_flag)
-						{
-							((DoublePointLed*)obj)->startFlash();
-						}
-						else
-						{
-							((DoublePointLed*)obj)->stopFlash();
-						}
-
-						if(state == NoLevel)
-						{
-							//White means HMI state none or NO or Invalid
-							((DoublePointLed*)obj)->setColor(Qt::white);
-							((DoublePointLed*)obj)->on(); 
-						}
-
-						if(state == FailureLevel)
-						{	    //Blue means Communication driver error state or Invalid
-								((DoublePointLed*)obj)->setColor(Qt::blue);
-								((DoublePointLed*)obj)->on(); 
-						}
-						
-						break; // handle the next record
-					}
-				}
-
-				delete l; // delete the list, not the objects
-			}
-
-			{
-				QObjectList *l = dialog_parent->queryList( "PSinglePointLed" );
-
-				QObjectListIt it( *l ); // iterate over the buttons
-
-				QObject *obj;
-
-				while((obj = it.current()) != 0) 
-				{
-					// for each found object...
-					++it;
-
-					QString name = obj->name();
-
-					// e.g. OPCPoint09
-
-					int idx = name.find('_');
-					name.truncate(idx);
-
-					if(name == s)
-					{
-						int state = GetCurrentDb()->GetInt("STATE");
-
-						int ack_flag = GetCurrentDb()->GetInt("ACKFLAG");
-						
-						if(ack_flag)
-						{
-							((PSinglePointLed*)obj)->startFlash();
-						}
-						else
-						{
-							((PSinglePointLed*)obj)->stopFlash();
-						}
-
-						if(state == NoLevel)
-						{
-							//White means HMI state none or NO or Invalid
-							((PSinglePointLed*)obj)->on();
-							((PSinglePointLed*)obj)->setOnColor(white);
-						}
-
-						if(state == FailureLevel)
-						{   //Blue means Communication driver error state or Invalid
-							((PSinglePointLed*)obj)->on();
-							((PSinglePointLed*)obj)->setOnColor(blue);
-						}
-						
-						break; // handle the next record
-					}
-				}
-
-				delete l; // delete the list, not the objects
-			}
-
-			{
-				QObjectList *l = dialog_parent->queryList( "PDoublePointLed" );
-
-				QObjectListIt it( *l ); // iterate over the buttons
-
-				QObject *obj;
-
-				while((obj = it.current()) != 0) 
-				{
-					// for each found object...
-					++it;
-
-					QString name = obj->name();
-
-					// e.g. IEC104Point
-
-					int idx = name.find('_');
-					name.truncate(idx);
-
-					if(name == s)
-					{
-						int state = GetCurrentDb()->GetInt("STATE");
-
-						int ack_flag = GetCurrentDb()->GetInt("ACKFLAG");
-						
-						if(ack_flag)
-						{
-							((PDoublePointLed*)obj)->startFlash();
-						}
-						else
-						{
-							((PDoublePointLed*)obj)->stopFlash();
-						}
-
-						if(state == NoLevel)
-						{
-							//White means HMI state none or NO or Invalid
-							((PDoublePointLed*)obj)->on();
-							((PDoublePointLed*)obj)->setOnColor(white);
-						}
-
-						if(state == FailureLevel)
-						{   //Blue means Communication driver error state or Invalid
-							((PDoublePointLed*)obj)->on();
-							((PDoublePointLed*)obj)->setOnColor(blue);
-						}
-						
-						break; // handle the next record
-					}
-				}
-
-				delete l; // delete the list, not the objects
-			}
-
-			{
-				QObjectList *l = dialog_parent->queryList( "PSwitch" );
-
-				QObjectListIt it( *l ); // iterate over the buttons
-
-				QObject *obj;
-
-				while((obj = it.current()) != 0) 
-				{
-					// for each found object...
-					++it;
-
-					QString name = obj->name();
-
-					int idx = name.find('_');
-					name.truncate(idx);
-
-					if(name == s)
-					{
-						int state = GetCurrentDb()->GetInt("STATE");
-
-						int ack_flag = GetCurrentDb()->GetInt("ACKFLAG");
-
-						/*
-						if(ack_flag)
-						{
-							((PSwitch*)obj)->startFlash();
-						}
-						else
-						{
-							((PSwitch*)obj)->stopFlash();
-						}
-						*/
-
-						if(state == NoLevel)
-						{
-							//White means HMI state none or NO or Invalid
-							((PSwitch*)obj)->setPSwitchValueInvalid(false);
-						}
-
-						if(state == FailureLevel)
-						{   //Blue means Communication driver error state or Invalid
-							((PSwitch*)obj)->setPSwitchValueInvalid(false);
-						}
-						
-						break; // handle the next record
-					}
-				}
-
-				delete l; // delete the list, not the objects
-			}
-
-			{
-				QObjectList *l = dialog_parent->queryList( "Breaker" );
-
-				QObjectListIt it( *l ); // iterate over the buttons
-
-				QObject *obj;
-
-				while((obj = it.current()) != 0) 
-				{
-					// for each found object...
-					++it;
-
-					QString name = obj->name();
-
-					int idx = name.find('_');
-					name.truncate(idx);
-
-					if(name == s)
-					{
-						int state = GetCurrentDb()->GetInt("STATE");
-
-						int ack_flag = GetCurrentDb()->GetInt("ACKFLAG");
-
-						/*
-						if(ack_flag)
-						{
-							((PSwitch*)obj)->startFlash();
-						}
-						else
-						{
-							((PSwitch*)obj)->stopFlash();
-						}
-						*/
-
-						if(state == NoLevel)
-						{
-							//White means HMI state none or NO or Invalid
-							((Breaker*)obj)->setBreakerValueInvalid(false);
-						}
-
-						if(state == FailureLevel)
-						{   //Blue means Communication driver error state or Invalid
-							((Breaker*)obj)->setBreakerValueInvalid(false);
-						}
-						
-						break; // handle the next record
-					}
-				}
-
-				delete l; // delete the list, not the objects
-			}
-
-			lastName = s;
-		}
+		doUpdateSamplePoint(s, state, ack_flag, Breaker_dictionary);
 	}
 };
 
@@ -1369,7 +972,7 @@ void HMI_manager::RightClicked(QString &class_name, QString &widget_name) // sho
 	{
 		QObjectList *l = dialog_parent->queryList("SinglePointLed");
 
-		QObjectListIt it( *l ); // iterate over the switches
+		QObjectListIt it( *l ); // iterate
 
 		QObject *obj;
 
@@ -1405,7 +1008,7 @@ void HMI_manager::RightClicked(QString &class_name, QString &widget_name) // sho
 	{
 		QObjectList *l = dialog_parent->queryList("DoublePointLed");
 
-		QObjectListIt it( *l ); // iterate over the switches
+		QObjectListIt it( *l ); // iterate
 
 		QObject *obj;
 
@@ -1475,7 +1078,7 @@ void HMI_manager::RightClicked(QString &class_name, QString &widget_name) // sho
 	{
 		QObjectList *l = dialog_parent->queryList("Breaker");
 
-		QObjectListIt it( *l ); // iterate over the switches
+		QObjectListIt it( *l ); // iterate
 
 		QObject *obj;
 
@@ -1509,7 +1112,7 @@ void HMI_manager::RightClicked(QString &class_name, QString &widget_name) // sho
 	{
 		QObjectList *l = dialog_parent->queryList("PSinglePointLed");
 
-		QObjectListIt it( *l ); // iterate over the switches
+		QObjectListIt it( *l ); // iterate
 
 		QObject *obj;
 
@@ -1545,7 +1148,7 @@ void HMI_manager::RightClicked(QString &class_name, QString &widget_name) // sho
 	{
 		QObjectList *l = dialog_parent->queryList("PDoublePointLed");
 
-		QObjectListIt it( *l ); // iterate over the switches
+		QObjectListIt it( *l ); // iterate
 
 		QObject *obj;
 
@@ -1581,7 +1184,7 @@ void HMI_manager::RightClicked(QString &class_name, QString &widget_name) // sho
 	{
 		QObjectList *l = dialog_parent->queryList("QwtThermo");
 
-		QObjectListIt it( *l ); // iterate over the switches
+		QObjectListIt it( *l ); // iterate
 
 		QObject *obj;
 
@@ -1615,7 +1218,7 @@ void HMI_manager::RightClicked(QString &class_name, QString &widget_name) // sho
 	{
 		QObjectList *l = dialog_parent->queryList("PTank");
 
-		QObjectListIt it( *l ); // iterate over the switches
+		QObjectListIt it( *l ); // iterate
 
 		QObject *obj;
 
@@ -1649,7 +1252,7 @@ void HMI_manager::RightClicked(QString &class_name, QString &widget_name) // sho
 	{
 		QObjectList *l = dialog_parent->queryList("PThermometer");
 
-		QObjectListIt it( *l ); // iterate over the switches
+		QObjectListIt it( *l ); // iterate
 
 		QObject *obj;
 
@@ -1683,7 +1286,7 @@ void HMI_manager::RightClicked(QString &class_name, QString &widget_name) // sho
 	{
 		QObjectList *l = dialog_parent->queryList("PLCDNumber");
 
-		QObjectListIt it( *l ); // iterate over the switches
+		QObjectListIt it( *l ); // iterate
 
 		QObject *obj;
 
@@ -1737,7 +1340,7 @@ void HMI_manager::QueryResponse (QObject *p, const QString &c, int id, QObject*c
 							
 				if(command_value.length() > 0)
 				{
-					(params->res[0]).value = atof((const char*)command_value);
+					params->value = atof((const char*)command_value);
 				}
 				else
 				{
@@ -1749,6 +1352,10 @@ void HMI_manager::QueryResponse (QObject *p, const QString &c, int id, QObject*c
 				strcpy(params->string1, (const char *)unit_name); //driver instance
 				strcpy(params->string2, (const char *)samplePointName);
 				strcpy(params->string3, (const char *)command_value); //For writing the string
+
+				struct cp56time2a actual_time;
+				get_utc_host_time(&actual_time);
+				params->time_stamp = actual_time;
 				
 				//Generate IEC command
 				
@@ -1774,7 +1381,7 @@ void HMI_manager::QueryResponse (QObject *p, const QString &c, int id, QObject*c
 				{
 					QObjectList *l = dialog_parent->queryList(widget_type);
 
-					QObjectListIt it( *l ); // iterate over the buttons
+					QObjectListIt it( *l ); // iterate
 
 					QObject *obj;
 
@@ -1892,7 +1499,7 @@ void HMI_manager::DoButtonCommand()
 		
 		QObjectList *l = dialog_parent->queryList( "QLineEdit" );
 
-		QObjectListIt it( *l ); // iterate over the buttons
+		QObjectListIt it( *l ); // iterate
 
 		QObject *obj;
 
@@ -2040,3 +1647,29 @@ void HMI_manager::ReceivedNotify(int ntf, const char * data)
 		break;
 	}
 };
+
+
+#include <time.h>
+#include <sys/timeb.h>
+
+void HMI_manager::get_utc_host_time(struct cp56time2a* time)
+{
+	struct timeb tb;
+	struct tm	*ptm;
+
+    ftime (&tb);
+	ptm = gmtime(&tb.time);
+		
+	time->hour = ptm->tm_hour;					//<0..23>
+	time->min = ptm->tm_min;					//<0..59>
+	time->msec = ptm->tm_sec*1000 + tb.millitm; //<0..59999>
+	time->mday = ptm->tm_mday; //<1..31>
+	time->wday = (ptm->tm_wday == 0) ? ptm->tm_wday + 7 : ptm->tm_wday; //<1..7>
+	time->month = ptm->tm_mon + 1; //<1..12>
+	time->year = ptm->tm_year - 100; //<0..99>
+	time->iv = 0; //<0..1> Invalid: <0> is valid, <1> is invalid
+	time->su = (u_char)tb.dstflag; //<0..1> SUmmer time: <0> is standard time, <1> is summer time
+
+    return;
+}
+

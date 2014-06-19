@@ -8,7 +8,7 @@ Last generated: Mon May 22 17:14:04 2000
 #include "opc_client_aeCommandData.h"
 
 //NOTA BENE: questa dialog viene caricata
-//dalla dll nel client di IndigoSCADA (ist.exe)
+//dalla dll nel client di IndigoSCADA (ui.exe)
 
 class Opc_client_aeCommand : public Opc_client_aeCommandData
 {
@@ -28,6 +28,7 @@ class Opc_client_aeCommand : public Opc_client_aeCommandData
 	virtual void Help();
 	virtual void OkClicked();
 	void QueryResponse (QObject *, const QString &, int, QObject*); // handles database responses
+	void get_utc_host_time(struct cp56time2a* time);
 };
 #endif // Opc_client_aeCommand_included
 

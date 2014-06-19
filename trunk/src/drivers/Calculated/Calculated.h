@@ -112,6 +112,7 @@ class CALCULATED_API CalculatedInstance : public DriverInstance // the unit inte
 	~CalculatedInstance()
 	{    
 	};
+	void get_utc_host_time(struct cp56time2a* time);
 	public slots:
 	virtual void Start(); // start everything under this driver's control
 	virtual void Stop(); // stop everything under this driver's control

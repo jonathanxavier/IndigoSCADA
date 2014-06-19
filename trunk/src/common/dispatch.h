@@ -83,28 +83,16 @@ struct QSEXPORT NotificationData{
 #define END_WRITE_NOTIF 737
 #define END_WAIT_NOTIF 773
 
-typedef struct IECValueToDispatch // a measured result
-{
-	char tag[30]; // the tag name eg value, 0.5
-	double value; // the value
-}IECValueToDispatch;
+#include "iec104types.h"
 
+//sizeof(dispatcher_extra_params) must be < string1 octects (100) in struct indigoscada_dispatch_message
 typedef struct _dispatcher_extra_params{
-	QObject *Client;
 	char string1[30];
 	char string2[30];
-	char string3[30];
-	char string4[30];
-	IECValueToDispatch res[MAX_NUM_OF_TAGS_FOR_SAMPLE_POINT];
-	int int_val[MAX_NUM_OF_TAGS_FOR_SAMPLE_POINT];
-	DWORD Operation;
+	char string3[20];
+	cp56time2a time_stamp;
+	double value;
 }dispatcher_extra_params;
-
-
-//#define MAKE_NOTIFICATION_COMMAND(cmd, param)      ((DWORD)(((DWORD)((WORD)(param))) << 16) | ((WORD)(cmd)))
-//#define GET_NOTIFICATION_COMMAND(ntf) (WORD)((ntf)&0xFFFF)
-//#define GET_NOTIFICATION_PARAM(ntf)   (WORD)(((ntf) >> 16)&0xFFFF)
-
 
 class QSEXPORT NotificationEvent : public QEvent
 {

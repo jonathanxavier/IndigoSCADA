@@ -13,15 +13,15 @@
 
 #include <stdlib.h>
 
-#ifndef SHMEM_DLL_ENTRY
-    #if defined(BUILDING_DLL)
-        #define SHMEM_DLL_ENTRY __declspec( dllexport )
-    #elif defined(USING_DLL)
-        #define SHMEM_DLL_ENTRY __declspec( dllimport )
-    #else
+//#ifndef SHMEM_DLL_ENTRY
+//    #if defined(BUILDING_DLL)
+//        #define SHMEM_DLL_ENTRY __declspec( dllexport )
+//    #elif defined(USING_DLL)
+//        #define SHMEM_DLL_ENTRY __declspec( dllimport )
+//    #else
         #define SHMEM_DLL_ENTRY
-    #endif
-#endif
+//    #endif
+//#endif
 
 #ifdef __cplusplus
 extern "C" { 
@@ -57,7 +57,7 @@ extern SHMEM_DLL_ENTRY shmem_h shmem_open(char const* file_name, char const* sha
 
 extern SHMEM_DLL_ENTRY void* shmem_malloc(shmem_h hnd, size_t size);
 extern SHMEM_DLL_ENTRY void* shmem_realloc(shmem_h hnd, void* ptr, size_t size);
-extern SHMEM_DLL_ENTRY void  shmem_free(void* ptr);
+extern SHMEM_DLL_ENTRY void shmem_free(shmem_h hnd, void* ptr);
 
 extern SHMEM_DLL_ENTRY shmem_status_t shmem_close(shmem_h hnd);
 extern SHMEM_DLL_ENTRY shmem_status_t shmem_flush(shmem_h hnd);

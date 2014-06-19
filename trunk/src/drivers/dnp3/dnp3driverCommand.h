@@ -8,7 +8,7 @@ Last generated: Mon May 22 17:14:04 2000
 #include "dnp3driverCommandData.h"
 
 //NOTA BENE: questa dialog viene caricata
-//dalla dll nel client di IndigoSCADA (ist.exe)
+//dalla dll nel client di IndigoSCADA (ui.exe)
 
 class Dnp3driverCommand : public Dnp3driverCommandData
 {
@@ -28,6 +28,7 @@ class Dnp3driverCommand : public Dnp3driverCommandData
 	virtual void Help();
 	virtual void OkClicked();
 	void QueryResponse (QObject *, const QString &, int, QObject*); // handles database responses
+	void get_utc_host_time(struct cp56time2a* time);
 };
 #endif // Dnp3driverCommand_included
 

@@ -16,7 +16,7 @@
 #include "dbase.h"
 #include "IndentedTrace.h" //APA added
 
-#define EMPTY_DATABASE "Empty_database"
+#define DB_NOT_CONNECTED "Database_not_connected"
 
 class Fastdb_Thread;
 class QSFastdb  : public QSDatabase

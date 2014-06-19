@@ -552,7 +552,7 @@ void CalculatedInstance::QueryResponse (QObject *p, const QString &c, int id, QO
 
 				memset(parametri, 0, sizeof(dispatcher_extra_params));
 							
-				(params->res[0]).value = p_item->current_value;
+				params->value = p_item->current_value;
 
 				QString unit_name = GetConfigureDb()->GetString("UNIT");
 				
@@ -665,7 +665,7 @@ void CalculatedInstance::Tick()
 
 				memset(parametri, 0, sizeof(dispatcher_extra_params));
 							
-				(params->res[0]).value = p_item->current_value;
+				params->value = p_item->current_value;
 				
 				strcpy(params->string1, "OPC"); //driver instance
 
@@ -680,6 +680,10 @@ void CalculatedInstance::Tick()
 
 				//NEXT instruction NOT used HERE
 				//strcpy(params->string3, (const char *)Value->text()); //For writing the string
+
+				struct cp56time2a actual_time;
+				get_utc_host_time(&actual_time);
+				params->time_stamp = actual_time;
 								
 				GetDispatcher()->DoExec(NotificationEvent::CMD_SEND_COMMAND_TO_UNIT, (char *)parametri, sizeof(dispatcher_extra_params));  //broadcast to all tcp clients
 			}
@@ -689,17 +693,6 @@ void CalculatedInstance::Tick()
 			}
 		}
 	}
-
-	//for(int i = 0; i < nSamplePoints; i++)
-	//{
-	//	ins_mutex_acquire(mut);
-	//	scada_db[i].current_value = LookupCurrentValue(scada_db[i].name, scada_db[i].tag);
-	//	ins_mutex_release(mut);
-
-		//printf("scada_db[%d].name = %s\n", i, scada_db[i].name);
-		//printf("scada_db[%d].tag = %s\n", i, scada_db[i].tag);
-		//printf("scada_db[%d].current_value = %lf\n", i, scada_db[i].current_value);
-	//}
 };
 // ********************************************************************************************************************************
 /*
@@ -737,3 +730,29 @@ extern "C"
 	};
 };
 			
+#include <time.h>
+#include <sys/timeb.h>
+
+void CalculatedInstance::get_utc_host_time(struct cp56time2a* time)
+{
+	struct timeb tb;
+	struct tm	*ptm;
+		
+	IT_IT("get_utc_host_time");
+
+    ftime (&tb);
+	ptm = gmtime(&tb.time);
+		
+	time->hour = ptm->tm_hour;					//<0..23>
+	time->min = ptm->tm_min;					//<0..59>
+	time->msec = ptm->tm_sec*1000 + tb.millitm; //<0..59999>
+	time->mday = ptm->tm_mday; //<1..31>
+	time->wday = (ptm->tm_wday == 0) ? ptm->tm_wday + 7 : ptm->tm_wday; //<1..7>
+	time->month = ptm->tm_mon + 1; //<1..12>
+	time->year = ptm->tm_year - 100; //<0..99>
+	time->iv = 0; //<0..1> Invalid: <0> is valid, <1> is invalid
+	time->su = (u_char)tb.dstflag; //<0..1> SUmmer time: <0> is standard time, <1> is summer time
+
+	IT_EXIT;
+    return;
+}

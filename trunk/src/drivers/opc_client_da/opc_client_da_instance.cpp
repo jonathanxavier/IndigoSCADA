@@ -13,13 +13,35 @@
 #include "opc_client_da_instance.h"
 #include "opc_client_dadriverthread.h"
 
+/////////////////////////////////////////////////////////////
+//This global data is not a problem bucause each
+//instace of Opc_client_da_Instance class
+//load the sqlite database at a different time
+static gl_row_counter = 0;
+static gl_column_counter = 0;
+static struct local_structItem* gl_Config_db = 0;
+/////////////////////////////////////////////////////////////
+
+struct local_structItem
+{
+	char indigo_scada_name[200];
+	CHAR spname[200]; //Item ID of opc server, i.e. Simulated Card.Simulated Node.Random.R8 as C string
+	char opc_type[100];
+	unsigned int ioa_control_center;//unique inside CASDU
+	unsigned int io_list_iec_type; //IEC 104 type
+	int readable;
+	int writeable;
+	float min_measure;
+	float max_measure;
+};
+
 /*
 *Function:
 *Inputs:none
 *Outputs:none
 *Returns:none
 */
-#define TICKS_PER_SEC 1
+
 void Opc_client_da_Instance::Start() 
 {
 	IT_IT("Opc_client_da_Instance::Start");
@@ -188,29 +210,6 @@ void Opc_client_da_Instance::QueryResponse(QObject *p, const QString &c, int id,
 			}
 		}
 		break;
-		case tGetSamplePointNamefromIOA:
-		{
-			QSTransaction &t = GetConfigureDb()->CurrentTransaction();
-
-			if(GetConfigureDb()->GetNumberResults() > 0)
-			{
-				//
-				#ifdef DEPRECATED_OPC_CLIENT_DA_CONFIG
-				QString SamplePointName = UndoEscapeSQLText(GetConfigureDb()->GetString("IKEY"));
-				#else
-				QString SamplePointName = UndoEscapeSQLText(GetConfigureDb()->GetString("NAME"));
-				#endif
-
-				double v = 0.0;
-
-				if(strlen((const char*)t.Data1) > 0)
-				{
-					v = atof((const char*)t.Data1);
-                    PostValue(SamplePointName, "VALUE", v); //Post the value directly in memory database
-				}
-			}
-		}
-		break;
 		case tGetIOAfromSamplePointName:
 		{
 			QSTransaction &t = GetConfigureDb()->CurrentTransaction();
@@ -218,11 +217,7 @@ void Opc_client_da_Instance::QueryResponse(QObject *p, const QString &c, int id,
 			if(GetConfigureDb()->GetNumberResults() > 0)
 			{
 				// 
-				#ifdef DEPRECATED_OPC_CLIENT_DA_CONFIG
-				QString IOACommand = UndoEscapeSQLText(GetConfigureDb()->GetString("DVAL"));
-				#else
 				int IOACommand = GetConfigureDb()->GetInt("IOA");
-				#endif
 				
 				double command_value = 0.0;
 
@@ -230,6 +225,14 @@ void Opc_client_da_Instance::QueryResponse(QObject *p, const QString &c, int id,
 				{
 					command_value = atof((const char*)t.Data1);
 				}
+
+				QString cmd_time_stamp = t.Data3;
+
+				__int64 epoch_in_millisec = _atoi64((const char*)cmd_time_stamp);
+
+				struct cp56time2a iec_cmd_time;
+				
+				epoch_to_cp56time2a(&iec_cmd_time, epoch_in_millisec);
 
 				printf("Command from %s, IOA = %d, value = %lf\n", (const char*)t.Data2, IOACommand, command_value);
 
@@ -239,10 +242,8 @@ void Opc_client_da_Instance::QueryResponse(QObject *p, const QString &c, int id,
 				item_to_send.iec_type = C_SE_TC_1;
 				item_to_send.iec_obj.ioa = IOACommand;
 				item_to_send.iec_obj.o.type63.sv = (float)command_value;
-
-				struct cp56time2a actual_time;
-				get_utc_host_time(&actual_time);
-				item_to_send.iec_obj.o.type63.time = actual_time;
+				
+				item_to_send.iec_obj.o.type63.time = iec_cmd_time;
 
 				item_to_send.msg_id = msg_sent_in_control_direction++;
 				item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
@@ -263,7 +264,39 @@ void Opc_client_da_Instance::QueryResponse(QObject *p, const QString &c, int id,
 		break;
 		case tSetTAgsParams:
 		{
+			QSTransaction &t = GetConfigureDb()->CurrentTransaction();
+			
+			QString cmd = "select NAME from TAGS where IOA="+ t.Data1 + " and UNIT='"+ Name + "';";
+		
+			GetConfigureDb()->DoExec(this, cmd, tSetSamplePointNamefromIOA, t.Data1);
+		}
+		break;
+		case tSetSamplePointNamefromIOA:
+		{
+			QSTransaction &t = GetConfigureDb()->CurrentTransaction();
 
+			if(GetConfigureDb()->GetNumberResults() > 0)
+			{
+				QString ioa = t.Data1;
+
+				int ioa_i = atoi((const char*)ioa);
+				//
+				QString SamplePointName = UndoEscapeSQLText(GetConfigureDb()->GetString("NAME"));
+
+				for(int j = 0; j < n_rows; j ++)
+				{
+					if(Config_db)
+					{
+						if(Config_db[j].ioa_control_center == ioa_i)
+						{
+							strcpy(Config_db[j].indigo_scada_name, (const char*)SamplePointName);
+
+							ioa_name_map.insert(ioa_i, SamplePointName);
+							break;
+						}
+					}
+				}
+			}					
 		}
 		break;
 		default:
@@ -374,25 +407,9 @@ void strip_white_space(char *dst, const char *src, int len)
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define MAX_CONFIGURABLE_OPC_ITEMIDS 30000
+#define MAX_OPC_ITEM_PER_LINE 1000
 
 #include <sqlite3.h>
-
-struct local_structItem
-{
-	CHAR spname[200]; //Item ID of opc server, i.e. Simulated Card.Simulated Node.Random.R8 as C string
-	char opc_type[100];
-	unsigned int ioa_control_center;//unique inside CASDU
-	unsigned int io_list_iec_type; //IEC 104 type
-	int readable;
-	int writeable;
-	float min_measure;
-	float max_measure;
-};
-
-static gl_row_counter = 0;
-static gl_column_counter = 0;
-static struct local_structItem* gl_Config_db = 0;
 
 static int db_callback(void *NotUsed, int argc, char **argv, char **azColName)
 {
@@ -529,6 +546,8 @@ void Opc_client_da_Instance::Tick()
 	{
 		case STATE_RESET:
 		{
+			fprintf(stderr, "State = STATE_RESET\n");
+			fflush(stderr);
 			State = STATE_INIT_DB;
 		}
 		break;
@@ -537,8 +556,8 @@ void Opc_client_da_Instance::Tick()
 			sqlite3 *db;
 			char *zErrMsg = 0;
 			int rc;
-			int n_rows = 0;
-			int m_columns = 0;
+			n_rows = 0;
+			m_columns = 0;
 
 			char db_name[100];
 
@@ -563,7 +582,7 @@ void Opc_client_da_Instance::Tick()
 			  break;
 			}
 
-			gl_Config_db = (struct local_structItem*)calloc(1, MAX_CONFIGURABLE_OPC_ITEMIDS*sizeof(struct local_structItem));
+			gl_Config_db = (struct local_structItem*)calloc(1, MAX_OPC_ITEM_PER_LINE*sizeof(struct local_structItem));
 
 			gl_row_counter = 0;
 
@@ -588,6 +607,16 @@ void Opc_client_da_Instance::Tick()
 			n_rows = gl_row_counter;
 			m_columns = gl_column_counter;
 
+			Config_db = (struct local_structItem*)calloc(1, MAX_OPC_ITEM_PER_LINE*sizeof(struct local_structItem));
+			memcpy(Config_db, gl_Config_db, MAX_OPC_ITEM_PER_LINE*sizeof(struct local_structItem));
+
+			if(gl_Config_db)
+			{
+				free(gl_Config_db);
+			}
+
+			gl_Config_db = NULL;
+			
 			if(n_rows > OpcItems)
 			{
 				QString msg;
@@ -600,7 +629,7 @@ void Opc_client_da_Instance::Tick()
 
 			for(int i = 0; i < n_rows; i ++)
 			{
-				if(gl_Config_db)
+				if(Config_db)
 				{
 					char str[10];
 					// update the tags
@@ -609,24 +638,19 @@ void Opc_client_da_Instance::Tick()
 					cmd = QString("update TAGS set PARAMS='");
 					
 					char dst[150];
-					strip_white_space(dst, gl_Config_db[i].spname, 150);
+					strip_white_space(dst, Config_db[i].spname, 150);
 					
 					cmd += QString(dst);
 					cmd += QString(" ");
-					cmd += QString(gl_Config_db[i].opc_type);
+					cmd += QString(Config_db[i].opc_type);
 					cmd += QString(" ");
-					cmd += QString(itoa(gl_Config_db[i].writeable, str, 10));
-					cmd += "' where IOA=" + QString(itoa(gl_Config_db[i].ioa_control_center, str, 10)) + " and UNIT='"+ Name + "';";
+					cmd += QString(itoa(Config_db[i].writeable, str, 10));
+					cmd += "' where IOA=" + QString(itoa(Config_db[i].ioa_control_center, str, 10)) + " and UNIT='"+ Name + "';";
 
-					GetConfigureDb()->DoExec(this, cmd , tSetTAgsParams);
+					GetConfigureDb()->DoExec(this, cmd , tSetTAgsParams, QString(itoa(Config_db[i].ioa_control_center, str, 10)));
 
 					printf("%s\n", (const char*)cmd);
 				}
-			}
-
-			if(gl_Config_db)
-			{
-				free(gl_Config_db);
 			}
 
 			State = STATE_INIT_DB_DONE;
@@ -634,6 +658,8 @@ void Opc_client_da_Instance::Tick()
 		break;
 		case STATE_INIT_DB_DONE:
 		{
+			fprintf(stderr, "State = STATE_INIT_DB_DONE\n");
+			fflush(stderr);
 			State = STATE_ASK_GENERAL_INTERROGATION;
 		}
 		break;
@@ -664,11 +690,15 @@ void Opc_client_da_Instance::Tick()
 
 			ORTEPublicationSend(publisher);
 
+			fprintf(stderr, "State = STATE_ASK_GENERAL_INTERROGATION\n");
+			fflush(stderr);
 			State = STATE_GENERAL_INTERROGATION_DONE;
 		}
 		break;
 		case STATE_GENERAL_INTERROGATION_DONE:
 		{
+			fprintf(stderr, "State = STATE_GENERAL_INTERROGATION_DONE\n");
+			fflush(stderr);
 			State = STATE_RUNNING;
 		}
 		break;
@@ -686,7 +716,6 @@ void Opc_client_da_Instance::Tick()
 		break;
 	}
 }
-
 
 void Opc_client_da_Instance::get_items_from_local_fifo(void)
 {
@@ -710,8 +739,10 @@ void Opc_client_da_Instance::get_items_from_local_fifo(void)
 			}
 		}
 			
-		//printf("Receiving %d th message \n", p_item->msg_id);
-		printf("Receiving %d th opc da message from line = %d\n", p_item->msg_id, instanceID + 1);
+		//fprintf(stderr,"Receiving %d th opc da message \n", p_item->msg_id);
+		//fflush(stderr);
+		fprintf(stderr,"Receiving %d th opc da message from line = %d\n", p_item->msg_id, instanceID + 1);
+		fflush(stderr);
 
 		//for (int j = 0; j < len; j++) 
 		//{ 
@@ -730,136 +761,184 @@ void Opc_client_da_Instance::get_items_from_local_fifo(void)
 
 		if(rc != 0)
 		{
+			fprintf(stderr, "checksum error rc =%d\n", rc);
+			fflush(stderr);
 			ExitProcess(1);
 		}
+		
+		QString sp_name;
 
-		QString value;
+		IOANameMap::Iterator it;
+
+		it = ioa_name_map.find(p_item->iec_obj.ioa);
 
 		switch(p_item->iec_type)
 		{
 			case M_SP_NA_1:
 			{
-				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+				if(it != ioa_name_map.end())
+				{
+					sp_name = it.data();
 
-				iec_type1 var = p_item->iec_obj.o.type1;
+					iec_type1 var = p_item->iec_obj.o.type1;
 				
-				IECValue v(VALUE_TAG, &var, M_SP_NA_1);
-				TODO:05-07-2011 Get name here
-				post_val(v, name);
+					IECValue v(VALUE_TAG, &var, M_SP_NA_1);
+									
+					IECValueList l;
 
-				#else
+					l.insert(l.end(),v);
 
-				value.sprintf("%d", p_item->iec_obj.o.type1.sp);
-
-				#endif
-				
+					PostList(sp_name, l);
+				}
+				else
+				{
+					fprintf(stderr, "Error: not found name of item with ioa = %d\n", p_item->iec_obj.ioa);
+					fflush(stderr);
+				}
 			}
 			break;
 			case M_DP_NA_1:
 			{
-				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+				if(it != ioa_name_map.end())
+				{
+					sp_name = it.data();
 
-				iec_type3 var = p_item->iec_obj.o.type3;
+					iec_type3 var = p_item->iec_obj.o.type3;
 				
-				IECValue v(VALUE_TAG, &var, M_DP_NA_1);
-				TODO:05-07-2011 Get name here
-				post_val(v, name);
+					IECValue v(VALUE_TAG, &var, M_DP_NA_1);
+				
+					IECValueList l;
 
-				#else
+					l.insert(l.end(),v);
 
-				value.sprintf("%d", p_item->iec_obj.o.type3.dp);
+					PostList(sp_name, l);
 
-				#endif
+				}
+				else
+				{
+					fprintf(stderr, "Error: not found name of item with ioa = %d\n", p_item->iec_obj.ioa);
+					fflush(stderr);
+				}
 			}
 			break;
-			//case M_BO_NA_1:
-			//{
-			//}
-			//break;
 			case M_ME_NA_1:
 			{
-				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+				if(it != ioa_name_map.end())
+				{
+					sp_name = it.data();
 
-				iec_type9 var = p_item->iec_obj.o.type9;
+					iec_type9 var = p_item->iec_obj.o.type9;
 				
-				IECValue v(VALUE_TAG, &var, M_ME_NA_1);
-				TODO:05-07-2011 Get name here
-				post_val(v, name);
+					IECValue v(VALUE_TAG, &var, M_ME_NA_1);
+				
+					IECValueList l;
 
-				#else
+					l.insert(l.end(),v);
 
-				value.sprintf("%d", p_item->iec_obj.o.type9.mv);
+					PostList(sp_name, l);
 
-				#endif
+				}
+				else
+				{
+					fprintf(stderr, "Error: not found name of item with ioa = %d\n", p_item->iec_obj.ioa);
+					fflush(stderr);
+				}
 			}
 			break;
 			case M_ME_NB_1:
 			{
+				if(it != ioa_name_map.end())
+				{
+					sp_name = it.data();
+
+					iec_type11 var = p_item->iec_obj.o.type11;
 				
-				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
-
-				iec_type11 var = p_item->iec_obj.o.type11;
+					IECValue v(VALUE_TAG, &var, M_ME_NB_1);
 				
-				IECValue v(VALUE_TAG, &var, M_ME_NB_1);
-				TODO:05-07-2011 Get name here
-				post_val(v, name);
+					IECValueList l;
 
-				#else
+					l.insert(l.end(),v);
 
-				value.sprintf("%d", p_item->iec_obj.o.type11.mv);
+					PostList(sp_name, l);
 
-				#endif
+				}
+				else
+				{
+					fprintf(stderr, "Error: not found name of item with ioa = %d\n", p_item->iec_obj.ioa);
+					fflush(stderr);
+				}
 			}
 			break;
 			case M_ME_NC_1:
 			{
-				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+				if(it != ioa_name_map.end())
+				{
+					sp_name = it.data();
 
-				iec_type13 var = p_item->iec_obj.o.type13;
+					iec_type13 var = p_item->iec_obj.o.type13;
+
+					IECValue v(VALUE_TAG, &var, M_ME_NC_1);
 				
-				IECValue v(VALUE_TAG, &var, M_ME_NC_1);
-				TODO:05-07-2011 Get name here
-				post_val(v, name);
+					IECValueList l;
 
-				#else
+					l.insert(l.end(),v);
 
-				value.sprintf("%d", p_item->iec_obj.o.type13.mv);
+					PostList(sp_name, l);
 
-				#endif
+				}
+				else
+				{
+					fprintf(stderr, "Error: not found name of item with ioa = %d\n", p_item->iec_obj.ioa);
+					fflush(stderr);
+				}
 			}
 			break;
 			case M_SP_TB_1:
 			{
-				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+				if(it != ioa_name_map.end())
+				{
+					sp_name = it.data();
 
-				iec_type30 var = p_item->iec_obj.o.type30;
+					iec_type30 var = p_item->iec_obj.o.type30;
 				
-				IECValue v(VALUE_TAG, &var, M_SP_TB_1);
-				TODO:05-07-2011 Get name here
-				post_val(v, name);
+					IECValue v(VALUE_TAG, &var, M_SP_TB_1);
+				
+					IECValueList l;
 
-				#else
+					l.insert(l.end(),v);
 
-				value.sprintf("%d", p_item->iec_obj.o.type30.sp);
+					PostList(sp_name, l);
 
-				#endif
+				}
+				else
+				{
+					fprintf(stderr, "Error: not found name of item with ioa = %d\n", p_item->iec_obj.ioa);
+					fflush(stderr);
+				}
 			}
 			break;
 			case M_DP_TB_1:
 			{
-				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+				if(it != ioa_name_map.end())
+				{
+					sp_name = it.data();
 
-				iec_type31 var = p_item->iec_obj.o.type31;
+					iec_type31 var = p_item->iec_obj.o.type31;
 				
-				IECValue v(VALUE_TAG, &var, M_DP_TB_1);
-				TODO:05-07-2011 Get name here
-				post_val(v, name);
+					IECValue v(VALUE_TAG, &var, M_DP_TB_1);
+				
+					IECValueList l;
 
-				#else
+					l.insert(l.end(),v);
 
-				value.sprintf("%d", p_item->iec_obj.o.type31.dp);
+					PostList(sp_name, l);
 
-				#endif
+				}
+				else
+				{
+					fprintf(stderr, "Error: not found name of item with ioa = %d\n", p_item->iec_obj.ioa);
+					fflush(stderr);
+				}
 			}
 			break;
 			case M_BO_TB_1:
@@ -869,87 +948,120 @@ void Opc_client_da_Instance::get_items_from_local_fifo(void)
 			break;
 			case M_ME_TD_1:
 			{
-				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
-
-				iec_type34 var = p_item->iec_obj.o.type34;
+				if(it != ioa_name_map.end())
+				{
+					sp_name = it.data();
+	
+					iec_type34 var = p_item->iec_obj.o.type34;
 				
-				IECValue v(VALUE_TAG, &var, M_ME_TD_1);
-				TODO:05-07-2011 Get name here
-				post_val(v, name);
+					IECValue v(VALUE_TAG, &var, M_ME_TD_1);
+				
+					IECValueList l;
 
-				#else
+					l.insert(l.end(),v);
 
-				value.sprintf("%d", p_item->iec_obj.o.type34.mv);
+					PostList(sp_name, l);
 
-				#endif
+				}
+				else
+				{
+					fprintf(stderr, "Error: not found name of item with ioa = %d\n", p_item->iec_obj.ioa);
+					fflush(stderr);
+				}
 			}
 			break;
 			case M_ME_TE_1:
 			{
-				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+				if(it != ioa_name_map.end())
+				{
+					sp_name = it.data();
 
-				iec_type35 var = p_item->iec_obj.o.type35;
+					iec_type35 var = p_item->iec_obj.o.type35;
 				
-				IECValue v(VALUE_TAG, &var, M_ME_TE_1);
-				TODO:05-07-2011 Get name here
-				post_val(v, name);
+					IECValue v(VALUE_TAG, &var, M_ME_TE_1);
+				
+					IECValueList l;
 
-				#else
+					l.insert(l.end(),v);
 
-				value.sprintf("%d", p_item->iec_obj.o.type35.mv);
-
-				#endif
+					PostList(sp_name, l);
+				}
+				else
+				{
+					fprintf(stderr, "Error: not found name of item with ioa = %d\n", p_item->iec_obj.ioa);
+					fflush(stderr);
+				}
 			}
 			break;
 			case M_ME_TF_1:
 			{
-				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+				if(it != ioa_name_map.end())
+				{
+					sp_name = it.data();
 
-				iec_type36 var = p_item->iec_obj.o.type36;
+					iec_type36 var = p_item->iec_obj.o.type36;
 				
-				IECValue v(VALUE_TAG, &var, M_ME_TF_1);
-				TODO:05-07-2011 Get name here
-				post_val(v, name);
+					IECValue v(VALUE_TAG, &var, M_ME_TF_1);
+				
+					IECValueList l;
 
-				#else
+					l.insert(l.end(),v);
 
-				value.sprintf("%f", p_item->iec_obj.o.type36.mv);
-
-				#endif
+					PostList(sp_name, l);
+				}
+				else
+				{
+					fprintf(stderr, "Error: not found name of item with ioa = %d\n", p_item->iec_obj.ioa);
+					fflush(stderr);
+				}
 			}
 			break;
 			case M_ME_TN_1:
 			{
-				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+				if(it != ioa_name_map.end())
+				{
+					sp_name = it.data();
 
-				iec_type150 var = p_item->iec_obj.o.type150;
+					is_type150 var = p_item->iec_obj.o.type150;
 				
-				IECValue v(VALUE_TAG, &var, M_ME_TN_1);
-				TODO:05-07-2011 Get name here
-				post_val(v, name);
+					IECValue v(VALUE_TAG, &var, M_ME_TN_1);
+				
+					IECValueList l;
 
-				#else
+					l.insert(l.end(),v);
 
-				value.sprintf("%lf", p_item->iec_obj.o.type150.mv);
+					PostList(sp_name, l);
 
-				#endif
+				}
+				else
+				{
+					fprintf(stderr, "Error: not found name of item with ioa = %d\n", p_item->iec_obj.ioa);
+					fflush(stderr);
+				}
 			}
 			break;
 			case M_IT_TB_1:
 			{
-				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+				if(it != ioa_name_map.end())
+				{
+					sp_name = it.data();
 
-				iec_type37 var = p_item->iec_obj.o.type37;
+					iec_type37 var = p_item->iec_obj.o.type37;
 				
-				IECValue v(VALUE_TAG, &var, M_ME_TN_1);
-				TODO:05-07-2011 Get name here
-				post_val(v, name);
+					IECValue v(VALUE_TAG, &var, M_IT_TB_1);
+				
+					IECValueList l;
 
-				#else
+					l.insert(l.end(),v);
 
-				value.sprintf("%d", p_item->iec_obj.o.type37.counter);
+					PostList(sp_name, l);
 
-				#endif
+				}
+				else
+				{
+					fprintf(stderr, "Error: not found name of item with ioa = %d\n", p_item->iec_obj.ioa);
+					fflush(stderr);
+				}
 			}
 			break;
 			case C_EX_IT_1:
@@ -973,24 +1085,11 @@ void Opc_client_da_Instance::get_items_from_local_fifo(void)
 			break;
 			default:
 			{
-				printf("Not supported type%d \n", p_item->iec_type);
-				value.sprintf("%d", 0);
+				fprintf(stderr, "Not supported type%d \n", p_item->iec_type);
+				fflush(stderr);
 			}
 			break;
 		}
-		
-		QString ioa;
-		ioa.sprintf("%d", p_item->iec_obj.ioa);
-
-		#ifdef DEPRECATED_IEC101_CONFIG
-		QString cmd = "select IKEY from PROPS where DVAL='"+ ioa + "' and SKEY='SAMPLEPROPS';";
-		#else
-		QString cmd = "select NAME from TAGS where IOA="+ ioa + " and UNIT='"+ Name + "';";
-		#endif
-		
-		GetConfigureDb()->DoExec(this, cmd, tGetSamplePointNamefromIOA, value, ioa);
-
-		//printf("ioa %s, value %s\n", (const char*)ioa, (const char*)value);
 
 		if(i > 50)
 		{
@@ -998,6 +1097,7 @@ void Opc_client_da_Instance::get_items_from_local_fifo(void)
 		}
 	}
 }
+
 
 /*
 *Function:event
@@ -1129,31 +1229,28 @@ void Opc_client_da_Instance::Command(const QString & name, BYTE cmd, LPVOID lpPa
 {
 	IT_IT("Opc_client_da_Instance::Command");
 
-	dispatcher_extra_params* params = (dispatcher_extra_params *)lpPa;
-
-	QString sample_point_name = QString(params->string2);
-
-	IT_COMMENT3("Ricevuto comando per instance %s, sample point: %s, value: %lf: %s", (const char*)name, (const char*)sample_point_name, (params->res[0]).value);
-
-
 	if(pConnect)
 	{
 		dispatcher_extra_params* params = (dispatcher_extra_params *)lpPa;
 
 		QString sample_point_name = QString(params->string2);
 
-		IT_COMMENT3("Received command for instance %s, sample point: %s, value: %lf", (const char*)name, (const char*)sample_point_name, (params->res[0]).value);
+		IT_COMMENT3("Received command for instance %s, sample point: %s, value: %lf", (const char*)name, (const char*)sample_point_name, params->value);
 
-		#ifdef DEPRECATED_OPC_CLIENT_DA_CONFIG
-		QString pc = "select * from PROPS where IKEY='" + sample_point_name + "';"; 
-		#else
 		QString pc = "select * from TAGS where NAME='" + sample_point_name + "';";
-		#endif
 
 		QString value_for_command;
-		value_for_command.sprintf("%lf", (params->res[0]).value);
-		// 
-		GetConfigureDb()->DoExec(this, pc, tGetIOAfromSamplePointName, value_for_command, sample_point_name);
+		value_for_command.sprintf("%lf", params->value);
+
+		/////////////////////////////////command time stamp/////////////////////////////////////////////////
+		__int64 command_arrive_time_in_ms = Epoch_in_millisec_from_cp56time2a(&(params->time_stamp));
+
+		char buffer[20];
+		_i64toa(command_arrive_time_in_ms, buffer, 10);
+		QString cmd_epoch_in_ms = QString(buffer);
+		////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		GetConfigureDb()->DoExec(this, pc, tGetIOAfromSamplePointName, value_for_command, sample_point_name, cmd_epoch_in_ms);
 	}
 }
 
@@ -1258,6 +1355,33 @@ void Opc_client_da_Instance::get_utc_host_time(struct cp56time2a* time)
 	IT_EXIT;
     return;
 }
+
+void Opc_client_da_Instance::epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch_in_millisec)
+{
+	struct tm	*ptm;
+	int ms = (int)(epoch_in_millisec%1000);
+	time_t seconds;
+	
+	memset(time, 0x00,sizeof(cp56time2a));
+	seconds = (long)(epoch_in_millisec/1000);
+	ptm = localtime(&seconds);
+		
+    if(ptm)
+	{
+		time->hour = ptm->tm_hour;					//<0.23>
+		time->min = ptm->tm_min;					//<0..59>
+		time->msec = ptm->tm_sec*1000 + ms; //<0.. 59999>
+		time->mday = ptm->tm_mday; //<1..31>
+		time->wday = (ptm->tm_wday == 0) ? ptm->tm_wday + 7 : ptm->tm_wday; //<1..7>
+		time->month = ptm->tm_mon + 1; //<1..12>
+		time->year = ptm->tm_year - 100; //<0.99>
+		time->iv = 0; //<0..1> Invalid: <0> is valid, <1> is invalid
+		time->su = (u_char)ptm->tm_isdst; //<0..1> SUmmer time: <0> is standard time, <1> is summer time
+	}
+
+    return;
+}
+
 /////////////////////////////////////Middleware/////////////////////////////////////////////
 
 

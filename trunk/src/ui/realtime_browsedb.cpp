@@ -760,7 +760,7 @@ void RealTimeBrowsedb::mouseButtonPressed( int button, QListViewItem * item, con
 						
 						if(!(i == db_dictionary.end()))
 						{
-							if(item->text(0) == EMPTY_DATABASE) break;
+							if(item->text(0) == DB_NOT_CONNECTED) break;
 							
 							QString table = item->text(0);
 							QString cmd = "describe " + table + ";"; 

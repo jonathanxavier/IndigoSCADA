@@ -218,7 +218,7 @@ Opc_client_aeConfigurationData::Opc_client_aeConfigurationData(QWidget *parent, 
 	PollInterval->setMidLineWidth( 0 );
 	PollInterval->QFrame::setMargin( 0 );
 	#endif
-	PollInterval->setRange( 0, 2000 );
+	PollInterval->setRange( 0, 60000 );
 	PollInterval->setSteps( 100, 0 );
 	PollInterval->setPrefix( "" );
 	PollInterval->setSuffix( "" );

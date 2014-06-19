@@ -40,7 +40,7 @@ RSC=rc.exe
 # PROP Use_Debug_Libraries 0
 # PROP Output_Dir "C:\scada\lib"
 # PROP Intermediate_Dir "src/obj"
-# PROP Ignore_Export_Lib 1
+# PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 LIB32=link.exe -lib
 # ADD CPP /nologo /MD /W3 /GX /O1 /I "include" /I "$(QTDIR)\include" /I "src\moc\\" /I "$(QTDIR)\mkspecs\win32-msvc" /I ".\designer\pixmaps" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "UNICODE" /D "QT_DLL" /D "QWT_DLL" /D "QWT_MAKEDLL" /D "QT_THREAD_SUPPORT" /D "QT_NO_DEBUG" /FD -Zm200 /c
@@ -65,7 +65,7 @@ LINK32=link.exe
 # PROP Use_Debug_Libraries 1
 # PROP Output_Dir "Debug"
 # PROP Intermediate_Dir "Debug"
-# PROP Ignore_Export_Lib 1
+# PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 LIB32=link.exe -lib
 # ADD CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "include" /I "$(QTDIR)\include" /I "src\moc\\" /I "$(QTDIR)\mkspecs\win32-msvc" /I ".\designer\pixmaps" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "UNICODE" /D "QT_DLL" /D "QWT_DLL" /D "QWT_MAKEDLL" /D "QT_THREAD_SUPPORT" /FD /GZ -Zm200 /c

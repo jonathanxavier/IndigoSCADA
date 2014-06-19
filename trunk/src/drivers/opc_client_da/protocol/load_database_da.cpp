@@ -293,13 +293,19 @@ int Opc_client_da_imp::AddItems()
 			//the current itemID name is already loaded in the DA server
 			//so nTestItem is NOT incremented
 		}
-		
-		//TODO: we need to free
+				
 		#define customA2W(lpa) (((_lpa = lpa) == NULL) ? NULL : (_convert = (lstrlenA(_lpa)+1), ATLA2WHELPER((LPWSTR) malloc(_convert*2), _lpa, _convert)))
 
 		strcpy(buf, Item[nTestItem].spname);
 
-		wcscpy(Item[nTestItem].wszName, customA2W(buf));
+		LPWSTR Wide_buf = customA2W(buf);
+
+		wcscpy(Item[nTestItem].wszName, Wide_buf);
+
+		if(Wide_buf)
+		{
+			free(Wide_buf);
+		}
 		
 		//set VT_EMPTY and the server will select the right type////
 		Item[nTestItem].vt = VT_EMPTY;

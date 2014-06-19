@@ -18,13 +18,15 @@
 
 #include <stdlib.h>
 
-#ifndef SHMEM_DLL_ENTRY
-    #if defined(BUILDING_DLL)
-        #define SHMEM_DLL_ENTRY __declspec( dllexport )
-    #elif defined(USING_DLL)
-        #define SHMEM_DLL_ENTRY __declspec( dllimport )
+#ifndef FIFO_DLL_ENTRY
+	#ifdef WIN32
+		#if defined(BUILDING_DLL)
+			#define FIFO_DLL_ENTRY __declspec( dllexport )
+		#else
+			#define FIFO_DLL_ENTRY __declspec( dllimport )
+		#endif
     #else
-        #define SHMEM_DLL_ENTRY
+        #define FIFO_DLL_ENTRY
     #endif
 #endif
 
@@ -35,10 +37,10 @@ extern "C" {
 typedef struct fifo_t* fifo_h;
 typedef void (*p_call_exit_handler)(int line, char* file, char* reason);
 
-extern SHMEM_DLL_ENTRY fifo_h fifo_open(char const* name, size_t max_size, p_call_exit_handler f_log_arg);
-extern SHMEM_DLL_ENTRY void fifo_put(fifo_h hnd, char* message, int length);
-extern SHMEM_DLL_ENTRY int fifo_get(fifo_h hnd, char* buf, int buf_size, unsigned msec);
-extern SHMEM_DLL_ENTRY void fifo_close(fifo_h hnd);
+extern FIFO_DLL_ENTRY fifo_h fifo_open(char const* name, size_t max_size, p_call_exit_handler f_log_arg);
+extern FIFO_DLL_ENTRY void fifo_put(fifo_h hnd, char* message, int length);
+extern FIFO_DLL_ENTRY int fifo_get(fifo_h hnd, char* buf, int buf_size, unsigned msec);
+extern FIFO_DLL_ENTRY void fifo_close(fifo_h hnd);
 
 #ifdef __cplusplus
 }

@@ -105,7 +105,8 @@ MaxRetryReconnectToDispatcher(0),
 MaxRetryReconnectToRealTimeDb(0),
 MaxRetryReconnectToHistoricDb(0),
 MaxRetryReconnectToSpareDispatcher(0),
-MaxRetryReconnectToSpareRealTimeDb(0)
+MaxRetryReconnectToSpareRealTimeDb(0),
+statusBar_state(WHITE_STATE)
 {
 	IT_IT("UserFrameWork::UserFrameWork");
 	
@@ -162,6 +163,7 @@ MaxRetryReconnectToSpareRealTimeDb(0)
 	QPixmap icon((const char **)scada);
 	setIcon(icon);
 	//
+	statusBar_state = WHITE_STATE;
 	statusBar()->setBackgroundColor(Qt::white);
 	statusBar()->message(tr(SYSTEM_NAME_STARTING));
 	statusBar()->setSizeGripEnabled(false);
@@ -312,12 +314,14 @@ void UserFrameWork::Logout()
 	//
 	menuBar()->insertItem(QString(tr("&File")),file);
 	//
+	#ifdef USE_STATUS_TAB
 	if(centralWidget())
 	{
 		centralWidget()->show();
 		((QTabWidget *)centralWidget())->showPage(pStatus);
 		pStatus->setFocus();
 	}
+	#endif
 	//
 	if(pToolBar)
 	{
@@ -377,8 +381,10 @@ void UserFrameWork::SetTabs()
 		pAlarms = new AlarmDisplay(centralWidget());
 		((QTabWidget *)centralWidget())->addTab(pAlarms,tr("&Alarms"));
 		
+		#ifdef USE_STATUS_TAB
 		pStatus = new StatusDisplay(centralWidget());
 		((QTabWidget *)centralWidget())->addTab(pStatus,tr("&Status"));
+		#endif
 
 		pMessage = new MessageDisplay(centralWidget()); // we need a trace / message window from the off
 		((QTabWidget *)centralWidget())->addTab(pMessage,tr("&Messages"));
@@ -930,16 +936,7 @@ void UserFrameWork::makeReport() // generate a report
 		}
 	}
 }
-/*
-*Function:OpenMap
-*Inputs:none
-*Outputs:none
-*Returns:none
-*/
-void UserFrameWork::OpenMap()
-{
-	IT_IT("UserFrameWork::OpenMap");
-};
+
 /*-Function: reviewReport
 *Inputs:none
 *Outputs:none
@@ -1517,6 +1514,7 @@ void UserFrameWork::ReceivedNotify(int ntf, const char * data)
 			//
 			// the monitoring has stopped
 			//
+			statusBar_state = RED_STATE;
 			QSMessage(QDateTimeString(QDateTime::currentDateTime()) + ":" + QString(tr("HMI -> Monitoring has stopped")));
 			statusBar()->setBackgroundColor(Qt::red);
 			statusBar()->message(tr("Monitoring has stopped"));
@@ -1565,6 +1563,7 @@ void UserFrameWork::ReceivedNotify(int ntf, const char * data)
 		case  NotificationEvent::ALARM_NOTIFY:
 		{
 			IT_COMMENT("ALARM_NOTIFY");
+			statusBar_state = RED_STATE;
 			statusBar()->setBackgroundColor(Qt::red);
 
 			QSTrace(QDateTimeString(QDateTime::currentDateTime()) + ":" + QString(data));
@@ -1578,11 +1577,10 @@ void UserFrameWork::ReceivedNotify(int ntf, const char * data)
 			MonitorRunning = true;
 
 			LastSeqNo = data; // get the sequence number
-
-			int LSN = atoi((const char*)data); // get the sequence number
-
-			if(!(LSN%2)) //if LastSeqNo is even
+			
+			if(statusBar_state != GREEN_STATE)
 			{
+				statusBar_state = GREEN_STATE;
 				statusBar()->setBackgroundColor(Qt::green);
 				QString message = tr("Monitor is Running -- ") + tr("Active receipe: ") + GetReceipeName() + tr(" -- User: ") + GetUserDetails().Name;
 				statusBar()->message(message);
@@ -1594,12 +1592,19 @@ void UserFrameWork::ReceivedNotify(int ntf, const char * data)
 		case  NotificationEvent::UPDATE_NOTIFY:
 		{
 			IT_COMMENT("UPDATE_NOTIFY");
+
+			fRequestFetch = true; //apa+++ 16-06-2014
+
+			LastSeqNo = data; // get the sequence number
+
+			//DoFetch();
 			
 			MonitorTimeout = MONITOR_TICK_TIME + 2000;
 		}
 		break;
 		case NotificationEvent::SERIAL_DRIVER_ERROR_NOTIFY:
 		{
+			statusBar_state = RED_STATE;
 			statusBar()->setBackgroundColor(Qt::red);
 			statusBar()->message(tr("Serial driver error - SERIOUS FAILURE"));
 		}
@@ -1632,6 +1637,7 @@ void UserFrameWork::Tick()
 	{
 		if(MonitorRunning)
 		{
+			statusBar_state = RED_STATE;
 			statusBar()->setBackgroundColor(Qt::red);
 			statusBar()->message(tr("No connection with monitor"));
 			QSMessage(QDateTimeString(QDateTime::currentDateTime()) + ":" + QString("HMI -> No connection with monitor"));
@@ -1647,12 +1653,12 @@ void UserFrameWork::Tick()
 		fRequestFetch = false;
 	}
 
-
 	if(GetSpareDispatcher() != NULL)
 	{
 		//if((!GetSpareDispatcher()->Ok()) && (MaxRetryReconnectToSpareDispatcher <= 5))
 		if(!GetSpareDispatcher()->Ok())
 		{
+			statusBar_state = RED_STATE;
 			statusBar()->setBackgroundColor(Qt::red);
 			statusBar()->message(tr("Spare Dispatcher Client Failure"));
 
@@ -1684,6 +1690,7 @@ void UserFrameWork::Tick()
 	//if((!GetDispatcher()->Ok()) && (MaxRetryReconnectToDispatcher <= 5))
 	if(!GetDispatcher()->Ok())
 	{
+		statusBar_state = RED_STATE;
 		statusBar()->setBackgroundColor(Qt::red);
 		statusBar()->message(tr("Dispatcher Client Failure"));
 
@@ -1715,6 +1722,7 @@ void UserFrameWork::Tick()
 		//if(MaxRetryReconnectToRealTimeDb <= 5)
 		{
 		
+			statusBar_state = RED_STATE;
 			statusBar()->setBackgroundColor(Qt::red);
 			statusBar()->message(tr("Realtime database Client Failure"));
 
@@ -1815,6 +1823,7 @@ void UserFrameWork::Tick()
 		//if((!GetHistoricResultDb()->Ok()) && (MaxRetryReconnectToHistoricDb <= 5))
 		if(!GetHistoricResultDb()->Ok())
 		{
+			statusBar_state = RED_STATE;
 			statusBar()->setBackgroundColor(Qt::red);
 			statusBar()->message(tr("Historical Database Client Failure"));
 
@@ -1846,6 +1855,7 @@ void UserFrameWork::Tick()
 		(MaxRetryReconnectToSpareDispatcher > 2) 
 		)
 	{
+		statusBar_state = RED_STATE;
 		statusBar()->setBackgroundColor(Qt::red);
 		statusBar()->message(tr("Too much reconnect retries .."));
 		
@@ -1878,7 +1888,7 @@ void UserFrameWork::Tick()
 
 		dispatcher_extra_params* params = (dispatcher_extra_params *) parametri;
 					
-		(params->res[0]).value = deltaUImem;
+		params->value = deltaUImem;
 		
 		//dispatch without feedback
 		GetDispatcher()->DoExec(NotificationEvent::UI_EXE_DATA, parametri, sizeof(dispatcher_extra_params));
@@ -1895,7 +1905,7 @@ void UserFrameWork::Tick()
 void UserFrameWork::DoFetch()
 {
 	IT_IT("UserFrameWork::DoFetch");
-	
+
 	// get all updated points
 	QString cmd = "select * from TAGS_DB where SEQNO >= " + LastFetchNo  + " order by NAME asc;";  
 	GetCurrentDb()->DoExec(this,cmd,tList); 	  
@@ -2050,7 +2060,7 @@ void UserFrameWork::About()
 		switch(compiler)
 		{
 			case 1200:
-			comp = QString("VC++ 6.0 SP5 with STLport 4.6.2 ");
+			comp = QString("VC++ 6.0 SP6 ");
 			break;
 			case 1300:
 			comp = QString("VC++ 7.0 ");

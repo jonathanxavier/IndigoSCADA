@@ -14,8 +14,6 @@
 
 p_call_exit_handler global_func_log;
 
-shared_memory* shared_memory::chain;
-
 #ifdef _WIN32
 #include <malloc.h>
 
@@ -371,9 +369,6 @@ shared_memory::status shared_memory::open(const char* file_name,
     n_nested_exclusive_locks = 0;
     shared_lock_chain = NULL;
 
-    next = chain;
-    chain = this;
-
     ReleaseMutex(hMutex);
 
     return ok;
@@ -402,12 +397,6 @@ void shared_memory::close()
 {
     if (hMutex != NULL) { 
 	WaitForSingleObject(hMutex, INFINITE);
-    }
-
-    shared_memory *sp, **spp;
-    for (spp = &chain; (sp = *spp) != NULL && sp != this; spp = &sp->next);
-    if (sp != NULL) { 
-	*spp = sp->next;
     }
 
     size_t file_size = 0;
@@ -1145,8 +1134,6 @@ shared_memory::status shared_memory::open(const char* file_name,
     n_nested_exclusive_locks = 0;
     shared_lock_chain = NULL;
 
-    next = chain;
-    chain = this;
     if (semp_post(&mutex) < 0) { 
 	goto return_error;
     }
@@ -1177,12 +1164,6 @@ void shared_memory::close()
 {
     if (mutex >= 0) { 
 	semp_wait(&mutex); 
-    }
-
-    shared_memory *sp, **spp;
-    for (spp = &chain; (sp = *spp) != NULL && sp != this; spp = &sp->next);
-    if (sp != NULL) { 
-	*spp = sp->next;
     }
 
     size_t file_size = 0;
@@ -1518,15 +1499,4 @@ void shared_memory::check_heap() const
 
 	if(!(bp == eof))
 		global_func_log(__LINE__,__FILE__, NULL);
-}
-
-shared_memory* shared_memory::find_storage(void* obj)
-{
-    for (shared_memory* shmem = chain; shmem != NULL; shmem = shmem->next) { 
-	size_t offs = (size_t)obj - (size_t)shmem->pHdr;
-	if (offs < (size_t)shmem->pHdr->size) { 
-	    return shmem;
-	}
-    }
-    return NULL;
 }

@@ -243,7 +243,6 @@ struct IECValue // a measured result
 
 extern "C"
 {
-	QSEXPORT double LookupCurrentValue(char *name, char *tag);
 	QSEXPORT double get_value_iec_value(IECValue &v);
 	QSEXPORT struct cp56time2a 	get_time_of_iec_value(IECValue &v);
 	QSEXPORT void set_value_iec_value(IECValue &v, double val);
@@ -418,8 +417,6 @@ public:
 	public:
 	static GroupDict &GetGroups(); // the alarm groups - NB Also Locks 
 	static SamplePointDictWrap &GetEnabledPoints();// this is the list of enabled sample points and current values - NB Also Locks
-	
-	static double LookupValue(const char *name, const char *tag);
 	//
 	// responsibility to action the update
 	//

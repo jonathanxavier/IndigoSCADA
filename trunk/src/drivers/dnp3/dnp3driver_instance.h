@@ -230,6 +230,7 @@ class DNP_3_DRIVERDRV Dnp3driver_Instance : public DriverInstance
 	void removeTransaction();
 	//////Middleware//////////////////////////////////////
 	void get_utc_host_time(struct cp56time2a* time);
+	void epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch_in_millisec);
 	////////////////////////////////////////////////
 	////////////////local fifo////////////////////////////
 	void get_items_from_local_fifo(void);
