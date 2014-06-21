@@ -820,7 +820,7 @@ void MainWindow::helpAbout()
 
 void MainWindow::helpAboutQt()
 {
-    QMessageBox::aboutQt( this, "Qt Designer" );
+    QMessageBox::aboutQt( this, "IndigoSCADA HMI Designer" );
 }
 
 #if defined(_WS_WIN_)
@@ -2840,8 +2840,8 @@ void MainWindow::checkTempFiles()
     QStringList lst = d.entryList();
     QApplication::restoreOverrideCursor();
     bool load = QMessageBox::information( this, tr( "Restoring the Last Session" ),
-					  tr( "Qt Designer found some temporary saved files, which were\n"
-					      "written when Qt Designer crashed last time. Do you want to\n"
+					  tr( "IndigoSCADA HMI Designer found some temporary saved files, which were\n"
+					      "written when IndigoSCADA HMI Designer crashed last time. Do you want to\n"
 					      "load these files?" ), tr( "&Yes" ), tr( "&No" ) ) == 0;
     QApplication::setOverrideCursor( waitCursor );
     for ( QStringList::ConstIterator it = lst.begin(); it != lst.end(); ++it ) {

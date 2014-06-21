@@ -97,7 +97,7 @@ static QString *old_settings_key = 0;
 QString DesignerApplication::settingsKey()
 {
     if ( !settings_key )
-	settings_key = new QString( "/Qt Designer/" +
+	settings_key = new QString( "/IndigoSCADA HMI Designer/" +
 				    QString::number( (QT_VERSION >> 16) & 0xff ) +
 	                            "." + QString::number( (QT_VERSION >> 8) & 0xff ) + "/" );
     return *settings_key;
@@ -114,7 +114,7 @@ QString DesignerApplication::oldSettingsKey()
 	if ( !minorVer == 0 )
 	    minorVer--;
 
-	old_settings_key = new QString( "/Qt Designer/" +
+	old_settings_key = new QString( "/IndigoSCADA HMI Designer/" +
 				    QString::number( majorVer ) +
 	                            "." + QString::number( minorVer ) + "/" );
     }

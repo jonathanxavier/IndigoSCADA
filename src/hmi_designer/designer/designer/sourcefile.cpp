@@ -260,8 +260,8 @@ void SourceFile::checkTimeStamp()
     if ( timeStamp.isUpToDate() )
 	return;
     timeStamp.update();
-    if ( QMessageBox::information( MainWindow::self, tr( "Qt Designer" ),
-				   tr( "File '%1' has been changed outside Qt Designer.\n"
+    if ( QMessageBox::information( MainWindow::self, tr( "IndigoSCADA HMI Designer" ),
+				   tr( "File '%1' has been changed outside IndigoSCADA HMI Designer.\n"
 				       "Do you want to reload it?" ).arg( filename ),
 				   tr( "&Yes" ), tr( "&No" ) ) == 0 ) {
 	load();

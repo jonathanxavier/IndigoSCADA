@@ -972,12 +972,12 @@ void MainWindow::setupHelpActions()
     connect( actionHelpContents, SIGNAL( activated() ), this, SLOT( helpContents() ) );
 
     actionHelpManual = new QAction( tr( "Manual" ), tr( "&Manual" ), CTRL + Key_M, this, 0 );
-    actionHelpManual->setStatusTip( tr("Opens the Qt Designer manual") );
+    actionHelpManual->setStatusTip( tr("Opens the IndigoSCADA HMI Designer manual") );
     actionHelpManual->setWhatsThis( whatsThisFrom( "Help|Manual" ) );
     connect( actionHelpManual, SIGNAL( activated() ), this, SLOT( helpManual() ) );
 
     actionHelpAbout = new QAction( tr("About"), QPixmap(), tr("&About"), 0, this, 0 );
-    actionHelpAbout->setStatusTip( tr("Displays information about Qt Designer") );
+    actionHelpAbout->setStatusTip( tr("Displays information about IndigoSCADA HMI Designer") );
     actionHelpAbout->setWhatsThis( whatsThisFrom( "Help|About" ) );
     connect( actionHelpAbout, SIGNAL( activated() ), this, SLOT( helpAbout() ) );
 
