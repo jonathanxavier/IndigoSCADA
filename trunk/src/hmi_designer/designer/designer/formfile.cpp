@@ -249,8 +249,8 @@ bool FormFile::shouldOverwriteUi() const
 {
     if (timeStampUi.isUpToDate())
 	return TRUE;
-    return (QMessageBox::information(MainWindow::self, tr( "Qt Designer" ),
-                                     tr("File '%1' has been changed outside Qt Designer.\n"
+    return (QMessageBox::information(MainWindow::self, tr( "IndigoSCADA HMI Designer" ),
+                                     tr("File '%1' has been changed outside IndigoSCADA HMI Designer.\n"
                                         "Do you want to overwrite it?" ).arg(timeStampUi.fileName()),
                                      tr("&Yes"), tr("&No")) == 0);
 }
@@ -667,8 +667,8 @@ void FormFile::checkTimeStamp()
 	return;
     timeStamp.update();
     if ( codeEdited ) {
-	if ( QMessageBox::information( MainWindow::self, tr( "Qt Designer" ),
-				       tr( "File '%1' has been changed outside Qt Designer.\n"
+	if ( QMessageBox::information( MainWindow::self, tr( "IndigoSCADA HMI Designer" ),
+				       tr( "File '%1' has been changed outside IndigoSCADA HMI Designer.\n"
 					   "Do you want to reload it?" ).arg( timeStamp.fileName() ),
 				       tr( "&Yes" ), tr( "&No" ) ) == 0 ) {
 	    QFile f( timeStamp.fileName() );

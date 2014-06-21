@@ -374,7 +374,7 @@ void FormWindow::insertWidget()
 			    "<p>Click <b>Edit Custom Widgets...</b> in the <b>Tools|Custom</b> "
 			    "menu to add and change custom widgets. You can add "
 			    "properties as well as signals and slots to integrate custom widgets into "
-			    "<i>Qt Designer</i>, and provide a pixmap which will be used to represent "
+			    "<i>IndigoSCADA HMI Designer</i>, and provide a pixmap which will be used to represent "
 			    "the widget on the form.</p>")
 			    .arg(WidgetDatabase::toolTip( id )) );
 	QToolTip::add( w, tr("A %1 (custom widget)").arg(WidgetDatabase::toolTip( id )) );
@@ -501,7 +501,7 @@ void FormWindow::insertWidget( QWidget *w, bool checkName )
 			    "<p>Click <b>Edit Custom Widgets...</b> in the <b>Tools|Custom</b> "
 			    "menu to add and change custom widgets. You can add "
 			    "properties as well as signals and slots to integrate custom widgets into "
-			    "<i>Qt Designer</i>, and provide a pixmap which will be used to represent "
+			    "<i>IndigoSCADA HMI Designer</i>, and provide a pixmap which will be used to represent "
 			    "the widget on the form.</p>")
 			    .arg(WidgetDatabase::toolTip( id )) );
 	QToolTip::add( w, tr("A %1 (custom widget)").arg(WidgetDatabase::toolTip( id )) );
@@ -1824,7 +1824,7 @@ bool FormWindow::checkCustomWidgets()
 
     if ( !missingCustomWidgets.isEmpty() ) {
 	QString txt = tr( "The following custom widgets are used in '%1',\n"
-			  "but are not known to Qt Designer:\n" ).arg( name() );
+			  "but are not known to IndigoSCADA HMI Designer:\n" ).arg( name() );
 	for ( QStringList::Iterator sit = missingCustomWidgets.begin(); sit != missingCustomWidgets.end(); ++sit )
 	    txt += "   " + *sit + "\n";
 	txt += "If you save this form and generate code for it using uic, \n"
