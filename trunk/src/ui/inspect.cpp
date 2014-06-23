@@ -206,6 +206,7 @@ void Inspect::ConfigQueryResponse (QObject *p,const QString &, int id, QObject* 
 		break;
 	};
 };
+
 /*
 *Function:
 *Inputs:client object, command string, transaction id
@@ -572,6 +573,113 @@ static ScadaWindowsDict acknowledge_alarm_windows;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "historic_inspect.h"
 #include "historicdb.h"
+
+inspectPopupMenu::inspectPopupMenu( class QWidget *parent, const char *name)
+: QPopupMenu( parent, name )
+{
+	// connect to the databases
+	// 
+	connect (GetConfigureDb (),
+	SIGNAL (TransactionDone (QObject *, const QString &, int, QObject*)), this,
+	SLOT (ConfigQueryResponse (QObject *, const QString &, int, QObject*)));	// connect to configuration database
+};
+
+void inspectPopupMenu::get_unit(QWidget* parent, QString name)
+{
+	// get the UNIT
+	char parent_string[15];
+	ultoa((unsigned long)parent, parent_string, 10);
+
+	QString par = QString(parent_string);
+	QString cmd = "select UNIT from TAGS where NAME='"+name+"';";
+
+	OutputDebugString((const char*)cmd);
+	GetConfigureDb()->DoExec(this,cmd,tTagUnit, par, name);			
+};
+
+/*
+*Function:ConfigQueryResponse
+*Inputs:client object, command string, transaction id
+*Outputs:none
+*Returns:none
+*/
+void inspectPopupMenu::ConfigQueryResponse (QObject *p,const QString &, int id, QObject* caller)  // handles configuration responses
+{
+	if(p != this) return;
+
+	IT_IT("inspectPopupMenu::ConfigQueryResponse");
+
+	switch(id)
+	{
+		case tTagUnit:
+		{
+			QSTransaction &t = GetConfigureDb()->CurrentTransaction();
+
+			int res = GetConfigureDb()->GetNumberResults();
+
+			if(res > 0)
+			{
+				if(res == 1)
+				{
+					QString parent = t.Data1;
+					QString samplePointName = t.Data2;
+
+					QString unit_name = GetConfigureDb()->GetString("UNIT");
+
+					QString cmd = "select UNITTYPE from UNITS where NAME='"+unit_name+"';";
+					GetConfigureDb()->DoExec(this,cmd,tUnitType, parent, samplePointName);
+				}
+				else
+				{
+					QMessageBox::warning(this,tr("Command Failed"),tr("The sample point name is not unique in the TAGS configuration database table"));
+				}
+			}
+			else
+			{
+				QMessageBox::warning(this,tr("Command Failed"),tr("No sample point name found"));
+			}
+		}
+		break;
+		case tUnitType:
+		{
+			QSTransaction &t = GetConfigureDb()->CurrentTransaction();
+
+			if(GetConfigureDb()->GetNumberResults() > 0)
+			{
+				command_parent = t.Data1;
+				command_samplePointName = t.Data2;
+				command_unit_type = GetConfigureDb()->GetString("UNITTYPE");
+
+				QTimer::singleShot(10,this,SLOT(DoCommandDialog()));
+			}
+		}
+		break;
+		default:
+		break;
+	};
+};
+
+
+void inspectPopupMenu::DoCommandDialog()
+{
+	//Send command trough dispatcher to monitor.exe
+	//In monitor.exe call the ::Command method of the drive of unit_type
+	//Note: dll drivers should be installed on the client PC, where ui.exe is running
+	//in C:\scada\Drivers 
+
+	QWidget* parent = (QWidget*) atol((const char*)command_parent);
+	
+	
+	Driver *dp = FindDriver(command_unit_type);
+
+	if(dp)
+	{
+		dp->CommandDlg(parent, command_samplePointName);
+	}			
+};
+
+static inspectPopupMenu* g_m = NULL;
+
 /*
 *Function:
 *Inputs:none
@@ -582,49 +690,29 @@ void InspectMenu(QWidget *parent, const QString &name, bool AckState)
 {
 	if(GetUserDetails().Name == QObject::tr(NONE_STR)) return;
 	// 
-	QPopupMenu m(parent);
+	if(g_m)
+	{
+		delete g_m;
+		g_m = NULL;
+	}
+
+	inspectPopupMenu* m = new inspectPopupMenu(parent);
+
+	g_m = m;
 
 	ScadaWindowsDict::iterator j =  inspect_windows.find(name);
 
 	if(j == inspect_windows.end())
 	{
-		m.insertItem(QPixmap((const char **)inspect), QObject::tr("Inspect (Last 2 hours)..."),0); // open a real time device inspector
-		m.insertItem(QPixmap((const char **)inspect), QObject::tr("Inspect (Last day)..."),1); // open a real time device inspector
-		m.insertItem(QPixmap((const char **)inspect), QObject::tr("Inspect (Last 2 days)..."),2); // open a real time device inspector
-		m.insertItem(QPixmap((const char **)inspect), QObject::tr("Inspect historical data..."),3); // open an historic device inspector
+		m->insertItem(QPixmap((const char **)inspect), QObject::tr("Inspect (Last 2 hours)..."),0); // open a real time device inspector
+		m->insertItem(QPixmap((const char **)inspect), QObject::tr("Inspect (Last day)..."),1); // open a real time device inspector
+		m->insertItem(QPixmap((const char **)inspect), QObject::tr("Inspect (Last 2 days)..."),2); // open a real time device inspector
+		m->insertItem(QPixmap((const char **)inspect), QObject::tr("Inspect historical data..."),3); // open an historic device inspector
 	}
 
 	if(GetUserDetails ().privs & PRIVS_ACK_ALARMS)
 	{
-		if(name.contains("OPC", false) > 0)
-		{
-			m.insertItem(QPixmap((const char **)button),QObject::tr("Send command..."),5); // Send command
-		}
-
-		if(name.contains("IEC104", false) > 0)
-		{
-			m.insertItem(QPixmap((const char **)button),QObject::tr("Send command..."),6); // Send command
-		}
-
-        if(name.contains("IEC101", false) > 0)
-		{
-			m.insertItem(QPixmap((const char **)button),QObject::tr("Send command..."),7); // Send command
-		}
-
-        if(name.contains("IEC103", false) > 0)
-		{
-			m.insertItem(QPixmap((const char **)button),QObject::tr("Send command..."),8); // Send command
-		}
-
-        if(name.contains("DNP3", false) > 0)
-		{
-			m.insertItem(QPixmap((const char **)button),QObject::tr("Send command..."),9); // Send command
-		}
-
-		if(name.contains("MDB", false) > 0)
-		{
-			m.insertItem(QPixmap((const char **)button),QObject::tr("Send command..."),10); // Send command
-		}
+		m->insertItem(QPixmap((const char **)button),QObject::tr("Send command..."),5); // Send command
 	}
 	
 	if(GetUserDetails ().privs &  PRIVS_ACK_ALARMS)
@@ -635,14 +723,14 @@ void InspectMenu(QWidget *parent, const QString &name, bool AckState)
 		{
 			if(AckState)
 			{
-				m.insertItem(QPixmap((const char **)alm_xpm),QObject::tr("Acknowledge Alarm..."),4); // acknowledge alarm
+				m->insertItem(QPixmap((const char **)alm_xpm),QObject::tr("Acknowledge Alarm..."),4); // acknowledge alarm
 			};
 		}
 	};
 
-	//m.insertItem(QPixmap((const char **)quit_xpm),QObject::tr("Cancel"),-1);
+	//m->insertItem(QPixmap((const char **)quit_xpm),QObject::tr("Cancel"),-1);
 	//
-	switch(m.exec(QCursor::pos()))
+	switch(m->exec(QCursor::pos()))
 	{
 		case 0: // open a sample point inspector
 		{
@@ -719,106 +807,9 @@ void InspectMenu(QWidget *parent, const QString &name, bool AckState)
 			}
 		};
 		break;
-		case 5: // send command to OPC driver
+		case 5: // send command to UNIT driver
 		{
-			//Send command trough dispatcher to monitor.exe
-			//In monitor.exe call the ::Command method of the drive of unit_type
-			//Note: dll drivers should be installed  on the client PC, where ist.exe is running
-			//in C:\scada\Drivers 
-
-			QString unit_type; // the current unit type
-			unit_type = "opc_client_da_driver"; 
-			Driver *dp = FindDriver(unit_type);
-
-			if(dp)
-			{
-				dp->CommandDlg(parent, name);
-			}
-		};
-		break;
-		case 6: // send command to IEC 104 driver
-		{
-			//Send command trough dispatcher to monitor.exe
-			//In monitor. exe call the ::Command method of the drive of unit_type
-			//Note: dll drivers should be installed  on the client PC, where ist.exe is running
-			//in C:\scada\Drivers
-
-			QString unit_type; // the current unit type
-			unit_type = "iec104driver"; 
-			Driver *dp = FindDriver(unit_type);
-
-			if(dp)
-			{
-				dp->CommandDlg(parent, name);
-			}
-		};
-		break;
-		case 7: // send command to IEC 101 driver
-		{
-			//Send command trough dispatcher to monitor.exe
-			//In monitor. exe call the ::Command method of the drive of unit_type
-			//Note: dll drivers should be installed  on the client PC, where ist.exe is running
-			//in C:\scada\Drivers
-
-			QString unit_type; // the current unit type
-			unit_type = "iec101driver"; 
-			Driver *dp = FindDriver(unit_type);
-
-			if(dp)
-			{
-				dp->CommandDlg(parent, name);
-			}
-		};
-		break;
-		case 8: // send command to IEC 103 driver
-		{
-			//Send command trough dispatcher to monitor.exe
-			//In monitor. exe call the ::Command method of the drive of unit_type
-			//Note: dll drivers should be installed  on the client PC, where ist.exe is running
-			//in C:\scada\Drivers
-
-			QString unit_type; // the current unit type
-			unit_type = "iec103driver"; 
-			Driver *dp = FindDriver(unit_type);
-
-			if(dp)
-			{
-				dp->CommandDlg(parent, name);
-			}
-		};
-		break;
-		case 9: // send command to IEC 104 driver
-		{
-			//Send command trough dispatcher to monitor.exe
-			//In monitor. exe call the ::Command method of the drive of unit_type
-			//Note: dll drivers should be installed  on the client PC, where ist.exe is running
-			//in C:\scada\Drivers
-
-			QString unit_type; // the current unit type
-			unit_type = "dnp3driver"; 
-			Driver *dp = FindDriver(unit_type);
-
-			if(dp)
-			{
-				dp->CommandDlg(parent, name);
-			}
-		};
-		break;
-		case 10: // send command to MODBUS drive
-		{
-			//Send command trough dispatcher to monitor.exe
-			//In monitor. exe call the ::Command method of the drive of unit_type
-			//Note: dll drivers should be installed  on the client PC, where ist.exe is running
-			//in C:\scada\Drivers
-
-			QString unit_type; // the current unit type
-			unit_type = "modbus_driver"; 
-			Driver *dp = FindDriver(unit_type);
-
-			if(dp)
-			{
-				dp->CommandDlg(parent, name);
-			}
+			m->get_unit(parent, name);
 		};
 		break;
 		default:

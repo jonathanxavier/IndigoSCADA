@@ -1,7 +1,7 @@
 /*
  *                         IndigoSCADA
  *
- *   This software and documentation are Copyright 2002 to 2009 Enscada 
+ *   This software and documentation are Copyright 2002 to 2014 Enscada 
  *   Limited and its licensees. All rights reserved. See file:
  *
  *                     $HOME/LICENSE 
@@ -45,7 +45,6 @@ class Inspect : public QMainWindow
 
 	QSplitter *pSm;
 	QSplitter *pS;
-
 	//
 	public:
 	// pass in the obect name and the time to go back (in secs) - default 2 hours
@@ -74,7 +73,29 @@ class Inspect : public QMainWindow
 	void Close();
 	//
 };
+
+class inspectPopupMenu: public QPopupMenu
+{
+	Q_OBJECT
+	enum { tTagUnit = 1, tUnitType};
+
+	QString command_parent;
+	QString command_samplePointName;
+	QString command_unit_type;
+
+	public:
+
+	inspectPopupMenu( class QWidget *parent = 0, const char *name = 0);
+	//~inspectPopupMenu();
+	void get_unit(QWidget* parent, QString name);
+	public slots:
+	//
+	void ConfigQueryResponse (QObject *,const QString &, int, QObject*);  // handles configuration responses
+	void DoCommandDialog();
+};
+
 void InspectMenu(QWidget *parent, const QString &name, bool AckState);
 ScadaWindowsDict* GetInpectWindowsDict();
+
 #endif
 
