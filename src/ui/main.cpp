@@ -51,7 +51,7 @@ int main(int argc, char **argv)
 
 	char version[100];
 	//version control///////////////////////////////////////////////////////////////
-    sprintf(version, "ist.exe - Build: %s %s at enscada.com",__DATE__,__TIME__);
+    sprintf(version, "ui.exe - Build: %s %s at enscada.com",__DATE__,__TIME__);
     fprintf(stdout, "%s\n", version);
 	SYSTEMTIME oT;
 	::GetLocalTime(&oT);
@@ -152,7 +152,7 @@ int main(int argc, char **argv)
 	else
 	{
 		//cerr << "Failed to connect to database(s) and (or) dispatcher" << endl;
-		MessageBox(NULL,"Failed to connect to database(s) and (or) dispatcher","Ist", MB_OK|MB_ICONSTOP);
+		MessageBox(NULL,"Failed to connect to database(s) and (or) dispatcher","UI", MB_OK|MB_ICONSTOP);
 		IT_COMMENT("Failed to connect to database(s) and (or) dispatcher");//error messag
 	};
 	
