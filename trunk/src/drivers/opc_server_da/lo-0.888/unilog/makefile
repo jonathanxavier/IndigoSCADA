@@ -2,7 +2,7 @@
 # Select the *SINGLE* path
 ###################################################
 
-MSDIR="C:\Programmi\Microsoft Visual Studio\VC98"
+MSDIR="C:\Program Files\Microsoft Visual Studio\VC98"
 
 ###################################################
 
