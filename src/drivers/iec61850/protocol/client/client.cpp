@@ -180,6 +180,8 @@ int IEC61850_client_imp::sendEvents()
 		{
 			break; //exit loop for timeout of connection with parent
 		}
+
+		getEvents();
 				
 		::Sleep(pollingTime);
 	}
@@ -285,7 +287,7 @@ int IEC61850_client_imp::Stop()
 int IEC61850_client_imp::check_connection_to_server(void)
 {
 	IT_IT("IEC61850_client_imp::check_connection_to_server");
-
+	//TODO: is there any way to check the connection with server?
 	return 0;
 }
 
@@ -431,7 +433,17 @@ void IEC61850_client_imp::getEvents(void)
 
 		typeSpec = MmsConnection_getVariableAccessAttributes(con, mmsDomain, str);
 
+		if(typeSpec->type == MMS_ARRAY)
+		{
+			continue;
+		}
+
 		value = MmsConnection_readVariable(con, mmsDomain, str);
+
+		if(value == NULL)
+		{
+			continue;
+		}
 
 		item_to_send.iec_obj.ioa = Item[elementCount].ioa_control_center;
 
