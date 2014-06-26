@@ -276,6 +276,8 @@ int IEC61850_client_imp::Stop()
 		Item = NULL;
 	}
 
+	MmsConnection_destroy(con);
+
 	char show_msg[200];
 	sprintf(show_msg, " IndigoSCADA IEC61850 client end\n");
 	LogMessage(NULL, show_msg);
@@ -931,21 +933,7 @@ void IEC61850_client_imp::check_for_commands(struct iec_item *queued_item)
 {
 	DWORD dw = 0;
 	MmsValue* value_to_write;
-	
-	struct cp56time2a actual_time;
-	get_utc_host_time(&actual_time);
-
-	time_t command_arrive_time_in_seconds = epoch_from_cp56time2a(&actual_time);
-	
-	get_utc_host_time(&actual_time);
-
-	time_t attual_time_in_seconds = epoch_from_cp56time2a(&actual_time);
-
-	if(attual_time_in_seconds - command_arrive_time_in_seconds > 10)
-	{
-		ExitProcess(0);
-	}
-	    
+		    
 	if(!fExit)
 	{ 
 		fprintf(stderr,"Receiving %d th message \n", queued_item->msg_id);
