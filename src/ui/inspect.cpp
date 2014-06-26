@@ -1,7 +1,7 @@
 /*
  *                         IndigoSCADA
  *
- *   This software and documentation are Copyright 2002 to 2009 Enscada 
+ *   This software and documentation are Copyright 2002 to 2014 Enscada 
  *   Limited and its licensees. All rights reserved. See file:
  *
  *                     $HOME/LICENSE 
@@ -592,8 +592,6 @@ void inspectPopupMenu::get_unit(QWidget* parent, QString name)
 
 	QString par = QString(parent_string);
 	QString cmd = "select UNIT from TAGS where NAME='"+name+"';";
-
-	OutputDebugString((const char*)cmd);
 	GetConfigureDb()->DoExec(this,cmd,tTagUnit, par, name);			
 };
 
