@@ -566,7 +566,18 @@ void Opc_client_da_imp::CreateSqlConfigurationFile(char* sql_file_name, char* op
 
 			strcpy(Item[nTestItem].spname, buf);
 
-			wcscpy(Item[nTestItem].wszName, T2W(buf));
+			//wcscpy(Item[nTestItem].wszName, T2W(buf));
+
+			#define customA2W(lpa) (((_lpa = lpa) == NULL) ? NULL : (_convert = (lstrlenA(_lpa)+1), ATLA2WHELPER((LPWSTR) malloc(_convert*2), _lpa, _convert)))
+
+			LPWSTR Wide_buf = customA2W(buf);
+
+			wcscpy(Item[nTestItem].wszName, Wide_buf);
+
+			if(Wide_buf)
+			{
+				free(Wide_buf);
+			}
 			
 			//set VT_EMPTY and the server will select the right type////
 			Item[nTestItem].vt = VT_EMPTY;
