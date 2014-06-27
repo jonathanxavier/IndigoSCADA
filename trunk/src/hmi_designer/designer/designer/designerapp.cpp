@@ -66,7 +66,7 @@ QSplashScreen *DesignerApplication::showSplash()
 {
     QRect screen = QApplication::desktop()->screenGeometry();
     QSettings config;
-    config.insertSearchPath( QSettings::Windows, "/Trolltech" );
+    config.insertSearchPath( QSettings::Windows, "/Enscada" );  //apa modified
 
     QRect mainRect;
     QString keybase = settingsKey();

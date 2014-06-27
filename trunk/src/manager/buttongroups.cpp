@@ -1,7 +1,7 @@
 /*
  *                         IndigoSCADA
  *
- *   This software and documentation are Copyright 2002 to 2009 Enscada 
+ *   This software and documentation are Copyright 2002 to 2014 Enscada 
  *   Limited and its licensees. All rights reserved. See file:
  *
  *                     $HOME/LICENSE 
@@ -20,6 +20,39 @@
 #include "..\ui\start.xpm"
 #include "..\ui\quit.xpm"
 #include "..\ui\computer.xpm"
+
+static QString HomeDirectory = (const char*) 0;
+
+void SetScadaHomeDirectory(const QString &s) 
+{ 
+	#ifdef WIN32
+	
+	char path[_MAX_PATH];
+	
+	path[0] = '\0';
+	if(GetModuleFileName(NULL, path, _MAX_PATH))
+	{
+		*(strrchr(path, '\\')) = '\0';        // Strip \\filename.exe off path
+		*(strrchr(path, '\\')) = '\0';        // Strip \\bin off path
+
+		HomeDirectory = path;
+    }
+		
+	#else //UNIX
+
+	char path[256];
+
+	strcpy(path, (const char*)s);
+	
+	*(strrchr(path, '/')) = '\0';        // Strip /filename.exe off path
+	*(strrchr(path, '/')) = '\0';        // Strip /bin off path
+
+	HomeDirectory = path;
+
+	#endif
+}
+
+const QString & GetScadaHomeDirectory() { return HomeDirectory;};
 
 void ButtonsGroups::WriteLog(char* pMsg)
 {
@@ -49,18 +82,73 @@ BOOL ButtonsGroups::StartProcess(int nIndex)
 
 	char pCommandLine[501];
 
-	GetPrivateProfileString(pItem,"CommandLine","",pCommandLine,nBufferSize,pInitFile);
+	pCommandLine[0] ='\0';
 
+	GetPrivateProfileString(pItem,"CommandLine","",pCommandLine,nBufferSize,pInitFile);
+	
 	if(strlen(pCommandLine)>4)
 	{
-		//char pStart[501];
+		char pUserInterface[501];
+		
+		GetPrivateProfileString(pItem,"UserInterface","N",pUserInterface,nBufferSize,pInitFile);
 
-		//GetPrivateProfileString(pItem,"Start","N",pStart,nBufferSize,pInitFile);
+		BOOL bUserInterface = (pUserInterface[0]=='y'||pUserInterface[0]=='Y'||pUserInterface[0]=='1')?TRUE:FALSE;
 
-		//BOOL bStart = (pStart[0]=='y'||pStart[0]=='Y'||pStart[0]=='1')?TRUE:FALSE;
+		char CurrentDesktopName[512];
 
-		//if(bStart)
-		//{
+		// set the correct desktop for the process to be started
+		if(bUserInterface)
+		{
+			//startUpInfo.wShowWindow = SW_SHOW;
+			startUpInfo.wShowWindow = SW_SHOWMINIMIZED;
+			startUpInfo.lpDesktop = NULL;
+		}
+		else
+		{
+			HDESK hCurrentDesktop = GetThreadDesktop(GetCurrentThreadId());
+			DWORD len;
+			GetUserObjectInformation(hCurrentDesktop,UOI_NAME,CurrentDesktopName,MAX_PATH,&len);
+			startUpInfo.wShowWindow = SW_HIDE;
+			startUpInfo.lpDesktop = CurrentDesktopName;
+		}
+
+		// create the process
+
+		char pWorkingDir[501];
+
+		GetPrivateProfileString(pItem,"WorkingDir","",pWorkingDir,nBufferSize,pInitFile);
+
+		if(CreateProcess(NULL,pCommandLine,NULL,NULL,TRUE,NORMAL_PRIORITY_CLASS,NULL,strlen(pWorkingDir)==0?NULL:pWorkingDir,&startUpInfo,&pProcInfo[nIndex]))
+		{
+			char pPause[501];
+			GetPrivateProfileString(pItem,"PauseStart","100",pPause,nBufferSize,pInitFile);
+			Sleep(atoi(pPause));
+			return TRUE;
+		}
+		else
+		{
+			long nError = GetLastError();
+			char pTemp[121];
+			sprintf(pTemp,"Failed to start program '%s', error code = %d", pCommandLine, nError); 
+			WriteLog(pTemp);
+			return FALSE;
+		}
+	}
+	else 
+	{
+		char pProcessName[501];
+
+		pProcessName[0] ='\0';
+
+		GetPrivateProfileString(pItem,"Process","",pProcessName,nBufferSize,pInitFile);
+
+		if(strlen(pProcessName)>4)
+		{
+			QString hm_dir = GetScadaHomeDirectory();
+			strcpy(pCommandLine, (const char*)hm_dir);
+			strcat(pCommandLine, "\\bin\\");
+			strcat(pCommandLine, pProcessName);
+						
 			char pUserInterface[501];
 			
 			GetPrivateProfileString(pItem,"UserInterface","N",pUserInterface,nBufferSize,pInitFile);
@@ -106,12 +194,11 @@ BOOL ButtonsGroups::StartProcess(int nIndex)
 				WriteLog(pTemp);
 				return FALSE;
 			}
-		//}
-		//return FALSE;
-	}
-	else 
-	{
-		return FALSE;
+		}
+		else
+		{
+			return FALSE;
+		}
 	}
 }
 

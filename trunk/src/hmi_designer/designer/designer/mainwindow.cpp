@@ -2138,7 +2138,7 @@ void MainWindow::writeConfig()
     QSettings config;
 
     // No search path for unix, only needs application name
-    config.insertSearchPath( QSettings::Windows, "/Trolltech" );
+    config.insertSearchPath( QSettings::Windows, "/Enscada" );  //apa modified
 
     QString keybase = DesignerApplication::settingsKey();
 
@@ -2247,7 +2247,7 @@ void MainWindow::readConfig()
 {
     QString keybase = DesignerApplication::settingsKey();
     QSettings config;
-    config.insertSearchPath( QSettings::Windows, "/Trolltech" );
+    config.insertSearchPath( QSettings::Windows, "/Enscada" );  //apa modified
 
     bool ok;
     bool readPreviousConfig = FALSE;
