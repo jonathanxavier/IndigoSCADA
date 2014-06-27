@@ -92,7 +92,6 @@ class IEC61850_client_imp
 
 		fExit = false;
 		Item = NULL;
-		Config_db = NULL;
 		client_state_variable = CLIENT_NOT_INITIALIZED;
 		timer_starts_at_epoch = 0;
 		nameList = NULL;
@@ -182,7 +181,6 @@ class IEC61850_client_imp
 	 time_t timer_starts_at_epoch;
 	 char ServerIPAddress[80];
 	 struct structItem* Item; //IEC61850 client items vector, indexed from 0
-	 struct structItem* Config_db;
 	 unsigned int g_dwNumItems;
 	 int pollingTime;
 
@@ -214,7 +212,7 @@ class IEC61850_client_imp
 	 int AddItems();
 	 void LogMessage(HRESULT hr = S_OK, LPCSTR pszError = NULL, const char* name = NULL);
 	 int sendEvents(void);
-	 void getEvents(void);
+	 void pollServer(void);
 	 void get_utc_host_time(struct cp56time2a* time);
 	 time_t epoch_from_cp56time2a(const struct cp56time2a* time);
 	 void epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch_in_millisec);
