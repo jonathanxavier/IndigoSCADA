@@ -190,7 +190,7 @@ int main( int argc, char *argv[] )
 
     QSettings config;
     QString keybase = DesignerApplication::settingsKey();
-    config.insertSearchPath( QSettings::Windows, "/Trolltech" );
+    config.insertSearchPath( QSettings::Windows, "/Enscada" ); //apa modified
     QStringList pluginPaths = config.readListEntry( keybase + "PluginPaths" );
     if (pluginPaths.count())
 	QApplication::setLibraryPaths(pluginPaths);
@@ -203,7 +203,7 @@ int main( int argc, char *argv[] )
     a.setMainWidget( mw );
     mw->setCaption( "IndigoSCADA HMI designer" );
 
-
+//apa begin removed
 //    MainWindow *mw = new MainWindow( creatPid );
 //    a.setMainWidget( mw );
 //#if defined(QT_NON_COMMERCIAL)
