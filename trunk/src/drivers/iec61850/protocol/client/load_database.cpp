@@ -26,7 +26,7 @@
 
 static gl_row_counter = 0;
 static gl_column_counter = 0;
-static struct structItem* gl_Config_db = 0;
+static struct structItem* gl_Config_db = NULL;
 
 static int db_callback(void *NotUsed, int argc, char **argv, char **azColName)
 {
@@ -242,9 +242,7 @@ int IEC61850_client_imp::AddItems()
 
 	g_dwNumItems = MAX_CONFIGURABLE_ITEMIDS;
 	
-	Config_db = (struct structItem*)calloc(1, g_dwNumItems*sizeof(struct structItem));
-
-	gl_Config_db = Config_db;
+	gl_Config_db = (struct structItem*)calloc(1, g_dwNumItems*sizeof(struct structItem));
 
 	gl_row_counter = 0;
 
@@ -285,7 +283,7 @@ int IEC61850_client_imp::AddItems()
 
 	//for(j = 0; j < n_rows; j++)
 	//{
-	//	fprintf(fp, "%s\n" , Config_db[j].spname); // only for test
+	//	fprintf(fp, "%s\n" , gl_Config_db[j].spname); // only for test
 	//}
 
 	//fclose(fp);
@@ -309,7 +307,7 @@ int IEC61850_client_imp::AddItems()
 
 		found_duplicated_item_id = 0;
 			
-		strcpy(Item[nTestItem].spname, Config_db[j].spname);
+		strcpy(Item[nTestItem].spname, gl_Config_db[j].spname);
 
 		//fprintf(stderr,"Item[nTestItem].spname = %s\n", Item[nTestItem].spname);
 		//fflush(stderr);
@@ -341,8 +339,8 @@ int IEC61850_client_imp::AddItems()
 			//fprintf(fp, " Added\n"); // only for test
 		}
 			
-		Item[nTestItem].ioa_control_center = Config_db[j].ioa_control_center;
-		Item[nTestItem].iec_104_type = Config_db[j].iec_104_type;
+		Item[nTestItem].ioa_control_center = gl_Config_db[j].ioa_control_center;
+		Item[nTestItem].iec_104_type = gl_Config_db[j].iec_104_type;
 
 		//ended to read a record
 
@@ -363,6 +361,11 @@ int IEC61850_client_imp::AddItems()
 		return 1;
 	}
 
+	if(gl_Config_db)
+	{
+		free(gl_Config_db);
+	}
+
 	IT_EXIT;
 	return(0);
 }
@@ -377,6 +380,8 @@ void IEC61850_client_imp::CreateSqlConfigurationFile(void)
 	char program_path[_MAX_PATH];
 	double max = 0.0;
 	double min = 0.0;
+	char spname[200];
+	int insert_record = 0;
 	
 	iec_104_type[0] = '\0';
 	iec61850_type[0] = '\0';
@@ -411,157 +416,160 @@ void IEC61850_client_imp::CreateSqlConfigurationFile(void)
 		return;
 	}
 
-	Item = (struct structItem*)calloc(1, MAX_CONFIGURABLE_ITEMIDS*sizeof(struct structItem));
-
 	LinkedList element = nameList;
 	int elementCount = 0;
 	char* str;
+
+	iec_104_type[0] = '\0';
 										
-		for(int nTestItem = 0; (element = LinkedList_getNext(element)) != NULL; )
+	for(int nTestItem = 0; (element = LinkedList_getNext(element)) != NULL; )
+	{
+		insert_record = 0;
+
+		str = (char*) (element->data);
+
+		strcpy(spname, str);
+
+		typeSpec = MmsConnection_getVariableAccessAttributes(con, mmsDomain, str);
+
+		//NOTE: keep aligned this swith with the one in pollServer
+
+		switch(typeSpec->type)
 		{
-			str = (char*) (element->data);
-
-			strcpy(Item[nTestItem].spname, str);
-
-			typeSpec = MmsConnection_getVariableAccessAttributes(con, mmsDomain, str);
-
-			Item[elementCount].ioa_control_center = nTestItem + 1;
-
-			//NOTE: kepp aligned this swith with the one in getEvents
-
-			switch(typeSpec->type)
+			//case MMS_ARRAY:
+			//{
+				//Not supported mapping at moment
+			//	strcpy(iec61850_type, "MMS_ARRAY");
+			//}
+			//break;
+			//case MMS_STRUCTURE:
+			//{
+			//  //Not to be mapped
+			//	strcpy(iec61850_type, "MMS_STRUCTURE");
+			//}
+			//break;
+			case MMS_BIT_STRING:
 			{
-				case MMS_ARRAY:
+				strcpy(iec61850_type, "MMS_BIT_STRING");
+				insert_record = 1;
+			}
+			break;
+			//case MMS_OCTET_STRING:
+			//{
+				//Not to be mapped
+			//	strcpy(iec61850_type, "MMS_OCTET_STRING");
+			//}
+			//break;
+			case MMS_GENERALIZED_TIME:
+			{
+				strcpy(iec61850_type, "MMS_GENERALIZED_TIME");
+				insert_record = 1;
+			}
+			break;
+			case MMS_BINARY_TIME:
+			{
+				strcpy(iec61850_type, "MMS_BINARY_TIME");
+				insert_record = 1;
+			}
+			break;
+			case MMS_BCD:
+			{
+				strcpy(iec61850_type, "MMS_BCD");
+				insert_record = 1;
+				nTestItem++;
+			}
+			break;
+			//case MMS_OBJ_ID:
+			//{
+			//	Not to be mapped at moment
+			//	strcpy(iec61850_type, "MMS_OBJ_ID");
+			//}
+			//break;
+			//case MMS_STRING:
+			//{
+			//  //Not to be mapped
+			//	strcpy(iec61850_type, "MMS_STRING");
+			//}
+			//break;
+			case MMS_UTC_TIME:
+			{
+				strcpy(iec61850_type, "MMS_UTC_TIME");
+				insert_record = 1;
+			}
+			break;
+			case MMS_UNSIGNED:
+			{
+				strcpy(iec_104_type, "M_IT_TB_1");
+				strcpy(iec61850_type, "MMS_UNSIGNED");
+				insert_record = 1;
+				nTestItem++;
+			}
+			break;
+			case MMS_INTEGER:
+			{
+				strcpy(iec_104_type, "M_IT_TB_1");
+				strcpy(iec61850_type, "MMS_INTEGER");
+				insert_record = 1;
+				nTestItem++;
+			}
+			break;
+			case MMS_FLOAT:
+			{
+				nTestItem++;
+				insert_record = 1;
+				if(typeSpec->typeSpec.floatingpoint.formatWidth == 64) 
 				{
-					strcpy(iec_104_type, "M_IT_TB_1"); //TODO: find correct IEC 104 type
-					strcpy(iec61850_type, "MMS_ARRAY");
+					strcpy(iec_104_type, "M_ME_TN_1");
+					strcpy(iec61850_type, "MMS_FLOAT");
 				}
-				break;
-				case MMS_STRUCTURE:
-				{
-					strcpy(iec_104_type, "M_IT_TB_1"); //TODO: find correct IEC 104 type
-					strcpy(iec61850_type, "MMS_STRUCTURE");
-				}
-				break;
-				case MMS_BIT_STRING:
-				{
-					strcpy(iec_104_type, "M_IT_TB_1"); //TODO: find correct IEC 104 type
-					strcpy(iec61850_type, "MMS_BIT_STRING");
-				}
-				break;
-				case MMS_OCTET_STRING:
-				{
-					strcpy(iec_104_type, "M_IT_TB_1"); //TODO: find correct IEC 104 type
-					strcpy(iec61850_type, "MMS_OCTET_STRING");
-				}
-				break;
-				case MMS_GENERALIZED_TIME:
-				{
-					strcpy(iec_104_type, "M_IT_TB_1"); //TODO: find correct IEC 104 type
-					strcpy(iec61850_type, "MMS_GENERALIZED_TIME");
-				}
-				break;
-				case MMS_BINARY_TIME:
-				{
-					strcpy(iec_104_type, "M_IT_TB_1"); //TODO: find correct IEC 104 type
-					strcpy(iec61850_type, "MMS_BINARY_TIME");
-				}
-				break;
-				case MMS_BCD:
-				{
-					strcpy(iec_104_type, "M_IT_TB_1"); //TODO: find correct IEC 104 type
-					strcpy(iec61850_type, "MMS_BCD");
-				}
-				break;
-				case MMS_OBJ_ID:
-				{
-					strcpy(iec_104_type, "M_IT_TB_1"); //TODO: find correct IEC 104 type
-					strcpy(iec61850_type, "MMS_OBJ_ID");
-				}
-				break;
-				case MMS_STRING:
-				{
-					strcpy(iec_104_type, "M_IT_TB_1"); //TODO: find correct IEC 104 type
-					strcpy(iec61850_type, "MMS_STRING");
-				}
-				break;
-				case MMS_UTC_TIME:
-				{
-					strcpy(iec_104_type, "M_IT_TB_1"); //TODO: find correct IEC 104 type
-					strcpy(iec61850_type, "MMS_UTC_TIME");
-				}
-				break;
-				case MMS_UNSIGNED:
-				{
-					strcpy(iec_104_type, "M_IT_TB_1");
-					strcpy(iec61850_type, "MMS_UNSIGNED");
-				}
-				break;
-				case MMS_INTEGER:
-				{
-					strcpy(iec_104_type, "M_IT_TB_1");
-					strcpy(iec61850_type, "MMS_INTEGER");
-				}
-				break;
-				case MMS_FLOAT:
-				{
-					if(typeSpec->typeSpec.floatingpoint.formatWidth == 64) 
-					{
-						strcpy(iec_104_type, "M_ME_TN_1");
-						strcpy(iec61850_type, "MMS_FLOAT");
-					}
-					else
-					{
-						strcpy(iec_104_type, "M_ME_TF_1");
-						strcpy(iec61850_type, "MMS_FLOAT");
-					}
-				}
-				break;
-				case MMS_BOOLEAN:
-				{
-					strcpy(iec_104_type, "M_SP_TB_1");
-					strcpy(iec61850_type, "MMS_BOOLEAN");
-				}
-				break;
-				case MMS_VISIBLE_STRING:
+				else
 				{
 					strcpy(iec_104_type, "M_ME_TF_1");
-					strcpy(iec61850_type, "MMS_VISIBLE_STRING");
+					strcpy(iec61850_type, "MMS_FLOAT");
 				}
-				break;
-				default:
-				{
-					//IEC61850 type NOT suported
-				}
-				break;
 			}
-
-			fprintf(dump, "insert into client_table values('%s', '%d', '%s', '%lf', '%lf', '%s');\n", 
-			Item[nTestItem].spname, nTestItem + 1, iec_104_type, max, min, iec61850_type);
-			fflush(dump);
-			
-			////////////////////////////end dumping one record/////////////////////////////////////////////
-
-			nTestItem++;
-			
-			if(nTestItem >= MAX_CONFIGURABLE_ITEMIDS)
-			{ 
-				printf("Warning! Increase ""MAX_CONFIGURABLE_ITEMIDS"" items\n");
-				break;
+			break;
+			case MMS_BOOLEAN:
+			{
+				strcpy(iec_104_type, "M_SP_TB_1");
+				strcpy(iec61850_type, "MMS_BOOLEAN");
+				insert_record = 1;
+				nTestItem++;
 			}
+			break;
+			//case MMS_VISIBLE_STRING:
+			//{
+			//  //Not to be mapped
+			//	strcpy(iec61850_type, "MMS_VISIBLE_STRING");
+			//}
+			//break;
+			default:
+			{
+				//IEC61850 type NOT supported
+			}
+			break;
 		}
 
-		Stop();
-
-		if(dump)
+		if(insert_record && strlen(iec_104_type) > 0)
 		{
-			fclose(dump);
-			dump = NULL;
+			fprintf(dump, "insert into client_table values('%s', '%d', '%s', '%lf', '%lf', '%s');\n", 
+			spname, nTestItem, iec_104_type, max, min, iec61850_type);
+			fflush(dump);
 		}
+		
+		////////////////////////////end dumping one record/////////////////////////////////////////////
+	}
 
-		fprintf(stderr,"Server browsing is complete!\n");
-		fflush(stderr);
-	
-	
+	Stop();
+
+	if(dump)
+	{
+		fclose(dump);
+		dump = NULL;
+	}
+
+	fprintf(stderr,"Server browsing is complete!\n");
+	fflush(stderr);
+		
 	IT_EXIT;
 }

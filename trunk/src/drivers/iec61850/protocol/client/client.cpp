@@ -27,6 +27,7 @@ extern "C" {
 #endif
 
 int32_t MmsValue_toInt32(MmsValue* value);
+uint32_t MmsValue_toUInt32(MmsValue* value);
 
 #ifdef __cplusplus
 }
@@ -181,7 +182,7 @@ int IEC61850_client_imp::sendEvents()
 			break; //exit loop for timeout of connection with parent
 		}
 
-		getEvents();
+		pollServer();
 				
 		::Sleep(pollingTime);
 	}
@@ -212,9 +213,9 @@ int IEC61850_client_imp::Start()
 
 	indication = MmsConnection_connect(con, ServerIPAddress, tcpPort);
 
-	if (indication != MMS_OK) {
+	if (indication != MMS_OK) 
+	{
 		printf("MMS connect failed!\n");
-		MmsConnection_destroy(con);
 		return(1);
 	}
 	else
@@ -246,7 +247,7 @@ int IEC61850_client_imp::Start()
 	LinkedList_destroy(nameList);
 	printf("\n");
 
-	nameList = MmsConnection_getDomainVariableNames(con, "SampleIEDDevice1");
+	nameList = MmsConnection_getDomainVariableNames(con, mmsDomain);
 
 	IT_EXIT;
 	return(0);
@@ -403,40 +404,46 @@ void IEC61850_client_imp::epoch_to_cp56time2a(cp56time2a *time, signed __int64 e
     return;
 }
 
-void IEC61850_client_imp::getEvents(void)
+void IEC61850_client_imp::pollServer(void)
 {
-	IT_IT("IEC61850_client_imp::sendEvents");
+	IT_IT("IEC61850_client_imp::pollServer");
 
 	cp56time2a time;
 	signed __int64 epoch_in_millisec;
 	struct iec_item item_to_send;
-	double delta = 0.0;
-	
+	unsigned int index_inside_db;
+	int send_item;
+				
 	if(Item == NULL)
 	{
 		//print error message
 		return;
 	}
-    	
-	memset(&item_to_send,0x00, sizeof(struct iec_item));
-	
-	//item_to_send.cause = cot;
-	item_to_send.cause = 0x03;
 	
 	LinkedList element = nameList;
 	int elementCount = 0;
 	char* str;
-		
+
+	///////////////////////initialize packet to send/////////
+	send_item = 0;
+	memset(&item_to_send,0x00, sizeof(struct iec_item));
+	item_to_send.cause = 0x03; //spontaneous
+	/////////////////////////////////////////////////////////
+			
 	while((element = LinkedList_getNext(element)) != NULL) 
 	{
 		str = (char*) (element->data);
 
-		//strcpy(item_to_send.spname, str);
-
 		typeSpec = MmsConnection_getVariableAccessAttributes(con, mmsDomain, str);
 
-		if(typeSpec->type == MMS_ARRAY)
+		if(typeSpec->type == MMS_ARRAY ||
+		   typeSpec->type == MMS_STRUCTURE ||
+		   typeSpec->type == MMS_STRING ||
+		   typeSpec->type == MMS_VISIBLE_STRING ||
+		   typeSpec->type == MMS_OCTET_STRING ||
+		   typeSpec->type == MMS_OBJ_ID)
 		{
+			elementCount++;
 			continue;
 		}
 
@@ -444,242 +451,102 @@ void IEC61850_client_imp::getEvents(void)
 
 		if(value == NULL)
 		{
+			elementCount++;
+			continue;
+		}
+	
+		int found = 0;
+		//linear search, TODO improve
+		for(index_inside_db = 0; index_inside_db < g_dwNumItems; index_inside_db++)
+		{
+			if(strcmp(str, Item[index_inside_db].spname) == 0)
+			{
+				found = 1;
+				break;
+			}
+		}
+
+		if(!found)
+		{
+			elementCount++;
 			continue;
 		}
 
-		item_to_send.iec_obj.ioa = Item[elementCount].ioa_control_center;
+		item_to_send.iec_obj.ioa = Item[index_inside_db].ioa_control_center;
 
 		switch(typeSpec->type) 
 		//switch(MmsValue_getType(value))
 		{
-			/*		
-			case VT_I1:
+			case MMS_UNSIGNED:
 			{
-				switch(Item[elementCount].iec_104_type)
+				switch(Item[index_inside_db].iec_104_type)
 				{
 					case M_IT_TB_1:
 					{
 						item_to_send.iec_type = M_IT_TB_1;
-						epoch_to_cp56time2a(&time, epoch_in_millisec);
-						item_to_send.iec_obj.o.type37.counter = V_I1(pValue);
-						item_to_send.iec_obj.o.type37.time = time;
-							
-						if(pwQualities != OPC_QUALITY_GOOD)
-							item_to_send.iec_obj.o.type37.iv = 1;
+						item_to_send.iec_obj.o.type37.counter = MmsValue_toUInt32(value);
+						send_item++;
 
-						IT_COMMENT1("Value = %d", V_I1(pValue));
+						fprintf(stderr, "Read %s with value: %u\n", Item[index_inside_db].spname, MmsValue_toUInt32(value));
+						fflush(stderr);
 					}
 					break;
 					case M_ME_TE_1:
 					{
 						int error = 0;
-
 						item_to_send.iec_type = M_ME_TE_1;
-						epoch_to_cp56time2a(&time, epoch_in_millisec);
-						item_to_send.iec_obj.o.type35.mv = rescale_value(V_I1(pValue),
-						Item[elementCount].min_measure, 
-						Item[elementCount].max_measure, &error);
-						
-						if(pwQualities != OPC_QUALITY_GOOD)
-							item_to_send.iec_obj.o.type35.iv = 1;
+						item_to_send.iec_obj.o.type35.mv = rescale_value(MmsValue_toUInt32(value),
+						Item[index_inside_db].min_measure, 
+						Item[index_inside_db].max_measure, &error);
+						send_item++;
 
-						IT_COMMENT1("Value = %d", V_I1(pValue));
-					}
-					break;
-					case C_DC_NA_1:
-					{
-						fprintf(stderr,"IEC type %d is NOT sent in monitoring direction\n", Item[elementCount].iec_104_type);
+						fprintf(stderr, "Read %s with value: %u\n", Item[index_inside_db].spname, MmsValue_toUInt32(value));
 						fflush(stderr);
 					}
 					break;
 					default:
 					{
-					  fprintf(stderr,"IEC type %d is NOT supported for VT_I1\n", Item[elementCount].iec_104_type);
+					  fprintf(stderr,"IEC type %d is NOT supported for MMS_UNSIGNED\n", Item[index_inside_db].iec_104_type);
 					  fflush(stderr);
 					}
 					break;
 				}
 			}
 			break;
-			case VT_UI1:
-			{
-				switch(Item[elementCount].iec_104_type)
-				{
-					case M_IT_TB_1:
-					{
-						item_to_send.iec_type = M_IT_TB_1;
-						epoch_to_cp56time2a(&time, epoch_in_millisec);
-						item_to_send.iec_obj.o.type37.counter = V_UI1(pValue);
-						item_to_send.iec_obj.o.type37.time = time;
-							
-						if(pwQualities != OPC_QUALITY_GOOD)
-							item_to_send.iec_obj.o.type37.iv = 1;
-
-						IT_COMMENT1("Value = %d", V_UI1(pValue));
-					}
-					break;
-					case M_ME_TE_1:
-					{
-						int error = 0;
-
-						item_to_send.iec_type = M_ME_TE_1;
-						epoch_to_cp56time2a(&time, epoch_in_millisec);
-						item_to_send.iec_obj.o.type35.mv = rescale_value(V_UI1(pValue),
-						Item[elementCount].min_measure, 
-						Item[elementCount].max_measure, &error);
-						
-						if(pwQualities != OPC_QUALITY_GOOD)
-							item_to_send.iec_obj.o.type35.iv = 1;
-
-						IT_COMMENT1("Value = %d", V_UI1(pValue));
-					}
-					break;
-					case C_DC_NA_1:
-					{
-						fprintf(stderr,"IEC type %d is NOT sent in monitoring direction\n", Item[elementCount].iec_104_type);
-						fflush(stderr);
-					}
-					break;
-					default:
-					{
-					  fprintf(stderr,"IEC type %d is NOT supported for VT_UI1\n", Item[elementCount].iec_104_type);
-					  fflush(stderr);
-					}
-					break;
-				}
-			}
-			break;
-			case VT_I2:
-			{
-					switch(Item[elementCount].iec_104_type)
-					{
-						case M_IT_TB_1:
-						{
-							item_to_send.iec_type = M_IT_TB_1;
-							epoch_to_cp56time2a(&time, epoch_in_millisec);
-							item_to_send.iec_obj.o.type37.counter = V_I2(pValue);
-							item_to_send.iec_obj.o.type37.time = time;
-								
-							if(pwQualities != OPC_QUALITY_GOOD)
-								item_to_send.iec_obj.o.type37.iv = 1;
-
-							IT_COMMENT1("Value = %d", V_I2(pValue));
-						}
-						break;
-						case M_ME_TE_1:
-						{
-							int error = 0;
-
-							item_to_send.iec_type = M_ME_TE_1;
-							epoch_to_cp56time2a(&time, epoch_in_millisec);
-							item_to_send.iec_obj.o.type35.mv = rescale_value(V_I2(pValue),
-							Item[elementCount].min_measure, 
-							Item[elementCount].max_measure, &error);
-							
-							if(pwQualities != OPC_QUALITY_GOOD)
-								item_to_send.iec_obj.o.type35.iv = 1;
-
-							IT_COMMENT1("Value = %d", V_I2(pValue));
-						}
-						break;
-						case C_DC_NA_1:
-						{
-							fprintf(stderr,"IEC type %d is NOT sent in monitoring direction\n", Item[elementCount].iec_104_type);
-							fflush(stderr);
-						}
-						break;
-						default:
-						{
-						  fprintf(stderr,"IEC type %d is NOT supported for VT_I2\n", Item[elementCount].iec_104_type);
-						  fflush(stderr);
-						}
-						break;
-					}
-			}
-			break;
-			case VT_UI2:
-			{
-					switch(Item[elementCount].iec_104_type)
-					{
-						case M_IT_TB_1:
-						{
-							item_to_send.iec_type = M_IT_TB_1;
-							epoch_to_cp56time2a(&time, epoch_in_millisec);
-							item_to_send.iec_obj.o.type37.counter = V_UI2(pValue);
-							item_to_send.iec_obj.o.type37.time = time;
-								
-							if(pwQualities != OPC_QUALITY_GOOD)
-								item_to_send.iec_obj.o.type37.iv = 1;
-
-							IT_COMMENT1("Value = %d", V_UI2(pValue));
-						}
-						break;
-						case M_ME_TE_1:
-						{
-							int error = 0;
-
-							item_to_send.iec_type = M_ME_TE_1;
-							epoch_to_cp56time2a(&time, epoch_in_millisec);
-							item_to_send.iec_obj.o.type35.mv = rescale_value(V_UI2(pValue),
-							Item[elementCount].min_measure, 
-							Item[elementCount].max_measure, &error);
-							
-							if(pwQualities != OPC_QUALITY_GOOD)
-								item_to_send.iec_obj.o.type35.iv = 1;
-
-							IT_COMMENT1("Value = %d", V_UI2(pValue));
-						}
-						break;
-						default:
-						{
-						  fprintf(stderr,"IEC type %d is NOT supported for VT_UI2\n", Item[elementCount].iec_104_type);
-						  fflush(stderr);
-						}
-						break;
-					}
-			}
-			break;
-			*/
 			case MMS_INTEGER:
 			{
-					switch(Item[elementCount].iec_104_type)
+				switch(Item[index_inside_db].iec_104_type)
+				{
+					case M_IT_TB_1:
 					{
-						case M_IT_TB_1:
-						{
-							item_to_send.iec_type = M_IT_TB_1;
-							epoch_to_cp56time2a(&time, epoch_in_millisec);
-							item_to_send.iec_obj.o.type37.counter = MmsValue_toInt32(value);
-							item_to_send.iec_obj.o.type37.time = time;
-								
-							//if(pwQualities != OPC_QUALITY_GOOD)
-							//	item_to_send.iec_obj.o.type37.iv = 1;
+						item_to_send.iec_type = M_IT_TB_1;
+						item_to_send.iec_obj.o.type37.counter = MmsValue_toInt32(value);
+						send_item++;
 
-							IT_COMMENT1("Value = %d", V_I4(pValue));
-						}
-						break;
-						case M_ME_TE_1:
-						{
-							int error = 0;
-
-							item_to_send.iec_type = M_ME_TE_1;
-							epoch_to_cp56time2a(&time, epoch_in_millisec);
-							item_to_send.iec_obj.o.type35.mv = rescale_value(MmsValue_toInt32(value),
-							Item[elementCount].min_measure, 
-							Item[elementCount].max_measure, &error);
-								
-							//if(pwQualities != OPC_QUALITY_GOOD)
-							//	item_to_send.iec_obj.o.type35.iv = 1;
-
-							IT_COMMENT1("Value = %d", V_I4(pValue));
-						}
-						break;
-						default:
-						{
-						  fprintf(stderr,"IEC type %d is NOT supported for VT_I4\n", Item[elementCount].iec_104_type);
-						  fflush(stderr);
-						}
-						break;
+						fprintf(stderr, "Read %s with value: %d\n", Item[index_inside_db].spname, MmsValue_toInt32(value));
+						fflush(stderr);
 					}
+					break;
+					case M_ME_TE_1:
+					{
+						int error = 0;
+						item_to_send.iec_type = M_ME_TE_1;
+						item_to_send.iec_obj.o.type35.mv = rescale_value(MmsValue_toInt32(value),
+						Item[index_inside_db].min_measure, 
+						Item[index_inside_db].max_measure, &error);
+						send_item++;
+
+						fprintf(stderr, "Read %s with value: %d\n", Item[index_inside_db].spname, MmsValue_toInt32(value));
+						fflush(stderr);
+					}
+					break;
+					default:
+					{
+					  fprintf(stderr,"IEC type %d is NOT supported for MMS_INTEGER\n", Item[index_inside_db].iec_104_type);
+					  fflush(stderr);
+					}
+					break;
+				}
 			}
 			break;
 			case MMS_FLOAT:
@@ -689,85 +556,116 @@ void IEC61850_client_imp::getEvents(void)
 					fprintf(stderr, "MMS_FLOAT 64\n");
 					fflush(stderr);
 
-					//printf("Read %s with value: %f\n", MmsValue_toFloat(value));
+					fprintf(stderr, "Read %s with value: %lf\n", Item[index_inside_db].spname, MmsValue_toDouble(value));
+					fflush(stderr);
 
 					item_to_send.iec_type = M_ME_TN_1;
-					epoch_to_cp56time2a(&time, epoch_in_millisec);
 					item_to_send.iec_obj.o.type150.mv = MmsValue_toDouble(value);
-					item_to_send.iec_obj.o.type150.time = time;
-
-					//if(pwQualities != OPC_QUALITY_GOOD)
-					//	item_to_send.iec_obj.o.type150.iv = 1;
-					
-					IT_COMMENT1("Value = %lf", V_R8(pValue));
+					send_item++;
 				}
 				else 
 				{
 					fprintf(stderr, "MMS_FLOAT 32\n");
 					fflush(stderr);
 
-					item_to_send.iec_type = M_ME_TF_1;
-					epoch_to_cp56time2a(&time, epoch_in_millisec);
-					item_to_send.iec_obj.o.type36.mv = MmsValue_toFloat(value);
-					item_to_send.iec_obj.o.type36.time = time;
+					fprintf(stderr, "Read %s with value: %f\n", Item[index_inside_db].spname, MmsValue_toFloat(value));
+					fflush(stderr);
 
-					//if(pwQualities != OPC_QUALITY_GOOD)
-					//	item_to_send.iec_obj.o.type36.iv = 1;
+					item_to_send.iec_type = M_ME_TF_1;
+					item_to_send.iec_obj.o.type36.mv = MmsValue_toFloat(value);
+					send_item++;
 				}
 			}
 			break;
 			case MMS_BOOLEAN:
 			{
-					item_to_send.iec_type = M_SP_TB_1;
-					epoch_to_cp56time2a(&time, epoch_in_millisec);
-					item_to_send.iec_obj.o.type30.sp = value->value.boolean;
-					item_to_send.iec_obj.o.type30.time = time;
+				item_to_send.iec_type = M_SP_TB_1;
+				item_to_send.iec_obj.o.type30.sp = value->value.boolean;
+				send_item++;
 
-					//if(pwQualities != OPC_QUALITY_GOOD)
-					//	item_to_send.iec_obj.o.type30.iv = 1;
-					
-					IT_COMMENT1("Value = %d", V_BOOL(pValue));
+				fprintf(stderr, "Read %s with value: %d\n", Item[index_inside_db].spname, value->value.boolean);
+				fflush(stderr);
 			}
 			break;
-			case MMS_BINARY_TIME:
+			case MMS_BIT_STRING:
 			{
-			
+				//quality
+				switch(Item[index_inside_db].iec_104_type)
+				{
+					case M_SP_TB_1:
+					item_to_send.iec_obj.o.type30.iv = *(value->value.bitString.buf);
+					send_item++;
+					break;
+					case M_ME_TF_1:
+					item_to_send.iec_obj.o.type36.iv = *(value->value.bitString.buf);
+					send_item++;
+					break;
+					case M_ME_TN_1:
+					item_to_send.iec_obj.o.type150.iv = *(value->value.bitString.buf);
+					send_item++;
+					break;
+					case M_ME_TE_1:
+					item_to_send.iec_obj.o.type35.iv = *(value->value.bitString.buf);
+					send_item++;
+					break;
+					case M_IT_TB_1:
+					item_to_send.iec_obj.o.type37.iv = *(value->value.bitString.buf);
+					send_item++;
+					break;
+					default:
+					break;
+				}
+
+				fprintf(stderr, "Quality of %s is: %d\n", Item[index_inside_db].spname, *(value->value.bitString.buf));
+				fflush(stderr);
 			}
 			break;
+			case MMS_GENERALIZED_TIME:
+			case MMS_BINARY_TIME:
 			case MMS_UTC_TIME:
 			{
+				//time stamp
 				uint32_t epoc = MmsValue_toUnixTimestamp(value);
 				epoch_in_millisec = epoc;
 				epoch_in_millisec = 1000*epoch_in_millisec;
-			}
-			break;
-			case MMS_STRING:
-			{
-					char* str = MmsValue_toString(value);
-					//fprintf(stderr,"%s\n", str);
-					//fflush(stderr);
-					
-					item_to_send.iec_type = M_ME_TF_1;
-					epoch_to_cp56time2a(&time, epoch_in_millisec);
-								
-					item_to_send.iec_obj.o.type36.mv = (float)atof(str);
+				epoch_to_cp56time2a(&time, epoch_in_millisec);
+				
+				switch(Item[index_inside_db].iec_104_type)
+				{
+					case M_SP_TB_1:
+					item_to_send.iec_obj.o.type30.time = time;
+					send_item++;
+					break;
+					case M_ME_TF_1:
 					item_to_send.iec_obj.o.type36.time = time;
-
-					//if(pwQualities != OPC_QUALITY_GOOD)
-					//	item_to_send.iec_obj.o.type36.iv = 1;
-											
-					IT_COMMENT1("Value STRING = %s", str);
+					send_item++;
+					break;
+					case M_ME_TN_1:
+					item_to_send.iec_obj.o.type150.time = time;
+					send_item++;
+					break;
+					case M_ME_TE_1:
+					item_to_send.iec_obj.o.type35.time = time;
+					send_item++;
+					break;
+					case M_IT_TB_1:
+					item_to_send.iec_obj.o.type37.time = time;
+					send_item++;
+					break;
+					default:
+					break;
+				}
 			}
 			break;
-			case MMS_STRUCTURE:
+			case MMS_BCD:
 			{
-			
+				//TODO: implement this
 			}
 			break;
 			default:
 			{
-				fprintf(stderr, "MMS type not known\n");
-				fflush(stderr);
+				//fprintf(stderr, "MMS type not supported\n");
+				//fflush(stderr);
 				item_to_send.iec_type = 0;
 			}
 			break;
@@ -775,44 +673,56 @@ void IEC61850_client_imp::getEvents(void)
 
 		elementCount++;
 
-		//IT_COMMENT6("at time: %d_%d_%d_%d_%d_%d", time.hour, time.min, time.msec, time.mday, time.month, time.year);
+		if(item_to_send.iec_type == 0)
+		{
+			continue;
+		}
 
-		item_to_send.msg_id = n_msg_sent;
-		item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
+		if(send_item >= 3)
+		{
+			item_to_send.msg_id = n_msg_sent;
+			item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
 
-		//unsigned char buf[sizeof(struct iec_item)];
-		//int len = sizeof(struct iec_item);
-		//memcpy(buf, &item_to_send, len);
-		//	for(j = 0;j < len; j++)
-		//	{
-		//	  unsigned char c = *(buf + j);
-			//fprintf(stderr,"tx ---> 0x%02x\n", c);
-			//fflush(stderr);
-			//IT_COMMENT1("tx ---> 0x%02x\n", c);
-		//	}
+			//unsigned char buf[sizeof(struct iec_item)];
+			//int len = sizeof(struct iec_item);
+			//memcpy(buf, &item_to_send, len);
+			//	for(j = 0;j < len; j++)
+			//	{
+			//	  unsigned char c = *(buf + j);
+				//fprintf(stderr,"tx ---> 0x%02x\n", c);
+				//fflush(stderr);
+				//IT_COMMENT1("tx ---> 0x%02x\n", c);
+			//	}
 
-		Sleep(10); //Without delay there is missing of messages in the loading
+			Sleep(10); //Without delay there is missing of messages in the loading
 
-		//Send in monitor direction
-		fprintf(stderr,"Sending message %u th\n", n_msg_sent);
-		fflush(stderr);
-		IT_COMMENT1("Sending message %u th\n", n_msg_sent);
+			//Send in monitor direction
+			fprintf(stderr,"Sending message %u th\n", n_msg_sent);
+			fflush(stderr);
+			IT_COMMENT1("Sending message %u th\n", n_msg_sent);
 
-		//prepare published data
-		memset(&instanceSend,0x00, sizeof(iec_item_type));
+			//prepare published data
+			memset(&instanceSend,0x00, sizeof(iec_item_type));
 
-		instanceSend.iec_type = item_to_send.iec_type;
-		memcpy(&(instanceSend.iec_obj), &(item_to_send.iec_obj), sizeof(struct iec_object));
-		instanceSend.cause = item_to_send.cause;
-		instanceSend.msg_id = item_to_send.msg_id;
-		instanceSend.ioa_control_center = item_to_send.ioa_control_center;
-		instanceSend.casdu = item_to_send.casdu;
-		instanceSend.is_neg = item_to_send.is_neg;
-		instanceSend.checksum = item_to_send.checksum;
+			instanceSend.iec_type = item_to_send.iec_type;
+			memcpy(&(instanceSend.iec_obj), &(item_to_send.iec_obj), sizeof(struct iec_object));
+			instanceSend.cause = item_to_send.cause;
+			instanceSend.msg_id = item_to_send.msg_id;
+			instanceSend.ioa_control_center = item_to_send.ioa_control_center;
+			instanceSend.casdu = item_to_send.casdu;
+			instanceSend.is_neg = item_to_send.is_neg;
+			instanceSend.checksum = item_to_send.checksum;
 
-		ORTEPublicationSend(publisher);
+			ORTEPublicationSend(publisher);
 
-		n_msg_sent++;
+			n_msg_sent++;
+
+			///////////////////////initialize packet to send/////////
+			send_item = 0;
+			memset(&item_to_send,0x00, sizeof(struct iec_item));
+			item_to_send.cause = 0x03; //spontaneous
+			/////////////////////////////////////////////////////////
+		}
 	}
 
 	IT_EXIT;
@@ -1419,7 +1329,8 @@ void IEC61850_client_imp::check_for_commands(struct iec_item *queued_item)
 								//value_to_write->type = MMS_FLOAT;
 								MmsValue_setFloat(value_to_write, (float)cmd_val);
 
-								printf("Write variable with value: %f\n", MmsValue_toFloat(value_to_write));
+								fprintf(stderr, "Write variable %s with value: %f\n", Item[hClient - 1].spname, MmsValue_toFloat(value_to_write));
+								fflush(stderr);
 
 								MmsConnection_writeVariable(con, mmsDomain, Item[hClient - 1].spname, value_to_write);
 
