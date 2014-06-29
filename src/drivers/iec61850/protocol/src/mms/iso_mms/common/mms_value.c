@@ -327,6 +327,23 @@ MmsValue_toInt32(MmsValue* value)
 	return integerValue;
 }
 
+//apa+++
+/**
+ * Convert signed integer to uint32_t
+ */
+uint32_t
+MmsValue_toUInt32(MmsValue* value)
+{
+	uint32_t integerValue = 0;
+
+	if (value->type == MMS_UNSIGNED)
+		BerInteger_toUint32(value->value.integer, &integerValue);
+
+	return integerValue;
+}
+//apa+++
+
+
 /**
  * Convert signed integer to int64_t and do sign extension if required
  */
