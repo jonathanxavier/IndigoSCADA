@@ -78,21 +78,21 @@ Iec103driverConfigurationData::Iec103driverConfigurationData(QWidget *parent, co
 	qtarch_Label_22->setAlignment( AlignLeft|AlignVCenter|ExpandTabs );
 	qtarch_Label_22->setMargin( 0 );
 
-	IEC103CASDUText = new QLineEdit(this, "LineEdit_7");
-	IEC103CASDUText->setGeometry(200, 80, 100, 30);
-	IEC103CASDUText->setMinimumSize(0, 0);
-	IEC103CASDUText->setMaximumSize(32767, 32767);
-	IEC103CASDUText->setFocusPolicy(QWidget::StrongFocus);
-	IEC103CASDUText->setBackgroundMode(QWidget::PaletteBase);
+	BaudRateText = new QLineEdit(this, "LineEdit_7");
+	BaudRateText->setGeometry(200, 80, 100, 30);
+	BaudRateText->setMinimumSize(0, 0);
+	BaudRateText->setMaximumSize(32767, 32767);
+	BaudRateText->setFocusPolicy(QWidget::StrongFocus);
+	BaudRateText->setBackgroundMode(QWidget::PaletteBase);
 #if QT_VERSION < 300
-	IEC103CASDUText->setFontPropagation(QWidget::SameFont);
-	IEC103CASDUText->setPalettePropagation(QWidget::SameFont);
+	BaudRateText->setFontPropagation(QWidget::SameFont);
+	BaudRateText->setPalettePropagation(QWidget::SameFont);
 	#endif
-	IEC103CASDUText->setText( tr( "" ) );
-	IEC103CASDUText->setMaxLength( 100 );
-	IEC103CASDUText->setFrame( QLineEdit::Normal );
-	IEC103CASDUText->setFrame( TRUE );
-	IEC103CASDUText->setAlignment( AlignLeft );
+	BaudRateText->setText( tr( "" ) );
+	BaudRateText->setMaxLength( 100 );
+	BaudRateText->setFrame( QLineEdit::Normal );
+	BaudRateText->setFrame( TRUE );
+	BaudRateText->setAlignment( AlignLeft );
 	QLabel *qtarch_Label_23 = new QLabel(this, "Label_21");
 	qtarch_Label_23->setGeometry(10, 80, 150, 30);
 	qtarch_Label_23->setMinimumSize(0, 0);
@@ -107,7 +107,7 @@ Iec103driverConfigurationData::Iec103driverConfigurationData(QWidget *parent, co
 	qtarch_Label_23->setLineWidth( 1 );
 	qtarch_Label_23->setMidLineWidth( 0 );
 	qtarch_Label_23->QFrame::setMargin( 0 );
-	qtarch_Label_23->setText( tr( "CASDU of slave" ) );
+	qtarch_Label_23->setText( tr( "Baud" ) );
 	qtarch_Label_23->setAlignment( AlignLeft|AlignVCenter|ExpandTabs );
 	qtarch_Label_23->setMargin( 0 );
 
@@ -205,7 +205,7 @@ Iec103driverConfigurationData::Iec103driverConfigurationData(QWidget *parent, co
 	qtarch_Label_11->setMargin( 0 );
 
 	PollInterval = new QSpinBox(this, "SpinBox_4");
-	PollInterval->setGeometry(200, 200, 50, 30);
+	PollInterval->setGeometry(200, 200, 100, 30);
 	PollInterval->setMinimumSize(0, 0);
 	PollInterval->setMaximumSize(32767, 32767);
 	PollInterval->setFocusPolicy(QWidget::StrongFocus);

@@ -253,14 +253,7 @@ void Iec104driver_Instance::QueryResponse(QObject *p, const QString &c, int id, 
 				///////////////////////////////////////////////////////////////////////////////////////////
 
 				////////////////////Middleware/////////////////////////////////////////////
-				//prepare published data
-				//memset(&instanceSend,0x00, sizeof(iec_item_type));
-				//instanceSend.iec_type = item_to_send.iec_type;
-				//memcpy(&(instanceSend.iec_obj), &(item_to_send.iec_obj), sizeof(struct iec_object));
-				//instanceSend.msg_id = item_to_send.msg_id;
-				//instanceSend.checksum = item_to_send.checksum;
-
-				//ORTEPublicationSend(publisher);
+				//TODO: publish item
 				//////////////////////////Middleware/////////////////////////////////////////
 			}
 		}

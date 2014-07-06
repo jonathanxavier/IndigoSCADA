@@ -42,8 +42,8 @@ void Iec103DriverThread::run()
 	strcpy(pCommandLine, GetScadaHomeDirectory());
 	strcat(pCommandLine, "\\bin\\iec103master.exe -a ");
 	strcat(pCommandLine, ((Iec103driver_Instance*)Parent)->Cfg.IEC103LinkAddress);
-	strcat(pCommandLine, " -c ");
-	strcat(pCommandLine, ((Iec103driver_Instance*)Parent)->Cfg.IEC103CASDU);
+	strcat(pCommandLine, " -s ");
+	strcat(pCommandLine, ((Iec103driver_Instance*)Parent)->Cfg.BaudRate);
 	strcat(pCommandLine, " -l ");
 	strcat(pCommandLine, line_number);
 	strcat(pCommandLine, " -t ");

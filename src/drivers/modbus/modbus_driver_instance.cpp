@@ -1,7 +1,7 @@
 /*
  *                         IndigoSCADA
  *
- *   This software and documentation are Copyright 2002 to 2011 Enscada 
+ *   This software and documentation are Copyright 2002 to 2014 Enscada 
  *   Limited and its licensees. All rights reserved. See file:
  *
  *                     $HOME/LICENSE 
@@ -10,10 +10,29 @@
  *
  */
 
-
-
 #include "modbus_driver_instance.h"
 #include "modbus_driverthread.h"
+
+int exit_consumer = 0;
+
+void consumer(void* pParam)
+{
+	struct subs_args* arg = (struct subs_args*)pParam;
+	struct iec_item item;
+	RIPCObject objDesc(&item, sizeof(struct iec_item));
+
+	while(1)
+	{
+		if(exit_consumer)
+		{
+			break;
+		}
+
+		arg->queue_monitor_dir->get(objDesc);
+
+		fifo_put(arg->fifo_monitor_direction, (char *)&item, sizeof(struct iec_item));
+	}
+}
 
 /*
 *Function:
@@ -21,7 +40,7 @@
 *Outputs:none
 *Returns:none
 */
-#define TICKS_PER_SEC 1
+
 void Modbus_driver_Instance::Start() 
 {
 	IT_IT("Modbus_driver_Instance::Start");
@@ -271,14 +290,8 @@ void Modbus_driver_Instance::QueryResponse(QObject *p, const QString &c, int id,
 				///////////////////////////////////////////////////////////////////////////////////////////
 
 				////////////////////Middleware/////////////////////////////////////////////
-				//prepare published data
-				memset(&instanceSend,0x00, sizeof(iec_item_type));
-				instanceSend.iec_type = item_to_send.iec_type;
-				memcpy(&(instanceSend.iec_obj), &(item_to_send.iec_obj), sizeof(struct iec_object));
-				instanceSend.msg_id = item_to_send.msg_id;
-				instanceSend.checksum = item_to_send.checksum;
-
-				ORTEPublicationSend(publisher);
+				//publishing data
+				queue_control_dir->put(&item_to_send, sizeof(struct iec_item));
 				//////////////////////////Middleware/////////////////////////////////////////
 			}
 		}
@@ -426,17 +439,9 @@ void Modbus_driver_Instance::Tick()
 			item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
 			///////////////////////////////////////////////////////////////////////////////////////////
 
-			//prepare published data
-			memset(&instanceSend,0x00, sizeof(iec_item_type));
-			instanceSend.iec_type = item_to_send.iec_type;
-			memcpy(&(instanceSend.iec_obj), &(item_to_send.iec_obj), sizeof(struct iec_object));
-			instanceSend.msg_id = item_to_send.msg_id;
-			instanceSend.checksum = item_to_send.checksum;
-
-			//printf("sizeof(struct iec_object) = %d\n", sizeof(struct iec_object));
-
-			ORTEPublicationSend(publisher);
-
+			//publishing data
+			queue_control_dir->put(&item_to_send, sizeof(struct iec_item));
+			
 			State = STATE_GENERAL_INTERROGATION_DONE;
 		}
 		break;
@@ -780,7 +785,6 @@ void Modbus_driver_Instance::get_items_from_local_fifo(void)
 *Returns:none
 */
 
-//Realtime method
 bool Modbus_driver_Instance::event(QEvent *e)
 {
 	IT_IT("Modbus_driver_Instance::event");
@@ -811,6 +815,7 @@ bool Modbus_driver_Instance::event(QEvent *e)
 
 		return true;
 	}
+
 	return QObject::event(e);
 };
 
@@ -912,80 +917,7 @@ void Modbus_driver_Instance::Command(const QString & name, BYTE cmd, LPVOID lpPa
 	}
 }
 
-
 /////////////////////////////////////Middleware///////////////////////////////////////////
-Boolean  quite=ORTE_FALSE;
-int	regfail=0;
-
-//event system
-void onRegFail(void *param) 
-{
-  printf("registration to a manager failed\n");
-  regfail = 1;
-}
-
-void rebuild_iec_item_message(struct iec_item *item2, iec_item_type *item1)
-{
-	unsigned char checksum;
-
-	///////////////Rebuild struct iec_item//////////////////////////////////
-	item2->iec_type = item1->iec_type;
-	memcpy(&(item2->iec_obj), &(item1->iec_obj), sizeof(struct iec_object));
-	item2->cause = item1->cause;
-	item2->msg_id = item1->msg_id;
-	item2->ioa_control_center = item1->ioa_control_center;
-	item2->casdu = item1->casdu;
-	item2->is_neg = item1->is_neg;
-	item2->checksum = item1->checksum;
-	///////and check the 1 byte checksum////////////////////////////////////
-	checksum = clearCrc((unsigned char *)item2, sizeof(struct iec_item));
-
-	//fprintf(stderr,"new checksum = %u\n", checksum);
-
-	//if checksum is 0 then there are no errors
-	if(checksum != 0)
-	{
-		//log error message
-		ExitProcess(0);
-	}
-
-	/*
-	fprintf(stderr,"iec_type = %u\n", item2->iec_type);
-	fprintf(stderr,"iec_obj = %x\n", item2->iec_obj);
-	fprintf(stderr,"cause = %u\n", item2->cause);
-	fprintf(stderr,"msg_id =%u\n", item2->msg_id);
-	fprintf(stderr,"ioa_control_center = %u\n", item2->ioa_control_center);
-	fprintf(stderr,"casdu =%u\n", item2->casdu);
-	fprintf(stderr,"is_neg = %u\n", item2->is_neg);
-	fprintf(stderr,"checksum = %u\n", item2->checksum);
-	*/
-}
-
-void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackParam) 
-{
-	Modbus_driver_Instance * cl = (Modbus_driver_Instance*)recvCallBackParam;
-	iec_item_type *item1 = (iec_item_type*)vinstance;
-
-	switch (info->status) 
-	{
-		case NEW_DATA:
-		{
-		  if(!quite)
-		  {
-			  struct iec_item item2;
-			  rebuild_iec_item_message(&item2, item1);
-			  //TODO: detect losts messages when item2.msg_id are NOT consecutive
-			  fifo_put(cl->fifo_monitor_direction, (char *)&item2, sizeof(struct iec_item));
-		  }
-		}
-		break;
-		case DEADLINE:
-		{
-			printf("deadline occurred\n");
-		}
-		break;
-	}
-}
 
 #include <time.h>
 #include <sys/timeb.h>

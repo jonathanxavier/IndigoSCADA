@@ -250,14 +250,6 @@ void Opc_client_da_Instance::QueryResponse(QObject *p, const QString &c, int id,
 				///////////////////////////////////////////////////////////////////////////////////////////
 
 				////////////////////Middleware/////////////////////////////////////////////
-				//prepare published data
-				memset(&instanceSend,0x00, sizeof(iec_item_type));
-				instanceSend.iec_type = item_to_send.iec_type;
-				memcpy(&(instanceSend.iec_obj), &(item_to_send.iec_obj), sizeof(struct iec_object));
-				instanceSend.msg_id = item_to_send.msg_id;
-				instanceSend.checksum = item_to_send.checksum;
-
-				ORTEPublicationSend(publisher);
 				//////////////////////////Middleware/////////////////////////////////////////
 			}
 		}
@@ -680,15 +672,6 @@ void Opc_client_da_Instance::Tick()
 			///////////////////////////////////////////////////////////////////////////////////////////
 
 			//prepare published data
-			memset(&instanceSend,0x00, sizeof(iec_item_type));
-			instanceSend.iec_type = item_to_send.iec_type;
-			memcpy(&(instanceSend.iec_obj), &(item_to_send.iec_obj), sizeof(struct iec_object));
-			instanceSend.msg_id = item_to_send.msg_id;
-			instanceSend.checksum = item_to_send.checksum;
-
-			//printf("sizeof(struct iec_object) = %d\n", sizeof(struct iec_object));
-
-			ORTEPublicationSend(publisher);
 
 			fprintf(stderr, "State = STATE_ASK_GENERAL_INTERROGATION\n");
 			fflush(stderr);
@@ -1255,80 +1238,6 @@ void Opc_client_da_Instance::Command(const QString & name, BYTE cmd, LPVOID lpPa
 }
 
 /////////////////////////////////////Middleware///////////////////////////////////////////
-Boolean  quite=ORTE_FALSE;
-int	regfail=0;
-
-//event system
-void onRegFail(void *param) 
-{
-  printf("registration to a manager failed\n");
-  regfail = 1;
-}
-
-void rebuild_iec_item_message(struct iec_item *item2, iec_item_type *item1)
-{
-	unsigned char checksum;
-
-	///////////////Rebuild struct iec_item//////////////////////////////////
-	item2->iec_type = item1->iec_type;
-	memcpy(&(item2->iec_obj), &(item1->iec_obj), sizeof(struct iec_object));
-	item2->cause = item1->cause;
-	item2->msg_id = item1->msg_id;
-	item2->ioa_control_center = item1->ioa_control_center;
-	item2->casdu = item1->casdu;
-	item2->is_neg = item1->is_neg;
-	item2->checksum = item1->checksum;
-	///////and check the 1 byte checksum////////////////////////////////////
-	checksum = clearCrc((unsigned char *)item2, sizeof(struct iec_item));
-
-	//fprintf(stderr,"new checksum = %u\n", checksum);
-
-	//if checksum is 0 then there are no errors
-	if(checksum != 0)
-	{
-		//log error message
-		ExitProcess(0);
-	}
-
-	/*
-	fprintf(stderr,"iec_type = %u\n", item2->iec_type);
-	fprintf(stderr,"iec_obj = %x\n", item2->iec_obj);
-	fprintf(stderr,"cause = %u\n", item2->cause);
-	fprintf(stderr,"msg_id =%u\n", item2->msg_id);
-	fprintf(stderr,"ioa_control_center = %u\n", item2->ioa_control_center);
-	fprintf(stderr,"casdu =%u\n", item2->casdu);
-	fprintf(stderr,"is_neg = %u\n", item2->is_neg);
-	fprintf(stderr,"checksum = %u\n", item2->checksum);
-	*/
-}
-
-void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackParam) 
-{
-	Opc_client_da_Instance * cl = (Opc_client_da_Instance*)recvCallBackParam;
-	iec_item_type *item1 = (iec_item_type*)vinstance;
-
-	switch (info->status) 
-	{
-		case NEW_DATA:
-		{
-		  if(!quite)
-		  {
-			  struct iec_item item2;
-			  rebuild_iec_item_message(&item2, item1);
-			  //TODO: detect losts messages when item2.msg_id are NOT consecutive
-			  //cl->get_items(&item2);
-			  fifo_put(cl->fifo_monitor_direction, (char *)&item2, sizeof(struct iec_item));
-		  }
-		}
-		break;
-		case DEADLINE:
-		{
-			printf("deadline occurred\n");
-		}
-		break;
-	}
-}
-
 #include <time.h>
 #include <sys/timeb.h>
 

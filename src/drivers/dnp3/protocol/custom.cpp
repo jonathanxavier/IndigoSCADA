@@ -15,7 +15,6 @@
 #include "iec104types.h"
 #include "iec_item.h"
 #include "clear_crc_eight.h"
-#include "iec_item_type.h" //Middleware
 //////////////////////////////////////////////////////
 
 #include <stdio.h>
@@ -33,11 +32,6 @@ CustomDb::CustomDb() :
 
 ////////////////////////////////////////////apa+++////////////////////////////////////////////
 #define ABS(x) ((x) >= 0 ? (x) : -(x))
-
-/////////////////////////////////Globals remove ASAP/////////////
-extern iec_item_type* global_instanceSend;
-extern ORTEPublication* global_publisher;
-/////////////////////////////////////////////////////////////////
 
 #define QUALITY_ONLINE 0x01
 
@@ -291,25 +285,11 @@ void CustomDb::changePoint(   DnpAddr_t      addr,
 		//IT_COMMENT1("tx ---> 0x%02x\n", c);
 	//	}
 
-	Sleep(10); //Without delay there is missing of messages in the loading
-
 	//Send in monitor direction
 	fprintf(stderr,"Sending message %u th\n", n_sent_items);
 	fflush(stderr);
 
 	//prepare published data
-	memset(global_instanceSend,0x00, sizeof(iec_item_type));
-	
-	global_instanceSend->iec_type = item_to_send.iec_type;
-	memcpy(&(global_instanceSend->iec_obj), &(item_to_send.iec_obj), sizeof(struct iec_object));
-	global_instanceSend->cause = item_to_send.cause;
-	global_instanceSend->msg_id = item_to_send.msg_id;
-	global_instanceSend->ioa_control_center = item_to_send.ioa_control_center;
-	global_instanceSend->casdu = item_to_send.casdu;
-	global_instanceSend->is_neg = item_to_send.is_neg;
-	global_instanceSend->checksum = item_to_send.checksum;
-
-	ORTEPublicationSend(global_publisher);
 
 	n_sent_items++;
 }

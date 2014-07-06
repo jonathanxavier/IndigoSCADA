@@ -1,7 +1,7 @@
 /*
  *                         IndigoSCADA
  *
- *   This software and documentation are Copyright 2002 to 2011 Enscada 
+ *   This software and documentation are Copyright 2002 to 2014 Enscada 
  *   Limited and its licensees. All rights reserved. See file:
  *
  *                     $HOME/LICENSE 
@@ -19,10 +19,12 @@
 #include "iec104types.h"
 #include "iec_item.h"
 ////////////////////////////Middleware/////////////////////////////////////////////////////////////
-#include "iec_item_type.h"
-extern void onRegFail(void *param);
-extern Boolean  quite;
-extern void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackParam); 
+#include "RIPCThread.h"
+#include "RIPCFactory.h"
+#include "RIPCSession.h"
+#include "RIPCServerFactory.h"
+#include "RIPCClientFactory.h"
+#include "ripc.h"
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /////////////////////////fifo///////////////////////////////////////////
@@ -30,6 +32,14 @@ extern void iec_call_exit_handler(int line, char* file, char* reason);
 #include "fifoc.h"
 #define MAX_FIFO_SIZE 65535
 ////////////////////////////////////////////////////////////////////////
+
+struct subs_args{
+	RIPCQueue* queue_monitor_dir;
+	fifo_h fifo_monitor_direction;
+};
+
+void consumer(void* pParam);
+extern int exit_consumer;
 
 class Modbus_DriverThread;
 
@@ -78,6 +88,18 @@ class MODBUS_DRIVERDRV Modbus_driver_Instance : public DriverInstance
 	//
 	Track* Values;
 
+	/////////////Middleware///////////////////////////////
+    int          port;
+    char const*  hostname;
+    RIPCFactory* factory1;
+	RIPCFactory* factory2;
+	RIPCSession* session1;
+	RIPCSession* session2;
+	RIPCQueue*   queue_monitor_dir;
+	RIPCQueue*   queue_control_dir;
+	struct subs_args arg;
+	//////////////////////////////////////////////////////
+
 	enum // states for the state machine
 	{
 		STATE_IDLE = 0,
@@ -108,51 +130,13 @@ class MODBUS_DRIVERDRV Modbus_driver_Instance : public DriverInstance
 		connect(pTimer,SIGNAL(timeout()),this,SLOT(Tick()));
 		pTimer->start(1000); // start with a 1 second timer
 
+		/////////////////////Middleware/////////////////////////////////////////////////////////////////
 		char fifo_control_name[150];
 		char str_instance_id[20];
         itoa(instance_id + 1, str_instance_id, 10);
 		strcpy(fifo_control_name,"fifo_control_direction");
         strcat(fifo_control_name, str_instance_id);
         strcat(fifo_control_name, "modbus");
-
-		/////////////////////Middleware/////////////////////////////////////////////////////////////////
-		ORTEDomainProp          dp; 
-		ORTESubscription        *s = NULL;
-		int32_t                 strength = 1;
-		NtpTime                 persistence,deadline,minimumSeparation,delay;
-		Boolean                 havePublisher = ORTE_FALSE;
-		Boolean                 haveSubscriber = ORTE_FALSE;
-		IPAddress				smIPAddress = IPADDRESS_INVALID;
-		ORTEDomainAppEvents     events;
-
-		ORTEInit();
-		ORTEDomainPropDefaultGet(&dp);
-		NTPTIME_BUILD(minimumSeparation, 0); //0 s
-		NTPTIME_BUILD(delay, 1); //1 s
-
-		//initiate event system
-		ORTEDomainInitEvents(&events);
-
-		events.onRegFail = onRegFail;
-
-		//Create application     
-		domain = ORTEDomainAppCreate(ORTE_DEFAULT_DOMAIN,&dp,&events,ORTE_FALSE);
-
-		iec_item_type_type_register(domain);
-
-		//Create publisher
-		NTPTIME_BUILD(persistence, 5); //5 s
-		
-		publisher = ORTEPublicationCreate(
-		domain,
-		fifo_control_name,
-		"iec_item_type",
-		&instanceSend,
-		&persistence,
-		strength,
-		NULL,
-		NULL,
-		NULL);
 		
 		char fifo_monitor_name[150];
 		itoa(instance_id + 1, str_instance_id, 10);
@@ -160,21 +144,17 @@ class MODBUS_DRIVERDRV Modbus_driver_Instance : public DriverInstance
         strcat(fifo_monitor_name, str_instance_id);
         strcat(fifo_monitor_name, "modbus");
 
-		//Create subscriber
-		NTPTIME_BUILD(deadline,3);
+		port = 6000;
+		hostname = "localhost";
 
-		subscriber = ORTESubscriptionCreate(
-		domain,
-		IMMEDIATE,
-		BEST_EFFORTS,
-		fifo_monitor_name,
-		"iec_item_type",
-		&instanceRecv,
-		&deadline,
-		&minimumSeparation,
-		recvCallBack,
-		this,
-		smIPAddress);
+		factory1 = RIPCClientFactory::getInstance();
+		factory2 = RIPCClientFactory::getInstance();
+		session1 = factory1->create(hostname, port);
+		session2 = factory2->create(hostname, port);
+		queue_monitor_dir = session1->createQueue(fifo_monitor_name);
+		queue_control_dir = session2->createQueue(fifo_control_name);
+
+		arg.queue_monitor_dir = queue_monitor_dir;
 		///////////////////////////////////Middleware//////////////////////////////////////////////////
 
 		/////////////////////////////////////local fifo//////////////////////////////////////////////////////////
@@ -183,7 +163,13 @@ class MODBUS_DRIVERDRV Modbus_driver_Instance : public DriverInstance
 		strcat(fifo_monitor_name, "_fifo_");
 
 		fifo_monitor_direction = fifo_open(fifo_monitor_name, max_fifo_queue_size, iec_call_exit_handler);
+
+		arg.fifo_monitor_direction = fifo_monitor_direction;
 		///////////////////////////////////////////////////////////////////////////////////////////////////
+
+		unsigned long threadid;
+	
+		CreateThread(NULL, 0, LPTHREAD_START_ROUTINE(consumer), (void*)&arg, 0, &threadid);
 	};
 
 	~Modbus_driver_Instance()
@@ -197,8 +183,15 @@ class MODBUS_DRIVERDRV Modbus_driver_Instance : public DriverInstance
 		}
 
 		///////////////////////////////////Middleware//////////////////////////////////////////////////
-		ORTEDomainAppDestroy(domain);
-        domain = NULL;
+		exit_consumer = 1;
+		Sleep(3000);
+		fifo_close(fifo_monitor_direction);
+		queue_monitor_dir->close();
+		queue_control_dir->close();
+		session1->close();
+		session2->close();
+		delete session1;
+		delete session2;
 		///////////////////////////////////Middleware//////////////////////////////////////////////////
 	};
 	//
@@ -212,14 +205,6 @@ class MODBUS_DRIVERDRV Modbus_driver_Instance : public DriverInstance
 	Driver* ParentDriver;
 	QString unit_name;
     int instanceID; //Equals to "line concept" of a SCADA driver
-
-	//////Middleware/////////////
-    ORTEDomain *domain;
-	ORTEPublication *publisher;
-	ORTESubscription *subscriber;
-	iec_item_type    instanceSend;
-	iec_item_type    instanceRecv;
-	/////////////////////////////
 
 	////////////////local fifo///////////
 	fifo_h fifo_monitor_direction;

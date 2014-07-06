@@ -343,24 +343,8 @@ END_COM_MAP()
 
 		//Send message to monitor.exe///////////////////////////////////////////////////////////////////
 
-		//Sleep(10);
-
 		//Send in monitor direction
 		//prepare published data
-		/*
-		memset(&(Opc_client_da_imp::instanceSend),0x00, sizeof(iec_item_type));
-
-		Opc_client_da_imp::instanceSend.iec_type = item_to_send.iec_type;
-		memcpy(&(Opc_client_da_imp::instanceSend.iec_obj), &(item_to_send.iec_obj), sizeof(struct iec_object));
-		Opc_client_da_imp::instanceSend.cause = item_to_send.cause;
-		Opc_client_da_imp::instanceSend.msg_id = item_to_send.msg_id;
-		Opc_client_da_imp::instanceSend.ioa_control_center = item_to_send.ioa_control_center;
-		Opc_client_da_imp::instanceSend.casdu = item_to_send.casdu;
-		Opc_client_da_imp::instanceSend.is_neg = item_to_send.is_neg;
-		Opc_client_da_imp::instanceSend.checksum = item_to_send.checksum;
-
-		ORTEPublicationSend(Opc_client_da_imp::publisher);
-		*/
 
 		//Client must always return S_OK in this function
 		IT_EXIT;

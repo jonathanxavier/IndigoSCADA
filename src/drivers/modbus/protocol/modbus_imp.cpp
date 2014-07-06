@@ -1,7 +1,7 @@
 /*
  *                         IndigoSCADA
  *
- *   This software and documentation are Copyright 2002 to 2013 Enscada 
+ *   This software and documentation are Copyright 2002 to 2014 Enscada 
  *   Limited and its licensees. All rights reserved. See file:
  *
  *                     $HOME/LICENSE 
@@ -14,7 +14,7 @@
 #include "iec104types.h"
 #include "iec_item.h"
 #include "clear_crc_eight.h"
-#include "modbus_item.h"
+#include "modbus_db.h"
 #include "modbus_imp.h"
 #include "stdlib.h"
 
@@ -25,83 +25,30 @@
 
 extern int gl_timeout_connection_with_parent;
 
-/////////////////////////////////////Middleware///////////////////////////////////////////
-Boolean  quite = ORTE_FALSE;
-int	regfail=0;
+void iec_call_exit_handler(int line, char* file, char* reason);
 
-//event system
-void onRegFail(void *param) 
+/////////////////////////////////////Middleware////////////////////////////////
+///////commands
+void control_dir_consumer(void* pParam)
 {
-  printf("registration to a manager failed\n");
-  regfail = 1;
-}
+	struct subs_args* arg = (struct subs_args*)pParam;
+	struct iec_item item;
+	RIPCObject objDesc(&item, sizeof(struct iec_item));
 
-void rebuild_iec_item_message(struct iec_item *item2, iec_item_type *item1)
-{
-	unsigned char checksum;
+	modbus_imp* parent = (modbus_imp*)arg->parent;
 
-	///////////////Rebuild struct iec_item//////////////////////////////////
-	item2->iec_type = item1->iec_type;
-	memcpy(&(item2->iec_obj), &(item1->iec_obj), sizeof(struct iec_object));
-	item2->cause = item1->cause;
-	item2->msg_id = item1->msg_id;
-	item2->ioa_control_center = item1->ioa_control_center;
-	item2->casdu = item1->casdu;
-	item2->is_neg = item1->is_neg;
-	item2->checksum = item1->checksum;
-	///////and check the 1 byte checksum////////////////////////////////////
-	checksum = clearCrc((unsigned char *)item2, sizeof(struct iec_item));
-
-//	fprintf(stderr,"new checksum = %u\n", checksum);
-
-	//if checksum is 0 then there are no errors
-	if(checksum != 0)
+	while(1)
 	{
-		//log error message
-		ExitProcess(0);
-	}
-
-	fprintf(stderr,"iec_type = %u\n", item2->iec_type);
-	fprintf(stderr,"iec_obj = %x\n", item2->iec_obj);
-	fprintf(stderr,"cause = %u\n", item2->cause);
-	fprintf(stderr,"msg_id =%u\n", item2->msg_id);
-	fprintf(stderr,"ioa_control_center = %u\n", item2->ioa_control_center);
-	fprintf(stderr,"casdu =%u\n", item2->casdu);
-	fprintf(stderr,"is_neg = %u\n", item2->is_neg);
-	fprintf(stderr,"checksum = %u\n", item2->checksum);
-}
-
-void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackParam) 
-{
-	modbus_imp * cl = (modbus_imp*)recvCallBackParam;
-	iec_item_type *item1 = (iec_item_type*)vinstance;
-
-	switch (info->status) 
-	{
-		case NEW_DATA:
+		if(parent->exit_threads)
 		{
-		  if(!quite)
-		  {
-			  struct iec_item item2;
-			  rebuild_iec_item_message(&item2, item1);
-			  cl->received_command_callback = 1;
-			  cl->check_for_commands(&item2);
-			  cl->received_command_callback = 0;
-		  }
+			break;
 		}
-		break;
-		case DEADLINE:
-		{
-			printf("deadline occurred\n");
-		}
-		break;
+
+		parent->queue_control_dir->get(objDesc);
+
+		parent->check_for_commands(&item);
 	}
 }
-////////////////////////////////Middleware/////////////////////////////////////
-
-////////////////////////////////Middleware/////////////////
-iec_item_type modbus_imp::instanceSend;
-ORTEPublication* modbus_imp::publisher = NULL;
 ////////////////////////////////Middleware/////////////////
 
 //   
@@ -140,73 +87,38 @@ fExit(false),pollingTime(polling_time), general_interrogation(true), is_connecte
     if (ctx != NULL) 
 	{
 		/////////////////////Middleware/////////////////////////////////////////////////////////////////
-		received_command_callback = 0;
-
-		int32_t                 strength = 1;
-		NtpTime                 persistence, deadline, minimumSeparation, delay;
-		IPAddress				smIPAddress = IPADDRESS_INVALID;
-		
-		subscriber = NULL;
-
-		ORTEInit();
-		ORTEDomainPropDefaultGet(&dp);
-		NTPTIME_BUILD(minimumSeparation,0); 
-		NTPTIME_BUILD(delay,1); //1s
-
-		//initiate event system
-		ORTEDomainInitEvents(&events);
-
-		events.onRegFail = onRegFail;
-
-		//Create application     
-		domain = ORTEDomainAppCreate(ORTE_DEFAULT_DOMAIN,&dp,&events,ORTE_FALSE);
-
-		iec_item_type_type_register(domain);
-
-		//Create publisher
-		NTPTIME_BUILD(persistence,5);
-
 		char fifo_monitor_name[150];
+		char fifo_control_name[150];
+
 		strcpy(fifo_monitor_name,"fifo_monitor_direction");
 		strcat(fifo_monitor_name, line_number);
 		strcat(fifo_monitor_name, "modbus");
-
-		publisher = ORTEPublicationCreate(
-		domain,
-		fifo_monitor_name,
-		"iec_item_type",
-		&instanceSend,
-		&persistence,
-		strength,
-		NULL,
-		NULL,
-		NULL);
-
-		//if(publisher == NULL){} //check this error
-		
-		char fifo_control_name[150];
+			
 		strcpy(fifo_control_name,"fifo_control_direction");
 		strcat(fifo_control_name, line_number);
 		strcat(fifo_control_name, "modbus");
 
-		//Create subscriber
-		NTPTIME_BUILD(deadline,3);
+		port = 6000;
+		hostname = "localhost";
 
-		subscriber = ORTESubscriptionCreate(
-		domain,
-		IMMEDIATE,
-		BEST_EFFORTS,
-		fifo_control_name,
-		"iec_item_type",
-		&instanceRecv,
-		&deadline,
-		&minimumSeparation,
-		recvCallBack,
-		this,
-		smIPAddress);
+		factory1 = RIPCClientFactory::getInstance();
+		factory2 = RIPCClientFactory::getInstance();
 
-		//if(subscriber == NULL){} //check this error
+		session1 = factory1->create(hostname, port);
+		session2 = factory2->create(hostname, port);
+		queue_monitor_dir = session1->createQueue(fifo_monitor_name);
+		queue_control_dir = session2->createQueue(fifo_control_name);
+
+		arg.parent = this;
 		///////////////////////////////////Middleware//////////////////////////////////////////////////
+		unsigned long threadid;
+		
+		strcat(fifo_control_name, "_fifo_client");
+
+		#define MAX_FIFO_SIZE 65535
+		fifo_control_direction = fifo_open(fifo_control_name, MAX_FIFO_SIZE, iec_call_exit_handler);
+			
+		CreateThread(NULL, 0, LPTHREAD_START_ROUTINE(control_dir_consumer), (void*)&arg, 0, &threadid);
 	}
 	else
 	{
@@ -241,6 +153,15 @@ modbus_imp::~modbus_imp()
 {   
     // free resources   
 	fExit = 1;
+	////////Middleware/////////////
+	Sleep(3000);
+	queue_monitor_dir->close();
+	queue_control_dir->close();
+	session1->close();
+	session2->close();
+	delete session1;
+	delete session2;
+	////////Middleware/////////////
     return;   
 }   
 
@@ -314,20 +235,9 @@ int modbus_imp::PollServer(void)
 				item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
 
 				//Send in monitor direction
-				//prepare published data
-				memset(&instanceSend,0x00, sizeof(iec_item_type));
-
-				instanceSend.iec_type = item_to_send.iec_type;
-				memcpy(&(instanceSend.iec_obj), &(item_to_send.iec_obj), sizeof(struct iec_object));
-				instanceSend.cause = item_to_send.cause;
-				instanceSend.msg_id = item_to_send.msg_id;
-				instanceSend.ioa_control_center = item_to_send.ioa_control_center;
-				instanceSend.casdu = item_to_send.casdu;
-				instanceSend.is_neg = item_to_send.is_neg;
-				instanceSend.checksum = item_to_send.checksum;
-
-				ORTEPublicationSend(publisher);
-
+				//publishing data
+				queue_monitor_dir->put(&item_to_send, sizeof(struct iec_item));
+				
 				n_msg_sent++;
 			
 				//break; //this terminate the loop and the program
@@ -415,11 +325,6 @@ int modbus_imp::Stop()
     /* Close the connection */
     modbus_close(ctx);
     modbus_free(ctx);
-
-	while(received_command_callback)
-	{
-		Sleep(100);
-	}
 	
 	// terminate server and it will clean up itself
 
@@ -460,6 +365,27 @@ void modbus_imp::LogMessage(int* error, const char* name)
 
 #include <time.h>
 #include <sys/timeb.h>
+
+void modbus_imp::get_local_host_time(struct cp56time2a* time)
+{
+	struct timeb tb;
+	struct tm	*ptm;
+
+    ftime (&tb);
+	ptm = localtime(&tb.time);
+		
+	time->hour = ptm->tm_hour;					//<0.23>
+	time->min = ptm->tm_min;					//<0..59>
+	time->msec = ptm->tm_sec*1000 + tb.millitm; //<0.. 59999>
+	time->mday = ptm->tm_mday; //<1..31>
+	time->wday = (ptm->tm_wday == 0) ? ptm->tm_wday + 7 : ptm->tm_wday; //<1..7>
+	time->month = ptm->tm_mon + 1; //<1..12>
+	time->year = ptm->tm_year - 100; //<0.99>
+	time->iv = 0; //<0..1> Invalid: <0> is valid, <1> is invalid
+	time->su = (u_char)tb.dstflag; //<0..1> SUmmer time: <0> is standard time, <1> is summer time
+
+    return;
+}
 
 void modbus_imp::get_utc_host_time(struct cp56time2a* time)
 {
@@ -879,26 +805,13 @@ int modbus_imp::PollItems(void)
 				//IT_COMMENT1("tx ---> 0x%02x\n", c);
 			//	}
 
-			Sleep(10); //Without delay there is missing of messages in the loading
-
 			//Send in monitor direction
 			fprintf(stderr,"Sending message %u th\n", n_msg_sent);
 			fflush(stderr);
 			IT_COMMENT1("Sending message %u th\n", n_msg_sent);
-
-			//prepare published data
-			memset(&instanceSend,0x00, sizeof(iec_item_type));
-
-			instanceSend.iec_type = item_to_send.iec_type;
-			memcpy(&(instanceSend.iec_obj), &(item_to_send.iec_obj), sizeof(struct iec_object));
-			instanceSend.cause = item_to_send.cause;
-			instanceSend.msg_id = item_to_send.msg_id;
-			instanceSend.ioa_control_center = item_to_send.ioa_control_center;
-			instanceSend.casdu = item_to_send.casdu;
-			instanceSend.is_neg = item_to_send.is_neg;
-			instanceSend.checksum = item_to_send.checksum;
-
-			ORTEPublicationSend(publisher);
+			
+			//publishing data
+			queue_monitor_dir->put(&item_to_send, sizeof(struct iec_item));
 
 			n_msg_sent++;
 		}
@@ -1649,4 +1562,75 @@ void modbus_imp::alloc_command_resources(void)
 void modbus_imp::free_command_resources(void)
 {
 
+}
+
+#include <signal.h>
+
+char* get_date_time()
+{
+	static char sz[128];
+	time_t t = time(NULL);
+	struct tm *ptm = localtime(&t);
+	
+	strftime(sz, sizeof(sz)-2, "%m/%d/%y %H:%M:%S", ptm);
+
+	strcat(sz, "|");
+	return sz;
+}
+
+void iec_call_exit_handler(int line, char* file, char* reason)
+{
+	FILE* fp;
+	char program_path[_MAX_PATH];
+	char log_file[_MAX_FNAME+_MAX_PATH];
+	IT_IT("iec_call_exit_handler");
+
+	program_path[0] = '\0';
+#ifdef WIN32
+	if(GetModuleFileName(NULL, program_path, _MAX_PATH))
+	{
+		*(strrchr(program_path, '\\')) = '\0';        // Strip \\filename.exe off path
+		*(strrchr(program_path, '\\')) = '\0';        // Strip \\bin off path
+    }
+#elif __unix__
+	if(getcwd(program_path, _MAX_PATH))
+	{
+		*(strrchr(program_path, '/')) = '\0';        // Strip \\filename.exe off path
+		*(strrchr(program_path, '/')) = '\0';        // Strip \\bin off path
+    }
+#endif
+
+	strcpy(log_file, program_path);
+
+#ifdef WIN32
+	strcat(log_file, "\\logs\\modbus.log");
+#elif __unix__
+	strcat(log_file, "/logs/modbus.log");	
+#endif
+
+	fp = fopen(log_file, "a");
+
+	if(fp)
+	{
+		if(line && file && reason)
+		{
+			fprintf(fp, "PID:%d time:%s exit process at line: %d, file %s, reason:%s\n", GetCurrentProcessId, get_date_time(), line, file, reason);
+		}
+		else if(line && file)
+		{
+			fprintf(fp, "PID:%d time:%s exit process at line: %d, file %s\n", GetCurrentProcessId, get_date_time(), line, file);
+		}
+		else if(reason)
+		{
+			fprintf(fp, "PID:%d time:%s exit process for reason %s\n", GetCurrentProcessId, get_date_time(), reason);
+		}
+
+		fflush(fp);
+		fclose(fp);
+	}
+
+	//raise(SIGABRT);   //raise abort signal which in turn starts automatically a separete thread and call exit SignalHandler
+	ExitProcess(0);
+
+	IT_EXIT;
 }
