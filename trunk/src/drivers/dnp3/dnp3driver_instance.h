@@ -19,10 +19,6 @@
 #include "iec104types.h"
 #include "iec_item.h"
 ////////////////////////////Middleware/////////////////////////////////////////////////////////////
-#include "iec_item_type.h"
-extern void onRegFail(void *param);
-extern Boolean  quite;
-extern void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackParam); 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////fifo//////////////////////////////////////////////
@@ -124,60 +120,6 @@ class DNP_3_DRIVERDRV Dnp3driver_Instance : public DriverInstance
         strcat(fifo_monitor_name, str_instance_id);
         strcat(fifo_control_name, "dnp3");
         strcat(fifo_monitor_name, "dnp3");
-
-		ORTEDomainProp          dp; 
-		ORTESubscription        *s = NULL;
-		int32_t                 strength=1;
-		NtpTime                 persistence,deadline,minimumSeparation,delay;
-		Boolean                 havePublisher = ORTE_FALSE;
-		Boolean                 haveSubscriber = ORTE_FALSE;
-		IPAddress				smIPAddress = IPADDRESS_INVALID;
-		ORTEDomainAppEvents     events;
-
-		ORTEInit();
-		ORTEDomainPropDefaultGet(&dp);
-		NTPTIME_BUILD(minimumSeparation,0); 
-		NTPTIME_BUILD(delay,1); //1s
-
-		//initiate event system
-		ORTEDomainInitEvents(&events);
-
-		events.onRegFail = onRegFail;
-
-		//Create application     
-		domain = ORTEDomainAppCreate(ORTE_DEFAULT_DOMAIN,&dp,&events,ORTE_FALSE);
-
-		iec_item_type_type_register(domain);
-
-		//Create publisher
-		NTPTIME_BUILD(persistence,5);
-		
-		publisher = ORTEPublicationCreate(
-		domain,
-		fifo_control_name,
-		"iec_item_type",
-		&instanceSend,
-		&persistence,
-		strength,
-		NULL,
-		NULL,
-		NULL);
-
-		//Create subscriber
-		NTPTIME_BUILD(deadline,3);
-
-		subscriber = ORTESubscriptionCreate(
-		domain,
-		IMMEDIATE,
-		BEST_EFFORTS,
-		fifo_monitor_name,
-		"iec_item_type",
-		&instanceRecv,
-		&deadline,
-		&minimumSeparation,
-		recvCallBack,
-		this,
-		smIPAddress);
 		///////////////////////////////////Middleware//////////////////////////////////////////////////
 
 		/////////////////////////////////////fifo//////////////////////////////////////////////////////////
@@ -211,11 +153,6 @@ class DNP_3_DRIVERDRV Dnp3driver_Instance : public DriverInstance
 	QString unit_name;
     int instanceID; //Equals to "line concept" of a SCADA driver
 	//////Middleware/////////////
-    ORTEDomain *domain;
-	ORTEPublication *publisher;
-	ORTESubscription *subscriber;
-	iec_item_type    instanceSend;
-	iec_item_type    instanceRecv;
 	/////////////////////////////
 	////////////////fifo///////////
 	fifo_h fifo_monitor_direction;

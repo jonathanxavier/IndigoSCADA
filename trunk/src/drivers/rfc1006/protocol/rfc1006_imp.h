@@ -21,11 +21,8 @@
 #include <stdio.h>
 #include <time.h>
 #include "itrace.h"
-#include "iec_item_type.h" //Middleware
 
 ////////////////////////////Middleware///////////////////////////////////////////////////////
-extern void onRegFail(void *param);
-extern void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackParam); 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 class rfc1006_imp
@@ -35,14 +32,6 @@ class rfc1006_imp
 	int g_dwNumItems;
 	struct rfc1006Item* Config_db;
 	/////////////////////Middleware/////////////////////////
-	int received_command_callback;
-	ORTEDomain              *domain;
-	ORTEDomainProp          dp; 
-	static ORTEPublication  *publisher;
-	ORTESubscription        *subscriber;
-	static iec_item_type    instanceSend;
-	iec_item_type		    instanceRecv;
-	ORTEDomainAppEvents     events;
 	///////////////////////////////////Middleware///////////
 	bool fExit;
 	int  g_dwUpdateRate;

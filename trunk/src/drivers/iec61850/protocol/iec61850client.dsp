@@ -41,8 +41,9 @@ RSC=rc.exe
 # PROP Intermediate_Dir "Release"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
+MTL=midl.exe
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /GX /O2 /I ".\src\hal\thread" /I ".\src\hal\socket" /I ".\inc" /I ".\src\common" /I ".\src\model" /I ".\src\mms\iso_mms\server" /I ".\src\hal" /I ".\src\mms\iso_acse\asn1c" /I ".\src\mms\iso_presentation\asn1c" /I ".\src\mms\iso_mms\common" /I ".\src\mms\asn1" /I ".\src\mms\iso_acse" /I ".\src\mms\iso_cotp" /I ".\src\mms\iso_session" /I ".\src\mms\iso_presentation" /I ".\src\mms\iso_client" /I ".\src\mms\iso_mms\asn1c" /I ".\src\mms\iso_server" /I ".\src\mms\iso_mms\client" /I ".\src\mms_mapping" /I ".\src\api" /I "..\..\..\utilities" /I "..\..\..\middleware\rtps\include" /I "..\..\..\common" /I "..\..\..\configurator\sqlite" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
+# ADD CPP /nologo /MD /W3 /GX /O2 /I ".\src\hal\thread" /I ".\src\hal\socket" /I ".\inc" /I ".\src\common" /I ".\src\model" /I ".\src\mms\iso_mms\server" /I ".\src\hal" /I ".\src\mms\iso_acse\asn1c" /I ".\src\mms\iso_presentation\asn1c" /I ".\src\mms\iso_mms\common" /I ".\src\mms\asn1" /I ".\src\mms\iso_acse" /I ".\src\mms\iso_cotp" /I ".\src\mms\iso_session" /I ".\src\mms\iso_presentation" /I ".\src\mms\iso_client" /I ".\src\mms\iso_mms\asn1c" /I ".\src\mms\iso_server" /I ".\src\mms\iso_mms\client" /I ".\src\mms_mapping" /I ".\src\api" /I "..\..\..\utilities" /I "..\..\..\common" /I "..\..\..\configurator\sqlite" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -65,8 +66,9 @@ LINK32=link.exe
 # PROP Intermediate_Dir "Debug"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
+MTL=midl.exe
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I ".\src\hal\thread" /I ".\src\hal\socket" /I ".\inc" /I ".\src\common" /I ".\src\model" /I ".\src\mms\iso_mms\server" /I ".\src\hal" /I ".\src\mms\iso_acse\asn1c" /I ".\src\mms\iso_presentation\asn1c" /I ".\src\mms\iso_mms\common" /I ".\src\mms\asn1" /I ".\src\mms\iso_acse" /I ".\src\mms\iso_cotp" /I ".\src\mms\iso_session" /I ".\src\mms\iso_presentation" /I ".\src\mms\iso_client" /I ".\src\mms\iso_mms\asn1c" /I ".\src\mms\iso_server" /I ".\src\mms\iso_mms\client" /I ".\src\mms_mapping" /I ".\src\api" /I "..\..\..\utilities" /I "..\..\..\middleware\rtps\include" /I "..\..\..\common" /I "..\..\..\configurator\sqlite" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FD /GZ /c
+# ADD CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I ".\src\hal\thread" /I ".\src\hal\socket" /I ".\inc" /I ".\src\common" /I ".\src\model" /I ".\src\mms\iso_mms\server" /I ".\src\hal" /I ".\src\mms\iso_acse\asn1c" /I ".\src\mms\iso_presentation\asn1c" /I ".\src\mms\iso_mms\common" /I ".\src\mms\asn1" /I ".\src\mms\iso_acse" /I ".\src\mms\iso_cotp" /I ".\src\mms\iso_session" /I ".\src\mms\iso_presentation" /I ".\src\mms\iso_client" /I ".\src\mms\iso_mms\asn1c" /I ".\src\mms\iso_server" /I ".\src\mms\iso_mms\client" /I ".\src\mms_mapping" /I ".\src\api" /I "..\..\..\utilities" /I "..\..\..\common" /I "..\..\..\configurator\sqlite" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FD /GZ /c
 # SUBTRACT CPP /YX
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
@@ -88,10 +90,6 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
-SOURCE=..\..\..\middleware\rtps\librtps\cdr.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\..\utilities\clear_crc_eight.c
 # End Source File
 # Begin Source File
@@ -101,10 +99,6 @@ SOURCE=.\client\client.cpp
 # Begin Source File
 
 SOURCE=.\client\getopt.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\common\iec_item_type.c
 # End Source File
 # Begin Source File
 

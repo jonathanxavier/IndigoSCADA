@@ -24,7 +24,7 @@ class Iec103driverConfigurationData : public QDialog
 	QSpinBox *NItems;
 	QSpinBox *PollInterval;
 	QLineEdit *IEC103LinkAddressText;
-	QLineEdit *IEC103CASDUText;
+	QLineEdit *BaudRateText;
 	QLineEdit *COMPortNameText;
 };
 #endif // Iec103driverConfigurationData_included

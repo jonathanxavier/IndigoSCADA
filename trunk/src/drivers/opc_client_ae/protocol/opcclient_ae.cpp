@@ -22,84 +22,11 @@ CComModule _Module;
 #include "opcaeclasses.h"
 
 /////////////////////////////////////Middleware///////////////////////////////////////////
-Boolean  quite = ORTE_FALSE;
-int	regfail=0;
-
-//event system
-void onRegFail(void *param) 
-{
-  printf("registration to a manager failed\n");
-  regfail = 1;
-}
-
-void rebuild_iec_item_message(struct iec_item *item2, iec_item_type *item1)
-{
-	unsigned char checksum;
-
-	///////////////Rebuild struct iec_item//////////////////////////////////
-	item2->iec_type = item1->iec_type;
-	memcpy(&(item2->iec_obj), &(item1->iec_obj), sizeof(struct iec_object));
-	item2->cause = item1->cause;
-	item2->msg_id = item1->msg_id;
-	item2->ioa_control_center = item1->ioa_control_center;
-	item2->casdu = item1->casdu;
-	item2->is_neg = item1->is_neg;
-	item2->checksum = item1->checksum;
-	///////and check the 1 byte checksum////////////////////////////////////
-	checksum = clearCrc((unsigned char *)item2, sizeof(struct iec_item));
-
-//	fprintf(stderr,"new checksum = %u\n", checksum);
-
-	//if checksum is 0 then there are no errors
-	if(checksum != 0)
-	{
-		//log error message
-		ExitProcess(0);
-	}
-
-	fprintf(stderr,"iec_type = %u\n", item2->iec_type);
-	fprintf(stderr,"iec_obj = %x\n", item2->iec_obj);
-	fprintf(stderr,"cause = %u\n", item2->cause);
-	fprintf(stderr,"msg_id =%u\n", item2->msg_id);
-	fprintf(stderr,"ioa_control_center = %u\n", item2->ioa_control_center);
-	fprintf(stderr,"casdu =%u\n", item2->casdu);
-	fprintf(stderr,"is_neg = %u\n", item2->is_neg);
-	fprintf(stderr,"checksum = %u\n", item2->checksum);
-}
-
-void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackParam) 
-{
-	Opc_client_ae_imp * cl = (Opc_client_ae_imp*)recvCallBackParam;
-	iec_item_type *item1 = (iec_item_type*)vinstance;
-
-	switch (info->status) 
-	{
-		case NEW_DATA:
-		{
-		  if(!quite)
-		  {
-			  struct iec_item item2;
-			  rebuild_iec_item_message(&item2, item1);
-			  cl->received_command_callback = 1;
-			  cl->check_for_commands(&item2);
-			  cl->received_command_callback = 0;
-		  }
-		}
-		break;
-		case DEADLINE:
-		{
-			printf("deadline occurred\n");
-		}
-		break;
-	}
-}
 ////////////////////////////////Middleware/////////////////////////////////////
 
 DWORD Opc_client_ae_imp::g_dwNumAlarmsEvents = 0;
 struct structEvent* Opc_client_ae_imp::Config_db = NULL;
 ////////////////////////////////Middleware/////////////////
-iec_item_type Opc_client_ae_imp::instanceSend;
-ORTEPublication* Opc_client_ae_imp::publisher = NULL;
 ////////////////////////////////Middleware/////////////////
 
 int Opc_client_ae_imp::Update()
@@ -1422,7 +1349,6 @@ void Opc_client_ae_imp::SendEvent2(ONEVENTSTRUCT* pEvent)
 	item_to_send.msg_id = n_msg_sent;
 
 	//Send messages to monitor.exe
-	Sleep(10); //Without delay there is missing of messages in the loading
 
 	fprintf(stderr,"Sending message %u th\n", n_msg_sent);
 	fflush(stderr);
@@ -1452,18 +1378,6 @@ void Opc_client_ae_imp::SendEvent2(ONEVENTSTRUCT* pEvent)
 */
 
 	//prepare published data
-	memset(&instanceSend,0x00, sizeof(iec_item_type));
-
-	instanceSend.iec_type = item_to_send.iec_type;
-	memcpy(&(instanceSend.iec_obj), &(item_to_send.iec_obj), sizeof(struct iec_object));
-	instanceSend.cause = item_to_send.cause;
-	instanceSend.msg_id = item_to_send.msg_id;
-	instanceSend.ioa_control_center = item_to_send.ioa_control_center;
-	instanceSend.casdu = item_to_send.casdu;
-	instanceSend.is_neg = item_to_send.is_neg;
-	instanceSend.checksum = item_to_send.checksum;
-
-	ORTEPublicationSend(publisher);
 
 	n_msg_sent++;
 

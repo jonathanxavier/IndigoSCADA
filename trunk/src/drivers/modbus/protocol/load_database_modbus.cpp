@@ -1,7 +1,7 @@
 /*
  *                         IndigoSCADA
  *
- *   This software and documentation are Copyright 2002 to 2013 Enscada
+ *   This software and documentation are Copyright 2002 to 2014 Enscada
  *   Limited and its licensees. All rights reserved. See file:
  *
  *                     $HOME/LICENSE 
@@ -19,7 +19,7 @@
 #include "iec104types.h"
 #include "iec_item.h"
 #include "itrace.h"	
-#include "modbus_item.h"
+#include "modbus_db.h"
 #include "modbus_imp.h"
 #include "stdlib.h"
 #include "string.h"
@@ -27,7 +27,7 @@
 
 static gl_row_counter = 0;
 static gl_column_counter = 0;
-static struct modbusItem* gl_Config_db = 0;
+static struct modbusDbRecord* gl_Config_db = 0;
 
 static int db_callback(void *NotUsed, int argc, char **argv, char **azColName)
 {
@@ -265,7 +265,7 @@ int modbus_imp::AddItems(void)
 
 	g_dwNumItems = MAX_CONFIGURABLE_MODBUS_ITEMIDS;
 	
-	Config_db = (struct modbusItem*)calloc(1, g_dwNumItems*sizeof(struct modbusItem));
+	Config_db = (struct modbusDbRecord*)calloc(1, g_dwNumItems*sizeof(struct modbusDbRecord));
 
 	gl_Config_db = Config_db;
 

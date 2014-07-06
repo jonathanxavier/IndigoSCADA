@@ -13,7 +13,6 @@
 #define EIO 1
 #define EOK 0
 
-#include "iec_item_type.h" //Middleware
 #include "station.hpp"
 #include "master.hpp"
 #include "datalink.hpp"
@@ -48,14 +47,6 @@ public:
 	int lineNumber;
 	int serverID;
 	/////////////////////Middleware/////////////////////////
-	int received_command_callback;
-	ORTEDomain              *domain;
-	ORTEDomainProp          dp; 
-	static ORTEPublication  *publisher;
-	ORTESubscription        *subscriber;
-	static iec_item_type    instanceSend;
-	iec_item_type		    instanceRecv;
-	ORTEDomainAppEvents     events;
 	///////////////////////////////////Middleware///////////
 	bool fExit;
 	int received_command;
