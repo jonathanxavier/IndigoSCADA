@@ -3,7 +3,7 @@ Microsoft Developer Studio Workspace File, Format Version 6.00
 
 ###############################################################################
 
-Project: "Calculated"=..\drivers\Calculated\Calculated.dsp - Package Owner=<4>
+Project: "Calculated"="..\drivers\Calculated\Calculated.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -14,14 +14,11 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name fifo
     End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name librtps
-    End Project Dependency
 }}}
 
 ###############################################################################
 
-Project: "Simulator"=..\drivers\Simulator\Simulator.dsp - Package Owner=<4>
+Project: "Simulator"="..\drivers\Simulator\Simulator.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -36,7 +33,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "System"=..\drivers\System\System.dsp - Package Owner=<4>
+Project: "System"="..\drivers\System\System.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -51,7 +48,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "all"=.\all.dsp - Package Owner=<4>
+Project: "all"=".\all.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -153,12 +150,6 @@ Package=<4>
     Project_Dep_Name lightopc_lib
     End Project Dependency
     Begin Project Dependency
-    Project_Dep_Name librtps
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name rtps_mngr
-    End Project Dependency
-    Begin Project Dependency
     Project_Dep_Name protocol_configurator
     End Project Dependency
     Begin Project Dependency
@@ -185,29 +176,14 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name iec61850server
     End Project Dependency
-}}}
-
-###############################################################################
-
-Project: "archiver"=..\archiver\archiver.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
     Begin Project Dependency
-    Project_Dep_Name scada
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name utilities
+    Project_Dep_Name mserver
     End Project Dependency
 }}}
 
 ###############################################################################
 
-Project: "designer"=..\hmi_designer\designer\app\designer.dsp - Package Owner=<4>
+Project: "designer"="..\hmi_designer\designer\app\designer.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -225,7 +201,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "designerlib"=..\hmi_designer\designer\designer\designerlib.dsp - Package Owner=<4>
+Project: "designerlib"="..\hmi_designer\designer\designer\designerlib.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -237,7 +213,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "dnp3driver"=..\drivers\dnp3\dnp3driver.dsp - Package Owner=<4>
+Project: "dnp3driver"="..\drivers\dnp3\dnp3driver.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -249,7 +225,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "dnp3master"=..\drivers\dnp3\protocol\dnp3master.dsp - Package Owner=<4>
+Project: "dnp3master"="..\drivers\dnp3\protocol\dnp3master.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -261,7 +237,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "dnp3slave"=..\drivers\dnp3\protocol\dnp3slave.dsp - Package Owner=<4>
+Project: "dnp3slave"="..\drivers\dnp3\protocol\dnp3slave.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -273,7 +249,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "dspserver"=..\dispatchserver\dspserver.dsp - Package Owner=<4>
+Project: "dspserver"="..\dispatchserver\dspserver.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -288,7 +264,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "fastdb"=..\fastdb\fastdb.dsp - Package Owner=<4>
+Project: "fastdb"="..\fastdb\fastdb.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -300,7 +276,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "fifo"=..\fifo\fifo.dsp - Package Owner=<4>
+Project: "fifo"="..\fifo\fifo.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -312,7 +288,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "gigabase"=..\gigabase\gigabase.dsp - Package Owner=<4>
+Project: "gigabase"="..\gigabase\gigabase.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -324,7 +300,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "iec101driver"=..\drivers\iec101\iec101driver.dsp - Package Owner=<4>
+Project: "iec101driver"="..\drivers\iec101\iec101driver.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -336,31 +312,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "iec103driver"=..\drivers\iec103\iec103driver.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "iec104driver"=..\drivers\iec104\iec104driver.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "iec61850client"=..\drivers\iec61850\protocol\iec61850client.dsp - Package Owner=<4>
+Project: "iec103driver"="..\drivers\iec103\iec103driver.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -369,16 +321,13 @@ Package=<5>
 Package=<4>
 {{{
     Begin Project Dependency
-    Project_Dep_Name iec61850lib
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name librtps
+    Project_Dep_Name ripcclient
     End Project Dependency
 }}}
 
 ###############################################################################
 
-Project: "iec61850driver"=..\drivers\iec61850\iec61850driver.dsp - Package Owner=<4>
+Project: "iec104driver"="..\drivers\iec104\iec104driver.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -390,19 +339,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "iec61850lib"=..\drivers\iec61850\protocol\iec61850lib.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "iec61850server"=..\drivers\iec61850\protocol\iec61850server.dsp - Package Owner=<4>
+Project: "iec61850client"="..\drivers\iec61850\protocol\iec61850client.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -417,7 +354,31 @@ Package=<4>
 
 ###############################################################################
 
-Project: "librtps"=..\middleware\rtps\librtps\msvc\librtps.dsp - Package Owner=<4>
+Project: "iec61850driver"="..\drivers\iec61850\iec61850driver.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "iec61850lib"="..\drivers\iec61850\protocol\iec61850lib.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "iec61850server"="..\drivers\iec61850\protocol\iec61850server.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -426,7 +387,7 @@ Package=<5>
 Package=<4>
 {{{
     Begin Project Dependency
-    Project_Dep_Name pthread
+    Project_Dep_Name iec61850lib
     End Project Dependency
 }}}
 
@@ -444,7 +405,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "manager"=..\manager\manager.dsp - Package Owner=<4>
+Project: "manager"="..\manager\manager.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -456,7 +417,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "modbus_driver"=..\drivers\modbus\modbus_driver.dsp - Package Owner=<4>
+Project: "modbus_driver"="..\drivers\modbus\modbus_driver.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -464,11 +425,14 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name ripcclient
+    End Project Dependency
 }}}
 
 ###############################################################################
 
-Project: "modbus_master"=..\drivers\modbus\protocol\modbus_master.dsp - Package Owner=<4>
+Project: "modbus_master"="..\drivers\modbus\protocol\modbus_master.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -476,11 +440,14 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name ripcclient
+    End Project Dependency
 }}}
 
 ###############################################################################
 
-Project: "monitor"=..\monitor\monitor.dsp - Package Owner=<4>
+Project: "monitor"="..\monitor\monitor.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -498,7 +465,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "opc_client_ae"=..\drivers\opc_client_ae\protocol\opc_client_ae.dsp - Package Owner=<4>
+Project: "mserver"="..\middleware\ripc\mserver.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -507,13 +474,13 @@ Package=<5>
 Package=<4>
 {{{
     Begin Project Dependency
-    Project_Dep_Name librtps
+    Project_Dep_Name ripcserver
     End Project Dependency
 }}}
 
 ###############################################################################
 
-Project: "opc_client_ae_driver"=..\drivers\opc_client_ae\opc_client_ae_driver.dsp - Package Owner=<4>
+Project: "opc_client_ae"="..\drivers\opc_client_ae\protocol\opc_client_ae.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -521,14 +488,11 @@ Package=<5>
 
 Package=<4>
 {{{
-    Begin Project Dependency
-    Project_Dep_Name librtps
-    End Project Dependency
 }}}
 
 ###############################################################################
 
-Project: "opc_client_da"=..\drivers\opc_client_da\protocol\opc_client_da.dsp - Package Owner=<4>
+Project: "opc_client_ae_driver"="..\drivers\opc_client_ae\opc_client_ae_driver.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -536,14 +500,11 @@ Package=<5>
 
 Package=<4>
 {{{
-    Begin Project Dependency
-    Project_Dep_Name librtps
-    End Project Dependency
 }}}
 
 ###############################################################################
 
-Project: "opc_client_da_driver"=..\drivers\opc_client_da\opc_client_da_driver.dsp - Package Owner=<4>
+Project: "opc_client_da"="..\drivers\opc_client_da\protocol\opc_client_da.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -551,14 +512,11 @@ Package=<5>
 
 Package=<4>
 {{{
-    Begin Project Dependency
-    Project_Dep_Name librtps
-    End Project Dependency
 }}}
 
 ###############################################################################
 
-Project: "opc_client_hda"=..\drivers\opc_client_hda\protocol\opc_client_hda.dsp - Package Owner=<4>
+Project: "opc_client_da_driver"="..\drivers\opc_client_da\opc_client_da_driver.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -566,14 +524,11 @@ Package=<5>
 
 Package=<4>
 {{{
-    Begin Project Dependency
-    Project_Dep_Name librtps
-    End Project Dependency
 }}}
 
 ###############################################################################
 
-Project: "opc_client_hda_driver"=..\drivers\opc_client_hda\opc_client_hda_driver.dsp - Package Owner=<4>
+Project: "opc_client_hda"="..\drivers\opc_client_hda\protocol\opc_client_hda.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -581,9 +536,18 @@ Package=<5>
 
 Package=<4>
 {{{
-    Begin Project Dependency
-    Project_Dep_Name librtps
-    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "opc_client_hda_driver"="..\drivers\opc_client_hda\opc_client_hda_driver.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
 }}}
 
 ###############################################################################
@@ -603,7 +567,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "protocol_configurator"=..\configurator\browser\protocol_configurator.dsp - Package Owner=<4>
+Project: "protocol_configurator"="..\configurator\browser\protocol_configurator.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -627,7 +591,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "qui"=..\hmi_designer\designer\uilib\qui.dsp - Package Owner=<4>
+Project: "qui"="..\hmi_designer\designer\uilib\qui.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -663,7 +627,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "realtimesqlserver"=..\realtimesqlserver\realtimesqlserver.dsp - Package Owner=<4>
+Project: "realtimesqlserver"="..\realtimesqlserver\realtimesqlserver.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -681,37 +645,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "rfc1006client"=..\drivers\rfc1006\protocol\rfc1006client.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-    Begin Project Dependency
-    Project_Dep_Name librtps
-    End Project Dependency
-}}}
-
-###############################################################################
-
-Project: "rfc1006driver"=..\drivers\rfc1006\rfc1006driver.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-    Begin Project Dependency
-    Project_Dep_Name librtps
-    End Project Dependency
-}}}
-
-###############################################################################
-
-Project: "rtps_mngr"=..\middleware\rtps\manager\mcvs\rtps_mngr.dsp - Package Owner=<4>
+Project: "rfc1006client"="..\drivers\rfc1006\protocol\rfc1006client.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -723,7 +657,43 @@ Package=<4>
 
 ###############################################################################
 
-Project: "scada"=..\scada\scada.dsp - Package Owner=<4>
+Project: "rfc1006driver"="..\drivers\rfc1006\rfc1006driver.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "ripcclient"="..\middleware\ripc\ripcclient.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "ripcserver"="..\middleware\ripc\ripcserver.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "scada"="..\scada\scada.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -741,7 +711,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "sqlserver"=..\sqlserver\sqlserver.dsp - Package Owner=<4>
+Project: "sqlserver"="..\sqlserver\sqlserver.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -759,7 +729,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "ui"=..\UI\ui.dsp - Package Owner=<4>
+Project: "ui"="..\UI\ui.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -783,7 +753,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "utilities"=..\utilities\utilities.dsp - Package Owner=<4>
+Project: "utilities"="..\utilities\utilities.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
