@@ -1,7 +1,7 @@
 /*
  *                         IndigoSCADA
  *
- *   This software and documentation are Copyright 2002 to 2013 Enscada 
+ *   This software and documentation are Copyright 2002 to 2014 Enscada 
  *   Limited and its licensees. All rights reserved. See file:
  *
  *                     $HOME/LICENSE 
@@ -10,8 +10,8 @@
  *
  */
 
-#ifndef MODBUS_ITEM_H
-#define MODBUS_ITEM_H
+#ifndef MODBUS_DB_H
+#define MODBUS_DB_H
 
 //We express the MODBUS types like the OPC types
 
@@ -30,7 +30,7 @@ enum MODBUS_TYPE {
 	VT_UI8	= 21
 };
 
-struct modbusItem
+struct modbusDbRecord
 {
 	//////////////////MODBUS RTU part/////////////////////////////////////////
 	int modbus_function_read;	//modbus funtion to read
@@ -49,4 +49,4 @@ struct modbusItem
     } last_value;
 };
 
-#endif //MODBUS_ITEM_H
+#endif //MODBUS_DB_H
