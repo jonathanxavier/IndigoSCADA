@@ -126,7 +126,7 @@ SystemCfgData::SystemCfgData(QWidget *parent, const char *name)
 	Language->setSizeLimit( 10 );
 	Language->setAutoResize( FALSE );
 	Language->insertItem("English");
-	Language->insertItem("Italiano");
+	Language->insertItem("Local");
 	Language->setMaxCount( 10 );
 	Language->setAutoCompletion( FALSE );
 	QLabel *qtarch_Label_6 = new QLabel(this, "Label_6");

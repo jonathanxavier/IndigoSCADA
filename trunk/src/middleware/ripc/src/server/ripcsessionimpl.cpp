@@ -1,4 +1,4 @@
-#define RIPC_IMPLEMENTATION
+//#define RIPC_IMPLEMENTATION
 
 #include "RIPCSessionImpl.h"
 #include "RIPCServer.h"

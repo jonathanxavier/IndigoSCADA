@@ -1,7 +1,7 @@
 /*
  *                         IndigoSCADA
  *
- *   This software and documentation are Copyright 2002 to 2009 Enscada 
+ *   This software and documentation are Copyright 2002 to 2014 Enscada 
  *   Limited and its licensees. All rights reserved. See file:
  *
  *                     $HOME/LICENSE 
@@ -10,10 +10,31 @@
  *
  */
 
-
-
 #include "opc_client_ae_instance.h"
 #include "opc_client_aedriverthread.h"
+
+////////////////////Middleware/////////////////////////////////////////////
+int exit_consumer = 0;
+
+void consumer(void* pParam)
+{
+	struct subs_args* arg = (struct subs_args*)pParam;
+	struct iec_item item;
+	RIPCObject objDesc(&item, sizeof(struct iec_item));
+
+	while(1)
+	{
+		if(exit_consumer)
+		{
+			break;
+		}
+
+		arg->queue_monitor_dir->get(objDesc);
+
+		fifo_put(arg->fifo_monitor_direction, (char *)&item, sizeof(struct iec_item));
+	}
+}
+////////////////////Middleware/////////////////////////////////////////////
 
 /*
 *Function:
@@ -21,7 +42,7 @@
 *Outputs:none
 *Returns:none
 */
-#define TICKS_PER_SEC 1
+
 void Opc_client_ae_Instance::Start() 
 {
 	IT_IT("Opc_client_ae_Instance::Start");
@@ -255,7 +276,8 @@ void Opc_client_ae_Instance::QueryResponse(QObject *p, const QString &c, int id,
 				///////////////////////////////////////////////////////////////////////////////////////////
 
 				////////////////////Middleware/////////////////////////////////////////////
-				//prepare published data
+				//publishing data
+				queue_control_dir->put(&item_to_send, sizeof(struct iec_item));
 				//////////////////////////Middleware/////////////////////////////////////////
 			}
 		}
@@ -373,48 +395,374 @@ void strip_white_space(char *dst, const char *src, int len)
 *Outputs:none
 *Returns:none
 */
-//Realtime timer
 void Opc_client_ae_Instance::Tick()
 {
 	IT_IT("Opc_client_ae_Instance::Tick");
+
+	//This code runs inside main monitor.exe thread
 
 	switch(State)
 	{
 		case STATE_RESET:
 		{
-			State = STATE_IDLE;
-			Countdown = 2;
+			State = STATE_ASK_GENERAL_INTERROGATION;
 		}
 		break;
-		case STATE_IDLE:
+		case STATE_ASK_GENERAL_INTERROGATION:
 		{
-			if(!Countdown)
-			{
-				State = STATE_DONE;
-			}
-			else
-			{
-				Countdown--;
-			}
-		}
-		break;
-		//
-		case STATE_DONE:
-		{
+			//Send C_IC_NA_1//////////////////////////////////////////////////////////////////////////
+			struct iec_item item_to_send;
+			memset(&item_to_send,0x00, sizeof(struct iec_item));
+			item_to_send.iec_type = C_IC_NA_1;
+			item_to_send.iec_obj.ioa = 0;
+			item_to_send.iec_obj.o.type100.qoi = 1;
+
+			//struct cp56time2a actual_time;
+			//get_utc_host_time(&actual_time);
+			//item_to_send.iec_obj.o.type58.time = actual_time;
+			item_to_send.msg_id = msg_sent_in_control_direction++;
+			item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
+			///////////////////////////////////////////////////////////////////////////////////////////
+
+			//////////////Middleware///////////////////////////////////////
+			//publishing data
+			queue_control_dir->put(&item_to_send, sizeof(struct iec_item));
+			//////////////Middleware///////////////////////////////////////
 			
-		};
+			State = STATE_GENERAL_INTERROGATION_DONE;
+		}
 		break;
-		//
+		case STATE_GENERAL_INTERROGATION_DONE:
+		{
+			State = STATE_RUNNING;
+		}
+		break;
 		case STATE_FAIL:
 		{
-			State = STATE_IDLE;
-		};
+			get_items_from_local_fifo();
+		}
 		break;
-		//
+		case STATE_RUNNING:
+		{
+			get_items_from_local_fifo();
+		}
+		break;
 		default:
 		break;
-	};
-};
+	}
+}
+
+void Opc_client_ae_Instance::get_items_from_local_fifo(void)
+{
+	unsigned char buf[sizeof(struct iec_item)];
+	int len;
+	const unsigned wait_limit_ms = 1;
+	struct iec_item* p_item;
+
+	for(int i = 0; (len = fifo_get(fifo_monitor_direction, (char*)buf, sizeof(struct iec_item), wait_limit_ms)) >= 0; i += 1)	
+	{ 
+		p_item = (struct iec_item*)buf;
+		
+		if(State == STATE_FAIL)
+		{
+			if(p_item->iec_type != C_LO_ST_1)
+			{
+				QString msg;
+				msg.sprintf("opc ae on line %d is now connected to opa ae server.", instanceID + 1); 
+				UnFailUnit(msg);
+				State = STATE_ASK_GENERAL_INTERROGATION;
+			}
+		}
+			
+		//printf("Receiving %d th message \n", p_item->msg_id);
+		printf("Receiving %d th opc ae message from line = %d\n", p_item->msg_id, instanceID + 1);
+
+		//for (int j = 0; j < len; j++) 
+		//{ 
+			//assert((unsigned char)buf[i] == len);
+			//unsigned char c = *((unsigned char*)buf + j);
+			//printf("rx <--- 0x%02x-\n", c);
+			//fprintf(fp,"rx <--- 0x%02x-\n", c);
+			//fflush(fp);
+
+			//IT_COMMENT1("rx <--- 0x%02x-\n", c);
+		//}
+
+		//printf("---------------\n");
+
+		unsigned char rc = clearCrc((unsigned char *)buf, sizeof(struct iec_item));
+
+		if(rc != 0)
+		{
+			ExitProcess(1);
+		}
+
+		QString value;
+
+		switch(p_item->iec_type)
+		{
+			case M_SP_NA_1:
+			{
+				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+				iec_type1 var = p_item->iec_obj.o.type1;
+				
+				IECValue v(VALUE_TAG, &var, M_SP_NA_1);
+				TODO:05-07-2011 Get name here
+				post_val(v, name);
+
+				#else
+
+				value.sprintf("%d", p_item->iec_obj.o.type1.sp);
+
+				#endif
+				
+			}
+			break;
+			case M_DP_NA_1:
+			{
+				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+				iec_type3 var = p_item->iec_obj.o.type3;
+				
+				IECValue v(VALUE_TAG, &var, M_DP_NA_1);
+				TODO:05-07-2011 Get name here
+				post_val(v, name);
+
+				#else
+
+				value.sprintf("%d", p_item->iec_obj.o.type3.dp);
+
+				#endif
+			}
+			break;
+			//case M_BO_NA_1:
+			//{
+			//}
+			//break;
+			case M_ME_NA_1:
+			{
+				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+				iec_type9 var = p_item->iec_obj.o.type9;
+				
+				IECValue v(VALUE_TAG, &var, M_ME_NA_1);
+				TODO:05-07-2011 Get name here
+				post_val(v, name);
+
+				#else
+
+				value.sprintf("%d", p_item->iec_obj.o.type9.mv);
+
+				#endif
+			}
+			break;
+			case M_ME_NB_1:
+			{
+				
+				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+				iec_type11 var = p_item->iec_obj.o.type11;
+				
+				IECValue v(VALUE_TAG, &var, M_ME_NB_1);
+				TODO:05-07-2011 Get name here
+				post_val(v, name);
+
+				#else
+
+				value.sprintf("%d", p_item->iec_obj.o.type11.mv);
+
+				#endif
+			}
+			break;
+			case M_ME_NC_1:
+			{
+				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+				iec_type13 var = p_item->iec_obj.o.type13;
+				
+				IECValue v(VALUE_TAG, &var, M_ME_NC_1);
+				TODO:05-07-2011 Get name here
+				post_val(v, name);
+
+				#else
+
+				value.sprintf("%d", p_item->iec_obj.o.type13.mv);
+
+				#endif
+			}
+			break;
+			case M_SP_TB_1:
+			{
+				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+				iec_type30 var = p_item->iec_obj.o.type30;
+				
+				IECValue v(VALUE_TAG, &var, M_SP_TB_1);
+				TODO:05-07-2011 Get name here
+				post_val(v, name);
+
+				#else
+
+				value.sprintf("%d", p_item->iec_obj.o.type30.sp);
+
+				#endif
+			}
+			break;
+			case M_DP_TB_1:
+			{
+				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+				iec_type31 var = p_item->iec_obj.o.type31;
+				
+				IECValue v(VALUE_TAG, &var, M_DP_TB_1);
+				TODO:05-07-2011 Get name here
+				post_val(v, name);
+
+				#else
+
+				value.sprintf("%d", p_item->iec_obj.o.type31.dp);
+
+				#endif
+			}
+			break;
+			case M_BO_TB_1:
+			{
+				//value.sprintf("%d", p_item->iec_obj.o.type33.stcd);
+			}
+			break;
+			case M_ME_TD_1:
+			{
+				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+				iec_type34 var = p_item->iec_obj.o.type34;
+				
+				IECValue v(VALUE_TAG, &var, M_ME_TD_1);
+				TODO:05-07-2011 Get name here
+				post_val(v, name);
+
+				#else
+
+				value.sprintf("%d", p_item->iec_obj.o.type34.mv);
+
+				#endif
+			}
+			break;
+			case M_ME_TE_1:
+			{
+				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+				iec_type35 var = p_item->iec_obj.o.type35;
+				
+				IECValue v(VALUE_TAG, &var, M_ME_TE_1);
+				TODO:05-07-2011 Get name here
+				post_val(v, name);
+
+				#else
+
+				value.sprintf("%d", p_item->iec_obj.o.type35.mv);
+
+				#endif
+			}
+			break;
+			case M_ME_TF_1:
+			{
+				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+				iec_type36 var = p_item->iec_obj.o.type36;
+				
+				IECValue v(VALUE_TAG, &var, M_ME_TF_1);
+				TODO:05-07-2011 Get name here
+				post_val(v, name);
+
+				#else
+
+				value.sprintf("%f", p_item->iec_obj.o.type36.mv);
+
+				#endif
+			}
+			break;
+			case M_ME_TN_1:
+			{
+				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+				iec_type150 var = p_item->iec_obj.o.type150;
+				
+				IECValue v(VALUE_TAG, &var, M_ME_TN_1);
+				TODO:05-07-2011 Get name here
+				post_val(v, name);
+
+				#else
+
+				value.sprintf("%lf", p_item->iec_obj.o.type150.mv);
+
+				#endif
+			}
+			break;
+			case M_IT_TB_1:
+			{
+				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+
+				iec_type37 var = p_item->iec_obj.o.type37;
+				
+				IECValue v(VALUE_TAG, &var, M_ME_TN_1);
+				TODO:05-07-2011 Get name here
+				post_val(v, name);
+
+				#else
+
+				value.sprintf("%d", p_item->iec_obj.o.type37.counter);
+
+				#endif
+			}
+			break;
+			case C_EX_IT_1:
+			{
+				printf("Child process is exiting...\n");
+			}
+			break;
+			case C_LO_ST_1:
+			{
+				if(State != STATE_FAIL)
+				{
+					printf("opc ae on line %d has lost connection with opc ae server...\n", instanceID + 1);
+
+					QString msg;
+					msg.sprintf("OPC AE master on line %d has lost connection with opc ae server...", instanceID + 1); 
+					FailUnit(msg);
+
+					State = STATE_FAIL;
+				}
+			}
+			break;
+			default:
+			{
+				printf("Not supported type%d \n", p_item->iec_type);
+				value.sprintf("%d", 0);
+			}
+			break;
+		}
+		
+		QString ioa;
+		ioa.sprintf("%d", p_item->iec_obj.ioa);
+
+		#ifdef DEPRECATED_IEC101_CONFIG
+		QString cmd = "select IKEY from PROPS where DVAL='"+ ioa + "' and SKEY='SAMPLEPROPS';";
+		#else
+		QString cmd = "select NAME from TAGS where IOA="+ ioa + " and UNIT='"+ Name + "';";
+		#endif
+		
+		GetConfigureDb()->DoExec(this, cmd, tGetSamplePointNamefromIOA, value, ioa);
+
+		//printf("ioa %s, value %s\n", (const char*)ioa, (const char*)value);
+
+		if(i > 50)
+		{
+			break;
+		}
+	}
+}
+
 
 /*
 *Function:event
@@ -573,259 +921,6 @@ void Opc_client_ae_Instance::Command(const QString & name, BYTE cmd, LPVOID lpPa
 
 /////////////////////////////////////Middleware///////////////////////////////////////////
 
-void Opc_client_ae_Instance::get_items(struct iec_item* p_item)
-{
-	printf("Receiving %d th opc da message from line = %d\n", p_item->msg_id, instanceID + 1);
-
-	//for (int j = 0; j < len; j++) 
-	//{ 
-		//assert((unsigned char)buf[i] == len);
-		//unsigned char c = *((unsigned char*)buf + j);
-		//printf("rx <--- 0x%02x-\n", c);
-		//fprintf(fp,"rx <--- 0x%02x-\n", c);
-		//fflush(fp);
-
-		//IT_COMMENT1("rx <--- 0x%02x-\n", c);
-	//}
-
-	//printf("---------------\n");
-	
-	unsigned char rc = clearCrc((unsigned char *)p_item, sizeof(struct iec_item));
-
-	if(rc != 0)
-	{
-		ExitProcess(1);
-	}
-
-	QString value;
-
-	switch(p_item->iec_type)
-	{
-		case M_SP_NA_1:
-		{
-			#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
-
-			iec_type1 var = p_item->iec_obj.o.type1;
-			
-			IECValue v(VALUE_TAG, &var, M_SP_NA_1);
-			TODO:05-07-2011 Get name here
-			post_val(v, name);
-
-			#else
-
-			value.sprintf("%d", p_item->iec_obj.o.type1.sp);
-
-			#endif
-			
-		}
-		break;
-		case M_DP_NA_1:
-		{
-			#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
-
-			iec_type3 var = p_item->iec_obj.o.type3;
-			
-			IECValue v(VALUE_TAG, &var, M_DP_NA_1);
-			TODO:05-07-2011 Get name here
-			post_val(v, name);
-
-			#else
-
-			value.sprintf("%d", p_item->iec_obj.o.type3.dp);
-
-			#endif
-		}
-		break;
-		//case M_BO_NA_1:
-		//{
-		//}
-		//break;
-		case M_ME_NA_1:
-		{
-			#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
-
-			iec_type9 var = p_item->iec_obj.o.type9;
-			
-			IECValue v(VALUE_TAG, &var, M_ME_NA_1);
-			TODO:05-07-2011 Get name here
-			post_val(v, name);
-
-			#else
-
-			value.sprintf("%d", p_item->iec_obj.o.type9.mv);
-
-			#endif
-		}
-		break;
-		case M_ME_NB_1:
-		{
-			
-			#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
-
-			iec_type11 var = p_item->iec_obj.o.type11;
-			
-			IECValue v(VALUE_TAG, &var, M_ME_NB_1);
-			TODO:05-07-2011 Get name here
-			post_val(v, name);
-
-			#else
-
-			value.sprintf("%d", p_item->iec_obj.o.type11.mv);
-
-			#endif
-		}
-		break;
-		case M_ME_NC_1:
-		{
-			#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
-
-			iec_type13 var = p_item->iec_obj.o.type13;
-			
-			IECValue v(VALUE_TAG, &var, M_ME_NC_1);
-			TODO:05-07-2011 Get name here
-			post_val(v, name);
-
-			#else
-
-			value.sprintf("%d", p_item->iec_obj.o.type13.mv);
-
-			#endif
-		}
-		break;
-		case M_SP_TB_1:
-		{
-			#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
-
-			iec_type30 var = p_item->iec_obj.o.type30;
-			
-			IECValue v(VALUE_TAG, &var, M_SP_TB_1);
-			TODO:05-07-2011 Get name here
-			post_val(v, name);
-
-			#else
-
-			value.sprintf("%d", p_item->iec_obj.o.type30.sp);
-
-			#endif
-		}
-		break;
-		case M_DP_TB_1:
-		{
-			#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
-
-			iec_type31 var = p_item->iec_obj.o.type31;
-			
-			IECValue v(VALUE_TAG, &var, M_DP_TB_1);
-			TODO:05-07-2011 Get name here
-			post_val(v, name);
-
-			#else
-
-			value.sprintf("%d", p_item->iec_obj.o.type31.dp);
-
-			#endif
-		}
-		break;
-		case M_BO_TB_1:
-		{
-			//value.sprintf("%d", p_item->iec_obj.o.type33.stcd);
-		}
-		break;
-		case M_ME_TD_1:
-		{
-			#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
-
-			iec_type34 var = p_item->iec_obj.o.type34;
-			
-			IECValue v(VALUE_TAG, &var, M_ME_TD_1);
-			TODO:05-07-2011 Get name here
-			post_val(v, name);
-
-			#else
-
-			value.sprintf("%d", p_item->iec_obj.o.type34.mv);
-
-			#endif
-		}
-		break;
-		case M_ME_TE_1:
-		{
-			#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
-
-			iec_type35 var = p_item->iec_obj.o.type35;
-			
-			IECValue v(VALUE_TAG, &var, M_ME_TE_1);
-			TODO:05-07-2011 Get name here
-			post_val(v, name);
-
-			#else
-
-			value.sprintf("%d", p_item->iec_obj.o.type35.mv);
-
-			#endif
-		}
-		break;
-		case M_ME_TF_1:
-		{
-			#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
-
-			iec_type36 var = p_item->iec_obj.o.type36;
-			
-			IECValue v(VALUE_TAG, &var, M_ME_TF_1);
-			TODO:05-07-2011 Get name here
-			post_val(v, name);
-
-			#else
-
-			value.sprintf("%f", p_item->iec_obj.o.type36.mv);
-
-			#endif
-		}
-		break;
-		case M_IT_TB_1:
-		{
-			#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
-
-			iec_type37 var = p_item->iec_obj.o.type37;
-			
-			IECValue v(VALUE_TAG, &var, M_ME_TN_1);
-			TODO:05-07-2011 Get name here
-			post_val(v, name);
-
-			#else
-
-			value.sprintf("%d", p_item->iec_obj.o.type37.counter);
-
-			#endif
-		}
-		break;
-        case C_EX_IT_1:
-		{
-            printf("Child process exiting...\n");
-		}
-		break;
-		default:
-		{
-			printf("Not supported type%d \n", p_item->iec_type);
-			value.sprintf("%d", 0);
-		}
-		break;
-	}
-	
-	QString ioa;
-	ioa.sprintf("%d", p_item->iec_obj.ioa);
-
-	#ifdef DEPRECATED_OPC_CLIENT_DA_CONFIG
-	QString cmd = "select IKEY from PROPS where DVAL='"+ ioa + "' and SKEY='SAMPLEPROPS';";
-	#else
-	QString cmd = "select NAME from TAGS where IOA="+ ioa + " and UNIT='"+ Name + "';";
-	#endif
-
-	GetConfigureDb()->DoExec(this, cmd, tGetSamplePointNamefromIOA, value, ioa);
-
-	//printf("ioa %s, value %s\n", (const char*)ioa, (const char*)value);
-}
-
 #include <time.h>
 #include <sys/timeb.h>
 
@@ -852,7 +947,6 @@ void Opc_client_ae_Instance::get_utc_host_time(struct cp56time2a* time)
 	IT_EXIT;
     return;
 }
-/////////////////////////////////////Middleware/////////////////////////////////////////////
 
 void Opc_client_ae_Instance::epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch_in_millisec)
 {
@@ -878,4 +972,77 @@ void Opc_client_ae_Instance::epoch_to_cp56time2a(cp56time2a *time, signed __int6
 	}
 
     return;
+}
+
+/////////////////////////////////////Middleware/////////////////////////////////////////////
+
+#include <signal.h>
+
+char* get_date_time()
+{
+	static char sz[128];
+	time_t t = time(NULL);
+	struct tm *ptm = localtime(&t);
+	
+	strftime(sz, sizeof(sz)-2, "%m/%d/%y %H:%M:%S", ptm);
+
+	strcat(sz, "|");
+	return sz;
+}
+
+void iec_call_exit_handler(int line, char* file, char* reason)
+{
+	FILE* fp;
+	char program_path[_MAX_PATH];
+	char log_file[_MAX_FNAME+_MAX_PATH];
+	IT_IT("iec_call_exit_handler");
+
+	program_path[0] = '\0';
+#ifdef WIN32
+	if(GetModuleFileName(NULL, program_path, _MAX_PATH))
+	{
+		*(strrchr(program_path, '\\')) = '\0';        // Strip \\filename.exe off path
+		*(strrchr(program_path, '\\')) = '\0';        // Strip \\bin off path
+    }
+#elif __unix__
+	if(getcwd(program_path, _MAX_PATH))
+	{
+		*(strrchr(program_path, '/')) = '\0';        // Strip \\filename.exe off path
+		*(strrchr(program_path, '/')) = '\0';        // Strip \\bin off path
+    }
+#endif
+
+	strcpy(log_file, program_path);
+
+#ifdef WIN32
+	strcat(log_file, "\\logs\\fifo.log");
+#elif __unix__
+	strcat(log_file, "/logs/fifo.log");	
+#endif
+
+	fp = fopen(log_file, "a");
+
+	if(fp)
+	{
+		if(line && file && reason)
+		{
+			fprintf(fp, "PID:%d time:%s exit process at line: %d, file %s, reason:%s\n", GetCurrentProcessId, get_date_time(), line, file, reason);
+		}
+		else if(line && file)
+		{
+			fprintf(fp, "PID:%d time:%s exit process at line: %d, file %s\n", GetCurrentProcessId, get_date_time(), line, file);
+		}
+		else if(reason)
+		{
+			fprintf(fp, "PID:%d time:%s exit process for reason %s\n", GetCurrentProcessId, get_date_time(), reason);
+		}
+
+		fflush(fp);
+		fclose(fp);
+	}
+
+	//raise(SIGABRT);   //raise abort signal which in turn starts automatically a separete thread and call exit SignalHandler
+	ExitProcess(0);
+
+	IT_EXIT;
 }

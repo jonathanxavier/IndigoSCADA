@@ -1,4 +1,4 @@
-#define RIPC_IMPLEMENTATION
+//#define RIPC_IMPLEMENTATION
 
 #include "RIPCSessionStub.h"
 
@@ -68,7 +68,9 @@ void RIPCPrimitiveStub::close()
 	RIPCResponse resp;
 	req.objectId = id;
 	req.opCode = RIPCRequest::CLOSE_PRIMITIVE;
-	session->sendAndVerify(req, resp);	
+	session->cs.leave(); //apa+++ 06-08-2014
+	//session->sendAndVerify(req, resp); //apa--- 06-08-2014	
+	session->send(req);//apa+++ 06-08-2014
 
 	if (next != NULL) { 
 	    next->prev = prev;

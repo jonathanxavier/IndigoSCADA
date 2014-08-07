@@ -1,7 +1,7 @@
 /*
  *                         IndigoSCADA
  *
- *   This software and documentation are Copyright 2002 to 2011 Enscada 
+ *   This software and documentation are Copyright 2002 to 2014 Enscada 
  *   Limited and its licensees. All rights reserved. See file:
  *
  *                     $HOME/LICENSE 
@@ -10,17 +10,38 @@
  *
  */
 
-
-
 #include "iec104driver_instance.h"
 #include "iec104driverthread.h"
+
+////////////////////Middleware/////////////////////////////////////////////
+int exit_consumer = 0;
+
+void consumer(void* pParam)
+{
+	struct subs_args* arg = (struct subs_args*)pParam;
+	struct iec_item item;
+	RIPCObject objDesc(&item, sizeof(struct iec_item));
+
+	while(1)
+	{
+		if(exit_consumer)
+		{
+			break;
+		}
+
+		arg->queue_monitor_dir->get(objDesc);
+
+		fifo_put(arg->fifo_monitor_direction, (char *)&item, sizeof(struct iec_item));
+	}
+}
+////////////////////Middleware/////////////////////////////////////////////
+
 /*
 *Function:
 *Inputs:none
 *Outputs:none
 *Returns:none
 */
-#define TICKS_PER_SEC 1
 void Iec104driver_Instance::Start() 
 {
 	IT_IT("Iec104driver_Instance::Start");
@@ -253,8 +274,9 @@ void Iec104driver_Instance::QueryResponse(QObject *p, const QString &c, int id, 
 				///////////////////////////////////////////////////////////////////////////////////////////
 
 				////////////////////Middleware/////////////////////////////////////////////
-				//TODO: publish item
-				//////////////////////////Middleware/////////////////////////////////////////
+				//publishing data
+				queue_control_dir->put(&item_to_send, sizeof(struct iec_item));
+				//////////////////////////Middleware///////////////////////////////////////
 			}
 		}
 		break;
@@ -378,6 +400,60 @@ void Iec104driver_Instance::Tick()
 
 	//This code runs inside main monitor.exe thread
 
+	switch(State)
+	{
+		case STATE_RESET:
+		{
+			State = STATE_ASK_GENERAL_INTERROGATION;
+		}
+		break;
+		case STATE_ASK_GENERAL_INTERROGATION:
+		{
+			//Send C_IC_NA_1//////////////////////////////////////////////////////////////////////////
+			struct iec_item item_to_send;
+			memset(&item_to_send,0x00, sizeof(struct iec_item));
+			item_to_send.iec_type = C_IC_NA_1;
+			item_to_send.iec_obj.ioa = 0;
+			item_to_send.iec_obj.o.type100.qoi = 1;
+
+			//struct cp56time2a actual_time;
+			//get_utc_host_time(&actual_time);
+			//item_to_send.iec_obj.o.type58.time = actual_time;
+			item_to_send.msg_id = msg_sent_in_control_direction++;
+			item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
+			///////////////////////////////////////////////////////////////////////////////////////////
+			
+			////////////////////Middleware/////////////////////////////////////////////
+			//publishing data
+			queue_control_dir->put(&item_to_send, sizeof(struct iec_item));
+			////////////////////Middleware/////////////////////////////////////////////
+			
+			State = STATE_GENERAL_INTERROGATION_DONE;
+		}
+		break;
+		case STATE_GENERAL_INTERROGATION_DONE:
+		{
+			State = STATE_RUNNING;
+		}
+		break;
+		case STATE_FAIL:
+		{
+			get_items_from_local_fifo();
+		}
+		break;
+		case STATE_RUNNING:
+		{
+			get_items_from_local_fifo();
+		}
+		break;
+		default:
+		break;
+	}
+}
+
+
+void Iec104driver_Instance::get_items_from_local_fifo(void)
+{
 	unsigned char buf[sizeof(struct iec_item)];
 	int len;
 	const unsigned wait_limit_ms = 1;
@@ -386,6 +462,17 @@ void Iec104driver_Instance::Tick()
 	for(int i = 0; (len = fifo_get(fifo_monitor_direction, (char*)buf, sizeof(struct iec_item), wait_limit_ms)) >= 0; i += 1)	
 	{ 
 		p_item = (struct iec_item*)buf;
+
+		if(State == STATE_FAIL)
+		{
+			if(p_item->iec_type != C_LO_ST_1)
+			{
+				QString msg;
+				msg.sprintf("IEC104 master on line %d is now connected to IEC104 slave.", instanceID + 1); 
+				UnFailUnit(msg);
+				State = STATE_ASK_GENERAL_INTERROGATION;
+			}
+		}
 			
 		//printf("Receiving %d th message \n", p_item->msg_id);
 		printf("Receiving %d th iec104 message from line = %d\n", p_item->msg_id, instanceID + 1);
@@ -404,6 +491,7 @@ void Iec104driver_Instance::Tick()
 		//printf("---------------\n");
 		
 		unsigned char rc = clearCrc((unsigned char *)buf, sizeof(struct iec_item));
+
 		if(rc != 0)
 		{
 			ExitProcess(1);
@@ -616,6 +704,20 @@ void Iec104driver_Instance::Tick()
                 printf("Child process exiting...\n");
 			}
 			break;
+			case C_LO_ST_1:
+			{
+				if(State != STATE_FAIL)
+				{
+					printf("iec104 master on line %d has lost connection with iec104 server...\n", instanceID + 1);
+
+					QString msg;
+					msg.sprintf("iec104 master on line %d has lost connection with iec104 server...", instanceID + 1); 
+					FailUnit(msg);
+
+					State = STATE_FAIL;
+				}
+			}
+			break;
 			default:
 			{
 				printf("Not supported type%d \n", p_item->iec_type);
@@ -785,26 +887,6 @@ void Iec104driver_Instance::Command(const QString & name, BYTE cmd, LPVOID lpPa,
 	}
 }
 
-/*
-void Iec104driver_Instance::EndProcess(int nIndex)
-{	
-    PROCESS_INFORMATION* pProcInfo = pConnect->getProcInfo();
-
-	if(pProcInfo[nIndex].hProcess)
-	{
-		int nPauseEnd = 100;
-
-		// post a WM_QUIT message first
-		PostThreadMessage(pProcInfo[nIndex].dwThreadId,WM_QUIT,0,0);
-		// sleep for a while so that the process has a chance to terminate itself
-		::Sleep(nPauseEnd>0?nPauseEnd:50);
-		// terminate the process by force
-		TerminateProcess(pProcInfo[nIndex].hProcess,0);
-		pProcInfo[nIndex].hProcess = 0;
-	}
-}
-*/
-
 #include <signal.h>
 
 char* get_date_time()
@@ -876,6 +958,35 @@ void iec_call_exit_handler(int line, char* file, char* reason)
 	IT_EXIT;
 }
 
+/////////////////////////////////////Middleware///////////////////////////////////////////
+
+#include <time.h>
+#include <sys/timeb.h>
+
+void Iec104driver_Instance::get_utc_host_time(struct cp56time2a* time)
+{
+	struct timeb tb;
+	struct tm	*ptm;
+		
+	IT_IT("get_utc_host_time");
+
+    ftime (&tb);
+	ptm = gmtime(&tb.time);
+		
+	time->hour = ptm->tm_hour;					//<0..23>
+	time->min = ptm->tm_min;					//<0..59>
+	time->msec = ptm->tm_sec*1000 + tb.millitm; //<0..59999>
+	time->mday = ptm->tm_mday; //<1..31>
+	time->wday = (ptm->tm_wday == 0) ? ptm->tm_wday + 7 : ptm->tm_wday; //<1..7>
+	time->month = ptm->tm_mon + 1; //<1..12>
+	time->year = ptm->tm_year - 100; //<0..99>
+	time->iv = 0; //<0..1> Invalid: <0> is valid, <1> is invalid
+	time->su = (u_char)tb.dstflag; //<0..1> SUmmer time: <0> is standard time, <1> is summer time
+
+	IT_EXIT;
+    return;
+}
+
 void Iec104driver_Instance::epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch_in_millisec)
 {
 	struct tm	*ptm;
@@ -901,3 +1012,4 @@ void Iec104driver_Instance::epoch_to_cp56time2a(cp56time2a *time, signed __int64
 
     return;
 }
+/////////////////////////////////////Middleware/////////////////////////////////////////////

@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Target_Dir ""
 MTL=midl.exe
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /GX /O2 /I ".\inc" /I ".\inc\internal" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /D "RIPC_DLL" /FD /c
+# ADD CPP /nologo /MD /W3 /GX /O2 /I ".\inc" /I ".\inc\internal" /I "..\..\utilities" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /D "RIPC_DLL" /FD /c
 # SUBTRACT CPP /YX
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
@@ -69,7 +69,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 MTL=midl.exe
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I ".\inc" /I ".\inc\internal" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FD /GZ /c
+# ADD CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I ".\inc" /I ".\inc\internal" /I "..\..\utilities" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FD /GZ /c
 # SUBTRACT CPP /YX
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
@@ -91,7 +91,11 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
-SOURCE=.\src\server\RIPCServerMain.cpp
+SOURCE=..\..\utilities\getopt.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\server\main.cpp
 # End Source File
 # End Group
 # End Target

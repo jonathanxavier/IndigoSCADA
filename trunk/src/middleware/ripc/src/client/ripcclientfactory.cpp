@@ -1,4 +1,4 @@
-#define RIPC_IMPLEMENTATION
+//#define RIPC_IMPLEMENTATION
 
 #include "RIPCClientFactory.h"
 #include "RIPCSessionStub.h"

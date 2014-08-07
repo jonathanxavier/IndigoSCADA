@@ -1,7 +1,7 @@
 /*
  *                         IndigoSCADA
  *
- *   This software and documentation are Copyright 2002 to 2009 Enscada 
+ *   This software and documentation are Copyright 2002 to 2014 Enscada 
  *   Limited and its licensees. All rights reserved. See file:
  *
  *                     $HOME/LICENSE 
@@ -33,6 +33,16 @@
 #include "opcerror.h"
 #include "itrace.h"
 
+////////Middleware/////////////
+#include "RIPCThread.h"
+#include "RIPCFactory.h"
+#include "RIPCSession.h"
+#include "RIPCServerFactory.h"
+#include "RIPCClientFactory.h"
+#include "ripc.h"
+///////////////////////////////
+#include "fifoc.h"
+
 struct structItem
 {
 	WCHAR wszName[256]; //Item ID of opc server, i.e. Simulated Card.Simulated Node.Random.R8
@@ -59,71 +69,19 @@ enum opc_client_states {
 
 #define ITEM_WRITTEN_AT_A_TIME 1
 
-////////////////////////////Middleware///////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////
+////////Middleware/////////////
+typedef class Opc_client_da_imp* par;
+
+struct subs_args{
+	par parent;
+};
+////////Middleware/////////////
 
 class Opc_client_da_imp
 {
 	public:
-
-	Opc_client_da_imp(char* opc_server_address, char* line_number)
-	{ 
-		IT_IT("Opc_client_da_imp::Opc_client_da_imp");
-
-		strcpy(ServerIPAddress, opc_server_address);
-
-		g_bWriteComplete = true;
-		g_dwReadTransID = 1;
-		Config_db = NULL;
-		opc_client_state_variable = OPC_CLIENT_NOT_INITIALIZED;
-		timer_starts_at_epoch = 0;
-		local_server = 0;
-		g_iOpcProperties = NULL;
-		g_iCatInfo = NULL;
-		g_pIOPCBrowse = NULL;
-		g_pIGroupUnknown = NULL;
-		g_pIOPCCommon = NULL;
-		g_pIOPCAsyncIO2 = NULL;
-		g_pIOPCItemMgt = NULL;
-		g_pIOPCSyncIO  = NULL;
-		g_pIOPCAsyncIO = NULL ;
-		g_pIOPCGroupStateMgt = NULL;
-		g_pIDataObject = NULL;
-		g_dwCancelID = 1;
-		g_dwUpdateTransID = 1;
-		g_hClientGroup = 0;
-		g_bVer2 = false;
-		g_dwNumItems = 0;
-		g_dwClientHandle = 1;
-		g_dwUpdateRate = 60000; //in milliseconds
-		nThreads = 1;
-		hServerRead = NULL;
-		id_of_ItemToWrite = 0;
-
-		opc_server_prog_id[0] = '\0';
-				
-		/////////////////////Middleware/////////////////////////////////////////////////////////////////
-		char fifo_monitor_name[150];
-		strcpy(fifo_monitor_name,"fifo_monitor_direction");
-		strcat(fifo_monitor_name, line_number);
-		strcat(fifo_monitor_name, "da");
-		
-		char fifo_control_name[150];
-		strcpy(fifo_control_name,"fifo_control_direction");
-		strcat(fifo_control_name, line_number);
-		strcat(fifo_control_name, "da");
-		///////////////////////////////////Middleware//////////////////////////////////////////////////
-
-		IT_EXIT;
-	};
-		
-	~Opc_client_da_imp()
-	{
-		IT_IT("Opc_client_da_imp::~Opc_client_da_imp");
-		stop_opc_thread();
-		Sleep(1000);
-		IT_EXIT;
-	}
+	 Opc_client_da_imp(char* opc_server_address, char* line_number);
+	~Opc_client_da_imp();
 
 	 DWORD g_dwUpdateRate;
 	 DWORD g_dwClientHandle;
@@ -167,8 +125,21 @@ class Opc_client_da_imp
 	 struct structItem* Config_db;
 	 int local_server;
 	 char opc_server_prog_id[100];
-	 /////////////////////Middleware/////////////////////////////////////////////////////////////////
-	 ///////////////////////////////////Middleware//////////////////////////////////////////////////
+	 /////////////Middleware///////////////////////////////
+	 u_int n_msg_sent_monitor_dir;
+	 u_int n_msg_sent_control_dir;
+	 int exit_threads;
+	 fifo_h fifo_control_direction;
+	 int          port;
+	 char const*  hostname;
+	 RIPCFactory* factory1;
+	 RIPCFactory* factory2;
+	 RIPCSession* session1;
+	 RIPCSession* session2;
+	 static RIPCQueue*   queue_monitor_dir;
+	 RIPCQueue*   queue_control_dir;
+	 struct subs_args arg;
+	 //////////////////////////////////////////////////////
 
 	 int OpcStart(char* OpcServerProgID, char* OpcclassId, char* OpcUpdateRate, char* OpcPercentDeadband);
 	 int OpcStop();

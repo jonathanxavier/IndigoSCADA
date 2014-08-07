@@ -1,7 +1,7 @@
 /*
  *                         IndigoSCADA
  *
- *   This software and documentation are Copyright 2002 to 2009 Enscada 
+ *   This software and documentation are Copyright 2002 to 2014 Enscada 
  *   Limited and its licensees. All rights reserved. See file:
  *
  *                     $HOME/LICENSE 
@@ -13,9 +13,32 @@
 #include "opc_client_da_instance.h"
 #include "opc_client_dadriverthread.h"
 
+////////////////////Middleware/////////////////////////////////////////////
+int exit_consumer = 0;
+
+void consumer(void* pParam)
+{
+	struct subs_args* arg = (struct subs_args*)pParam;
+	struct iec_item item;
+	RIPCObject objDesc(&item, sizeof(struct iec_item));
+
+	while(1)
+	{
+		if(exit_consumer)
+		{
+			break;
+		}
+
+		arg->queue_monitor_dir->get(objDesc);
+
+		fifo_put(arg->fifo_monitor_direction, (char *)&item, sizeof(struct iec_item));
+	}
+}
+////////////////////Middleware/////////////////////////////////////////////
+
 /////////////////////////////////////////////////////////////
 //This global data is not a problem bucause each
-//instace of Opc_client_da_Instance class
+//instance of Opc_client_da_Instance class
 //load the sqlite database at a different time
 static gl_row_counter = 0;
 static gl_column_counter = 0;
@@ -250,6 +273,8 @@ void Opc_client_da_Instance::QueryResponse(QObject *p, const QString &c, int id,
 				///////////////////////////////////////////////////////////////////////////////////////////
 
 				////////////////////Middleware/////////////////////////////////////////////
+				//publishing data
+				queue_control_dir->put(&item_to_send, sizeof(struct iec_item));
 				//////////////////////////Middleware/////////////////////////////////////////
 			}
 		}
@@ -671,7 +696,10 @@ void Opc_client_da_Instance::Tick()
 			item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
 			///////////////////////////////////////////////////////////////////////////////////////////
 
-			//prepare published data
+			//////////////Middleware///////////////////////////////////////
+			//publishing data
+			queue_control_dir->put(&item_to_send, sizeof(struct iec_item));
+			//////////////Middleware///////////////////////////////////////
 
 			fprintf(stderr, "State = STATE_ASK_GENERAL_INTERROGATION\n");
 			fflush(stderr);
@@ -1238,6 +1266,7 @@ void Opc_client_da_Instance::Command(const QString & name, BYTE cmd, LPVOID lpPa
 }
 
 /////////////////////////////////////Middleware///////////////////////////////////////////
+
 #include <time.h>
 #include <sys/timeb.h>
 
@@ -1292,7 +1321,6 @@ void Opc_client_da_Instance::epoch_to_cp56time2a(cp56time2a *time, signed __int6
 }
 
 /////////////////////////////////////Middleware/////////////////////////////////////////////
-
 
 #include <signal.h>
 

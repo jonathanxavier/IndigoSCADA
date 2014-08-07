@@ -128,7 +128,7 @@ UserCfgDlgData::UserCfgDlgData
 	Language->setSizeLimit( 10 );
 	Language->setAutoResize( FALSE );
 	Language->insertItem( "English" );
-	Language->insertItem("Italiano");
+	Language->insertItem("Local");
 	Language->setMaxCount( 10 );
 	Language->setAutoCompletion( FALSE );
 

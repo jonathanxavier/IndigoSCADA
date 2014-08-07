@@ -127,7 +127,7 @@ SOURCE=.\factory.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\getopt.c
+SOURCE=..\..\..\utilities\getopt.c
 # End Source File
 # Begin Source File
 

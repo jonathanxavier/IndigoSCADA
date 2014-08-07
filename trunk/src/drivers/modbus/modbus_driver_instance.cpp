@@ -13,6 +13,7 @@
 #include "modbus_driver_instance.h"
 #include "modbus_driverthread.h"
 
+////////////////////Middleware/////////////////////////////////////////////
 int exit_consumer = 0;
 
 void consumer(void* pParam)
@@ -33,6 +34,7 @@ void consumer(void* pParam)
 		fifo_put(arg->fifo_monitor_direction, (char *)&item, sizeof(struct iec_item));
 	}
 }
+////////////////////Middleware/////////////////////////////////////////////
 
 /*
 *Function:
@@ -439,8 +441,10 @@ void Modbus_driver_Instance::Tick()
 			item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
 			///////////////////////////////////////////////////////////////////////////////////////////
 
+			//////////////Middleware///////////////////////////////////////
 			//publishing data
 			queue_control_dir->put(&item_to_send, sizeof(struct iec_item));
+			//////////////Middleware///////////////////////////////////////
 			
 			State = STATE_GENERAL_INTERROGATION_DONE;
 		}
@@ -945,8 +949,34 @@ void Modbus_driver_Instance::get_utc_host_time(struct cp56time2a* time)
 	IT_EXIT;
     return;
 }
-/////////////////////////////////////Middleware/////////////////////////////////////////////
 
+void Modbus_driver_Instance::epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch_in_millisec)
+{
+	struct tm	*ptm;
+	int ms = (int)(epoch_in_millisec%1000);
+	time_t seconds;
+	
+	memset(time, 0x00,sizeof(cp56time2a));
+	seconds = (long)(epoch_in_millisec/1000);
+	ptm = localtime(&seconds);
+		
+    if(ptm)
+	{
+		time->hour = ptm->tm_hour;					//<0.23>
+		time->min = ptm->tm_min;					//<0..59>
+		time->msec = ptm->tm_sec*1000 + ms; //<0.. 59999>
+		time->mday = ptm->tm_mday; //<1..31>
+		time->wday = (ptm->tm_wday == 0) ? ptm->tm_wday + 7 : ptm->tm_wday; //<1..7>
+		time->month = ptm->tm_mon + 1; //<1..12>
+		time->year = ptm->tm_year - 100; //<0.99>
+		time->iv = 0; //<0..1> Invalid: <0> is valid, <1> is invalid
+		time->su = (u_char)ptm->tm_isdst; //<0..1> SUmmer time: <0> is standard time, <1> is summer time
+	}
+
+    return;
+}
+
+/////////////////////////////////////Middleware/////////////////////////////////////////////
 
 #include <signal.h>
 
@@ -1017,30 +1047,4 @@ void iec_call_exit_handler(int line, char* file, char* reason)
 	ExitProcess(0);
 
 	IT_EXIT;
-}
-
-void Modbus_driver_Instance::epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch_in_millisec)
-{
-	struct tm	*ptm;
-	int ms = (int)(epoch_in_millisec%1000);
-	time_t seconds;
-	
-	memset(time, 0x00,sizeof(cp56time2a));
-	seconds = (long)(epoch_in_millisec/1000);
-	ptm = localtime(&seconds);
-		
-    if(ptm)
-	{
-		time->hour = ptm->tm_hour;					//<0.23>
-		time->min = ptm->tm_min;					//<0..59>
-		time->msec = ptm->tm_sec*1000 + ms; //<0.. 59999>
-		time->mday = ptm->tm_mday; //<1..31>
-		time->wday = (ptm->tm_wday == 0) ? ptm->tm_wday + 7 : ptm->tm_wday; //<1..7>
-		time->month = ptm->tm_mon + 1; //<1..12>
-		time->year = ptm->tm_year - 100; //<0.99>
-		time->iv = 0; //<0..1> Invalid: <0> is valid, <1> is invalid
-		time->su = (u_char)ptm->tm_isdst; //<0..1> SUmmer time: <0> is standard time, <1> is summer time
-	}
-
-    return;
 }

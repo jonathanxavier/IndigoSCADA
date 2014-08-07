@@ -19,6 +19,12 @@
 #include "iec104types.h"
 #include "iec_item.h"
 ////////////////////////////Middleware/////////////////////////////////////////////////////////////
+#include "RIPCThread.h"
+#include "RIPCFactory.h"
+#include "RIPCSession.h"
+#include "RIPCServerFactory.h"
+#include "RIPCClientFactory.h"
+#include "ripc.h"
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /////////////////////////fifo///////////////////////////////////////////
@@ -26,6 +32,16 @@ extern void iec_call_exit_handler(int line, char* file, char* reason);
 #include "fifoc.h"
 #define MAX_FIFO_SIZE 65535
 ////////////////////////////////////////////////////////////////////////
+
+////////////////////////////Middleware/////////////////////////////////////////////////////////////
+struct subs_args{
+	RIPCQueue* queue_monitor_dir;
+	fifo_h fifo_monitor_direction;
+};
+
+void consumer(void* pParam);
+extern int exit_consumer;
+/////////////////////////////////////////////////////////////////////////////////////////////
 
 typedef QMap<int, QString> IOANameMap;
 
@@ -76,6 +92,18 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 
 	Track* Values;
 
+	/////////////Middleware///////////////////////////////
+    int          port;
+    char const*  hostname;
+    RIPCFactory* factory1;
+	RIPCFactory* factory2;
+	RIPCSession* session1;
+	RIPCSession* session2;
+	RIPCQueue*   queue_monitor_dir;
+	RIPCQueue*   queue_control_dir;
+	struct subs_args arg;
+	//////////////////////////////////////////////////////
+
 	enum // states for the state machine
 	{
 		STATE_IDLE = 0,
@@ -108,7 +136,6 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 		pTimer->start(100); // start with a 100 ms timer
 
 		/////////////////////Middleware/////////////////////////////////////////////////////////////////
-		
 		char fifo_control_name[150];
 		char str_instance_id[20];
         itoa(instance_id + 1, str_instance_id, 10);
@@ -121,6 +148,18 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 		strcpy(fifo_monitor_name,"fifo_monitor_direction");
         strcat(fifo_monitor_name, str_instance_id);
         strcat(fifo_monitor_name, "da");
+
+		port = 6000;
+		hostname = "localhost";
+
+		factory1 = RIPCClientFactory::getInstance();
+		factory2 = RIPCClientFactory::getInstance();
+		session1 = factory1->create(hostname, port);
+		session2 = factory2->create(hostname, port);
+		queue_monitor_dir = session1->createQueue(fifo_monitor_name);
+		queue_control_dir = session2->createQueue(fifo_control_name);
+
+		arg.queue_monitor_dir = queue_monitor_dir;
 		///////////////////////////////////Middleware//////////////////////////////////////////////////
 
 		/////////////////////////////////////local fifo//////////////////////////////////////////////////////////
@@ -129,7 +168,15 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 		strcat(fifo_monitor_name, "_fifo_");
 
 		fifo_monitor_direction = fifo_open(fifo_monitor_name, max_fifo_queue_size, iec_call_exit_handler);
+
+		arg.fifo_monitor_direction = fifo_monitor_direction;
 		///////////////////////////////////////////////////////////////////////////////////////////////////
+
+		/////////////////////Middleware/////////////////////////////////////////////////////////////////
+		unsigned long threadid;
+	
+		CreateThread(NULL, 0, LPTHREAD_START_ROUTINE(consumer), (void*)&arg, 0, &threadid);
+		/////////////////////Middleware/////////////////////////////////////////////////////////////////
 	};
 
 	~Opc_client_da_Instance()
@@ -142,13 +189,22 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 			Values = NULL;
 		}
 
-		///////////////////////////////////Middleware//////////////////////////////////////////////////
-		///////////////////////////////////Middleware//////////////////////////////////////////////////
-
 		if(Config_db)
 		{
 			free(Config_db);
 		}
+
+		///////////////////////////////////Middleware//////////////////////////////////////////////////
+		exit_consumer = 1;
+//		Sleep(3000);
+		fifo_close(fifo_monitor_direction);
+		queue_monitor_dir->close();
+		queue_control_dir->close();
+		session1->close();
+		session2->close();
+		delete session1;
+		delete session2;
+		///////////////////////////////////Middleware//////////////////////////////////////////////////
 	};
 
 	void Fail(const QString &s)
@@ -161,9 +217,6 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 	Driver* ParentDriver;
 	QString unit_name;
 	int instanceID; //Equals to "line concept" of a SCADA driver
-
-	//////Middleware/////////////
-	/////////////////////////////
 
 	////////////////local fifo///////////
 	fifo_h fifo_monitor_direction;

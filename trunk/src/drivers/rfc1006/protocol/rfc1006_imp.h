@@ -63,7 +63,6 @@ class rfc1006_imp
 	void alloc_command_resources(void);
 	void free_command_resources(void);
 	void get_utc_host_time(struct cp56time2a* time);
-	void get_items(struct iec_item* p_item);
 	////////////////////////////////////////////////
 };
 

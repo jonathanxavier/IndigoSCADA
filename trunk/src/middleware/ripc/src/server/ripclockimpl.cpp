@@ -1,4 +1,4 @@
-#define RIPC_IMPLEMENTATION
+//#define RIPC_IMPLEMENTATION
 
 #include "RIPCLockImpl.h"
 #include "RIPCWaitObject.h"

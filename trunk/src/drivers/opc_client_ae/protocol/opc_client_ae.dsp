@@ -95,7 +95,7 @@ SOURCE=..\..\..\utilities\clear_crc_eight.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\getopt.c
+SOURCE=..\..\..\utilities\getopt.c
 # End Source File
 # Begin Source File
 
