@@ -1,7 +1,7 @@
 /*
  *                         IndigoSCADA
  *
- *   This software and documentation are Copyright 2002 to 2011 Enscada 
+ *   This software and documentation are Copyright 2002 to 2014 Enscada 
  *   Limited and its licensees. All rights reserved. See file:
  *
  *                     $HOME/LICENSE 
@@ -10,10 +10,31 @@
  *
  */
 
-
-
 #include "dnp3driver_instance.h"
 #include "dnp3driverthread.h"
+
+////////////////////Middleware/////////////////////////////////////////////
+int exit_consumer = 0;
+
+void consumer(void* pParam)
+{
+	struct subs_args* arg = (struct subs_args*)pParam;
+	struct iec_item item;
+	RIPCObject objDesc(&item, sizeof(struct iec_item));
+
+	while(1)
+	{
+		if(exit_consumer)
+		{
+			break;
+		}
+
+		arg->queue_monitor_dir->get(objDesc);
+
+		fifo_put(arg->fifo_monitor_direction, (char *)&item, sizeof(struct iec_item));
+	}
+}
+////////////////////Middleware/////////////////////////////////////////////
 
 /*
 *Function:
@@ -21,7 +42,7 @@
 *Outputs:none
 *Returns:none
 */
-#define TICKS_PER_SEC 1
+
 void Dnp3driver_Instance::Start() 
 {
 	IT_IT("Dnp3driver_Instance::Start");
@@ -261,6 +282,8 @@ void Dnp3driver_Instance::QueryResponse(QObject *p, const QString &c, int id, QO
 				///////////////////////////////////////////////////////////////////////////////////////////
 
 				////////////////////Middleware/////////////////////////////////////////////
+				//publishing data
+				queue_control_dir->put(&item_to_send, sizeof(struct iec_item));
 				//////////////////////////Middleware/////////////////////////////////////////
 			}
 		}
@@ -406,7 +429,10 @@ void Dnp3driver_Instance::Tick()
 			item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
 			///////////////////////////////////////////////////////////////////////////////////////////
 
-			//prepare published data
+			//////////////Middleware///////////////////////////////////////
+			//publishing data
+			queue_control_dir->put(&item_to_send, sizeof(struct iec_item));
+			//////////////Middleware///////////////////////////////////////
 			
 			State = STATE_GENERAL_INTERROGATION_DONE;
 		}
@@ -752,7 +778,6 @@ void Dnp3driver_Instance::get_items_from_local_fifo(void)
 *Returns:none
 */
 
-//Realtime method
 bool Dnp3driver_Instance::event(QEvent *e)
 {
 	IT_IT("Dnp3driver_Instance::event");
@@ -783,6 +808,7 @@ bool Dnp3driver_Instance::event(QEvent *e)
 
 		return true;
 	}
+
 	return QObject::event(e);
 };
 
@@ -885,6 +911,7 @@ void Dnp3driver_Instance::Command(const QString & name, BYTE cmd, LPVOID lpPa, D
 }
 
 /////////////////////////////////////Middleware///////////////////////////////////////////
+
 #include <time.h>
 #include <sys/timeb.h>
 
@@ -911,8 +938,35 @@ void Dnp3driver_Instance::get_utc_host_time(struct cp56time2a* time)
 	IT_EXIT;
     return;
 }
+
+void Dnp3driver_Instance::epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch_in_millisec)
+{
+	struct tm	*ptm;
+	int ms = (int)(epoch_in_millisec%1000);
+	time_t seconds;
+	
+	memset(time, 0x00,sizeof(cp56time2a));
+	seconds = (long)(epoch_in_millisec/1000);
+	ptm = localtime(&seconds);
+		
+    if(ptm)
+	{
+		time->hour = ptm->tm_hour;					//<0.23>
+		time->min = ptm->tm_min;					//<0..59>
+		time->msec = ptm->tm_sec*1000 + ms; //<0.. 59999>
+		time->mday = ptm->tm_mday; //<1..31>
+		time->wday = (ptm->tm_wday == 0) ? ptm->tm_wday + 7 : ptm->tm_wday; //<1..7>
+		time->month = ptm->tm_mon + 1; //<1..12>
+		time->year = ptm->tm_year - 100; //<0.99>
+		time->iv = 0; //<0..1> Invalid: <0> is valid, <1> is invalid
+		time->su = (u_char)ptm->tm_isdst; //<0..1> SUmmer time: <0> is standard time, <1> is summer time
+	}
+
+    return;
+}
 /////////////////////////////////////Middleware/////////////////////////////////////////////
 
+#include <signal.h>
 
 char* get_date_time()
 {
@@ -983,28 +1037,3 @@ void iec_call_exit_handler(int line, char* file, char* reason)
 	IT_EXIT;
 }
 
-void Dnp3driver_Instance::epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch_in_millisec)
-{
-	struct tm	*ptm;
-	int ms = (int)(epoch_in_millisec%1000);
-	time_t seconds;
-	
-	memset(time, 0x00,sizeof(cp56time2a));
-	seconds = (long)(epoch_in_millisec/1000);
-	ptm = localtime(&seconds);
-		
-    if(ptm)
-	{
-		time->hour = ptm->tm_hour;					//<0.23>
-		time->min = ptm->tm_min;					//<0..59>
-		time->msec = ptm->tm_sec*1000 + ms; //<0.. 59999>
-		time->mday = ptm->tm_mday; //<1..31>
-		time->wday = (ptm->tm_wday == 0) ? ptm->tm_wday + 7 : ptm->tm_wday; //<1..7>
-		time->month = ptm->tm_mon + 1; //<1..12>
-		time->year = ptm->tm_year - 100; //<0.99>
-		time->iv = 0; //<0..1> Invalid: <0> is valid, <1> is invalid
-		time->su = (u_char)ptm->tm_isdst; //<0..1> SUmmer time: <0> is standard time, <1> is summer time
-	}
-
-    return;
-}

@@ -19,6 +19,12 @@
 #include "iec104types.h"
 #include "iec_item.h"
 ////////////////////////////Middleware/////////////////////////////////////////////////////////////
+#include "RIPCThread.h"
+#include "RIPCFactory.h"
+#include "RIPCSession.h"
+#include "RIPCServerFactory.h"
+#include "RIPCClientFactory.h"
+#include "ripc.h"
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /////////////////////////fifo///////////////////////////////////////////
@@ -26,6 +32,16 @@ extern void iec_call_exit_handler(int line, char* file, char* reason);
 #include "fifoc.h"
 #define MAX_FIFO_SIZE 65535
 ////////////////////////////////////////////////////////////////////////
+
+////////////////////////////Middleware//////////////////////////////////
+struct subs_args{
+	RIPCQueue* queue_monitor_dir;
+	fifo_h fifo_monitor_direction;
+};
+
+void consumer(void* pParam);
+extern int exit_consumer;
+////////////////////////////Middleware//////////////////////////////////
 
 class Iec61850DriverThread;
 
@@ -74,6 +90,18 @@ class IEC61850DRIVERDRV Iec61850driver_Instance : public DriverInstance
 	//
 	Track* Values;
 
+	/////////////Middleware///////////////////////////////
+    int          port;
+    char const*  hostname;
+    RIPCFactory* factory1;
+	RIPCFactory* factory2;
+	RIPCSession* session1;
+	RIPCSession* session2;
+	RIPCQueue*   queue_monitor_dir;
+	RIPCQueue*   queue_control_dir;
+	struct subs_args arg;
+	//////////////////////////////////////////////////////
+
 	enum // states for the state machine
 	{
 		STATE_IDLE = 0,
@@ -83,7 +111,6 @@ class IEC61850DRIVERDRV Iec61850driver_Instance : public DriverInstance
 		STATE_FAIL,
 		STATE_RUNNING
 	};
-
 
 	public:
 	Iec61850DriverThread *pConnect;
@@ -117,6 +144,18 @@ class IEC61850DRIVERDRV Iec61850driver_Instance : public DriverInstance
 		strcpy(fifo_monitor_name,"fifo_monitor_direction");
         strcat(fifo_monitor_name, str_instance_id);
         strcat(fifo_monitor_name, "iec61850");
+
+		port = 6000;
+		hostname = "localhost";
+
+		factory1 = RIPCClientFactory::getInstance();
+		factory2 = RIPCClientFactory::getInstance();
+		session1 = factory1->create(hostname, port);
+		session2 = factory2->create(hostname, port);
+		queue_monitor_dir = session1->createQueue(fifo_monitor_name);
+		queue_control_dir = session2->createQueue(fifo_control_name);
+
+		arg.queue_monitor_dir = queue_monitor_dir;
 		///////////////////////////////////Middleware//////////////////////////////////////////////////
 
 		/////////////////////////////////////local fifo//////////////////////////////////////////////////////////
@@ -125,7 +164,15 @@ class IEC61850DRIVERDRV Iec61850driver_Instance : public DriverInstance
 		strcat(fifo_monitor_name, "_fifo_");
 
 		fifo_monitor_direction = fifo_open(fifo_monitor_name, max_fifo_queue_size, iec_call_exit_handler);
+
+		arg.fifo_monitor_direction = fifo_monitor_direction;
 		///////////////////////////////////////////////////////////////////////////////////////////////////
+
+		/////////////////////Middleware/////////////////////////////////////////////////////////////////
+		unsigned long threadid;
+	
+		CreateThread(NULL, 0, LPTHREAD_START_ROUTINE(consumer), (void*)&arg, 0, &threadid);
+		/////////////////////Middleware/////////////////////////////////////////////////////////////////
 	};
 
 	~Iec61850driver_Instance()
@@ -139,6 +186,15 @@ class IEC61850DRIVERDRV Iec61850driver_Instance : public DriverInstance
 		}
 
 		///////////////////////////////////Middleware//////////////////////////////////////////////////
+		exit_consumer = 1;
+//		Sleep(3000);
+		fifo_close(fifo_monitor_direction);
+		queue_monitor_dir->close();
+		queue_control_dir->close();
+		session1->close();
+		session2->close();
+		delete session1;
+		delete session2;
 		///////////////////////////////////Middleware//////////////////////////////////////////////////
 	};
 	//
@@ -152,9 +208,6 @@ class IEC61850DRIVERDRV Iec61850driver_Instance : public DriverInstance
 	Driver* ParentDriver;
 	QString unit_name;
     int instanceID; //Equals to "line concept" of a SCADA driver
-
-	//////Middleware/////////////
-	/////////////////////////////
 
 	////////////////local fifo///////////
 	fifo_h fifo_monitor_direction;

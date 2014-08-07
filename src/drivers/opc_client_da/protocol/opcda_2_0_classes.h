@@ -342,9 +342,11 @@ END_COM_MAP()
 		//Opc_client_da_imp::g_bWriteComplete = true;
 
 		//Send message to monitor.exe///////////////////////////////////////////////////////////////////
-
-		//Send in monitor direction
-		//prepare published data
+		item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
+		////////Middleware/////////////
+		//publishing data
+		//Opc_client_da_imp::queue_monitor_dir->put(&item_to_send, sizeof(struct iec_item));
+		////////Middleware/////////////
 
 		//Client must always return S_OK in this function
 		IT_EXIT;

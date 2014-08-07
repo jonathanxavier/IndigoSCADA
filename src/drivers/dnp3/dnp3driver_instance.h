@@ -1,7 +1,7 @@
 /*
  *                         IndigoSCADA
  *
- *   This software and documentation are Copyright 2002 to 2011 Enscada 
+ *   This software and documentation are Copyright 2002 to 2014 Enscada 
  *   Limited and its licensees. All rights reserved. See file:
  *
  *                     $HOME/LICENSE 
@@ -19,19 +19,31 @@
 #include "iec104types.h"
 #include "iec_item.h"
 ////////////////////////////Middleware/////////////////////////////////////////////////////////////
+#include "RIPCThread.h"
+#include "RIPCFactory.h"
+#include "RIPCSession.h"
+#include "RIPCServerFactory.h"
+#include "RIPCClientFactory.h"
+#include "ripc.h"
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////fifo//////////////////////////////////////////////
 extern void iec_call_exit_handler(int line, char* file, char* reason);
 #include "fifoc.h"
+#define MAX_FIFO_SIZE 65535
 /////////////////////////////////////////////////////////////////////////
 
+////////////////////////////Middleware/////////////////////////////////////////////////////////////
+struct subs_args{
+	RIPCQueue* queue_monitor_dir;
+	fifo_h fifo_monitor_direction;
+};
+
+void consumer(void* pParam);
+extern int exit_consumer;
+/////////////////////////////////////////////////////////////////////////////////////////////
+
 class Dnp3DriverThread;
-
-#define MAX_FIFO_SIZE 65535
-
-#include "iec104types.h"
-#include "iec_item.h"
 
 class DNP_3_DRIVERDRV Dnp3driver_Instance : public DriverInstance 
 {
@@ -78,6 +90,18 @@ class DNP_3_DRIVERDRV Dnp3driver_Instance : public DriverInstance
 	//
 	Track* Values;
 
+	/////////////Middleware///////////////////////////////
+    int          port;
+    char const*  hostname;
+    RIPCFactory* factory1;
+	RIPCFactory* factory2;
+	RIPCSession* session1;
+	RIPCSession* session2;
+	RIPCQueue*   queue_monitor_dir;
+	RIPCQueue*   queue_control_dir;
+	struct subs_args arg;
+	//////////////////////////////////////////////////////
+
 	enum // states for the state machine
 	{
 		STATE_IDLE = 0,
@@ -108,27 +132,47 @@ class DNP_3_DRIVERDRV Dnp3driver_Instance : public DriverInstance
 		pTimer->start(1000); // start with a 1 second timer
 
 		/////////////////////Middleware/////////////////////////////////////////////////////////////////
-        char fifo_control_name[150];
-        char fifo_monitor_name[150];
-
-        char str_instance_id[20];
+		char fifo_control_name[150];
+		char str_instance_id[20];
         itoa(instance_id + 1, str_instance_id, 10);
- 
-        strcpy(fifo_control_name,"fifo_control_direction");
-        strcpy(fifo_monitor_name,"fifo_monitor_direction");
+		strcpy(fifo_control_name,"fifo_control_direction");
         strcat(fifo_control_name, str_instance_id);
-        strcat(fifo_monitor_name, str_instance_id);
         strcat(fifo_control_name, "dnp3");
+		
+		char fifo_monitor_name[150];
+		itoa(instance_id + 1, str_instance_id, 10);
+		strcpy(fifo_monitor_name,"fifo_monitor_direction");
+        strcat(fifo_monitor_name, str_instance_id);
         strcat(fifo_monitor_name, "dnp3");
+
+		port = 6000;
+		hostname = "localhost";
+
+		factory1 = RIPCClientFactory::getInstance();
+		factory2 = RIPCClientFactory::getInstance();
+		session1 = factory1->create(hostname, port);
+		session2 = factory2->create(hostname, port);
+		queue_monitor_dir = session1->createQueue(fifo_monitor_name);
+		queue_control_dir = session2->createQueue(fifo_control_name);
+
+		arg.queue_monitor_dir = queue_monitor_dir;
 		///////////////////////////////////Middleware//////////////////////////////////////////////////
 
-		/////////////////////////////////////fifo//////////////////////////////////////////////////////////
-		const size_t max_fifo_queue_size = 65535;
+		/////////////////////////////////////local fifo//////////////////////////////////////////////////////////
+		const size_t max_fifo_queue_size = MAX_FIFO_SIZE;
 		
 		strcat(fifo_monitor_name, "_fifo_");
 
 		fifo_monitor_direction = fifo_open(fifo_monitor_name, max_fifo_queue_size, iec_call_exit_handler);
+
+		arg.fifo_monitor_direction = fifo_monitor_direction;
 		///////////////////////////////////////////////////////////////////////////////////////////////////
+
+		/////////////////////Middleware/////////////////////////////////////////////////////////////////
+		unsigned long threadid;
+	
+		CreateThread(NULL, 0, LPTHREAD_START_ROUTINE(consumer), (void*)&arg, 0, &threadid);
+		/////////////////////Middleware////////////////////////////////////////////////////
 	};
 
 	~Dnp3driver_Instance()
@@ -140,6 +184,18 @@ class DNP_3_DRIVERDRV Dnp3driver_Instance : public DriverInstance
 			delete[] Values;
 			Values = NULL;
 		}
+
+		///////////////////////////////////Middleware//////////////////////////////////////////////////
+		exit_consumer = 1;
+		//Sleep(3000);
+		fifo_close(fifo_monitor_direction);
+		queue_monitor_dir->close();
+		queue_control_dir->close();
+		session1->close();
+		session2->close();
+		delete session1;
+		delete session2;
+		///////////////////////////////////Middleware//////////////////////////////////////////////////
 	};
 	//
 	void Fail(const QString &s)
@@ -152,9 +208,8 @@ class DNP_3_DRIVERDRV Dnp3driver_Instance : public DriverInstance
 	Driver* ParentDriver;
 	QString unit_name;
     int instanceID; //Equals to "line concept" of a SCADA driver
-	//////Middleware/////////////
-	/////////////////////////////
-	////////////////fifo///////////
+	
+	////////////////local fifo///////////
 	fifo_h fifo_monitor_direction;
 	///////////////////////////////
 	
@@ -172,7 +227,6 @@ class DNP_3_DRIVERDRV Dnp3driver_Instance : public DriverInstance
 	////////////////local fifo////////////////////////////
 	void get_items_from_local_fifo(void);
 	//////////////////////////////////////////////////////
-    //
 	public slots:
 	//
 	virtual void Start(); // start everything under this driver's control

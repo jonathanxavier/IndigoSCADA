@@ -98,7 +98,7 @@ SOURCE=.\client\client.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\client\getopt.c
+SOURCE=..\..\..\utilities\getopt.c
 # End Source File
 # Begin Source File
 

@@ -1,7 +1,7 @@
 /*
  *                         IndigoSCADA
  *
- *   This software and documentation are Copyright 2002 to 2012 Enscada 
+ *   This software and documentation are Copyright 2002 to 2014 Enscada 
  *   Limited and its licensees. All rights reserved. See file:
  *
  *                     $HOME/LICENSE 
@@ -27,20 +27,142 @@ static DWORD g_dwSleepInLoop = 1000;
 
 #include "opcda_2_0_classes.h"
 
-extern int gl_timeout_connection_with_parent;
+/////////////////////////////////////Middleware////////////////////////////////
+static void iec_call_exit_handler(int line, char* file, char* reason);
+///////commands
+void control_dir_consumer(void* pParam)
+{
+	struct subs_args* arg = (struct subs_args*)pParam;
+	struct iec_item item;
+	RIPCObject objDesc(&item, sizeof(struct iec_item));
 
-/////////////////////////////////////Middleware///////////////////////////////////////////
-////////////////////////////////Middleware/////////////////////////////////////
+	Opc_client_da_imp* parent = (Opc_client_da_imp*)arg->parent;
+
+	while(1)
+	{
+		if(parent->exit_threads)
+		{
+			break;
+		}
+
+		parent->queue_control_dir->get(objDesc);
+
+		parent->check_for_commands(&item);
+	}
+}
+////////////////////////////////Middleware/////////////////
+
+
+extern int gl_timeout_connection_with_parent;
 
 bool Opc_client_da_imp::fExit = false;
 struct structItem* Opc_client_da_imp::Item = NULL;
 double Opc_client_da_imp::dead_band_percent = 0.0;
 DWORD Opc_client_da_imp::g_dwWriteTransID = 2;
 IOPCServer* Opc_client_da_imp::g_pIOPCServer = NULL;
-////////////////////////////////Middleware/////////////////
-////////////////////////////////Middleware/////////////////
+RIPCQueue*  Opc_client_da_imp::queue_monitor_dir = NULL;
 
 static u_int n_msg_sent = 0;
+
+Opc_client_da_imp::Opc_client_da_imp(char* opc_server_address, char* line_number)
+{ 
+	IT_IT("Opc_client_da_imp::Opc_client_da_imp");
+
+	strcpy(ServerIPAddress, opc_server_address);
+
+	g_bWriteComplete = true;
+	g_dwReadTransID = 1;
+	Config_db = NULL;
+	opc_client_state_variable = OPC_CLIENT_NOT_INITIALIZED;
+	timer_starts_at_epoch = 0;
+	local_server = 0;
+	g_iOpcProperties = NULL;
+	g_iCatInfo = NULL;
+	g_pIOPCBrowse = NULL;
+	g_pIGroupUnknown = NULL;
+	g_pIOPCCommon = NULL;
+	g_pIOPCAsyncIO2 = NULL;
+	g_pIOPCItemMgt = NULL;
+	g_pIOPCSyncIO  = NULL;
+	g_pIOPCAsyncIO = NULL ;
+	g_pIOPCGroupStateMgt = NULL;
+	g_pIDataObject = NULL;
+	g_dwCancelID = 1;
+	g_dwUpdateTransID = 1;
+	g_hClientGroup = 0;
+	g_bVer2 = false;
+	g_dwNumItems = 0;
+	g_dwClientHandle = 1;
+	g_dwUpdateRate = 60000; //in milliseconds
+	nThreads = 1;
+	hServerRead = NULL;
+	id_of_ItemToWrite = 0;
+
+	opc_server_prog_id[0] = '\0';
+	
+	/////////////////////Middleware/////////////////////////////////////////////////////////////////
+
+    factory1 = NULL;
+	factory2 = NULL;
+	session1 = NULL;
+	session2 = NULL;
+	//queue_monitor_dir = NULL;
+	queue_control_dir = NULL;
+
+	char fifo_monitor_name[150];
+	char fifo_control_name[150];
+
+	strcpy(fifo_monitor_name,"fifo_monitor_direction");
+	strcat(fifo_monitor_name, line_number);
+	strcat(fifo_monitor_name, "da");
+		
+	strcpy(fifo_control_name,"fifo_control_direction");
+	strcat(fifo_control_name, line_number);
+	strcat(fifo_control_name, "da");
+
+	port = 6000;
+	hostname = "localhost";
+
+	factory1 = RIPCClientFactory::getInstance();
+	factory2 = RIPCClientFactory::getInstance();
+
+	session1 = factory1->create(hostname, port);
+	session2 = factory2->create(hostname, port);
+	queue_monitor_dir = session1->createQueue(fifo_monitor_name);
+	queue_control_dir = session2->createQueue(fifo_control_name);
+
+	arg.parent = this;
+	///////////fifo//////////////////
+	unsigned long threadid;
+	
+	strcat(fifo_control_name, "_fifo_client");
+
+	#define MAX_FIFO_SIZE 65535
+	fifo_control_direction = fifo_open(fifo_control_name, MAX_FIFO_SIZE, iec_call_exit_handler);
+		
+	CreateThread(NULL, 0, LPTHREAD_START_ROUTINE(control_dir_consumer), (void*)&arg, 0, &threadid);
+	///////////////////////////////////Middleware//////////////////////////////////////////////////
+	IT_EXIT;
+}
+		
+Opc_client_da_imp::~Opc_client_da_imp()
+{
+	IT_IT("Opc_client_da_imp::~Opc_client_da_imp");
+	stop_opc_thread();
+		
+	////////Middleware/////////////
+	exit_threads = 1;
+//	Sleep(3000);
+	fifo_close(fifo_control_direction);
+	queue_monitor_dir->close();
+	queue_control_dir->close();
+	session1->close();
+	delete session1;
+	session2->close();
+	delete session2;
+	////////Middleware/////////////
+	IT_EXIT;
+}
 
 int Opc_client_da_imp::Async2Update()
 {
@@ -128,8 +250,8 @@ int Opc_client_da_imp::Async2Update()
 
 		if(rc)
 		{ 
-			//fprintf(stderr,"Opc_client_da_imp exiting...., due to lack of connection with server\n");
-			//fflush(stderr);
+			fprintf(stderr,"Opc_client_da_imp exiting...., due to lack of connection with server\n");
+			fflush(stderr);
 			IT_COMMENT("Opc_client_da_imp exiting...., due to lack of connection with server");
 			
 			//Send LOST message to parent (monitor.exe)
@@ -150,7 +272,10 @@ int Opc_client_da_imp::Async2Update()
 			item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
 
 			//Send in monitor direction
-			//prepare published data
+			////////Middleware/////////////
+			//publishing data
+			queue_monitor_dir->put(&item_to_send, sizeof(struct iec_item));
+			////////Middleware/////////////
 			break; 
 		}
 
@@ -947,8 +1072,8 @@ int Opc_client_da_imp::OpcStop()
 		}
 	}
 
-	//fprintf(stderr,"Server and all group interfaces terminated.\n");
-	//fflush(stderr);
+	fprintf(stderr,"Server and all group interfaces terminated.\n");
+	fflush(stderr);
 
 	::CoUninitialize();
 
@@ -1819,8 +1944,11 @@ void Opc_client_da_imp::SendEvent2(VARIANT *pValue, const FILETIME* ft, DWORD pw
 	fprintf(stderr,"Sending message %u th\n", n_msg_sent);
 	fflush(stderr);
 	IT_COMMENT1("Sending message %u th\n", n_msg_sent);
-
-	//prepare published data
+	
+	////////Middleware/////////////
+	//publishing data
+	queue_monitor_dir->put(&item_to_send, sizeof(struct iec_item));
+	////////Middleware/////////////
 	n_msg_sent++;
 
 	IT_EXIT;
@@ -2732,4 +2860,75 @@ void Opc_client_da_imp::free_command_resources(void)
 	}
 	
 	::VariantClear(&vCommandValue);
+}
+
+#include <signal.h>
+
+static char* get_date_time()
+{
+	static char sz[128];
+	time_t t = time(NULL);
+	struct tm *ptm = localtime(&t);
+	
+	strftime(sz, sizeof(sz)-2, "%m/%d/%y %H:%M:%S", ptm);
+
+	strcat(sz, "|");
+	return sz;
+}
+
+static void iec_call_exit_handler(int line, char* file, char* reason)
+{
+	FILE* fp;
+	char program_path[_MAX_PATH];
+	char log_file[_MAX_FNAME+_MAX_PATH];
+	IT_IT("iec_call_exit_handler");
+
+	program_path[0] = '\0';
+#ifdef WIN32
+	if(GetModuleFileName(NULL, program_path, _MAX_PATH))
+	{
+		*(strrchr(program_path, '\\')) = '\0';        // Strip \\filename.exe off path
+		*(strrchr(program_path, '\\')) = '\0';        // Strip \\bin off path
+    }
+#elif __unix__
+	if(getcwd(program_path, _MAX_PATH))
+	{
+		*(strrchr(program_path, '/')) = '\0';        // Strip \\filename.exe off path
+		*(strrchr(program_path, '/')) = '\0';        // Strip \\bin off path
+    }
+#endif
+
+	strcpy(log_file, program_path);
+
+#ifdef WIN32
+	strcat(log_file, "\\logs\\modbus.log");
+#elif __unix__
+	strcat(log_file, "/logs/modbus.log");	
+#endif
+
+	fp = fopen(log_file, "a");
+
+	if(fp)
+	{
+		if(line && file && reason)
+		{
+			fprintf(fp, "PID:%d time:%s exit process at line: %d, file %s, reason:%s\n", GetCurrentProcessId, get_date_time(), line, file, reason);
+		}
+		else if(line && file)
+		{
+			fprintf(fp, "PID:%d time:%s exit process at line: %d, file %s\n", GetCurrentProcessId, get_date_time(), line, file);
+		}
+		else if(reason)
+		{
+			fprintf(fp, "PID:%d time:%s exit process for reason %s\n", GetCurrentProcessId, get_date_time(), reason);
+		}
+
+		fflush(fp);
+		fclose(fp);
+	}
+
+	//raise(SIGABRT);   //raise abort signal which in turn starts automatically a separete thread and call exit SignalHandler
+	ExitProcess(0);
+
+	IT_EXIT;
 }

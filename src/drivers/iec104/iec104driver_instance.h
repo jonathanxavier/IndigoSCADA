@@ -1,7 +1,7 @@
 /*
  *                         IndigoSCADA
  *
- *   This software and documentation are Copyright 2002 to 2011 Enscada 
+ *   This software and documentation are Copyright 2002 to 2014 Enscada 
  *   Limited and its licensees. All rights reserved. See file:
  *
  *                     $HOME/LICENSE 
@@ -15,18 +15,35 @@
 
 #include "iec104driver.h"
 #include "IndentedTrace.h"
-#include "fifo.h"
-#include "fifoc.h"
 #include "clear_crc_eight.h"
-
-class Iec104DriverThread;
-
-void iec_call_exit_handler(int line, char* file, char* reason);
-
-#define MAX_FIFO_SIZE 65535
-
 #include "iec104types.h"
 #include "iec_item.h"
+////////Middleware////////////
+#include "RIPCThread.h"
+#include "RIPCFactory.h"
+#include "RIPCSession.h"
+#include "RIPCServerFactory.h"
+#include "RIPCClientFactory.h"
+#include "ripc.h"
+//////////////////////////////
+
+/////////////////////////fifo///////////////////////////////////////////
+extern void iec_call_exit_handler(int line, char* file, char* reason);
+#include "fifoc.h"
+#define MAX_FIFO_SIZE 65535
+////////////////////////////////////////////////////////////////////////
+
+////////////////////////////Middleware//////////////////////////////////
+struct subs_args{
+	RIPCQueue* queue_monitor_dir;
+	fifo_h fifo_monitor_direction;
+};
+
+void consumer(void* pParam);
+extern int exit_consumer;
+////////////////////////////Middleware//////////////////////////////////
+
+class Iec104DriverThread;
 
 class IEC_104_DRIVERDRV Iec104driver_Instance : public DriverInstance 
 {
@@ -72,21 +89,31 @@ class IEC_104_DRIVERDRV Iec104driver_Instance : public DriverInstance
 	//
 	Track* Values;
 
+	/////////////Middleware///////////////////////////////
+    int          port;
+    char const*  hostname;
+    RIPCFactory* factory1;
+	RIPCFactory* factory2;
+	RIPCSession* session1;
+	RIPCSession* session2;
+	RIPCQueue*   queue_monitor_dir;
+	RIPCQueue*   queue_control_dir;
+	struct subs_args arg;
+	//////////////////////////////////////////////////////
+
 	enum // states for the state machine
 	{
 		STATE_IDLE = 0,
-		STATE_READ,
-		STATE_WRITE,
 		STATE_RESET,
+		STATE_ASK_GENERAL_INTERROGATION,
+		STATE_GENERAL_INTERROGATION_DONE,
 		STATE_FAIL,
-		STATE_DONE
+		STATE_RUNNING
 	};
 
 	public:
 	Iec104DriverThread *pConnect;
-	fifo_h fifo_control_direction;
 	unsigned int msg_sent_in_control_direction;
-	fifo_h fifo_monitor_direction;
 	//
 	Iec104driver_Instance(Driver *parent, const QString &name, int instance_id) : 
 	DriverInstance(parent,name),fFail(0), Countdown(1),
@@ -103,25 +130,48 @@ class IEC_104_DRIVERDRV Iec104driver_Instance : public DriverInstance
 		connect(pTimer,SIGNAL(timeout()),this,SLOT(Tick()));
 		pTimer->start(1000); // start with a 1 second timer
 
-		/////////////////////////////////////////////////////////////////////////////
-		const size_t max_fifo_queue_size = MAX_FIFO_SIZE;
-		//Init thread shared fifos
-        char fifo_ctr_name[150];
-        char fifo_mon_name[150];
-
-        char str_instance_id[20];
+		/////////////////////Middleware/////////////////////////////////////////////////////////////////
+		char fifo_control_name[150];
+		char str_instance_id[20];
         itoa(instance_id + 1, str_instance_id, 10);
- 
-        strcpy(fifo_ctr_name,"fifo_control_direction");
-        strcpy(fifo_mon_name,"fifo_monitor_direction");
-        strcat(fifo_ctr_name, str_instance_id);
-        strcat(fifo_mon_name, str_instance_id);
-        strcat(fifo_ctr_name, "iec104");
-        strcat(fifo_mon_name, "iec104");
- 
-		fifo_control_direction = fifo_open(fifo_ctr_name, max_fifo_queue_size, iec_call_exit_handler);
-		fifo_monitor_direction = fifo_open(fifo_mon_name, max_fifo_queue_size, iec_call_exit_handler);
-        /////////////////////////////////////////////////////////////////////////////
+		strcpy(fifo_control_name,"fifo_control_direction");
+        strcat(fifo_control_name, str_instance_id);
+        strcat(fifo_control_name, "iec104");
+		
+		char fifo_monitor_name[150];
+		itoa(instance_id + 1, str_instance_id, 10);
+		strcpy(fifo_monitor_name,"fifo_monitor_direction");
+        strcat(fifo_monitor_name, str_instance_id);
+        strcat(fifo_monitor_name, "iec104");
+
+		port = 6000;
+		hostname = "localhost";
+
+		factory1 = RIPCClientFactory::getInstance();
+		factory2 = RIPCClientFactory::getInstance();
+		session1 = factory1->create(hostname, port);
+		session2 = factory2->create(hostname, port);
+		queue_monitor_dir = session1->createQueue(fifo_monitor_name);
+		queue_control_dir = session2->createQueue(fifo_control_name);
+
+		arg.queue_monitor_dir = queue_monitor_dir;
+		///////////////////////////////////Middleware//////////////////////////////////////////////////
+
+		/////////////////////////////////////local fifo//////////////////////////////////////////////////////////
+		const size_t max_fifo_queue_size = MAX_FIFO_SIZE;
+		
+		strcat(fifo_monitor_name, "_fifo_");
+
+		fifo_monitor_direction = fifo_open(fifo_monitor_name, max_fifo_queue_size, iec_call_exit_handler);
+
+		arg.fifo_monitor_direction = fifo_monitor_direction;
+		///////////////////////////////////////////////////////////////////////////////////////////////////
+
+		/////////////////////Middleware/////////////////////////////////////////////////////////////////
+		unsigned long threadid;
+	
+		CreateThread(NULL, 0, LPTHREAD_START_ROUTINE(consumer), (void*)&arg, 0, &threadid);
+		/////////////////////Middleware/////////////////////////////////////////////////////////////////
 	};
 
 	~Iec104driver_Instance()
@@ -133,6 +183,18 @@ class IEC_104_DRIVERDRV Iec104driver_Instance : public DriverInstance
 			delete[] Values;
 			Values = NULL;
 		}
+
+		///////////////////////////////////Middleware//////////////////////////////////////////////////
+		exit_consumer = 1;
+//		Sleep(3000);
+		fifo_close(fifo_monitor_direction);
+		queue_monitor_dir->close();
+		queue_control_dir->close();
+		session1->close();
+		session2->close();
+		delete session1;
+		delete session2;
+		///////////////////////////////////Middleware//////////////////////////////////////////////////
 	};
 	//
 	void Fail(const QString &s)
@@ -145,16 +207,25 @@ class IEC_104_DRIVERDRV Iec104driver_Instance : public DriverInstance
 	Driver* ParentDriver;
 	QString unit_name;
     int instanceID; //Equals to "line concept" of a SCADA driver
+
+	////////////////local fifo///////////
+	fifo_h fifo_monitor_direction;
+	///////////////////////////////
 	
 	void driverEvent(DriverEvent *); // message from thread to parent
 	bool event(QEvent *e);
 	bool Connect();					//connect to the DriverThread
 	bool Disconnect();              //disconnect from the DriverThread
 	bool DoExec(SendRecePacket *t);
-	void epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch_in_millisec);
 	bool expect(unsigned int cmd);
 	void removeTransaction();
-	
+	//////Middleware//////////////////////////////////////
+	void get_utc_host_time(struct cp56time2a* time);
+	void epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch_in_millisec);
+	//////////////////////////////////////////////////////
+	////////////////local fifo////////////////////////////
+	void get_items_from_local_fifo(void);
+	//////////////////////////////////////////////////////
 	public slots:
 	//
 	virtual void Start(); // start everything under this driver's control
@@ -162,6 +233,7 @@ class IEC_104_DRIVERDRV Iec104driver_Instance : public DriverInstance
 	virtual void Command(const QString & name, BYTE cmd, LPVOID lpPa, DWORD pa_length, DWORD ipindex); // process a command for a named unit 
 	virtual void QueryResponse (QObject *, const QString &, int, QObject*); // handles database responses
 	virtual void Tick();
+	//
 };
 
 #endif

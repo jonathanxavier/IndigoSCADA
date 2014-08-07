@@ -13,6 +13,7 @@
 #include "iec103driver_instance.h"
 #include "iec103driverthread.h"
 
+////////////////////Middleware/////////////////////////////////////////////
 int exit_consumer = 0;
 
 void consumer(void* pParam)
@@ -33,7 +34,7 @@ void consumer(void* pParam)
 		fifo_put(arg->fifo_monitor_direction, (char *)&item, sizeof(struct iec_item));
 	}
 }
-
+////////////////////Middleware/////////////////////////////////////////////
 
 /*
 *Function:
@@ -424,8 +425,10 @@ void Iec103driver_Instance::Tick()
 			item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
 			///////////////////////////////////////////////////////////////////////////////////////////
 			
+			////////////////////Middleware/////////////////////////////////////////////
 			//publishing data
 			queue_control_dir->put(&item_to_send, sizeof(struct iec_item));
+			////////////////////Middleware/////////////////////////////////////////////
 			
 			State = STATE_GENERAL_INTERROGATION_DONE;
 		}
@@ -449,7 +452,6 @@ void Iec103driver_Instance::Tick()
 		break;
 	}
 }
-
 
 void Iec103driver_Instance::get_items_from_local_fifo(void)
 {
@@ -765,7 +767,6 @@ void Iec103driver_Instance::get_items_from_local_fifo(void)
 	}
 }
 
-
 /*
 *Function:event
 *event handler
@@ -1007,7 +1008,6 @@ void Iec103driver_Instance::get_utc_host_time(struct cp56time2a* time)
 	IT_EXIT;
     return;
 }
-/////////////////////////////////////Middleware/////////////////////////////////////////////
 
 void Iec103driver_Instance::epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch_in_millisec)
 {
@@ -1034,3 +1034,4 @@ void Iec103driver_Instance::epoch_to_cp56time2a(cp56time2a *time, signed __int64
 
     return;
 }
+/////////////////////////////////////Middleware/////////////////////////////////////////////

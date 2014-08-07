@@ -33,6 +33,7 @@ extern void iec_call_exit_handler(int line, char* file, char* reason);
 #define MAX_FIFO_SIZE 65535
 ////////////////////////////////////////////////////////////////////////
 
+////////////////////////////Middleware//////////////////////////////////
 struct subs_args{
 	RIPCQueue* queue_monitor_dir;
 	fifo_h fifo_monitor_direction;
@@ -40,6 +41,7 @@ struct subs_args{
 
 void consumer(void* pParam);
 extern int exit_consumer;
+////////////////////////////Middleware//////////////////////////////////
 
 class Iec103DriverThread;
 
@@ -87,6 +89,7 @@ class IEC_103_DRIVERDRV Iec103driver_Instance : public DriverInstance
 	};
 	//
 	Track* Values;
+
 	/////////////Middleware///////////////////////////////
     int          port;
     char const*  hostname;
@@ -165,9 +168,11 @@ class IEC_103_DRIVERDRV Iec103driver_Instance : public DriverInstance
 		arg.fifo_monitor_direction = fifo_monitor_direction;
 		///////////////////////////////////////////////////////////////////////////////////////////////////
 
+		/////////////////////Middleware/////////////////////////////////////////////////////////////////
 		unsigned long threadid;
 	
 		CreateThread(NULL, 0, LPTHREAD_START_ROUTINE(consumer), (void*)&arg, 0, &threadid);
+		/////////////////////Middleware/////////////////////////////////////////////////////////////////
 	};
 
 	~Iec103driver_Instance()
@@ -182,7 +187,7 @@ class IEC_103_DRIVERDRV Iec103driver_Instance : public DriverInstance
 
 		///////////////////////////////////Middleware//////////////////////////////////////////////////
 		exit_consumer = 1;
-		Sleep(3000);
+//		Sleep(3000);
 		fifo_close(fifo_monitor_direction);
 		queue_monitor_dir->close();
 		queue_control_dir->close();

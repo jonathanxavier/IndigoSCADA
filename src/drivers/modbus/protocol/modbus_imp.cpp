@@ -25,9 +25,8 @@
 
 extern int gl_timeout_connection_with_parent;
 
-void iec_call_exit_handler(int line, char* file, char* reason);
-
 /////////////////////////////////////Middleware////////////////////////////////
+static void iec_call_exit_handler(int line, char* file, char* reason);
 ///////commands
 void control_dir_consumer(void* pParam)
 {
@@ -110,7 +109,7 @@ fExit(false),pollingTime(polling_time), general_interrogation(true), is_connecte
 		queue_control_dir = session2->createQueue(fifo_control_name);
 
 		arg.parent = this;
-		///////////////////////////////////Middleware//////////////////////////////////////////////////
+		///////////fifo//////////////////
 		unsigned long threadid;
 		
 		strcat(fifo_control_name, "_fifo_client");
@@ -119,6 +118,7 @@ fExit(false),pollingTime(polling_time), general_interrogation(true), is_connecte
 		fifo_control_direction = fifo_open(fifo_control_name, MAX_FIFO_SIZE, iec_call_exit_handler);
 			
 		CreateThread(NULL, 0, LPTHREAD_START_ROUTINE(control_dir_consumer), (void*)&arg, 0, &threadid);
+		///////////////////////////////////Middleware//////////////////////////////////////////////////
 	}
 	else
 	{
@@ -153,8 +153,10 @@ modbus_imp::~modbus_imp()
 {   
     // free resources   
 	fExit = 1;
+	
 	////////Middleware/////////////
-	Sleep(3000);
+	exit_threads = 1;
+//	Sleep(3000);
 	queue_monitor_dir->close();
 	queue_control_dir->close();
 	session1->close();
@@ -235,8 +237,10 @@ int modbus_imp::PollServer(void)
 				item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
 
 				//Send in monitor direction
+				////////Middleware/////////////
 				//publishing data
 				queue_monitor_dir->put(&item_to_send, sizeof(struct iec_item));
+				////////Middleware/////////////
 				
 				n_msg_sent++;
 			
@@ -810,8 +814,10 @@ int modbus_imp::PollItems(void)
 			fflush(stderr);
 			IT_COMMENT1("Sending message %u th\n", n_msg_sent);
 			
+			////////Middleware/////////////
 			//publishing data
 			queue_monitor_dir->put(&item_to_send, sizeof(struct iec_item));
+			////////Middleware/////////////
 
 			n_msg_sent++;
 		}
@@ -1566,7 +1572,7 @@ void modbus_imp::free_command_resources(void)
 
 #include <signal.h>
 
-char* get_date_time()
+static char* get_date_time()
 {
 	static char sz[128];
 	time_t t = time(NULL);
@@ -1578,7 +1584,7 @@ char* get_date_time()
 	return sz;
 }
 
-void iec_call_exit_handler(int line, char* file, char* reason)
+static void iec_call_exit_handler(int line, char* file, char* reason)
 {
 	FILE* fp;
 	char program_path[_MAX_PATH];
