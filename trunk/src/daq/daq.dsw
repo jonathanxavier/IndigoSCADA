@@ -126,16 +126,7 @@ Package=<4>
     Project_Dep_Name iec101driver
     End Project Dependency
     Begin Project Dependency
-    Project_Dep_Name exe_sample
-    End Project Dependency
-    Begin Project Dependency
     Project_Dep_Name iec103driver
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name mpi_driver
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name mpi_master
     End Project Dependency
     Begin Project Dependency
     Project_Dep_Name rfc1006client
@@ -512,6 +503,9 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name ripcclient
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -568,18 +562,6 @@ Package=<4>
 ###############################################################################
 
 Project: "protocol_configurator"="..\configurator\browser\protocol_configurator.dsp" - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "pthread"="..\common\pthreads-w32-2-8-0\pthread.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
