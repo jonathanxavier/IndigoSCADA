@@ -16,8 +16,7 @@ Set the "all" project as the active project
 Press F7 to compile all the projects
 
 You need:
-Qt Development Frameworks version 3.1.2 commercial or 2.3.2 non commercial for Windows
-STLPort 6.4.6 or later
+Qt Development Frameworks version 3.3.8 for Windows
 
 Linux
 
@@ -26,6 +25,6 @@ compilation under Linux. You need to create your own makefiles.
 
 You need to download IndigoSCADA dependencies:
 
-Qt Development Frameworks version 3.1.2 or 2.3.2 for Linux
+Qt Development Frameworks version 3.3.8 for Linux
 
 Enjoy!

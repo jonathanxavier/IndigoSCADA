@@ -1,14 +1,4 @@
-IndigoSCADA list of TO DO on 26-09-2011
-
-- Porting of GUI of IndigoSCADA to QT version 4.x.x
-
-- Implement configurator, where configuration files are in in .xls format, use ExcelFormat to read,
-  or .xml format, use TinyXML to read
-
-- Reimplement the GUI interface in general and in particular the HMI interface.
-  At the following links there is a possible solution, but only for QT version 4.x.x
-  http://processors.wiki.ti.com/index.php/XgxPerf_HMI
-  http://processors.wiki.ti.com/index.php/XgxPerfArch
+IndigoSCADA list of TO DO on 26-08-2014
 
 - Implement dinamic alarm and event lists, now alarm list is static
 
@@ -21,13 +11,3 @@ IndigoSCADA list of TO DO on 26-09-2011
 - Update documentation 
 
 - Translate user interface, contribution needed
-
-- Remove dependecy on STL std::map, so looking for a stable implemention of red-black trees
-  (we plan to use kazlib or libds-2.2)
-  kazlib is already used as an efficient alternative to the C++ map template in numerous places in the code base
-  of other projects
-  
-- Use CMake build system - http://www.cmake.org/ or qmake
-
-- Make reports in .xml format, use TinyXML to write
-- Make reports in .xls format, use ExcelFormat to write
