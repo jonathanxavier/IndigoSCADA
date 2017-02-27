@@ -733,6 +733,16 @@ void Modbus_driver_Instance::get_items_from_local_fifo(void)
 				#endif
 			}
 			break;
+			case M_ME_TO_1:
+			{
+				value.sprintf("%d", p_item->iec_obj.o.type151.mv);
+			}
+			break;
+			case M_ME_TQ_1:
+			{
+				value.sprintf("%d", p_item->iec_obj.o.type153.mv);
+			}
+			break;
 			case C_EX_IT_1:
 			{
 				printf("Child process is exiting...\n");

@@ -116,3 +116,25 @@ void modbus_set_int(int n, uint16_t *dest)
     dest[0] = (uint16_t)i;
     dest[1] = (uint16_t)(i >> 16);
 }
+
+/* Get an unsigned int from 4 bytes in Modbus format apa+++ */
+unsigned int modbus_get_uint(const uint16_t *src)
+{
+    unsigned int ret  = 0;
+    uint32_t i;
+
+    i = (((uint32_t)src[1]) << 16) + src[0];
+    memcpy(&ret, &i, sizeof(unsigned int));
+
+    return ret;
+}
+
+/* Set a unsigned int to 4 bytes in Modbus format apa+++ */
+void modbus_set_uint(unsigned int n, uint16_t *dest)
+{
+    uint32_t i = 0;
+
+    memcpy(&i, &n, sizeof(uint32_t));
+    dest[0] = (uint16_t)i;
+    dest[1] = (uint16_t)(i >> 16);
+}
