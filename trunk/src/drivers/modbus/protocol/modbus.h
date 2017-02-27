@@ -216,7 +216,8 @@ float modbus_get_float(const uint16_t *src);
 void modbus_set_float(float f, uint16_t *dest);
 int modbus_get_int(const uint16_t *src); //apa+++
 void modbus_set_int(int n, uint16_t *dest); //apa+++
-
+unsigned int modbus_get_uint(const uint16_t *src); //apa+++
+void modbus_set_uint(unsigned int n, uint16_t *dest); //apa+++
 
 #include "modbus-tcp.h"
 #include "modbus-rtu.h"

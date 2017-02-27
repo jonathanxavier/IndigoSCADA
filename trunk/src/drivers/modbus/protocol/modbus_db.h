@@ -44,6 +44,7 @@ struct modbusDbRecord
 	unsigned int iec_type_write;   //IEC 104 type to write
 	float deadband; //Deadband for analog values
 	union {
+		unsigned int ua;
 		int a;
 		float f;
     } last_value;
