@@ -170,6 +170,12 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name mserver
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name mqtt_client
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name mqtt_client_driver
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -384,6 +390,42 @@ Package=<4>
 
 ###############################################################################
 
+Project: "iec62541client"="..\drivers\opc_ua\protocol2\iec62541client.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "iec62541lib"="..\drivers\opc_ua\protocol2\iec62541lib.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "iec62541server"="..\drivers\opc_ua\protocol2\iec62541server.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "lightopc_lib"="..\drivers\opc_server_da\lo-0.888\LightOPC\lightopc.dsp" - Package Owner=<4>
 
 Package=<5>
@@ -452,6 +494,30 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name utilities
     End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "mqtt_client"="..\drivers\mqtt\protocol\mqtt_client.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "mqtt_client_driver"="..\drivers\mqtt\mqtt_client_driver.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
 }}}
 
 ###############################################################################

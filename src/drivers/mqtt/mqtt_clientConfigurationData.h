@@ -23,9 +23,8 @@ class MQTT_clientConfigurationData : public QDialog
 	QLabel *Name;
 	QSpinBox *NItems;
 	QSpinBox *PollInterval;
-	QLineEdit *OpcServerProgIDText;
-	QLineEdit *OpcServerIPAddressText;
-	QLineEdit *OpcServerClassIDText;
+	QLineEdit *MqttBrokerHostNameText;
+	QLineEdit *SubscribeTopicNameText;
 };
 #endif // MQTT_clientConfigurationData_included
 

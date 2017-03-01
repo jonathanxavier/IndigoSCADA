@@ -40,8 +40,8 @@ void MQTT_client_DriverThread::run()
 	strcpy(pCommandLine, GetScadaHomeDirectory());
 	strcat(pCommandLine, "\\bin\\mqtt_client.exe -a ");
 	strcat(pCommandLine, ((MQTT_client_Instance*)Parent)->Cfg.MqttBrokerHostName);
-	//strcat(pCommandLine, " -p ");
-	//strcat(pCommandLine, ((MQTT_client_Instance*)Parent)->Cfg.OpcServerProgID);
+	strcat(pCommandLine, " -p ");
+	strcat(pCommandLine, ((MQTT_client_Instance*)Parent)->Cfg.SubscribeTopicName);
 	//strcat(pCommandLine, " -q ");
 	//strcat(pCommandLine, ((MQTT_client_Instance*)Parent)->Cfg.OpcclassId);
 	strcat(pCommandLine, " -l ");

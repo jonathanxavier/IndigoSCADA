@@ -141,13 +141,13 @@ class MQTT_CLIENT_DRV MQTT_client_Instance : public DriverInstance
         itoa(instance_id + 1, str_instance_id, 10);
 		strcpy(fifo_control_name,"fifo_control_direction");
         strcat(fifo_control_name, str_instance_id);
-        strcat(fifo_control_name, "da");
+        strcat(fifo_control_name, "mqtt");
 		
 		char fifo_monitor_name[150];
 		itoa(instance_id + 1, str_instance_id, 10);
 		strcpy(fifo_monitor_name,"fifo_monitor_direction");
         strcat(fifo_monitor_name, str_instance_id);
-        strcat(fifo_monitor_name, "da");
+        strcat(fifo_monitor_name, "mqtt");
 
 		port = 6000;
 		hostname = "localhost";

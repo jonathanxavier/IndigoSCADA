@@ -48,9 +48,8 @@ Inherited( parent, name ),Receipe(receipe)
 	if(Receipe != "(default)")
 	{
 		NItems->setEnabled(false);
-		OpcServerProgIDText->setEnabled(false);
-		OpcServerIPAddressText->setEnabled(false);
-		OpcServerClassIDText->setEnabled(false);
+		MqttBrokerHostNameText->setEnabled(false);
+		SubscribeTopicNameText->setEnabled(false);
 	};
 }
 MQTT_clientConfiguration::~MQTT_clientConfiguration()
@@ -69,36 +68,12 @@ void MQTT_clientConfiguration::OkClicked()
 	QString cmd = QString("delete from PROPS where SKEY='")+QString(Name->text()) + QString("' and IKEY='") + Receipe + "';";
 	GetConfigureDb()->DoExec(0,cmd,0); // delete the old value
 	//
-	if( (strlen((const char*)OpcServerClassIDText->text()) > 0) &&  (strlen((const char*)OpcServerIPAddressText->text()) > 0) )
-	{
-		cmd = "insert into PROPS values('"+Name->text() +"','" + Receipe + "','" + 
-		NItems->text() + 
-		" " + PollInterval->text() + 
-		" " + OpcServerProgIDText->text() + 
-		" " + OpcServerIPAddressText->text() +
-		" " + OpcServerClassIDText->text() +
-		"');";
-	}
-	else if( (strlen((const char*)OpcServerClassIDText->text()) == 0) &&  (strlen((const char*)OpcServerIPAddressText->text()) > 0) )
-	{
-		cmd = "insert into PROPS values('"+Name->text() +"','" + Receipe + "','" + 
-		NItems->text() + 
-		" " + PollInterval->text() + 
-		" " + OpcServerProgIDText->text() + 
-		" " + OpcServerIPAddressText->text() +
-		" " + "{}" +
-		"');";
-	}
-	else
-	{
-		cmd = "insert into PROPS values('"+Name->text() +"','" + Receipe + "','" + 
-		NItems->text() + 
-		" " + PollInterval->text() + 
-		" " + OpcServerProgIDText->text() + 
-		" " + "127.0.0.1" +
-		" " + "{}" +
-		"');";
-	}
+	cmd = "insert into PROPS values('"+Name->text() +"','" + Receipe + "','" + 
+	NItems->text() + 
+	" " + PollInterval->text() + 
+	" " + MqttBrokerHostNameText->text() + 
+	" " + SubscribeTopicNameText->text() +
+	"');";
 
 	GetConfigureDb()->DoExec(0,cmd,0);
 	QSAuditTrail(this,caption(), tr("Edited"));
@@ -131,12 +106,9 @@ void MQTT_clientConfiguration::QueryResponse (QObject *p, const QString &c, int 
 				is >> n;
 				PollInterval->setValue(n);
 				is >> t;
-				//SetComboItem(OpcServerProgID,t);
-				OpcServerProgIDText->setText(t);
+				MqttBrokerHostNameText->setText(t);
 				is >> t;
-				OpcServerIPAddressText->setText(t);
-				is >> t;
-				OpcServerClassIDText->setText(t);
+				SubscribeTopicNameText->setText(t);
 			}
 			else
 			{
@@ -147,9 +119,8 @@ void MQTT_clientConfiguration::QueryResponse (QObject *p, const QString &c, int 
 				GetConfigureDb()->DoExec(0,cmd,0);
 				NItems->setValue(8);
 				PollInterval->setValue(1000);
-				OpcServerProgIDText->setText("");
-				OpcServerIPAddressText->setText("");
-				OpcServerClassIDText->setText("");
+				MqttBrokerHostNameText->setText("");
+				SubscribeTopicNameText->setText("");
 			}
 		} 
 		break;

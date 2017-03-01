@@ -45,21 +45,21 @@ MQTT_clientConfigurationData::MQTT_clientConfigurationData(QWidget *parent, cons
 	Name->setAlignment( AlignLeft|AlignVCenter|ExpandTabs );
 	Name->setMargin( 0 );
 	/////////////////////////////////////////////////////////////////////////
-	OpcServerProgIDText = new QLineEdit(this, "LineEdit_7");
-	OpcServerProgIDText->setGeometry(200, 40, 250, 30);
-	OpcServerProgIDText->setMinimumSize(0, 0);
-	OpcServerProgIDText->setMaximumSize(32767, 32767);
-	OpcServerProgIDText->setFocusPolicy(QWidget::StrongFocus);
-	OpcServerProgIDText->setBackgroundMode(QWidget::PaletteBase);
+	MqttBrokerHostNameText = new QLineEdit(this, "LineEdit_7");
+	MqttBrokerHostNameText->setGeometry(200, 40, 250, 30);
+	MqttBrokerHostNameText->setMinimumSize(0, 0);
+	MqttBrokerHostNameText->setMaximumSize(32767, 32767);
+	MqttBrokerHostNameText->setFocusPolicy(QWidget::StrongFocus);
+	MqttBrokerHostNameText->setBackgroundMode(QWidget::PaletteBase);
 #if QT_VERSION < 300
-	OpcServerProgIDText->setFontPropagation(QWidget::SameFont);
-	OpcServerProgIDText->setPalettePropagation(QWidget::SameFont);
+	MqttBrokerHostNameText->setFontPropagation(QWidget::SameFont);
+	MqttBrokerHostNameText->setPalettePropagation(QWidget::SameFont);
 	#endif
-	OpcServerProgIDText->setText( tr( "" ) );
-	OpcServerProgIDText->setMaxLength( 100 );
-	OpcServerProgIDText->setFrame( QLineEdit::Normal );
-	OpcServerProgIDText->setFrame( TRUE );
-	OpcServerProgIDText->setAlignment( AlignLeft );
+	MqttBrokerHostNameText->setText( tr( "" ) );
+	MqttBrokerHostNameText->setMaxLength( 100 );
+	MqttBrokerHostNameText->setFrame( QLineEdit::Normal );
+	MqttBrokerHostNameText->setFrame( TRUE );
+	MqttBrokerHostNameText->setAlignment( AlignLeft );
 	QLabel *qtarch_Label_21 = new QLabel(this, "Label_21");
 	qtarch_Label_21->setGeometry(10, 40, 150, 30);
 	qtarch_Label_21->setMinimumSize(0, 0);
@@ -74,25 +74,25 @@ MQTT_clientConfigurationData::MQTT_clientConfigurationData(QWidget *parent, cons
 	qtarch_Label_21->setLineWidth( 1 );
 	qtarch_Label_21->setMidLineWidth( 0 );
 	qtarch_Label_21->QFrame::setMargin( 0 );
-	qtarch_Label_21->setText( tr( "OPC Server ProgID" ) );
+	qtarch_Label_21->setText( tr( "MQTT broker name" ) );
 	qtarch_Label_21->setAlignment( AlignLeft|AlignVCenter|ExpandTabs );
 	qtarch_Label_21->setMargin( 0 );
 
-	OpcServerIPAddressText = new QLineEdit(this, "LineEdit_8");
-	OpcServerIPAddressText->setGeometry(200, 80, 100, 30);
-	OpcServerIPAddressText->setMinimumSize(0, 0);
-	OpcServerIPAddressText->setMaximumSize(32767, 32767);
-	OpcServerIPAddressText->setFocusPolicy(QWidget::StrongFocus);
-	OpcServerIPAddressText->setBackgroundMode(QWidget::PaletteBase);
+	SubscribeTopicNameText = new QLineEdit(this, "LineEdit_8");
+	SubscribeTopicNameText->setGeometry(200, 80, 250, 30);
+	SubscribeTopicNameText->setMinimumSize(0, 0);
+	SubscribeTopicNameText->setMaximumSize(32767, 32767);
+	SubscribeTopicNameText->setFocusPolicy(QWidget::StrongFocus);
+	SubscribeTopicNameText->setBackgroundMode(QWidget::PaletteBase);
 #if QT_VERSION < 300
-	OpcServerIPAddressText->setFontPropagation(QWidget::SameFont);
-	OpcServerIPAddressText->setPalettePropagation(QWidget::SameFont);
+	SubscribeTopicNameText->setFontPropagation(QWidget::SameFont);
+	SubscribeTopicNameText->setPalettePropagation(QWidget::SameFont);
 	#endif
-	OpcServerIPAddressText->setText( tr( "" ) );
-	OpcServerIPAddressText->setMaxLength( 100 );
-	OpcServerIPAddressText->setFrame( QLineEdit::Normal );
-	OpcServerIPAddressText->setFrame( TRUE );
-	OpcServerIPAddressText->setAlignment( AlignLeft );
+	SubscribeTopicNameText->setText( tr( "" ) );
+	SubscribeTopicNameText->setMaxLength( 100 );
+	SubscribeTopicNameText->setFrame( QLineEdit::Normal );
+	SubscribeTopicNameText->setFrame( TRUE );
+	SubscribeTopicNameText->setAlignment( AlignLeft );
 	QLabel *qtarch_Label_22 = new QLabel(this, "Label_22");
 	qtarch_Label_22->setGeometry(10, 80, 150, 30);
 	qtarch_Label_22->setMinimumSize(0, 0);
@@ -107,42 +107,9 @@ MQTT_clientConfigurationData::MQTT_clientConfigurationData(QWidget *parent, cons
 	qtarch_Label_22->setLineWidth( 1 );
 	qtarch_Label_22->setMidLineWidth( 0 );
 	qtarch_Label_22->QFrame::setMargin( 0 );
-	qtarch_Label_22->setText( tr( "OPC Server IP address" ) );
+	qtarch_Label_22->setText( tr( "Subscribe topic name" ) );
 	qtarch_Label_22->setAlignment( AlignLeft|AlignVCenter|ExpandTabs );
 	qtarch_Label_22->setMargin( 0 );
-
-	OpcServerClassIDText = new QLineEdit(this, "LineEdit_9");
-	OpcServerClassIDText->setGeometry(200, 120, 250, 30);
-	OpcServerClassIDText->setMinimumSize(0, 0);
-	OpcServerClassIDText->setMaximumSize(32767, 32767);
-	OpcServerClassIDText->setFocusPolicy(QWidget::StrongFocus);
-	OpcServerClassIDText->setBackgroundMode(QWidget::PaletteBase);
-#if QT_VERSION < 300
-	OpcServerClassIDText->setFontPropagation(QWidget::SameFont);
-	OpcServerClassIDText->setPalettePropagation(QWidget::SameFont);
-	#endif
-	OpcServerClassIDText->setText( tr( "" ) );
-	OpcServerClassIDText->setMaxLength( 100 );
-	OpcServerClassIDText->setFrame( QLineEdit::Normal );
-	OpcServerClassIDText->setFrame( TRUE );
-	OpcServerClassIDText->setAlignment( AlignLeft );
-	QLabel *qtarch_Label_23 = new QLabel(this, "Label_23");
-	qtarch_Label_23->setGeometry(10, 120, 150, 30);
-	qtarch_Label_23->setMinimumSize(0, 0);
-	qtarch_Label_23->setMaximumSize(32767, 32767);
-	qtarch_Label_23->setFocusPolicy(QWidget::NoFocus);
-	qtarch_Label_23->setBackgroundMode(QWidget::PaletteBackground);
-	#if QT_VERSION < 300
-	qtarch_Label_23->setFontPropagation(QWidget::SameFont);
-	qtarch_Label_23->setPalettePropagation(QWidget::SameFont);
-	#endif
-	qtarch_Label_23->setFrameStyle( 0 );
-	qtarch_Label_23->setLineWidth( 1 );
-	qtarch_Label_23->setMidLineWidth( 0 );
-	qtarch_Label_23->QFrame::setMargin( 0 );
-	qtarch_Label_23->setText( tr( "OPC Server Class ID" ) );
-	qtarch_Label_23->setAlignment( AlignLeft|AlignVCenter|ExpandTabs );
-	qtarch_Label_23->setMargin( 0 );
 /////////////////////////////////////////////////////////////////////////
 	
 /////////////////////////////////////////////////////////////////////////

@@ -37,17 +37,19 @@ class MQTT_client_Instance;
 
 struct InstanceCfg // friend to anyone
 {
-	QString MqttBrokerHostName;  // MQTTBroker host name
+	QString MqttBrokerHostName;   
+	QString SubscribeTopicName;  
 	
 	unsigned SampleTime; // sampling time 
 
 	InstanceCfg() : 
-	MqttBrokerHostName(""),SampleTime(1000)
+	MqttBrokerHostName(""),SampleTime(1000),SubscribeTopicName("")
 	{
 	};
 
 	InstanceCfg(const InstanceCfg &m) : 
-	MqttBrokerHostName(m.MqttBrokerHostName),SampleTime(m.SampleTime)
+	MqttBrokerHostName(m.MqttBrokerHostName),SampleTime(m.SampleTime),
+	SubscribeTopicName(m.SubscribeTopicName)
 	{
 	};
 };
