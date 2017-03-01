@@ -206,6 +206,7 @@ void MQTT_client_Instance::QueryResponse(QObject *p, const QString &c, int id, Q
 				is >> MqttItems;	  // how many MQTT items there are in the RTU or PLC
 				is >> Cfg.SampleTime; // how long we sample for in milliseconds
 				is >> Cfg.MqttBrokerHostName;    // MQTT broker host name
+				is >> Cfg.SubscribeTopicName;    // subscribe topic name
 								
 				Countdown = 1;
 
