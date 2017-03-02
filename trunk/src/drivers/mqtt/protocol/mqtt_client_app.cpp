@@ -120,7 +120,8 @@ MQTT_client_imp::MQTT_client_imp(char* opc_server_address, char* line_number)
 MQTT_client_imp::~MQTT_client_imp()
 {
 	IT_IT("MQTT_client_imp::~MQTT_client_imp");
-	stop_opc_thread();
+	
+	fExit = true;
 		
 	////////Middleware/////////////
 	exit_threads = 1;
@@ -179,7 +180,7 @@ int MQTT_client_imp::Async2Update()
 		
 		if(fExit)
 		{
-			IT_COMMENT("Terminate opc loop!");
+			IT_COMMENT("Terminate mqtt loop!");
 			break;
 		}
 
@@ -197,23 +198,24 @@ int MQTT_client_imp::Async2Update()
 	return 0;
 }
 
-int MQTT_client_imp::OpcStart(char* SubscribeTopicName)
+int MQTT_client_imp::MQTTStart(char* SubscribeTopicName)
 {
-	IT_IT("MQTT_client_imp::OpcStart");
+	IT_IT("MQTT_client_imp::MQTTStart");
 
     /* init defaults */
     mqtt_init_ctx(&mqttCtx);
     mqttCtx.app_name = "mqttclient";
 	mqttCtx.host = ServerIPAddress;
 	mqttCtx.topic_name = SubscribeTopicName;
+	mqttCtx.dump_mode = 0;
 
 	IT_EXIT;
     return(0);
 }
 
-int MQTT_client_imp::OpcStop()
+int MQTT_client_imp::MQTTStop()
 {
-	IT_IT("MQTT_client_imp::OpcStop");
+	IT_IT("MQTT_client_imp::MQTTStop");
 
 	if(dump)
 	{
@@ -230,33 +232,8 @@ int MQTT_client_imp::OpcStop()
 		Item = NULL;
 	}
 
-	char show_msg[200];
-	sprintf(show_msg, " IndigoSCADA MQTT Client End\n");
-	LogMessage(NULL, show_msg);
-
 	IT_EXIT;
 	return 1;
-}
-
-void MQTT_client_imp::LogMessage(HRESULT hr, LPCSTR pszError, const char* name)
-{
-	//TODO: send message to monitor.exe as a single point
-
-	/*
-	struct iec_item item_to_send;
-	struct cp56time2a actual_time;
-	get_utc_host_time(&actual_time);
-
-	memset(&item_to_send,0x00, sizeof(struct iec_item));
-
-	//item_to_send.iec_obj.ioa =  Find ioa given the message in a vector of log_message
-
-	item_to_send.cause = 0x03;
-	item_to_send.iec_type = M_SP_TB_1;
-	item_to_send.iec_obj.o.type30.sp = 0;
-	item_to_send.iec_obj.o.type30.time = actual_time;
-	item_to_send.iec_obj.o.type30.iv = 0;
-	*/
 }
 
 #include <time.h>
@@ -1266,7 +1243,8 @@ static void iec_call_exit_handler(int line, char* file, char* reason)
 //MQTT specific/////////////
 /* locals */
 static int mPacketIdLast;
-static unsigned int message_hash_key = 0;	
+static unsigned int message_hash_key = 0;
+static int nTestItem = 0;
 
 void mqtt_init_ctx(MQTTCtx* mqttCtx)
 {
@@ -1326,7 +1304,8 @@ static int mqtt_message_cb(MqttClient *client, MqttMessage *msg,
 
 	parent_class = (MQTT_client_imp*)mqttCtx->parent_class;
 
-    if (msg_new) {
+    if (msg_new) 
+	{
         /* Determine min size to dump */
         len = msg->topic_name_len;
         if (len > PRINT_BUFFER_SIZE) {
@@ -1338,22 +1317,6 @@ static int mqtt_message_cb(MqttClient *client, MqttMessage *msg,
         /* Print incoming message */
         PRINTF("MQTT Message: Topic %s, Qos %d, Len %u\n",
             buf, msg->qos, msg->total_len);
-
-		//////////////////////////////////////////////////////////////////////////
-		//Prepare message in monitoring direction
-		message_hash_key = APHash((char *)buf, len);
-
-		for(unsigned int dw = 0; dw < parent_class->g_dwNumItems; dw++) 
-		{ 
-			if(parent_class->Item[dw].hash_key == message_hash_key)
-			{
-				item_to_send.iec_obj.ioa = parent_class->Item[dw].ioa_control_center;
-
-				//printf("Found topic %s, ioa= %d\n",parent_class->Item[dw].spname, parent_class->Item[dw].ioa_control_center);
-				break;
-			}
-		}
-		//////////////////////////////////////////////////////////////////////////
 
 		if (mqttCtx->dump_mode) 
 		{
@@ -1370,68 +1333,77 @@ static int mqtt_message_cb(MqttClient *client, MqttMessage *msg,
 			int readable = 1;
 			int writeable = 1;
 
-			fprintf(mqttCtx->dump, "insert into mqtt_client_table values('%s', '%d', '%s', '%d', '%d', '%lf', '%lf', '%s');\n", 
-			buf, mqttCtx->nTestItem + 1, iec_type, readable,	writeable,	max, min, opc_type);
-			fflush(mqttCtx->dump);
+			fprintf(parent_class->dump, "insert into mqtt_client_table values('%s', '%d', '%s', '%d', '%d', '%lf', '%lf', '%s');\n", 
+			buf, nTestItem + 1, iec_type, readable,	writeable,	max, min, opc_type);
+			fflush(parent_class->dump);
 			
-			mqttCtx->nTestItem++;
+			nTestItem++;
 			////////////////////////////end dumping one record/////////////////////////////////////////////
 		}
+		else
+		{
+			//////////////////////////////////////////////////////////////////////////
+			//Prepare message in monitoring direction
+			message_hash_key = APHash((char *)buf, len);
 
-        /* for test mode: check if TEST_MESSAGE was received */
-        //if (mqttCtx->test_mode) {
-        //    if (XSTRLEN(TEST_MESSAGE) == msg->buffer_len &&
-        //        XSTRNCMP(TEST_MESSAGE, (char*)msg->buffer, msg->buffer_len) == 0) {
-                //mStopRead = 1;
-        //    }
-        //}
-    }
+			for(unsigned int dw = 0; dw < parent_class->g_dwNumItems; dw++) 
+			{ 
+				if(parent_class->Item[dw].hash_key == message_hash_key)
+				{
+					item_to_send.iec_obj.ioa = parent_class->Item[dw].ioa_control_center;
 
-    /* Print message payload */
-    len = msg->buffer_len;
-    if (len > PRINT_BUFFER_SIZE) {
-        len = PRINT_BUFFER_SIZE;
-    }
-    XMEMCPY(buf, msg->buffer, len);
-    buf[len] = '\0'; /* Make sure its null terminated */
-    PRINTF("Payload (%d - %d): %s\n",
-        msg->buffer_pos, msg->buffer_pos + len, buf);
+					//printf("Found topic %s, ioa= %d\n",parent_class->Item[dw].spname, parent_class->Item[dw].ioa_control_center);
+					break;
+				}
+			}
+			//////////////////////////////////////////////////////////////////////////
+			
+			/* Print message payload */
+			len = msg->buffer_len;
+			if (len > PRINT_BUFFER_SIZE) {
+				len = PRINT_BUFFER_SIZE;
+			}
+			XMEMCPY(buf, msg->buffer, len);
+			buf[len] = '\0'; /* Make sure its null terminated */
+			PRINTF("Payload (%d - %d): %s\n",
+				msg->buffer_pos, msg->buffer_pos + len, buf);
 
-	if (msg_done) {
-        PRINTF("MQTT Message: Done\n");
-    }
+			if (msg_done) {
+				PRINTF("MQTT Message: Done\n");
+			}
 
-	//////////////////////////////////////////////////////////////////////////
-	//Prepare message in monitoring direction
-	item_to_send.iec_type = M_ME_TF_1;
-	//parent_class->epoch_to_cp56time2a(&time, epoch_in_millisec);
-	//item_to_send.iec_obj.o.type36.time = time;
-	item_to_send.iec_obj.o.type36.iv = 0;
-	item_to_send.iec_obj.o.type36.mv = (float)atof((char *)buf);
-	item_to_send.msg_id = n_msg_sent;
-	item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
+			//////////////////////////////////////////////////////////////////////////
+			//Prepare message in monitoring direction
+			item_to_send.iec_type = M_ME_TF_1;
+			//parent_class->epoch_to_cp56time2a(&time, epoch_in_millisec);
+			//item_to_send.iec_obj.o.type36.time = time;
+			item_to_send.iec_obj.o.type36.iv = 0;
+			item_to_send.iec_obj.o.type36.mv = (float)atof((char *)buf);
+			item_to_send.msg_id = n_msg_sent;
+			item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
 
-	//unsigned char buf[sizeof(struct iec_item)];
-	//int len = sizeof(struct iec_item);
-	//memcpy(buf, &item_to_send, len);
-	//	for(j = 0;j < len; j++)
-	//	{
-	//	  unsigned char c = *(buf + j);
-		//fprintf(stderr,"tx ---> 0x%02x\n", c);
-		//fflush(stderr);
-		//IT_COMMENT1("tx ---> 0x%02x\n", c);
-	//	}
+			//unsigned char buf[sizeof(struct iec_item)];
+			//int len = sizeof(struct iec_item);
+			//memcpy(buf, &item_to_send, len);
+			//	for(j = 0;j < len; j++)
+			//	{
+			//	  unsigned char c = *(buf + j);
+				//fprintf(stderr,"tx ---> 0x%02x\n", c);
+				//fflush(stderr);
+				//IT_COMMENT1("tx ---> 0x%02x\n", c);
+			//	}
 
-	//Send in monitor direction
-	fprintf(stderr,"Sending message %u th\n", n_msg_sent);
-	fflush(stderr);
-		
-	////////Middleware/////////////
-	//publishing data
-	parent_class->queue_monitor_dir->put(&item_to_send, sizeof(struct iec_item));
-	////////Middleware/////////////
-	n_msg_sent++;
-
+			//Send in monitor direction
+			fprintf(stderr,"Sending message %u th\n", n_msg_sent);
+			fflush(stderr);
+				
+			////////Middleware/////////////
+			//publishing data
+			parent_class->queue_monitor_dir->put(&item_to_send, sizeof(struct iec_item));
+			////////Middleware/////////////
+			n_msg_sent++;
+		}
+	}
 
     /* Return negative to terminate publish processing */
     return MQTT_CODE_SUCCESS;

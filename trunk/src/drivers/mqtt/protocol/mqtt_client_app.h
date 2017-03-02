@@ -40,7 +40,7 @@
 
 struct structItem
 {
-	CHAR spname[200]; //Topic name, i.e. Simulated Card.Simulated Node.Random.R8 as C string
+	CHAR spname[200]; //Topic name, i.e. Simulated Card/SimulatedNode/Random/R8 as C string
 	unsigned int ioa_control_center;//unique inside CASDU
 	unsigned int io_list_iec_type; //IEC 104 type
 	int readable;
@@ -98,12 +98,9 @@ class MQTT_client_imp
 	 struct subs_args arg;
 	 //////////////////////////////////////////////////////
 
-	 int OpcStart(char* SubscribeTopicName);
-	 int OpcStop();
-	 int GetStatus(WORD *pwMav, WORD *pwMiv, WORD *pwB, LPWSTR *pswzV);
+	 int MQTTStart(char* SubscribeTopicName);
+	 int MQTTStop();
 	 int AddItems();
-	 static void LogMessage(HRESULT hr = S_OK, LPCSTR pszError = NULL, const char* name = NULL);
-	 bool Version2();
 	 int Async2Update();
 	 static signed __int64 epoch_from_FILETIME(const FILETIME *fileTime);
 	 static void get_utc_host_time(struct cp56time2a* time);
@@ -112,14 +109,7 @@ class MQTT_client_imp
 	 static short rescale_value(double V, double Vmin, double Vmax, int* error);
 	 double rescale_value_inv(double A, double Vmin, double Vmax, int* error);
 	 void CreateSqlConfigurationFile(char* sql_file_name, char* opc_path);
-	 ////////////////////Middleware////////////////////////////////////////////////////
 	 void check_for_commands(struct iec_item *item);
-	 ////////////////////Middleware////////////////////////////////////////////////////
-	
-	 void stop_opc_thread()
-	 {
-		fExit = true;
-	 };
 };
 
 #endif //MQTT_CLIENT

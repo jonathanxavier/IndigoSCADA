@@ -312,8 +312,6 @@ void MQTT_client_imp::CreateSqlConfigurationFile(char* sql_file_name, char* opc_
 	
 	dump = fopen(sql_file_path, "w");
 
-	mqttCtx.dump = dump;
-
 	fprintf(dump, "create table mqtt_client_table(mqtt_topic varchar(150), ioa_control_center varchar(150), iec_type varchar(150), readable varchar(150), writeable varchar(150), HiHiLimit varchar(150), LoLoLimit varchar(150), mqtt_type varchar(150));\n");
 	fflush(dump);
 							

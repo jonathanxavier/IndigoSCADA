@@ -77,7 +77,6 @@ typedef struct MQTTCtx {
     byte *tx_buf, *rx_buf;
     const char* topic_name;
     word32 cmd_timeout_ms;
-    byte dump_mode;
     const char* pub_file;
     int retain;
 #if defined(ENABLE_AZUREIOTHUB_EXAMPLE) || defined(ENABLE_AWSIOT_EXAMPLE)
@@ -103,8 +102,7 @@ typedef struct MQTTCtx {
     MqttTopic topics[1], *topic;
     MqttPublish publish;
 	/////////for dump of topics name
-	FILE *dump;//apa added at Enscada.com
-	int nTestItem;//apa added at Enscada.com
+	byte dump_mode;
 	////////////////////////////////
 	void *parent_class;//apa added at Enscada.com
 } MQTTCtx;
