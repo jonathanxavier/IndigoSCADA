@@ -184,11 +184,11 @@ int main(int argc, char **argv)
 	MQTT_client_imp* po = new MQTT_client_imp(OPCServerAddress, line_number);
 
 	// connect to a MQTT broker
-	int nRet = po->OpcStart(SubscribeTopicName);
+	int nRet = po->MQTTStart(SubscribeTopicName);
 	
 	if(nRet)
 	{
-		po->OpcStop();
+		po->MQTTStop();
 		IT_EXIT;
 		return EXIT_FAILURE;
 	}
@@ -196,23 +196,25 @@ int main(int argc, char **argv)
 	if(strlen(sqlFileName) > 0)
 	{
 		po->mqttCtx.dump_mode = 1;
-		po->mqttCtx.nTestItem = 0;
 		po->CreateSqlConfigurationFile(sqlFileName, structurePath);
 	}
+	else
+	{
+		nRet = po->AddItems();
+	}
 
-	nRet = po->AddItems();
     po->mqttCtx.parent_class = po;
 
 	if(nRet)
 	{
-		po->OpcStop();
+		po->MQTTStop();
 		IT_EXIT;
 		return EXIT_FAILURE;
 	}
 
 	po->Async2Update();
 
-	po->OpcStop();
+	po->MQTTStop();
 
 	if(po)
 	{
