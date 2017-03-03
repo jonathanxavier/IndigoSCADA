@@ -433,13 +433,9 @@ double MQTT_client_imp::rescale_value_inv(double A, double Vmin, double Vmax, in
 
 void MQTT_client_imp::check_for_commands(struct iec_item *queued_item)
 {
-/*
 	DWORD dw = 0;
-	DWORD nWriteItems = ITEM_WRITTEN_AT_A_TIME;
-	HRESULT hr = S_OK;
-	HRESULT *pErrorsWrite = NULL;
-	HRESULT *pErrorsRead = NULL;
-	
+	char topic_to_write[200];
+	int item = 0;
         
 	if(!fExit)
 	{ 
@@ -463,17 +459,17 @@ void MQTT_client_imp::check_for_commands(struct iec_item *queued_item)
 			Sleep(100); //Delay between one command and the next one
 
 			/////////Here we make the QUERY:////////////////////////////////////////// /////////////////////////////
-			// select from Item table hClient where ioa is equal to ioa of packet arriving (command) from monitor.exe
+			// select from Item table spname where ioa is equal to ioa of packet arriving (command) from monitor.exe
 			///////////////////////////////////////////////////////////////////////////////////////
 			int found = 0;
-			DWORD hClient = -1;
-
+			
 			for(dw = 0; dw < g_dwNumItems; dw++) 
 			{ 
 				if(queued_item->iec_obj.ioa == Item[dw].ioa_control_center)
 				{
 					found = 1;
-					hClient = Item[dw].hClient;
+					strcpy(topic_to_write, Item[dw].spname); //Found topic to write
+					item = dw;
 					break;
 				}
 			}
@@ -486,23 +482,10 @@ void MQTT_client_imp::check_for_commands(struct iec_item *queued_item)
 				fflush(stderr);
 				return;
 			}
-			/////////////////////////////////////////////////////////////////////
-			#ifdef CHECK_TYPE
-			//check iec type of command
-			if(Item[hClient - 1].io_list_iec_type != queued_item->iec_type)
-			{
-				//error
-				fprintf(stderr,"Error: Command with IOA %d has iec_type %d, different from IO list type %d\n", queued_item->iec_obj.ioa, queued_item->iec_type, Item[hClient - 1].io_list_iec_type);
-				fflush(stderr);
-				fprintf(stderr,"Command NOT executed\n");
-				fflush(stderr);
-				return;
-			}
-			#endif
-
+			
 			//Receive a write command
 								
-			fprintf(stderr,"Receiving command for hClient %d, ioa %d\n", hClient, queued_item->iec_obj.ioa);
+			fprintf(stderr,"Receiving command for topic %s, ioa %d\n", topic_to_write, queued_item->iec_obj.ioa);
 			fflush(stderr);
 			
 			//Check the life time of the command/////////////////////////////////////////////////////////////////
@@ -628,14 +611,6 @@ void MQTT_client_imp::check_for_commands(struct iec_item *queued_item)
 				break;
 				default:
 				{
-					//error
-					//fprintf(stderr,"Error %d, %s\n",__LINE__, __FILE__);
-					//fflush(stderr);
-
-					char show_msg[200];
-					sprintf(show_msg, "Error %d, %s\n",__LINE__, __FILE__);
-					MQTT_client_imp::LogMessage(0, show_msg);
-				
 					return;
 				}
 				break;
@@ -665,381 +640,143 @@ void MQTT_client_imp::check_for_commands(struct iec_item *queued_item)
 
 			if(delta < MAX_COMMAND_SEND_TIME && delta >= 0)
 			{
-				//hServer[id_of_ItemToWrite] = Item[hClient - 1].hServer; //<--the server handle identifies the item to write
+				char command_string[20];
 
-				switch(V_VT(&Item[hClient - 1]))
+				double val_to_write = 0.0;
+				
+				switch(queued_item->iec_type)
 				{
-					case VT_BSTR:
+					case C_SC_TA_1:
 					{
-						#define COMMAND_STR_LEN 20
-						char command_string[COMMAND_STR_LEN];
+						val_to_write = queued_item->iec_obj.o.type58.scs;
+						sprintf(command_string, "%f", val_to_write);
+					}
+					break;
+					case C_DC_TA_1:
+					{
+						val_to_write = queued_item->iec_obj.o.type59.dcs;
+						sprintf(command_string, "%f", val_to_write);
+					}
+					break;
+					case C_SE_TA_1:
+					{
+						double Vmin = Item[item].min_measure;
+						double Vmax = Item[item].max_measure;
+						double A = (double)queued_item->iec_obj.o.type61.sv;
+						int error = 0;
 
-						double val_to_write = 0.0;
+						val_to_write = rescale_value_inv(A, Vmin, Vmax, &error);
+						if(error){ return;}
+
+						sprintf(command_string, "%lf", val_to_write);
+					}
+					break;
+					case C_SE_TB_1:
+					{
+						double Vmin = Item[item].min_measure;
+						double Vmax = Item[item].max_measure;
+						double A = (double)queued_item->iec_obj.o.type62.sv;
+						int error = 0;
+
+						val_to_write = rescale_value_inv(A, Vmin, Vmax, &error);
+						if(error){ return;}
 						
-						switch(queued_item->iec_type)
-						{
-							case C_SC_TA_1:
-							{
-								val_to_write = queued_item->iec_obj.o.type58.scs;
-								sprintf(command_string, "%f", val_to_write);
-							}
-							break;
-							case C_DC_TA_1:
-							{
-								val_to_write = queued_item->iec_obj.o.type59.dcs;
-								sprintf(command_string, "%f", val_to_write);
-							}
-							break;
-							case C_SE_TA_1:
-							{
-								double Vmin = Item[hClient - 1].min_measure;
-								double Vmax = Item[hClient - 1].max_measure;
-								double A = (double)queued_item->iec_obj.o.type61.sv;
-								int error = 0;
+						sprintf(command_string, "%lf", val_to_write);
+					}
+					break;
+					case C_SE_TC_1:
+					{
+						val_to_write = queued_item->iec_obj.o.type63.sv;
+						sprintf(command_string, "%lf", val_to_write);
+					}
+					break;
+					case C_BO_TA_1:
+					{
+						memset(command_string, 0x00, 20);
+						memcpy(command_string, &(queued_item->iec_obj.o.type64.stcd), sizeof(struct iec_stcd));
+					}
+					break;
+					case C_SC_NA_1:
+					{
+						val_to_write = queued_item->iec_obj.o.type45.scs;
+						sprintf(command_string, "%lf", val_to_write);
+					}
+					break;
+					case C_DC_NA_1:
+					{
+						val_to_write = queued_item->iec_obj.o.type46.dcs;
+						sprintf(command_string, "%lf", val_to_write);
+					}
+					break;
+					case C_SE_NA_1:
+					{
+						double Vmin = Item[item].min_measure;
+						double Vmax = Item[item].max_measure;
+						double A = (double)queued_item->iec_obj.o.type48.sv;
+						int error = 0;
 
-								val_to_write = rescale_value_inv(A, Vmin, Vmax, &error);
-								if(error){ return;}
+						val_to_write = rescale_value_inv(A, Vmin, Vmax, &error);
+						if(error){ return;}
+					
+						sprintf(command_string, "%lf", val_to_write);
+					}
+					break;
+					case C_SE_NB_1:
+					{
+						double Vmin = Item[item].min_measure;
+						double Vmax = Item[item].max_measure;
+						double A = (double)queued_item->iec_obj.o.type49.sv;
+						int error = 0;
 
-								sprintf(command_string, "%lf", val_to_write);
-							}
-							break;
-							case C_SE_TB_1:
-							{
-								double Vmin = Item[hClient - 1].min_measure;
-								double Vmax = Item[hClient - 1].max_measure;
-								double A = (double)queued_item->iec_obj.o.type62.sv;
-								int error = 0;
-
-								val_to_write = rescale_value_inv(A, Vmin, Vmax, &error);
-								if(error){ return;}
-								
-								sprintf(command_string, "%lf", val_to_write);
-							}
-							break;
-							case C_SE_TC_1:
-							{
-								val_to_write = queued_item->iec_obj.o.type63.sv;
-								sprintf(command_string, "%lf", val_to_write);
-							}
-							break;
-							case C_BO_TA_1:
-							{
-								memset(command_string, 0x00, COMMAND_STR_LEN);
-								memcpy(command_string, &(queued_item->iec_obj.o.type64.stcd), sizeof(struct iec_stcd));
-							}
-							break;
-							case C_SC_NA_1:
-							{
-								val_to_write = queued_item->iec_obj.o.type45.scs;
-								sprintf(command_string, "%lf", val_to_write);
-							}
-							break;
-							case C_DC_NA_1:
-							{
-								val_to_write = queued_item->iec_obj.o.type46.dcs;
-								sprintf(command_string, "%lf", val_to_write);
-							}
-							break;
-							case C_SE_NA_1:
-							{
-								double Vmin = Item[hClient - 1].min_measure;
-								double Vmax = Item[hClient - 1].max_measure;
-								double A = (double)queued_item->iec_obj.o.type48.sv;
-								int error = 0;
-
-								val_to_write = rescale_value_inv(A, Vmin, Vmax, &error);
-								if(error){ return;}
-							
-								sprintf(command_string, "%lf", val_to_write);
-							}
-							break;
-							case C_SE_NB_1:
-							{
-								double Vmin = Item[hClient - 1].min_measure;
-								double Vmax = Item[hClient - 1].max_measure;
-								double A = (double)queued_item->iec_obj.o.type49.sv;
-								int error = 0;
-
-								val_to_write = rescale_value_inv(A, Vmin, Vmax, &error);
-								if(error){ return;}
-								
-								sprintf(command_string, "%lf", val_to_write);
-							}
-							break;
-							case C_SE_NC_1:
-							{
-								val_to_write = queued_item->iec_obj.o.type50.sv;
-								sprintf(command_string, "%lf", val_to_write);
-							}
-							break;
-							case C_BO_NA_1:
-							{
-								memset(command_string, 0x00, COMMAND_STR_LEN);
-								memcpy(command_string, &(queued_item->iec_obj.o.type51.stcd), sizeof(struct iec_stcd));
-							}
-							break;
-							default:
-							{
-								//error
-								//fprintf(stderr,"Error %d, %s\n",__LINE__, __FILE__);
-								//fflush(stderr);
-
-								char show_msg[200];
-								sprintf(show_msg, "Error %d, %s\n",__LINE__, __FILE__);
-								MQTT_client_imp::LogMessage(0, show_msg);
-
-
-								
-								return;
-							}
-							break;
-						}
+						val_to_write = rescale_value_inv(A, Vmin, Vmax, &error);
+						if(error){ return;}
 						
-						USES_CONVERSION;
-
-						V_VT(&vCommandValue) = VT_BSTR;
-
-						V_BSTR(&vCommandValue) = SysAllocString(T2COLE(command_string));
-						
-						if(FAILED(::VariantCopy(&Val[id_of_ItemToWrite], &vCommandValue)))
-						{
-							//fprintf(stderr,"Error %d, %s\n",__LINE__, __FILE__);
-							//fflush(stderr);
-
-							char show_msg[200];
-							sprintf(show_msg, "Error %d, %s\n",__LINE__, __FILE__);
-							MQTT_client_imp::LogMessage(0, show_msg);
-							
-							return;
-						}
-
-						//fprintf(stderr,"Command for sample point %s, value: %s\n", Item[hClient - 1].spname, OLE2T(V_BSTR(&vCommandValue)));
-						//fflush(stderr);
-
-						char show_msg[450];
-						sprintf(show_msg, "Command for sample point %s, value: %s\n", Item[hClient - 1].spname, OLE2T(V_BSTR(&vCommandValue)));
-						LogMessage(NULL, show_msg);
-						
-						IT_COMMENT2("Command for sample point %s, value: %s\n", Item[hClient - 1].spname, OLE2T(V_BSTR(&vCommandValue)));
-
-						SysFreeString(V_BSTR(&vCommandValue));
+						sprintf(command_string, "%lf", val_to_write);
+					}
+					break;
+					case C_SE_NC_1:
+					{
+						val_to_write = queued_item->iec_obj.o.type50.sv;
+						sprintf(command_string, "%lf", val_to_write);
+					}
+					break;
+					case C_BO_NA_1:
+					{
+						memset(command_string, 0x00, 20);
+						memcpy(command_string, &(queued_item->iec_obj.o.type51.stcd), sizeof(struct iec_stcd));
 					}
 					break;
 					default:
 					{
-						V_VT(&vCommandValue) = VT_R4;
-
-						unsigned int v = 0;
-						double cmd_val = 0.0;
-
-						switch(queued_item->iec_type)
-						{
-							case C_SC_TA_1:
-							{
-								v = queued_item->iec_obj.o.type58.scs;
-								cmd_val = (double)v;
-							}
-							break;
-							case C_DC_TA_1:
-							{
-								v = queued_item->iec_obj.o.type59.dcs;
-								cmd_val = (double)v;
-							}
-							break;
-							case C_SE_TA_1:
-							{
-								double Vmin = Item[hClient - 1].min_measure;
-								double Vmax = Item[hClient - 1].max_measure;
-								double A = (double)queued_item->iec_obj.o.type61.sv;
-								int error = 0;
-
-								cmd_val = rescale_value_inv(A, Vmin, Vmax, &error);
-								if(error){ return;}
-							}
-							break;
-							case C_SE_TB_1:
-							{
-								double Vmin = Item[hClient - 1].min_measure;
-								double Vmax = Item[hClient - 1].max_measure;
-								double A = (double)queued_item->iec_obj.o.type62.sv;
-								int error = 0;
-
-								cmd_val = rescale_value_inv(A, Vmin, Vmax, &error);
-								if(error){ return;}
-							}
-							break;
-							case C_SE_TC_1:
-							{
-								cmd_val = queued_item->iec_obj.o.type63.sv;
-							}
-							break;
-							case C_BO_TA_1:
-							{
-								memcpy(&v, &(queued_item->iec_obj.o.type64.stcd), sizeof(struct iec_stcd));
-								cmd_val = (double)v;
-							}
-							break;
-							case C_SC_NA_1:
-							{
-								v = queued_item->iec_obj.o.type45.scs;
-								cmd_val = (double)v;
-							}
-							break;
-							case C_DC_NA_1:
-							{
-								v = queued_item->iec_obj.o.type46.dcs;
-								cmd_val = (double)v;
-							}
-							break;
-							case C_SE_NA_1:
-							{
-								double Vmin = Item[hClient - 1].min_measure;
-								double Vmax = Item[hClient - 1].max_measure;
-								double A = (double)queued_item->iec_obj.o.type48.sv;
-								int error = 0;
-
-								cmd_val = rescale_value_inv(A, Vmin, Vmax, &error);
-								if(error){ return;}
-							}
-							break;
-							case C_SE_NB_1:
-							{
-								double Vmin = Item[hClient - 1].min_measure;
-								double Vmax = Item[hClient - 1].max_measure;
-								double A = (double)queued_item->iec_obj.o.type49.sv;
-								int error = 0;
-
-								cmd_val = rescale_value_inv(A, Vmin, Vmax, &error);
-								if(error){ return;}
-							}
-							break;
-							case C_SE_NC_1:
-							{
-								cmd_val = queued_item->iec_obj.o.type50.sv;
-							}
-							break;
-							case C_BO_NA_1:
-							{
-								memcpy(&v, &(queued_item->iec_obj.o.type51.stcd), sizeof(struct iec_stcd));
-								cmd_val = (double)v;
-							}
-							break;
-							default:
-							{
-								//error
-								//fprintf(stderr,"Error %d, %s\n",__LINE__, __FILE__);
-								//fflush(stderr);
-
-								char show_msg[200];
-								sprintf(show_msg, "Error %d, %s\n",__LINE__, __FILE__);
-								MQTT_client_imp::LogMessage(0, show_msg);
-								
-								return;
-							}
-							break;
-						}
-						
-						V_R4(&vCommandValue) = (float)cmd_val;
-
-						if (FAILED(::VariantCopy(&Val[id_of_ItemToWrite], &vCommandValue)))
-						{
-							//fprintf(stderr,"Error %d, %s\n",__LINE__, __FILE__);
-							//fflush(stderr);
-
-							char show_msg[200];
-							sprintf(show_msg, "Error %d, %s\n",__LINE__, __FILE__);
-							MQTT_client_imp::LogMessage(0, show_msg);
-						
-							return;
-						}
-
-						//fprintf(stderr,"Command for sample point %s, value: %lf\n", Item[hClient - 1].spname, cmd_val);
-						//fflush(stderr);
-
-						char show_msg[450];
-						sprintf(show_msg, " Command for sample point %s, value: %lf\n", Item[hClient - 1].spname, cmd_val);
-						LogMessage(NULL, show_msg);
-
-						//IT_COMMENT2("Command for sample point %s, value: %lf", Item[hClient - 1].spname, cmd_val);
+						return;
 					}
 					break;
 				}
+				
+				printf("Command for sample point %s, value: %s\n", Item[item].spname, command_string);
 
-				if(FAILED(::VariantChangeType(&Val[id_of_ItemToWrite], &Val[id_of_ItemToWrite], 0, V_VT(&Item[hClient - 1]))))
-				{
-					//fprintf(stderr,"Error %d, %s\n",__LINE__, __FILE__);
-					//fflush(stderr);
+				//write MQTT command///////////////////////////////////////////////////
+				/* Publish Topic */
+				int rc;
 
-					char show_msg[200];
-					sprintf(show_msg, "Error %d, %s\n",__LINE__, __FILE__);
-					MQTT_client_imp::LogMessage(0, show_msg);
-
-					return;
-				}
-								
-				DWORD dwAccessRights = Item[hClient - 1].dwAccessRights;
-
-				dwAccessRights = dwAccessRights & OPC_WRITEABLE;
-
-				if(dwAccessRights == OPC_WRITEABLE)
-				{
-					//MQTT_client_imp::g_bWriteComplete = false;
-
-					hr = g_pIOPCAsyncIO2->Write(nWriteItems, hServer, Val, ++g_dwWriteTransID, &g_dwCancelID, &pErrorsWrite);
-
-					if(FAILED(hr))
-					{
-						LogMessage(hr,"AsyncIO2->Write()");
-
-						return;
-					}
-					else if(hr == S_FALSE)
-					{
-						for(dw = 0; dw < nWriteItems; dw++)
-						{
-							if(FAILED(pErrorsWrite[dw]))
-							{
-								LogMessage(pErrorsWrite[dw],"AsyncIO2->Write() item returned");
-
-								return;
-							}
-						}
-
-						::CoTaskMemFree(pErrorsWrite);
-					}
-					else // S_OK
-					{
-						::CoTaskMemFree(pErrorsWrite);
-					}
-
-					if(V_VT(&Val[id_of_ItemToWrite]) == VT_BSTR)
-					{
-						SysFreeString(V_BSTR(&Val[id_of_ItemToWrite]));
-					}
-				}
-				else
-				{
-					IT_COMMENT1("No access write for sample point %s", Item[hClient - 1].spname);
-					//fprintf(stderr,"No access write for sample point %s\n", Item[hClient - 1].spname);
-					//fflush(stderr);
-					
-					char show_msg[200];
-					sprintf(show_msg, "No access write for sample point %s\n", Item[hClient - 1].spname);
-					MQTT_client_imp::LogMessage(0, show_msg);
-					
-					return;
-				}
+				XMEMSET(&mqttCtx.publish, 0, sizeof(MqttPublish));
+				mqttCtx.publish.retain = 0;
+				mqttCtx.publish.qos = mqttCtx.qos;
+				mqttCtx.publish.duplicate = 0;
+				mqttCtx.publish.topic_name = topic_to_write;
+				mqttCtx.publish.packet_id = mqtt_get_packetid();
+				mqttCtx.publish.buffer = (byte*)command_string;
+				mqttCtx.publish.total_len = (word16)XSTRLEN(command_string);
+						
+				rc = MqttClient_Publish(&mqttCtx.client, &mqttCtx.publish);
+				
+				printf("MQTT Publish: Topic %s, %s (%d)\n",
+					mqttCtx.publish.topic_name, MqttClient_ReturnCodeToString(rc), rc);
+				////////////////////////////////////////////////////////////////////////
 			}
 			else
 			{
-				IT_COMMENT3("Rejeced command for sample point %s, aged for %ld s; max aging time %d s\n", Item[hClient - 1].spname, delta, MAX_COMMAND_SEND_TIME);
-				//fprintf(stderr,"Rejeced command for sample point %s, aged for %ld s; max aging time %d s\n", Item[hClient - 1].spname, delta, MAX_COMMAND_SEND_TIME);
-				//fflush(stderr);
-
-				char show_msg[200];
-				sprintf(show_msg, "Rejeced command for sample point %s, aged for %ld s; max aging time %d s\n", Item[hClient - 1].spname, delta, MAX_COMMAND_SEND_TIME);
-				MQTT_client_imp::LogMessage(0, show_msg);
-			
+				printf("Rejeced command for sample point %s, aged for %ld s; max aging time %d s\n", Item[item].spname, delta, MAX_COMMAND_SEND_TIME);
 				return;
 			}
 		}
@@ -1049,60 +786,8 @@ void MQTT_client_imp::check_for_commands(struct iec_item *queued_item)
 			//exit the thread, and stop the process
 			fExit = true;
 		}
-		else if(queued_item->iec_type == C_IC_NA_1)
-		{
-			//Receiving general interrogation command from monitor.exe
-			IT_COMMENT("Receiving general interrogation command from monitor.exe");
-			fprintf(stderr,"Receiving general interrogation command from monitor.exe\n");
-			fflush(stderr);
-
-			//Check if resources are allocated
-
-			if(hServerRead == NULL)
-				alloc_command_resources();
-
-			for(dw = 0; dw < g_dwNumItems; dw++)
-			{
-				hServerRead[dw] = Item[dw].hServer;
-			}
-			
-			// read all items in group
-
-			hr = g_pIOPCAsyncIO2->Read(g_dwNumItems, hServerRead, ++g_dwReadTransID, &g_dwCancelID, &pErrorsRead);
-
-			if(FAILED(hr))
-			{
-				LogMessage(hr,"AsyncIO2->Read()");
-				//When this happen the read is no more working,
-				//this means that the General Interrogation is no more working
-				//The asyncronous events could still arriving form the server
-				//So we exit the process
-				fExit = 1;
-			}
-			else if(hr == S_FALSE)
-			{
-				//If we arrive here there is something wrong in AddItems()
-				for(dw = 0; dw < g_dwNumItems; dw++)
-				{
-					if(FAILED(pErrorsRead[dw]))
-					{
-						LogMessage(pErrorsRead[dw],"AsyncIO2->Read() item returned");
-					}
-				}
-
-				::CoTaskMemFree(pErrorsRead);
-
-				//So we exit the process
-				fExit = 1;
-			}
-			else // S_OK
-			{
-				::CoTaskMemFree(pErrorsRead);
-			}
-			/////////end General interrogation command
-		}
 	}
-*/
+
 	return;
 }
 
