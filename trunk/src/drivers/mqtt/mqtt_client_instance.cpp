@@ -204,9 +204,11 @@ void MQTT_client_Instance::QueryResponse(QObject *p, const QString &c, int id, Q
 				QTextIStream is(&s); // extract the values
 				//
 				is >> MqttItems;	  // how many MQTT items there are in the RTU or PLC
-				is >> Cfg.SampleTime; // how long we sample for in milliseconds
 				is >> Cfg.MqttBrokerHostName;    // MQTT broker host name
 				is >> Cfg.SubscribeTopicName;    // subscribe topic name
+				is >> Cfg.UserName;
+				is >> Cfg.Password;
+				is >> Cfg.Port;
 								
 				Countdown = 1;
 
@@ -217,13 +219,7 @@ void MQTT_client_Instance::QueryResponse(QObject *p, const QString &c, int id, Q
 				}
 
 				Values = new Track[MqttItems+1];
-				//
-				if(InTest())
-				{
-					Cfg.SampleTime = 1000; // override sampling period
-				};
-				//
-
+				
 				//Start MQTT client driver
 				if(!Connect())
 				{

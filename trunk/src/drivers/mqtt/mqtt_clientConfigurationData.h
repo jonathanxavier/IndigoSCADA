@@ -22,9 +22,11 @@ class MQTT_clientConfigurationData : public QDialog
 	protected:
 	QLabel *Name;
 	QSpinBox *NItems;
-	QSpinBox *PollInterval;
 	QLineEdit *MqttBrokerHostNameText;
 	QLineEdit *SubscribeTopicNameText;
+	QLineEdit *UserNameText;
+	QLineEdit *PasswordText;
+	QLineEdit *PortText;
 };
 #endif // MQTT_clientConfigurationData_included
 

@@ -102,7 +102,7 @@ typedef struct MQTTCtx {
     MqttTopic topics[1], *topic;
     MqttPublish publish;
 	/////////for dump of topics name
-	byte dump_mode;
+	byte dump_mode;//apa added at Enscada.com
 	////////////////////////////////
 	void *parent_class;//apa added at Enscada.com
 } MQTTCtx;

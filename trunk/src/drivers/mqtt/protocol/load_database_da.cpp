@@ -175,7 +175,7 @@ int MQTT_client_imp::AddItems()
 	#endif
 
 	strcat(db_name, "\\project\\");
-	strcat(db_name, ServerIPAddress);
+	strcat(db_name, BrokerHostName);
 	strcat(db_name, ".db");
 
 	rc = sqlite3_open(db_name, &db);
@@ -288,7 +288,7 @@ int MQTT_client_imp::AddItems()
 	return(0);
 }
 
-void MQTT_client_imp::CreateSqlConfigurationFile(char* sql_file_name, char* opc_path)
+void MQTT_client_imp::CreateSqlConfigurationFile(char* sql_file_name)
 {
 	//Subcribe to MQTT broker for available Topics
 

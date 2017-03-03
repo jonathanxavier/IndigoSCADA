@@ -50,6 +50,9 @@ Inherited( parent, name ),Receipe(receipe)
 		NItems->setEnabled(false);
 		MqttBrokerHostNameText->setEnabled(false);
 		SubscribeTopicNameText->setEnabled(false);
+		UserNameText->setEnabled(false);
+		PasswordText->setEnabled(false);
+		PortText->setEnabled(false);
 	};
 }
 MQTT_clientConfiguration::~MQTT_clientConfiguration()
@@ -70,9 +73,11 @@ void MQTT_clientConfiguration::OkClicked()
 	//
 	cmd = "insert into PROPS values('"+Name->text() +"','" + Receipe + "','" + 
 	NItems->text() + 
-	" " + PollInterval->text() + 
 	" " + MqttBrokerHostNameText->text() + 
 	" " + SubscribeTopicNameText->text() +
+	" " + UserNameText->text() +
+	" " + PasswordText->text() +
+	" " + PortText->text() +
 	"');";
 
 	GetConfigureDb()->DoExec(0,cmd,0);
@@ -103,12 +108,16 @@ void MQTT_clientConfiguration::QueryResponse (QObject *p, const QString &c, int 
 				int n;
 				is >> n;
 				NItems->setValue(n);
-				is >> n;
-				PollInterval->setValue(n);
 				is >> t;
 				MqttBrokerHostNameText->setText(t);
 				is >> t;
 				SubscribeTopicNameText->setText(t);
+				is >> t;
+				UserNameText->setText(t);
+				is >> t;
+				PasswordText->setText(t);
+				is >> t;
+				PortText->setText(t);
 			}
 			else
 			{
@@ -118,9 +127,11 @@ void MQTT_clientConfiguration::QueryResponse (QObject *p, const QString &c, int 
 				cmd = "insert into PROPS values('"+Name->text()+"','(default)','');"; // create default
 				GetConfigureDb()->DoExec(0,cmd,0);
 				NItems->setValue(8);
-				PollInterval->setValue(1000);
 				MqttBrokerHostNameText->setText("");
 				SubscribeTopicNameText->setText("");
+				UserNameText->setText("");
+				PasswordText->setText("");
+				PortText->setText("");
 			}
 		} 
 		break;

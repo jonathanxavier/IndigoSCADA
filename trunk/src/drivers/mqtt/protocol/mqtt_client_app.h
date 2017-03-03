@@ -62,7 +62,7 @@ struct subs_args{
 class MQTT_client_imp
 {
 	public:
-	 MQTT_client_imp(char* opc_server_address, char* line_number);
+	 MQTT_client_imp(char* broker_host_name, char* line_number);
 	~MQTT_client_imp();
 
 	 DWORD g_dwUpdateRate;
@@ -74,14 +74,11 @@ class MQTT_client_imp
 
 	 static bool fExit;
 	 int opc_client_state_variable;
-	 time_t timer_starts_at_epoch;
 	 static double dead_band_percent;
-	 char ServerIPAddress[80];
+	 char BrokerHostName[80];
 
 	 static struct structItem* Item; //MQTT client topics vector, indexed from 0
 	 struct structItem* Config_db;
-	 int local_server;
-	 char opc_server_prog_id[100];
 	 /////////////Middleware///////////////////////////////
 	 u_int n_msg_sent_monitor_dir;
 	 u_int n_msg_sent_control_dir;
@@ -98,17 +95,16 @@ class MQTT_client_imp
 	 struct subs_args arg;
 	 //////////////////////////////////////////////////////
 
-	 int MQTTStart(char* SubscribeTopicName);
+	 int MQTTStart(char* SubscribeTopicName, char*UserName, char* Password, int Port, char* ClientID);
 	 int MQTTStop();
 	 int AddItems();
-	 int Async2Update();
-	 static signed __int64 epoch_from_FILETIME(const FILETIME *fileTime);
+	 int Update();
 	 static void get_utc_host_time(struct cp56time2a* time);
 	 time_t epoch_from_cp56time2a(const struct cp56time2a* time);
 	 static void epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch_in_millisec);
 	 static short rescale_value(double V, double Vmin, double Vmax, int* error);
 	 double rescale_value_inv(double A, double Vmin, double Vmax, int* error);
-	 void CreateSqlConfigurationFile(char* sql_file_name, char* opc_path);
+	 void CreateSqlConfigurationFile(char* sql_file_name);
 	 void check_for_commands(struct iec_item *item);
 };
 

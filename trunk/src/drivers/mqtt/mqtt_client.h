@@ -38,18 +38,22 @@ class MQTT_client_Instance;
 struct InstanceCfg // friend to anyone
 {
 	QString MqttBrokerHostName;   
-	QString SubscribeTopicName;  
-	
-	unsigned SampleTime; // sampling time 
+	QString SubscribeTopicName;
+	QString UserName;
+	QString Password;
+	QString Port;
 
 	InstanceCfg() : 
-	MqttBrokerHostName(""),SampleTime(1000),SubscribeTopicName("")
+	MqttBrokerHostName(""),SubscribeTopicName(""),
+	UserName(""), Password(""), Port("")
 	{
 	};
 
 	InstanceCfg(const InstanceCfg &m) : 
-	MqttBrokerHostName(m.MqttBrokerHostName),SampleTime(m.SampleTime),
-	SubscribeTopicName(m.SubscribeTopicName)
+
+	MqttBrokerHostName(m.MqttBrokerHostName),
+	SubscribeTopicName(m.SubscribeTopicName),UserName(m.UserName),
+	Password(m.Password),Port(m.Port)
 	{
 	};
 };

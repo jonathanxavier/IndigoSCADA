@@ -110,11 +110,110 @@ MQTT_clientConfigurationData::MQTT_clientConfigurationData(QWidget *parent, cons
 	qtarch_Label_22->setText( tr( "Subscribe topic name" ) );
 	qtarch_Label_22->setAlignment( AlignLeft|AlignVCenter|ExpandTabs );
 	qtarch_Label_22->setMargin( 0 );
+
+	UserNameText = new QLineEdit(this, "LineEdit_9");
+	UserNameText->setGeometry(200, 120, 250, 30);
+	UserNameText->setMinimumSize(0, 0);
+	UserNameText->setMaximumSize(32767, 32767);
+	UserNameText->setFocusPolicy(QWidget::StrongFocus);
+	UserNameText->setBackgroundMode(QWidget::PaletteBase);
+#if QT_VERSION < 300
+	UserNameText->setFontPropagation(QWidget::SameFont);
+	UserNameText->setPalettePropagation(QWidget::SameFont);
+	#endif
+	UserNameText->setText( tr( "" ) );
+	UserNameText->setMaxLength( 100 );
+	UserNameText->setFrame( QLineEdit::Normal );
+	UserNameText->setFrame( TRUE );
+	UserNameText->setAlignment( AlignLeft );
+	QLabel *qtarch_Label_23 = new QLabel(this, "Label_23");
+	qtarch_Label_23->setGeometry(10, 120, 150, 30);
+	qtarch_Label_23->setMinimumSize(0, 0);
+	qtarch_Label_23->setMaximumSize(32767, 32767);
+	qtarch_Label_23->setFocusPolicy(QWidget::NoFocus);
+	qtarch_Label_23->setBackgroundMode(QWidget::PaletteBackground);
+	#if QT_VERSION < 300
+	qtarch_Label_23->setFontPropagation(QWidget::SameFont);
+	qtarch_Label_23->setPalettePropagation(QWidget::SameFont);
+	#endif
+	qtarch_Label_23->setFrameStyle( 0 );
+	qtarch_Label_23->setLineWidth( 1 );
+	qtarch_Label_23->setMidLineWidth( 0 );
+	qtarch_Label_23->QFrame::setMargin( 0 );
+	qtarch_Label_23->setText( tr( "User name" ) );
+	qtarch_Label_23->setAlignment( AlignLeft|AlignVCenter|ExpandTabs );
+	qtarch_Label_23->setMargin( 0 );
+
+	PasswordText = new QLineEdit(this, "LineEdit_10");
+	PasswordText->setGeometry(200, 160, 250, 30);
+	PasswordText->setMinimumSize(0, 0);
+	PasswordText->setMaximumSize(32767, 32767);
+	PasswordText->setFocusPolicy(QWidget::StrongFocus);
+	PasswordText->setBackgroundMode(QWidget::PaletteBase);
+#if QT_VERSION < 300
+	PasswordText->setFontPropagation(QWidget::SameFont);
+	PasswordText->setPalettePropagation(QWidget::SameFont);
+	#endif
+	PasswordText->setText( tr( "" ) );
+	PasswordText->setMaxLength( 100 );
+	PasswordText->setFrame( QLineEdit::Normal );
+	PasswordText->setFrame( TRUE );
+	PasswordText->setAlignment( AlignLeft );
+	QLabel *qtarch_Label_24 = new QLabel(this, "Label_24");
+	qtarch_Label_24->setGeometry(10, 160, 150, 30);
+	qtarch_Label_24->setMinimumSize(0, 0);
+	qtarch_Label_24->setMaximumSize(32767, 32767);
+	qtarch_Label_24->setFocusPolicy(QWidget::NoFocus);
+	qtarch_Label_24->setBackgroundMode(QWidget::PaletteBackground);
+	#if QT_VERSION < 300
+	qtarch_Label_24->setFontPropagation(QWidget::SameFont);
+	qtarch_Label_24->setPalettePropagation(QWidget::SameFont);
+	#endif
+	qtarch_Label_24->setFrameStyle( 0 );
+	qtarch_Label_24->setLineWidth( 1 );
+	qtarch_Label_24->setMidLineWidth( 0 );
+	qtarch_Label_24->QFrame::setMargin( 0 );
+	qtarch_Label_24->setText( tr( "Password" ) );
+	qtarch_Label_24->setAlignment( AlignLeft|AlignVCenter|ExpandTabs );
+	qtarch_Label_24->setMargin( 0 );
+
+	PortText = new QLineEdit(this, "LineEdit_11");
+	PortText->setGeometry(200, 200, 250, 30);
+	PortText->setMinimumSize(0, 0);
+	PortText->setMaximumSize(32767, 32767);
+	PortText->setFocusPolicy(QWidget::StrongFocus);
+	PortText->setBackgroundMode(QWidget::PaletteBase);
+#if QT_VERSION < 300
+	PortText->setFontPropagation(QWidget::SameFont);
+	PortText->setPalettePropagation(QWidget::SameFont);
+	#endif
+	PortText->setText( tr( "" ) );
+	PortText->setMaxLength( 100 );
+	PortText->setFrame( QLineEdit::Normal );
+	PortText->setFrame( TRUE );
+	PortText->setAlignment( AlignLeft );
+	QLabel *qtarch_Label_25 = new QLabel(this, "Label_25");
+	qtarch_Label_25->setGeometry(10, 200, 150, 30);
+	qtarch_Label_25->setMinimumSize(0, 0);
+	qtarch_Label_25->setMaximumSize(32767, 32767);
+	qtarch_Label_25->setFocusPolicy(QWidget::NoFocus);
+	qtarch_Label_25->setBackgroundMode(QWidget::PaletteBackground);
+	#if QT_VERSION < 300
+	qtarch_Label_25->setFontPropagation(QWidget::SameFont);
+	qtarch_Label_25->setPalettePropagation(QWidget::SameFont);
+	#endif
+	qtarch_Label_25->setFrameStyle( 0 );
+	qtarch_Label_25->setLineWidth( 1 );
+	qtarch_Label_25->setMidLineWidth( 0 );
+	qtarch_Label_25->QFrame::setMargin( 0 );
+	qtarch_Label_25->setText( tr( "Port" ) );
+	qtarch_Label_25->setAlignment( AlignLeft|AlignVCenter|ExpandTabs );
+	qtarch_Label_25->setMargin( 0 );
 /////////////////////////////////////////////////////////////////////////
 	
 /////////////////////////////////////////////////////////////////////////
 	QLabel *qtarch_Label_10 = new QLabel(this, "Label_10");
-	qtarch_Label_10->setGeometry(10, 160, 100, 30);
+	qtarch_Label_10->setGeometry(10, 240, 100, 30);
 	qtarch_Label_10->setMinimumSize(0, 0);
 	qtarch_Label_10->setMaximumSize(32767, 32767);
 	qtarch_Label_10->setFocusPolicy(QWidget::NoFocus);
@@ -132,7 +231,7 @@ MQTT_clientConfigurationData::MQTT_clientConfigurationData(QWidget *parent, cons
 	qtarch_Label_10->setMargin( 0 );
 
 	NItems = new QSpinBox(this, "SpinBox_3");
-	NItems->setGeometry(200, 160, 100, 30);
+	NItems->setGeometry(200, 240, 100, 30);
 	NItems->setMinimumSize(0, 0);
 	NItems->setMaximumSize(32767, 32767);
 	NItems->setFocusPolicy(QWidget::StrongFocus);
@@ -151,51 +250,11 @@ MQTT_clientConfigurationData::MQTT_clientConfigurationData(QWidget *parent, cons
 	NItems->setSuffix( "" );
 	NItems->setSpecialValueText( "" );
 	NItems->setWrapping( FALSE );
-///////////////////////////////////////////////////////////////////////////
 	
-	QLabel *qtarch_Label_11 = new QLabel(this, "Label_11");
-	qtarch_Label_11->setGeometry(10, 200, 200, 30);
-	qtarch_Label_11->setMinimumSize(0, 0);
-	qtarch_Label_11->setMaximumSize(32767, 32767);
-	qtarch_Label_11->setFocusPolicy(QWidget::NoFocus);
-	qtarch_Label_11->setBackgroundMode(QWidget::PaletteBackground);
-	#if QT_VERSION < 300
-	qtarch_Label_11->setFontPropagation(QWidget::SameFont);
-	qtarch_Label_11->setPalettePropagation(QWidget::SameFont);
-	#endif
-	qtarch_Label_11->setFrameStyle( 0 );
-	qtarch_Label_11->setLineWidth( 1 );
-	qtarch_Label_11->setMidLineWidth( 0 );
-	qtarch_Label_11->QFrame::setMargin( 0 );
-	qtarch_Label_11->setText( tr( "Update Interval (ms)" ) );
-	qtarch_Label_11->setAlignment( AlignLeft|AlignVCenter|ExpandTabs );
-	qtarch_Label_11->setMargin( 0 );
-
-	PollInterval = new QSpinBox(this, "SpinBox_4");
-	PollInterval->setGeometry(200, 200, 80, 30);
-	PollInterval->setMinimumSize(0, 0);
-	PollInterval->setMaximumSize(32767, 32767);
-	PollInterval->setFocusPolicy(QWidget::StrongFocus);
-	PollInterval->setBackgroundMode(QWidget::PaletteBackground);
-	#if QT_VERSION < 300
-	PollInterval->setFontPropagation(QWidget::SameFont);
-	PollInterval->setPalettePropagation(QWidget::SameFont);
-	PollInterval->setFrameStyle( 50 );
-	PollInterval->setLineWidth( 2 );
-	PollInterval->setMidLineWidth( 0 );
-	PollInterval->QFrame::setMargin( 0 );
-	#endif
-	PollInterval->setRange( 0, 60000 );
-	PollInterval->setSteps( 100, 0 );
-	PollInterval->setPrefix( "" );
-	PollInterval->setSuffix( "" );
-	PollInterval->setSpecialValueText( "" );
-	PollInterval->setWrapping( TRUE );
-/////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////
 
 	QPushButton *qtarch_PushButton_1 = new QPushButton(this, "PushButton_1");
-	qtarch_PushButton_1->setGeometry(20, 240, 100, 30);
+	qtarch_PushButton_1->setGeometry(20, 280, 100, 30);
 	qtarch_PushButton_1->setMinimumSize(0, 0);
 	qtarch_PushButton_1->setMaximumSize(32767, 32767);
 	qtarch_PushButton_1->setFocusPolicy(QWidget::TabFocus);
@@ -213,7 +272,7 @@ MQTT_clientConfigurationData::MQTT_clientConfigurationData(QWidget *parent, cons
 	qtarch_PushButton_1->setIsMenuButton( FALSE );
 	connect(qtarch_PushButton_1, SIGNAL(clicked()), SLOT(OkClicked()));
 	QPushButton *qtarch_PushButton_2 = new QPushButton(this, "PushButton_2");
-	qtarch_PushButton_2->setGeometry(210, 240, 100, 30);
+	qtarch_PushButton_2->setGeometry(210, 280, 100, 30);
 	qtarch_PushButton_2->setMinimumSize(0, 0);
 	qtarch_PushButton_2->setMaximumSize(32767, 32767);
 	qtarch_PushButton_2->setFocusPolicy(QWidget::TabFocus);
@@ -231,7 +290,7 @@ MQTT_clientConfigurationData::MQTT_clientConfigurationData(QWidget *parent, cons
 	qtarch_PushButton_2->setIsMenuButton( FALSE );
 	connect(qtarch_PushButton_2, SIGNAL(clicked()), SLOT(Help()));
 	QPushButton *qtarch_PushButton_3 = new QPushButton(this, "PushButton_3");
-	qtarch_PushButton_3->setGeometry(360, 240, 100, 30);
+	qtarch_PushButton_3->setGeometry(360, 280, 100, 30);
 	qtarch_PushButton_3->setMinimumSize(0, 0);
 	qtarch_PushButton_3->setMaximumSize(32767, 32767);
 	qtarch_PushButton_3->setFocusPolicy(QWidget::TabFocus);
@@ -249,7 +308,7 @@ MQTT_clientConfigurationData::MQTT_clientConfigurationData(QWidget *parent, cons
 	qtarch_PushButton_3->setIsMenuButton( FALSE );
 	connect(qtarch_PushButton_3, SIGNAL(clicked()), SLOT(reject()));
 
-	resize(480,290);
+	resize(480,330);
 	setMinimumSize(0, 0);
 	setMaximumSize(32767, 32767);
 }

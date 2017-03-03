@@ -65,7 +65,8 @@ void PipeWorker(void* pParam);
 char *optarg;
 
 #define RUNTIME_USAGE "Run time usage: %s -a broker_host_name\
- -p subscribe_topic_name -l line_number -e config_itemids.sql\n"
+ -p subscribe_topic_name -q user_name -r password\
+ -l line_number -e config_itemids.sql -t port\n"
 
 void usage(char** argv)
 {
@@ -79,14 +80,17 @@ int main(int argc, char **argv)
 	int c;
 	char OPCServerAddress[80];
 	char SubscribeTopicName[80];
-	
+	char UserName[80];
+	char Password[80];
+	int Port;
+	char ClientID[80];
+
 	DWORD len;
 	char OldConsoleTitle[500];
 	char NewConsoleTitle[500];
 	char line_number[80];
 	char sqlFileName[80];
-	char structurePath[MAX_PATH];
-		
+			
 	IT_IT("main MQTT CLIENT");
 
 	//version control///////////////////////////////////////////////////////////////
@@ -98,13 +102,16 @@ int main(int argc, char **argv)
 
 	OPCServerAddress[0] = '\0';
 	SubscribeTopicName[0] = '\0';
+	UserName[0] = '\0';
+	Password[0] = '\0';
+	Port = 0;
+	ClientID[0] = '\0';
 	OldConsoleTitle[0] = '\0';
 	NewConsoleTitle[0] = '\0';
 	sqlFileName[0] = '\0';
-	structurePath[0] = '\0';
 	line_number[0] = '\0';
 
-	while( ( c = getopt ( argc, argv, "a:e:p:l:s:?" )) != EOF ) {
+	while( ( c = getopt ( argc, argv, "a:e:p:l:s:q:r:t:?" )) != EOF ) {
 		switch ( c ) {
 			case 'a' :
 				strcpy(OPCServerAddress, optarg);
@@ -124,8 +131,20 @@ int main(int argc, char **argv)
 				strcat(NewConsoleTitle, optarg);
 				strcat(NewConsoleTitle, "   ");
 			break;
-			case 's' :
-				strcpy(structurePath, optarg);
+			case 'q' :
+				strcpy(UserName, optarg);
+				strcat(NewConsoleTitle, optarg);
+				strcat(NewConsoleTitle, "   ");
+			break;
+			case 'r' :
+				strcpy(Password, optarg);
+				strcat(NewConsoleTitle, optarg);
+				strcat(NewConsoleTitle, "   ");
+			break;
+			case 't' :
+				Port = atoi(optarg);
+				strcat(NewConsoleTitle, optarg);
+				strcat(NewConsoleTitle, "   ");
 			break;
 			case '?' :
 				fprintf(stderr, RUNTIME_USAGE, argv[0]);
@@ -183,8 +202,11 @@ int main(int argc, char **argv)
 	//Alloc MQTT client class and start
 	MQTT_client_imp* po = new MQTT_client_imp(OPCServerAddress, line_number);
 
+	strcpy(ClientID, "IndigoSCADAMQTTClient");
+	strcat(ClientID, line_number);
+
 	// connect to a MQTT broker
-	int nRet = po->MQTTStart(SubscribeTopicName);
+	int nRet = po->MQTTStart(SubscribeTopicName, UserName, Password, Port, ClientID);
 	
 	if(nRet)
 	{
@@ -196,7 +218,7 @@ int main(int argc, char **argv)
 	if(strlen(sqlFileName) > 0)
 	{
 		po->mqttCtx.dump_mode = 1;
-		po->CreateSqlConfigurationFile(sqlFileName, structurePath);
+		po->CreateSqlConfigurationFile(sqlFileName);
 	}
 	else
 	{
@@ -212,7 +234,7 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 
-	po->Async2Update();
+	po->Update();
 
 	po->MQTTStop();
 
