@@ -27,27 +27,26 @@ void MQTT_client_DriverThread::run()
 
     ///////////////////start child process mqtt_client.exe////////////////////
 	char line_number[50];
-	char polling_time[50];
-
+	
 	strcpy(pipe_name, "\\\\.\\pipe\\mqtt_client_namedpipe");
 
 	itoa(instanceID + 1, line_number, 10);
 
     strcat(pipe_name, line_number);
 
-	itoa(((MQTT_client_Instance*)Parent)->Cfg.SampleTime, polling_time, 10);
-
 	strcpy(pCommandLine, GetScadaHomeDirectory());
 	strcat(pCommandLine, "\\bin\\mqtt_client.exe -a ");
 	strcat(pCommandLine, ((MQTT_client_Instance*)Parent)->Cfg.MqttBrokerHostName);
 	strcat(pCommandLine, " -p ");
 	strcat(pCommandLine, ((MQTT_client_Instance*)Parent)->Cfg.SubscribeTopicName);
-	//strcat(pCommandLine, " -q ");
-	//strcat(pCommandLine, ((MQTT_client_Instance*)Parent)->Cfg.OpcclassId);
+	strcat(pCommandLine, " -q ");
+	strcat(pCommandLine, ((MQTT_client_Instance*)Parent)->Cfg.UserName);
+	strcat(pCommandLine, " -r ");
+	strcat(pCommandLine, ((MQTT_client_Instance*)Parent)->Cfg.Password);
 	strcat(pCommandLine, " -l ");
 	strcat(pCommandLine, line_number);
-	//strcat(pCommandLine, " -t ");
-	//strcat(pCommandLine, polling_time);
+	strcat(pCommandLine, " -t ");
+	strcat(pCommandLine, ((MQTT_client_Instance*)Parent)->Cfg.Port);
 		
 	strcpy(pWorkingDir, GetScadaHomeDirectory());
 	strcat(pWorkingDir,"\\bin");

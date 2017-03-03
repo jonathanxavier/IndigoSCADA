@@ -57,22 +57,18 @@ RIPCQueue*  MQTT_client_imp::queue_monitor_dir = NULL;
 
 static u_int n_msg_sent = 0;
 
-MQTT_client_imp::MQTT_client_imp(char* opc_server_address, char* line_number)
+MQTT_client_imp::MQTT_client_imp(char* broker_host_name, char* line_number)
 { 
 	IT_IT("MQTT_client_imp::MQTT_client_imp");
 
-	strcpy(ServerIPAddress, opc_server_address);
+	strcpy(BrokerHostName, broker_host_name);
 
 	Config_db = NULL;
-	timer_starts_at_epoch = 0;
-	local_server = 0;
 	g_dwNumItems = 0;
 	g_dwUpdateRate = 60000; //in milliseconds
 	nThreads = 1;
 
 	dump = NULL;
-	opc_server_prog_id[0] = '\0';
-	
 	/////////////////////Middleware/////////////////////////////////////////////////////////////////
 
     factory1 = NULL;
@@ -137,9 +133,9 @@ MQTT_client_imp::~MQTT_client_imp()
 	IT_EXIT;
 }
 
-int MQTT_client_imp::Async2Update()
+int MQTT_client_imp::Update()
 {
-	IT_IT("MQTT_client_imp::Async2Update");
+	IT_IT("MQTT_client_imp::Update");
 	
 	int rc = 0;
 	
@@ -198,16 +194,20 @@ int MQTT_client_imp::Async2Update()
 	return 0;
 }
 
-int MQTT_client_imp::MQTTStart(char* SubscribeTopicName)
+int MQTT_client_imp::MQTTStart(char* SubscribeTopicName, char*UserName, char* Password, int Port, char* ClientID)
 {
 	IT_IT("MQTT_client_imp::MQTTStart");
 
     /* init defaults */
     mqtt_init_ctx(&mqttCtx);
     mqttCtx.app_name = "mqttclient";
-	mqttCtx.host = ServerIPAddress;
+	mqttCtx.host = BrokerHostName;
 	mqttCtx.topic_name = SubscribeTopicName;
 	mqttCtx.dump_mode = 0;
+	mqttCtx.username = UserName;
+	mqttCtx.password = Password;
+	mqttCtx.port = Port;
+	mqttCtx.client_id = ClientID;
 
 	IT_EXIT;
     return(0);
@@ -317,69 +317,6 @@ void MQTT_client_imp::epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch
 
 	IT_EXIT;
     return;
-}
-
-//The FILETIME structure is a 64-bit value representing the number 
-//of 100-nanosecond intervals since January 1, 1601.
-//
-//epoch_in_millisec is a 64-bit value representing the number of milliseconds 
-//elapsed since January 1, 1970
-
-signed __int64 MQTT_client_imp::epoch_from_FILETIME(const FILETIME *fileTime)
-{
-	IT_IT("epoch_from_FILETIME");
-	
-	FILETIME localTime;
-	struct tm	t;
-
-	time_t sec;
-	signed __int64 epoch_in_millisec;
-
-	if(fileTime == NULL)
-	{
-		IT_EXIT;
-		return 0;
-	}
-	
-	// first convert file time (UTC time) to local time
-	if (!FileTimeToLocalFileTime(fileTime, &localTime))
-	{
-		IT_EXIT;
-		return 0;
-	}
-
-	// then convert that time to system time
-	SYSTEMTIME sysTime;
-	if (!FileTimeToSystemTime(&localTime, &sysTime))
-	{
-		IT_EXIT;
-		return 0;
-	}
-	
-	memset(&t, 0x00, sizeof(struct tm));
-	
-	t.tm_hour = sysTime.wHour;
-	t.tm_min = sysTime.wMinute;
-	t.tm_sec = sysTime.wSecond;
-	t.tm_mday = sysTime.wDay;
-	t.tm_mon = sysTime.wMonth - 1;
-	t.tm_year = sysTime.wYear - 1900; //tm_year contains years after 1900
-	t.tm_isdst = -1; //to force mktime to check for dst
-	
-	sec = mktime(&t);
-
-	if(sec < 0)
-	{
-		IT_EXIT;
-		return 0;
-	}
-
-	epoch_in_millisec =  (signed __int64)sec;
-
-	epoch_in_millisec =  epoch_in_millisec*1000 + sysTime.wMilliseconds;
-
-	IT_EXIT;
-	return epoch_in_millisec;
 }
 
 #define _EPSILON_ ((double)(2.220446E-16))
@@ -1253,7 +1190,7 @@ void mqtt_init_ctx(MQTTCtx* mqttCtx)
 	mqttCtx->qos = DEFAULT_MQTT_QOS;
     mqttCtx->clean_session = 1;
     mqttCtx->keep_alive_sec = DEFAULT_KEEP_ALIVE_SEC;
-    mqttCtx->client_id = DEFAULT_CLIENT_ID;
+    //mqttCtx->client_id = DEFAULT_CLIENT_ID;
     //mqttCtx->topic_name = DEFAULT_TOPIC_NAME;
     mqttCtx->cmd_timeout_ms = DEFAULT_CMD_TIMEOUT_MS;
 }
