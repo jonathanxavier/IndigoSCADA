@@ -526,6 +526,26 @@ void Opc_client_da_imp::CreateSqlConfigurationFile(char* sql_file_name, char* op
 
 	USES_CONVERSION;
 
+	///////////////////////////ChangeBrowsePosition/////////////////////////////////////
+	if(strlen(opc_path) > 0)
+	{
+		WCHAR structure_level[MAX_PATH];
+
+		wcscpy(structure_level, T2W(opc_path));
+
+		hr = g_pIOPCBrowse->ChangeBrowsePosition(OPC_BROWSE_TO, structure_level);
+
+		if(FAILED(hr))
+		{
+			LogMessage(hr, _T("ChangeBrowsePosition()"));
+			fprintf(stderr,"Error ChangeBrowsePosition to %s\n", opc_path);
+			fflush(stderr);
+			IT_EXIT;
+			return;
+		}
+	}
+	////////////////////////////////end///////////////////////////////////////////////
+
 	hr = g_pIOPCBrowse->BrowseOPCItemIDs(OPC_FLAT, L""/*NULL*/, VT_EMPTY, 0, &pEnumString);
 
 	if(FAILED(hr))
@@ -538,6 +558,7 @@ void Opc_client_da_imp::CreateSqlConfigurationFile(char* sql_file_name, char* op
 	if(hr == S_OK)
 	{
 		LPOLESTR pszName = NULL;
+		LPOLESTR pszItemID = NULL;
 		ULONG count = 0;
 		char buf[256];
 		ULONG nCount = 0;
@@ -569,11 +590,28 @@ void Opc_client_da_imp::CreateSqlConfigurationFile(char* sql_file_name, char* op
 		{
 			//printf(_T("%s\n"), OLE2T(pszName));
 			//strcpy(buf, OLE2T(pszName)); Do NOT use OLE2T
+			
+			///////////////////////////ChangeBrowsePosition/////////////////////////////////////
+			if(strlen(opc_path) > 0)
+			{
+				hr = g_pIOPCBrowse->GetItemID(pszName, &pszItemID);
 
-			sprintf(buf, "%ls", pszName);
+				if(FAILED(hr))
+				{
+					LogMessage(hr, _T("GetItemID()"));
+					IT_EXIT;
+					return;
+				}
+
+				sprintf(buf, "%ls", pszItemID);
+			}
+			else
+			{
+				sprintf(buf, "%ls", pszName);
+			}
 
 			strcpy(Item[nTestItem].spname, buf);
-
+			
 			//wcscpy(Item[nTestItem].wszName, T2W(buf));
 
 			#define customA2W(lpa) (((_lpa = lpa) == NULL) ? NULL : (_convert = (lstrlenA(_lpa)+1), ATLA2WHELPER((LPWSTR) malloc(_convert*2), _lpa, _convert)))
