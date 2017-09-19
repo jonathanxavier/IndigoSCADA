@@ -65,7 +65,8 @@ void PipeWorker(void* pParam);
 char *optarg;
 
 #define RUNTIME_USAGE "Run time usage: %s -a server_IP_address -d percent_dead_band\
- -p OPCServerProgID -q CLSID -l line_number -t polling_time_in_ms -e config_itemids.sql\n"
+ -p OPCServerProgID -q CLSID -l line_number -t polling_time_in_ms -e config_itemids.sql\
+ -s opc_path\n"
 
 void usage(char** argv)
 {
