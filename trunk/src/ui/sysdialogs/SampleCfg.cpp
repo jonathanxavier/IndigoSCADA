@@ -217,6 +217,7 @@ void SampleCfg::Delete ()
 		//
 		cmd ="drop table " + Name->text () + ";";
 		GetResultDb ()->DoExec (0,cmd,0);
+		GetHistoricResultDb()->DoExec (0,cmd,0);
 
 		if(pCfgDriver)
 		{
