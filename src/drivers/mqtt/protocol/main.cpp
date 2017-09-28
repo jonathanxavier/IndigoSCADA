@@ -78,7 +78,7 @@ int main(int argc, char **argv)
 {
 	char version[100];
 	int c;
-	char OPCServerAddress[80];
+	char BrokerAddress[80];
 	char SubscribeTopicName[80];
 	char UserName[80];
 	char Password[80];
@@ -100,7 +100,7 @@ int main(int argc, char **argv)
 	IT_COMMENT(version);
 	////////////////////////////////////////////////////////////////////////////////
 
-	OPCServerAddress[0] = '\0';
+	BrokerAddress[0] = '\0';
 	SubscribeTopicName[0] = '\0';
 	UserName[0] = '\0';
 	Password[0] = '\0';
@@ -114,7 +114,7 @@ int main(int argc, char **argv)
 	while( ( c = getopt ( argc, argv, "a:e:p:l:s:q:r:t:?" )) != EOF ) {
 		switch ( c ) {
 			case 'a' :
-				strcpy(OPCServerAddress, optarg);
+				strcpy(BrokerAddress, optarg);
 				strcat(NewConsoleTitle, optarg);
 				strcat(NewConsoleTitle, "   ");
 			break;
@@ -161,7 +161,7 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
     }
 
-	if(strlen(OPCServerAddress) == 0)
+	if(strlen(BrokerAddress) == 0)
 	{
 		fprintf(stderr,"MQTT broker IP address not known\n");
 		fflush(stderr);
@@ -200,7 +200,7 @@ int main(int argc, char **argv)
 	/////////////////end keep alive////////////////////////////////////////////////
 	
 	//Alloc MQTT client class and start
-	MQTT_client_imp* po = new MQTT_client_imp(OPCServerAddress, line_number);
+	MQTT_client_imp* po = new MQTT_client_imp(BrokerAddress, line_number);
 
 	strcpy(ClientID, "IndigoSCADAMQTTClient");
 	strcat(ClientID, line_number);
@@ -238,10 +238,10 @@ int main(int argc, char **argv)
 
 	po->MQTTStop();
 
-	if(po)
-	{
-		delete po;
-	}
+	//if(po)
+	//{
+		//delete po;
+	//}
 
 	IT_EXIT;
 	return EXIT_SUCCESS;
