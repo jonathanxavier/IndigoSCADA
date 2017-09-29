@@ -367,7 +367,7 @@ void UserFrameWork::Logout()
 */
 
 static HMIDict	hmi_database;
-#define MAX_HMI_WINDOWS 10
+#define MAP_FILE_EXT		"ui"
 
 void UserFrameWork::SetTabs()
 {
@@ -395,17 +395,61 @@ void UserFrameWork::SetTabs()
 		strcpy(library_path, (const char*)GetScadaHomeDirectory());
 		strcat(library_path,"\\plugins");
 		QApplication::addLibraryPath(library_path); //apa+++ 21-07-2012 So we can load qwtplugin.dll from directory C:\scada\plugins\designer
-		
-		int n = MAX_HMI_WINDOWS;
+				
 		QString hmi_index;
-		HMI_manager     *hmi_mng;
 		
-		for(int i = 0; i < n; i++)
+		///////////////find .ui files//////////////////////
+		char buffer01[_MAX_PATH];
+		char buffer02[_MAX_PATH];
+		HANDLE HRicerca;
+		WIN32_FIND_DATA DescrittoreF;
+		char file_ext[50];
+		int rt;
+
+		strcpy(buffer01, (const char*)GetScadaHomeDirectory());
+		strcat(buffer01, "\\project\\*.*");
+		
+		HRicerca = FindFirstFile(buffer01, &DescrittoreF);
+
+		if(HRicerca == INVALID_HANDLE_VALUE)
 		{
-			hmi_index = "hmi" + QString::number(i) + ".ui";	
-			HMIDict::value_type pr(hmi_index, new HMI_manager);
-			hmi_database.insert(pr); // put in the dictionary
+			
 		}
+		else
+		{
+			for(; rt = FindNextFile(HRicerca, &DescrittoreF); )
+			{
+				if(rt)
+				{
+					if((DescrittoreF.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
+					{
+						strcpy(buffer02, (const char*)GetScadaHomeDirectory());
+						strcat(buffer02, "\\");
+						strcat(buffer02, DescrittoreF.cFileName);
+
+						char *pdest = strrchr(buffer02, '.');
+
+						if(pdest)
+						{
+							strncpy(file_ext, pdest + 1, 4);
+							file_ext[4] = '\0';
+
+							if(!strcmp(file_ext, MAP_FILE_EXT))
+							{
+								hmi_index = QString(DescrittoreF.cFileName);	
+								HMIDict::value_type pr(hmi_index, new HMI_manager);
+								hmi_database.insert(pr); // put in the dictionary					
+							}
+						}
+					}
+				}
+			}
+
+			FindClose(HRicerca);
+		}
+		///////////////////////////////////////////////////
+				
+		HMI_manager     *hmi_mng;
 						
 		for(HMIDict::iterator it = hmi_database.begin(); !(it == hmi_database.end()); it++)
 		{
