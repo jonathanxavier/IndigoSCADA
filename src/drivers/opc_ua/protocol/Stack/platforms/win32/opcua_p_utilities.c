@@ -22,7 +22,6 @@
 /* System Headers */
 #include <winsock2.h>
 #include "ws2tcpip.h"
-#include "wspiapi.h"
 
 
 /* UA platform definitions */
