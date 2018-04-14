@@ -122,7 +122,7 @@ OpcUa_StatusCode my_Browse(
 	if(OpcUa_IsBad(uStatus))
 	{
 #ifndef NO_DEBUGING_
-		MY_TRACE("\nAuthentication Token ungültig.\n"); 
+		MY_TRACE("\nAuthentication Token invalid.\n"); 
 #endif /*_DEBUGING_*/
 		OpcUa_GotoError;
 	}

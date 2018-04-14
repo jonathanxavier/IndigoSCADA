@@ -87,7 +87,6 @@
 /*********************************************************************************************/
 
 
-
 char * UATESTSERVER_ENDPOINT_URL = "opc.tcp://localhost:4840";
 
 //SESSION DATEN  -----------------------------------------------
@@ -846,7 +845,7 @@ OpcUa_StatusCode my_ActivateSession(
 	if(OpcUa_IsBad(uStatus))
 	{
 #ifndef NO_DEBUGING_
-		MY_TRACE("\nAuthentication Token ungültig.\n"); 
+		MY_TRACE("\nAuthentication Token invalid.\n"); 
 #endif /*_DEBUGING_*/
 		uStatus = OpcUa_BadSecurityChecksFailed;
 		OpcUa_GotoError;
@@ -981,7 +980,7 @@ OpcUa_StatusCode my_CloseSession(
 	if(OpcUa_IsBad(uStatus))
 	{
 #ifndef NO_DEBUGING_
-		MY_TRACE("\nAuthentication Token ungültig.\n"); 
+		MY_TRACE("\nAuthentication Token invalid.\n"); 
 #endif /*_DEBUGING_*/
 		uStatus =OpcUa_BadSecurityChecksFailed;
 		OpcUa_GotoError;
@@ -1311,7 +1310,10 @@ OpcUa_StatusCode check_authentication_token (const OpcUa_RequestHeader* a_pReque
 		uStatus=OpcUa_BadSessionIdInvalid;
 		OpcUa_GotoError
 	}
-	if((a_pRequestHeader->AuthenticationToken.IdentifierType==OpcUa_IdentifierType_Numeric && a_pRequestHeader->AuthenticationToken.NamespaceIndex==0) && (a_pRequestHeader->AuthenticationToken.Identifier.Numeric==12345))
+	
+	if((a_pRequestHeader->AuthenticationToken.IdentifierType==OpcUa_IdentifierType_Numeric && 
+		a_pRequestHeader->AuthenticationToken.NamespaceIndex==0) && 
+		(a_pRequestHeader->AuthenticationToken.Identifier.Numeric==12345))
 	{
 		uStatus=OpcUa_Good;
 	}
@@ -1319,6 +1321,7 @@ OpcUa_StatusCode check_authentication_token (const OpcUa_RequestHeader* a_pReque
 	{
 		uStatus=OpcUa_BadSessionIdInvalid;
 	}
+	
 	return uStatus;
 	OpcUa_BeginErrorHandling;
     

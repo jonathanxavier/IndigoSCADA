@@ -29,7 +29,7 @@
 
 #include "main.h"
 
-extern int Main_Publisher();
+extern int Main_Client();
 
 /*===========================================================================================*/
 /** @brief Main entry function.                                                              */
@@ -46,12 +46,12 @@ int main(int argc, char* argv[])
 	OpcUa_ReferenceParameter(argc);
 	OpcUa_ReferenceParameter(argv);
 
-	Main_Publisher();
+	Main_Client();
 
-#if UACLIENT_WAIT_FOR_USER_INPUT
-	printf("Shutdown complete!\nPress enter to exit!\n");
-	getchar();
-#endif
+//#if UACLIENT_WAIT_FOR_USER_INPUT
+//	printf("Shutdown complete!\nPress enter to exit!\n");
+//	getchar();
+//#endif
 
 	return 0;
 }

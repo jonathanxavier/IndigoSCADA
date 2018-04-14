@@ -42,11 +42,14 @@
 /* standard timeout for connect process */
 #define UACLIENT_TIMEOUT                                OPCUA_INFINITE
 /* URL of the server */
-#define UACLIENT_SERVER_URL                             "opc.tcp://localhost:51210"
+#define UACLIENT_SERVER_URL                             "opc.tcp://localhost:4840"
+//#define UACLIENT_SERVER_URL                             "opc.tcp://localhost:16664"
 /* Transport profile used by the client */
 #define UACLIENT_TRANSPORT_PROFILE_URI                  OpcUa_TransportProfile_UaTcp
 /* the used trace level */
-#define UACLIENT_TRACE_LEVEL                            OPCUA_TRACE_OUTPUT_LEVEL_SYSTEM
+//#define UACLIENT_TRACE_LEVEL                            OPCUA_TRACE_OUTPUT_LEVEL_SYSTEM
+#define UACLIENT_TRACE_LEVEL                            OPCUA_TRACE_OUTPUT_LEVEL_CONTENT
+
 /* whether to wait for user input */
 #define UACLIENT_WAIT_FOR_USER_INPUT                    1
 
@@ -56,7 +59,7 @@
 #define UACLIENT_CERTIFICATE_LOCATION                           "../PKI/certs/Opc.Ua.Publisher [A482BEA2CEC01DCE670A6624A131943D3B1020AC].der"
 #define UACLIENT_PRIVATE_KEY_LOCATION                           "../PKI/private/Opc.Ua.Publisher [A482BEA2CEC01DCE670A6624A131943D3B1020AC].pfx"
 
-#define UACLIENTNAME              "Opc.Ua.Publisher"
+#define UACLIENTNAME              "Opc.Ua.Client"
 #define UACLIENTURI               "urn:localhost:OPCFoundation:AMQPPublisher"
 #define UACLIENT_PRODUCTURI		  "http://opcfoundation.org/UA/Publisher/"
 
@@ -102,10 +105,6 @@
 #define UACLIENT_SECURITY_MODE                      OpcUa_MessageSecurityMode_None
 #endif
 
-/* String containing Hostname, Device Id & Device Key in the format:        */
-/* "HostName=<host_name>;DeviceId=<device_id>;SharedAccessKey=<device_key>" */
-static const char* connectionString = "[TODO: Add your connection string here!]";
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <conio.h>
@@ -122,7 +121,3 @@ static const char* connectionString = "[TODO: Add your connection string here!]"
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #endif
-
-//#include <iothub_client.h>
-//#include <iothub_message.h>
-//#include <iothubtransportamqp.h>
