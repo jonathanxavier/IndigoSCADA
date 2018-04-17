@@ -239,6 +239,27 @@ int MQTT_client_imp::MQTTStop()
 #include <time.h>
 #include <sys/timeb.h>
 
+void MQTT_client_imp::get_local_host_time(struct cp56time2a* time)
+{
+	struct timeb tb;
+	struct tm	*ptm;
+
+    ftime (&tb);
+	ptm = localtime(&tb.time);
+		
+	time->hour = ptm->tm_hour;					//<0.23>
+	time->min = ptm->tm_min;					//<0..59>
+	time->msec = ptm->tm_sec*1000 + tb.millitm; //<0.. 59999>
+	time->mday = ptm->tm_mday; //<1..31>
+	time->wday = (ptm->tm_wday == 0) ? ptm->tm_wday + 7 : ptm->tm_wday; //<1..7>
+	time->month = ptm->tm_mon + 1; //<1..12>
+	time->year = ptm->tm_year - 100; //<0.99>
+	time->iv = 0; //<0..1> Invalid: <0> is valid, <1> is invalid
+	time->su = (u_char)tb.dstflag; //<0..1> SUmmer time: <0> is standard time, <1> is summer time
+
+    return;
+}
+
 void MQTT_client_imp::get_utc_host_time(struct cp56time2a* time)
 {
 	struct timeb tb;
@@ -913,7 +934,7 @@ static int mqtt_message_cb(MqttClient *client, MqttMessage *msg,
     word32 len;
     MQTTCtx* mqttCtx = (MQTTCtx*)client->ctx;
 
-	//cp56time2a time;
+	cp56time2a time;
 	//signed __int64 epoch_in_millisec;
 	struct iec_item item_to_send;
 
@@ -998,7 +1019,8 @@ static int mqtt_message_cb(MqttClient *client, MqttMessage *msg,
 			//Prepare message in monitoring direction
 			item_to_send.iec_type = M_ME_TF_1;
 			//parent_class->epoch_to_cp56time2a(&time, epoch_in_millisec);
-			//item_to_send.iec_obj.o.type36.time = time;
+			parent_class->get_local_host_time(&time);
+			item_to_send.iec_obj.o.type36.time = time;
 			item_to_send.iec_obj.o.type36.iv = 0;
 			item_to_send.iec_obj.o.type36.mv = (float)atof((char *)buf);
 			item_to_send.msg_id = n_msg_sent;

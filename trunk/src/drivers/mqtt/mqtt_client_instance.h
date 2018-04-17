@@ -221,7 +221,7 @@ class MQTT_CLIENT_DRV MQTT_client_Instance : public DriverInstance
 	////////////////local fifo///////////
 	fifo_h fifo_monitor_direction;
 	///////////////////////////////
-	
+		
 	void driverEvent(DriverEvent *); // message from thread to parent
 	bool event(QEvent *e);
 	bool Connect();					//connect to the DriverThread

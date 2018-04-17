@@ -50,7 +50,7 @@ class Monitor : public QObject
 	{	
 		tUnitTypes = 1,tAlarmGroups,tReceipe,tReceipeRecord,tUnits,
 		tSamples,tSerialPorts,tTags,tTable,tUpdateDone,tAllUpdated,
-		tTagsCurrent,tGet,tSamplesCurrent
+		tTagsCurrent,tGet,tSamplesCurrent,tGetUnitfromIOA
 	};
 
 	QTranslator translation;
@@ -102,6 +102,8 @@ class Monitor : public QObject
 	void Stop(); // stop everything
 	void Tick();
 	void Trace(const QString &, const QString &);
+	void get_items_from_global_fifo(void);
+	void get_utc_host_time(struct cp56time2a* time);
 	//
 	signals:
 	void DoCommand(const QString &, BYTE cmd, LPVOID lpPa, DWORD pa_length, DWORD ipindex);

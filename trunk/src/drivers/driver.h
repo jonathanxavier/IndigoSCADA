@@ -23,6 +23,7 @@
 #include "common.h"
 #include "results.h"
 #include "IndentedTrace.h"
+#include "fifoc.h"
 //
 // base class for driver class
 // this class has two functions
@@ -199,6 +200,11 @@ class QSEXPORT DriverInstance : public QObject // the actual driver bits
 	//
 	typedef std::map<QString,QString, std::less<QString> > DriverProps; // driver properties dictionary - ashared values/flags
 	static DriverProps Props; // the properites and semaphores
+	//
+	////////////////gloabal fifo///////////
+	static fifo_h fifo_global_monitor_direction;
+	static fifo_h fifo_global_control_direction;
+	///////////////////////////////////////
 	//
 	void AddProp(const QString &k,const QString &v) // add a property
 	{

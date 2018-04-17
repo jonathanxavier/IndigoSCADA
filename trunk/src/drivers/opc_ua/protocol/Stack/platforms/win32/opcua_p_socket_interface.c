@@ -562,7 +562,7 @@ OpcUa_InitializeStatus(OpcUa_Module_Socket, "CreateClient");
                                 &uPort);
     OpcUa_ReturnErrorIfBad(uStatus);
 
-	strcpy(sRemoteAdress, "127.0.0.1");//apa+++
+//	strcpy(sRemoteAdress, "127.0.0.1");//apa+++
 
     pInternalSocketManager = (OpcUa_InternalSocketManager*)a_hSocketManager;
 
