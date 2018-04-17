@@ -100,6 +100,7 @@ class MQTT_client_imp
 	 int AddItems();
 	 int Update();
 	 static void get_utc_host_time(struct cp56time2a* time);
+	 static void get_local_host_time(struct cp56time2a* time);
 	 time_t epoch_from_cp56time2a(const struct cp56time2a* time);
 	 static void epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch_in_millisec);
 	 static short rescale_value(double V, double Vmin, double Vmax, int* error);

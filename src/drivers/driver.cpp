@@ -358,6 +358,8 @@ void DriverInstance::PostList(const QString &name, IECValueList &list)
 QStringList DriverInstance::EnabledUnits;          // this is the list of enabled units
 DriverInstance::DriverProps DriverInstance::Props; // properties dictionary
 QMutex DriverInstance::Lock; // mutex lock
+fifo_h DriverInstance::fifo_global_monitor_direction;
+fifo_h DriverInstance::fifo_global_control_direction;
 //
 QString DriverInstance::FormUnitList() // build the lists for SQL transaction filtering
 {

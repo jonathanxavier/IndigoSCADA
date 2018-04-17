@@ -162,3 +162,6 @@ Created project directory /scada/project with all project files: .ini .db .fdb .
 -------------------------------------------------------------------------------------------------------
 06-07-2014
 Removed ORTE and integration of RIPC
+-------------------------------------------------------------------------------------------------------
+17-04-2018
+Added Gateway functionallity

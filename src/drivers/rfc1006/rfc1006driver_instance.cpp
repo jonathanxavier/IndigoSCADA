@@ -497,6 +497,10 @@ void Rfc1006driver_Instance::get_items_from_local_fifo(void)
 			ExitProcess(1);
 		}
 
+		////////////////////////////////Send in gloabal monitor direction/////////////////
+		fifo_put(fifo_global_monitor_direction, (char *)p_item, sizeof(struct iec_item));	
+		//////////////////////////////////////////////////////////////////////////////////
+
 		QString value;
 
 		switch(p_item->iec_type)

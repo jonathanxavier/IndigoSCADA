@@ -776,6 +776,10 @@ void Opc_client_da_Instance::get_items_from_local_fifo(void)
 			fflush(stderr);
 			ExitProcess(1);
 		}
+
+		////////////////////////////////Send in gloabal monitor direction/////////////////
+		fifo_put(fifo_global_monitor_direction, (char *)p_item, sizeof(struct iec_item));	
+		//////////////////////////////////////////////////////////////////////////////////
 		
 		QString sp_name;
 
