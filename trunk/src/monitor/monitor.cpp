@@ -41,6 +41,31 @@ extern void iec_call_exit_handler(int line, char* file, char* reason);
 #define MAX_FIFO_SIZE 65535
 ////////////////////////////////////////////////////////////////////////
 
+#include "iec104types.h"
+#include "iec_item.h"
+
+void control_dir_consumer(void* pParam)
+{
+	struct subs_args* arg = (struct subs_args*)pParam;
+	struct iec_item item;
+	RIPCObject objDesc(&item, sizeof(struct iec_item));
+
+	Monitor* parent = (Monitor*)arg->parent;
+
+	while(1)
+	{
+		if(parent->exit_command_thread)
+		{
+			break;
+		}
+
+		parent->queue_control_dir->get(objDesc);
+
+		fifo_put(parent->fifo_control_direction, (char*)&item, sizeof(struct iec_item));
+	}
+}
+
+
 /*
 *Function: Monitor
 *Inputs:none
@@ -53,7 +78,7 @@ Monitor::Monitor(QObject *parent,RealTimeDbDict *db_dct, Dispatcher *dsp) : QObj
 fStarted(false),SequenceNumber(0),fHalt(0),translation(0),dispatcher(dsp),db_dictionary(*db_dct),
 MaxRetryReconnectToDispatcher(0),MaxRetryReconnectToRealTimeDb(0),
 MaxRetryReconnectToHistoricDb(0),MaxRetryReconnectToSpareDispatcher(0),
-MaxRetryReconnectToSpareRealTimeDb(0)
+MaxRetryReconnectToSpareRealTimeDb(0),exit_command_thread(0)
 {
 	IT_IT("Monitor::Monitor");
 	
@@ -61,8 +86,21 @@ MaxRetryReconnectToSpareRealTimeDb(0)
 	MidnightReset = 1;
 
 	//Open global fifos
-	DriverInstance::fifo_global_monitor_direction = fifo_open("fifo_global_monitor_direction", MAX_FIFO_SIZE, iec_call_exit_handler);
-	DriverInstance::fifo_global_control_direction = fifo_open("fifo_global_control_direction", MAX_FIFO_SIZE, iec_call_exit_handler);
+	DriverInstance::global_factory1 = RIPCClientFactory::getInstance();
+	DriverInstance::global_factory2 = RIPCClientFactory::getInstance();
+	DriverInstance::global_session1 = DriverInstance::global_factory1->create("localhost", 6000);
+	DriverInstance::global_session2 = DriverInstance::global_factory2->create("localhost", 6000);
+	DriverInstance::fifo_global_monitor_direction = DriverInstance::global_session1->createQueue("fifo_global_monitor_direction");
+	DriverInstance::fifo_global_control_direction = DriverInstance::global_session2->createQueue("fifo_global_control_direction");
+
+	queue_control_dir = DriverInstance::fifo_global_control_direction;
+	
+	fifo_control_direction = fifo_open("fifo_control_dir", MAX_FIFO_SIZE, iec_call_exit_handler);
+
+	arg.parent = this;
+
+	unsigned long threadid;
+	CreateThread(NULL, 0, LPTHREAD_START_ROUTINE(control_dir_consumer), (void*)&arg, 0, &threadid);
 
 	// Connect to real time database
 
@@ -158,6 +196,8 @@ Monitor::~Monitor()
 	
 	Stop();
 	Instance = 0;
+
+	exit_command_thread = 1;
 };
 /*
 *Function:UpdateCurrentValue
@@ -583,7 +623,7 @@ void Monitor::get_items_from_global_fifo(void)
 	const unsigned wait_limit_ms = 1;
 	struct iec_item* p_item;
 
-	for(int i = 0; (len = fifo_get(DriverInstance::fifo_global_control_direction, (char*)buf, sizeof(struct iec_item), wait_limit_ms)) >= 0; i += 1)	
+	for(int i = 0; (len = fifo_get(fifo_control_direction, (char*)buf, sizeof(struct iec_item), wait_limit_ms)) >= 0; i += 1)	
 	{ 
 		p_item = (struct iec_item*)buf;
 
@@ -723,7 +763,7 @@ void Monitor::Start()
 void Monitor::Stop()
 {
 	IT_IT("Monitor::Stop");
-
+		
 	if(fStarted)
 	{
 		DDict::iterator i = drivers.begin();

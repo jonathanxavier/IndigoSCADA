@@ -18,6 +18,15 @@
 
 #include "realtimedb.h"
 #include "historicdb.h"
+#include "fifoc.h"
+////////Middleware////////////
+#include "RIPCThread.h"
+#include "RIPCFactory.h"
+#include "RIPCSession.h"
+#include "RIPCServerFactory.h"
+#include "RIPCClientFactory.h"
+#include "ripc.h"
+//////////////////////////////
 
 #include <map>
 class SamplePoint;
@@ -26,6 +35,12 @@ class MessageDisplay;
 class Driver;
 class Dispatcher;
 struct NotificationData;
+
+typedef class Monitor* par;
+
+struct subs_args{
+	par parent;
+};
 
 class Monitor : public QObject
 {
@@ -78,6 +93,12 @@ class Monitor : public QObject
 	QSDatabase *CfgDb;
 	QSDatabase *CurDb;
 	QSDatabase *ResDb;
+	/////////////////middleware//////////////
+	fifo_h fifo_control_direction;
+	struct subs_args arg;
+	int exit_command_thread;
+	RIPCQueue* queue_control_dir;
+	/////////////////////////////////////////
 	//
 	public slots:
 	//
