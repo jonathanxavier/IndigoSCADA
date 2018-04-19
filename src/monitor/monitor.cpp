@@ -65,7 +65,6 @@ void control_dir_consumer(void* pParam)
 	}
 }
 
-
 /*
 *Function: Monitor
 *Inputs:none
@@ -613,8 +612,6 @@ void Monitor::Tick()
 }
 
 #include "clear_crc_eight.h"
-#include "iec104types.h"
-#include "iec_item.h"
 
 void Monitor::get_items_from_global_fifo(void)
 {
@@ -654,9 +651,54 @@ void Monitor::get_items_from_global_fifo(void)
 
 		switch(p_item->iec_type)
 		{
+			case C_SC_TA_1:
+			{
+				value.sprintf("%d", p_item->iec_obj.o.type58.scs);
+			}
+			break;
+			case C_SC_NA_1:
+			{
+				value.sprintf("%d", p_item->iec_obj.o.type45.scs);
+			}
+			break;
+			case C_DC_TA_1:
+			{
+				value.sprintf("%d", p_item->iec_obj.o.type59.dcs);
+			}
+			break;
+			case C_DC_NA_1:
+			{
+				value.sprintf("%d", p_item->iec_obj.o.type46.dcs);
+			}
+			break;
+			case C_SE_TA_1:
+			{
+				value.sprintf("%d", p_item->iec_obj.o.type61.sv);
+			}
+			break;
+			case C_SE_NA_1:
+			{
+				value.sprintf("%d", p_item->iec_obj.o.type48.sv);
+			}
+			break;
+			case C_SE_TB_1:
+			{
+				value.sprintf("%d", p_item->iec_obj.o.type62.sv);
+			}
+			break;
+			case C_SE_NB_1:
+			{
+				value.sprintf("%d", p_item->iec_obj.o.type49.sv);
+			}
+			break;
 			case C_SE_TC_1:
 			{
 				value.sprintf("%f", p_item->iec_obj.o.type63.sv);
+			}
+			break;
+			case C_SE_NC_1:
+			{
+				value.sprintf("%f", p_item->iec_obj.o.type50.sv);
 			}
 			break;
 			default:
