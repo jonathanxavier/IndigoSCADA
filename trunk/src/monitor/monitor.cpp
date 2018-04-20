@@ -197,6 +197,13 @@ Monitor::~Monitor()
 	Instance = 0;
 
 	exit_command_thread = 1;
+
+	DriverInstance::fifo_global_monitor_direction->close();
+	DriverInstance::fifo_global_control_direction->close();
+	DriverInstance::global_session1->close();
+	DriverInstance::global_session2->close();
+	delete DriverInstance::global_session1;
+	delete DriverInstance::global_session2;
 };
 /*
 *Function:UpdateCurrentValue
