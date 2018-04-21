@@ -44,7 +44,7 @@ RSC=rc.exe
 # PROP Target_Dir ""
 LIB32=link.exe -lib
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "SCADA_EXPORTS" /YX /FD /GZ /c
-# ADD CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "$(QTDIR)\include" /I "$(QTDIR)\mkspecs\win32-msvc" /I "..\common" /I "..\database" /I "..\ui" /I "..\ui\widgets" /I ".\userdialogs" /I ".\sysdialogs" /I ".\widgets" /I ".\map" /I ".\drivers" /I ".\drivers\Simulator" /I "..\gigabase" /I "..\dispatcher\client" /I "..\ui\widgets\extra" /I "..\trace" /I "..\utilities" /I "..\fastdb\inc" /I "..\drivers" /I "..\fifo" /I "..\middleware\ripc\inc" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_USRDLL" /D "SCADA_EXPORTS" /D "USING_GARRET" /D "SECURE_SERVER" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_H_CPP" /FD /GZ /Zm200 /c
+# ADD CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "$(QTDIR)\include" /I "$(QTDIR)\mkspecs\win32-msvc" /I "..\common" /I "..\database" /I "..\ui" /I "..\ui\widgets" /I ".\userdialogs" /I ".\sysdialogs" /I ".\widgets" /I ".\map" /I ".\drivers" /I ".\drivers\Simulator" /I "..\gigabase" /I "..\dispatcher\client" /I "..\ui\widgets\extra" /I "..\trace" /I "..\utilities" /I "..\fastdb\inc" /I "..\drivers" /I "..\fifo" /I "..\middleware\ripc\inc" /I "..\middleware\rtps\include" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_USRDLL" /D "SCADA_EXPORTS" /D "USING_GARRET" /D "SECURE_SERVER" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_H_CPP" /FD /GZ /Zm200 /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x410 /d "_DEBUG"
@@ -74,7 +74,7 @@ LINK32=link.exe
 LIB32=link.exe -lib
 # ADD BASE CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "$(QTDIR)\include" /I "..\common" /I "..\database" /I "..\ui" /I "..\ui\widgets" /I "..\ui\drivers" /I ".\userdialogs" /I ".\sysdialogs" /I ".\widgets" /I ".\map" /I ".\drivers" /I ".\drivers\Simulator" /I "..\STL" /I "..\gigabase" /I "..\dispatcher\client" /I "..\ui\widgets\extra" /I "..\trace" /I "..\utilities" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_USRDLL" /D "SCADA_EXPORTS" /D "USING_GARRET" /D "SECURE_SERVER" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /FD /GZ /c
 # SUBTRACT BASE CPP /YX
-# ADD CPP /nologo /MD /W3 /GX /O2 /I "$(QTDIR)\include" /I "$(QTDIR)\mkspecs\win32-msvc" /I "..\common" /I "..\database" /I "..\ui" /I "..\ui\widgets" /I "..\ui\drivers" /I ".\userdialogs" /I ".\sysdialogs" /I ".\widgets" /I ".\map" /I ".\drivers" /I ".\drivers\Simulator" /I "..\gigabase" /I "..\dispatcher\client" /I "..\ui\widgets\extra" /I "..\trace" /I "..\utilities" /I "..\drivers" /I "..\fifo" /I "..\middleware\ripc\inc" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_USRDLL" /D "SCADA_EXPORTS" /D "USING_GARRET" /D "SECURE_SERVER" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_H_CPP" /FD /Zm200 /c
+# ADD CPP /nologo /MD /W3 /GX /O2 /I "$(QTDIR)\include" /I "$(QTDIR)\mkspecs\win32-msvc" /I "..\common" /I "..\database" /I "..\ui" /I "..\ui\widgets" /I "..\ui\drivers" /I ".\userdialogs" /I ".\sysdialogs" /I ".\widgets" /I ".\map" /I ".\drivers" /I ".\drivers\Simulator" /I "..\gigabase" /I "..\dispatcher\client" /I "..\ui\widgets\extra" /I "..\trace" /I "..\utilities" /I "..\drivers" /I "..\fifo" /I "..\middleware\ripc\inc" /I "..\middleware\rtps\include" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_USRDLL" /D "SCADA_EXPORTS" /D "USING_GARRET" /D "SECURE_SERVER" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_H_CPP" /FD /Zm200 /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x410 /d "_DEBUG"

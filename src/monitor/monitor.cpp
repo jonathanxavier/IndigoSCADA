@@ -30,7 +30,7 @@
 #include "start.xpm"
 #include "quit.xpm"
 #include "monitor.xpm"
-
+#include "clear_crc_eight.h"
 
 //#define TICK_CYCLE 2000 //2 seconds
 #define TICK_CYCLE 100
@@ -44,6 +44,7 @@ extern void iec_call_exit_handler(int line, char* file, char* reason);
 #include "iec104types.h"
 #include "iec_item.h"
 
+#ifdef USE_RIPC_MIDDLEWARE
 void control_dir_consumer(void* pParam)
 {
 	struct subs_args* arg = (struct subs_args*)pParam;
@@ -64,6 +65,82 @@ void control_dir_consumer(void* pParam)
 		fifo_put(parent->fifo_control_direction, (char*)&item, sizeof(struct iec_item));
 	}
 }
+#endif
+
+/////////////////////////////////////Middleware///////////////////////////////////////////
+Boolean  quite = ORTE_FALSE;
+int	regfail=0;
+
+//event system
+void onRegFail(void *param) 
+{
+  printf("registration to a manager failed\n");
+  regfail = 1;
+}
+
+void rebuild_iec_item_message(struct iec_item *item2, iec_item_type *item1)
+{
+	unsigned char checksum;
+
+	///////////////Rebuild struct iec_item//////////////////////////////////
+	item2->iec_type = item1->iec_type;
+	memcpy(&(item2->iec_obj), &(item1->iec_obj), sizeof(struct iec_object));
+	item2->cause = item1->cause;
+	item2->msg_id = item1->msg_id;
+	item2->ioa_control_center = item1->ioa_control_center;
+	item2->casdu = item1->casdu;
+	item2->is_neg = item1->is_neg;
+	item2->checksum = item1->checksum;
+	///////and check the 1 byte checksum////////////////////////////////////
+	checksum = clearCrc((unsigned char *)item2, sizeof(struct iec_item));
+
+//	fprintf(stderr,"new checksum = %u\n", checksum);
+
+	//if checksum is 0 then there are no errors
+	if(checksum != 0)
+	{
+		//log error message
+		ExitProcess(0);
+	}
+
+//	fprintf(stderr,"iec_type = %u\n", item2->iec_type);
+//	fprintf(stderr,"iec_obj = %x\n", item2->iec_obj);
+//	fprintf(stderr,"cause = %u\n", item2->cause);
+//	fprintf(stderr,"msg_id =%u\n", item2->msg_id);
+//	fprintf(stderr,"ioa_control_center = %u\n", item2->ioa_control_center);
+//	fprintf(stderr,"casdu =%u\n", item2->casdu);
+//	fprintf(stderr,"is_neg = %u\n", item2->is_neg);
+//	fprintf(stderr,"checksum = %u\n", item2->checksum);
+}
+
+void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackParam) 
+{
+	Monitor * cl = (Monitor*)recvCallBackParam;
+	iec_item_type *item1 = (iec_item_type*)vinstance;
+
+	switch (info->status) 
+	{
+		case NEW_DATA:
+		{
+		  if(!quite)
+		  {
+			  struct iec_item item2;
+			  rebuild_iec_item_message(&item2, item1);
+			  //cl->received_command_callback = 1;
+			  fifo_put(cl->fifo_control_direction, (char*)&item2, sizeof(struct iec_item));
+			  //cl->received_command_callback = 0;
+		  }
+		}
+		break;
+		case DEADLINE:
+		{
+			//printf("deadline occurred\n");
+		}
+		break;
+	}
+}
+////////////////////////////////Middleware/////////////////////////////////////
+
 
 /*
 *Function: Monitor
@@ -77,13 +154,14 @@ Monitor::Monitor(QObject *parent,RealTimeDbDict *db_dct, Dispatcher *dsp) : QObj
 fStarted(false),SequenceNumber(0),fHalt(0),translation(0),dispatcher(dsp),db_dictionary(*db_dct),
 MaxRetryReconnectToDispatcher(0),MaxRetryReconnectToRealTimeDb(0),
 MaxRetryReconnectToHistoricDb(0),MaxRetryReconnectToSpareDispatcher(0),
-MaxRetryReconnectToSpareRealTimeDb(0),exit_command_thread(0)
+MaxRetryReconnectToSpareRealTimeDb(0)
 {
 	IT_IT("Monitor::Monitor");
 	
 	Instance = this;
 	MidnightReset = 1;
 
+	#ifdef USE_RIPC_MIDDLEWARE
 	//Open global fifos
 	DriverInstance::global_factory1 = RIPCClientFactory::getInstance();
 	DriverInstance::global_factory2 = RIPCClientFactory::getInstance();
@@ -93,13 +171,72 @@ MaxRetryReconnectToSpareRealTimeDb(0),exit_command_thread(0)
 	DriverInstance::fifo_global_control_direction = DriverInstance::global_session2->createQueue("fifo_global_control_direction");
 
 	queue_control_dir = DriverInstance::fifo_global_control_direction;
+	#endif
 	
 	fifo_control_direction = fifo_open("fifo_control_dir", MAX_FIFO_SIZE, iec_call_exit_handler);
 
+	#ifdef USE_RIPC_MIDDLEWARE
 	arg.parent = this;
-
 	unsigned long threadid;
 	CreateThread(NULL, 0, LPTHREAD_START_ROUTINE(control_dir_consumer), (void*)&arg, 0, &threadid);
+	#endif
+
+	/////////////////////Middleware/////////////////////////////////////////////////////////////////
+	ORTEDomainProp          dp; 
+	ORTESubscription        *s = NULL;
+	int32_t                 strength = 1;
+	NtpTime                 persistence,deadline,minimumSeparation,delay;
+	Boolean                 havePublisher = ORTE_FALSE;
+	Boolean                 haveSubscriber = ORTE_FALSE;
+	IPAddress				smIPAddress = IPADDRESS_INVALID;
+	ORTEDomainAppEvents     events;
+
+	ORTEInit();
+	ORTEDomainPropDefaultGet(&dp);
+	NTPTIME_BUILD(minimumSeparation, 0); //0 s
+	NTPTIME_BUILD(delay, 1); //1 s
+
+	//initiate event system
+	ORTEDomainInitEvents(&events);
+
+	events.onRegFail = onRegFail;
+
+	//Create application     
+	domain = ORTEDomainAppCreate(ORTE_DEFAULT_DOMAIN,&dp,&events,ORTE_FALSE);
+
+	iec_item_type_type_register(domain);
+
+	//Create publisher
+	NTPTIME_BUILD(persistence, 5); //5 s
+	
+	DriverInstance::global_publisher = ORTEPublicationCreate(
+	domain,
+	"fifo_global_monitor_direction",
+	"iec_item_type",
+	&(DriverInstance::global_instanceSend),
+	&persistence,
+	strength,
+	NULL,
+	NULL,
+	NULL);
+
+	//Create subscriber
+	NTPTIME_BUILD(deadline,3);
+
+	subscriber = ORTESubscriptionCreate(
+	domain,
+	IMMEDIATE,
+	BEST_EFFORTS,
+	"fifo_global_control_direction",
+	"iec_item_type",
+	&instanceRecv,
+	&deadline,
+	&minimumSeparation,
+	recvCallBack,
+	this,
+	smIPAddress);
+	///////////////////////////////////Middleware//////////////////////////////////////////////////
+
 
 	// Connect to real time database
 
@@ -196,14 +333,15 @@ Monitor::~Monitor()
 	Stop();
 	Instance = 0;
 
+	#ifdef USE_RIPC_MIDDLEWARE
 	exit_command_thread = 1;
-
 	DriverInstance::fifo_global_monitor_direction->close();
 	DriverInstance::fifo_global_control_direction->close();
 	DriverInstance::global_session1->close();
 	DriverInstance::global_session2->close();
 	delete DriverInstance::global_session1;
 	delete DriverInstance::global_session2;
+	#endif
 };
 /*
 *Function:UpdateCurrentValue

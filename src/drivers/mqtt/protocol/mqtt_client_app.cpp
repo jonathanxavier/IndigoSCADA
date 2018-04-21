@@ -24,6 +24,8 @@ static DWORD g_dwSleepInLoop = 1000;
 
 /////////////////////////////////////Middleware////////////////////////////////
 static void iec_call_exit_handler(int line, char* file, char* reason);
+
+#ifdef USE_RIPC_MIDDLEWARE
 ///////commands
 void control_dir_consumer(void* pParam)
 {
@@ -46,6 +48,86 @@ void control_dir_consumer(void* pParam)
 	}
 }
 ////////////////////////////////Middleware/////////////////
+#endif
+
+/////////////////////////////////////Middleware///////////////////////////////////////////
+Boolean  quite = ORTE_FALSE;
+int	regfail=0;
+
+//event system
+void onRegFail(void *param) 
+{
+  printf("registration to a manager failed\n");
+  regfail = 1;
+}
+
+void rebuild_iec_item_message(struct iec_item *item2, iec_item_type *item1)
+{
+	unsigned char checksum;
+
+	///////////////Rebuild struct iec_item//////////////////////////////////
+	item2->iec_type = item1->iec_type;
+	memcpy(&(item2->iec_obj), &(item1->iec_obj), sizeof(struct iec_object));
+	item2->cause = item1->cause;
+	item2->msg_id = item1->msg_id;
+	item2->ioa_control_center = item1->ioa_control_center;
+	item2->casdu = item1->casdu;
+	item2->is_neg = item1->is_neg;
+	item2->checksum = item1->checksum;
+	///////and check the 1 byte checksum////////////////////////////////////
+	checksum = clearCrc((unsigned char *)item2, sizeof(struct iec_item));
+
+//	fprintf(stderr,"new checksum = %u\n", checksum);
+
+	//if checksum is 0 then there are no errors
+	if(checksum != 0)
+	{
+		//log error message
+		ExitProcess(0);
+	}
+
+//	fprintf(stderr,"iec_type = %u\n", item2->iec_type);
+//	fprintf(stderr,"iec_obj = %x\n", item2->iec_obj);
+//	fprintf(stderr,"cause = %u\n", item2->cause);
+//	fprintf(stderr,"msg_id =%u\n", item2->msg_id);
+//	fprintf(stderr,"ioa_control_center = %u\n", item2->ioa_control_center);
+//	fprintf(stderr,"casdu =%u\n", item2->casdu);
+//	fprintf(stderr,"is_neg = %u\n", item2->is_neg);
+//	fprintf(stderr,"checksum = %u\n", item2->checksum);
+}
+
+void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackParam) 
+{
+	MQTT_client_imp * cl = (MQTT_client_imp*)recvCallBackParam;
+	iec_item_type *item1 = (iec_item_type*)vinstance;
+
+	switch (info->status) 
+	{
+		case NEW_DATA:
+		{
+		  if(!quite)
+		  {
+			  struct iec_item item2;
+			  rebuild_iec_item_message(&item2, item1);
+			  cl->received_command_callback = 1;
+			  cl->check_for_commands(&item2);
+			  cl->received_command_callback = 0;
+		  }
+		}
+		break;
+		case DEADLINE:
+		{
+			//printf("deadline occurred\n");
+		}
+		break;
+	}
+}
+////////////////////////////////Middleware/////////////////////////////////////
+
+////////////////////////////////Middleware/////////////////
+iec_item_type MQTT_client_imp::instanceSend;
+ORTEPublication* MQTT_client_imp::publisher = NULL;
+////////////////////////////////Middleware/////////////////
 
 
 extern int gl_timeout_connection_with_parent;
@@ -53,7 +135,9 @@ extern int gl_timeout_connection_with_parent;
 bool MQTT_client_imp::fExit = false;
 struct structItem* MQTT_client_imp::Item = NULL;
 double MQTT_client_imp::dead_band_percent = 0.0;
+#ifdef USE_RIPC_MIDDLEWARE
 RIPCQueue*  MQTT_client_imp::queue_monitor_dir = NULL;
+#endif
 
 static u_int n_msg_sent = 0;
 
@@ -69,13 +153,14 @@ MQTT_client_imp::MQTT_client_imp(char* broker_host_name, char* line_number)
 	nThreads = 1;
 
 	dump = NULL;
-	/////////////////////Middleware/////////////////////////////////////////////////////////////////
 
+	#ifdef USE_RIPC_MIDDLEWARE
+	/////////////////////Middleware/////////////////////////////////////////////////////////////////
     factory1 = NULL;
 	factory2 = NULL;
 	session1 = NULL;
 	session2 = NULL;
-	queue_control_dir = NULL;
+	#endif
 
 	char fifo_monitor_name[150];
 	char fifo_control_name[150];
@@ -88,6 +173,7 @@ MQTT_client_imp::MQTT_client_imp(char* broker_host_name, char* line_number)
 	strcat(fifo_control_name, line_number);
 	strcat(fifo_control_name, "mqtt");
 
+	#ifdef USE_RIPC_MIDDLEWARE
 	port = 6000;
 	hostname = "localhost";
 
@@ -100,16 +186,80 @@ MQTT_client_imp::MQTT_client_imp(char* broker_host_name, char* line_number)
 	queue_control_dir = session2->createQueue(fifo_control_name);
 
 	arg.parent = this;
-	///////////fifo//////////////////
-	unsigned long threadid;
+	#endif
+
+	/////////////////////Middleware/////////////////////////////////////////////////////////////////
+	received_command_callback = 0;
+
+	int32_t                 strength = 1;
+	NtpTime                 persistence, deadline, minimumSeparation, delay;
+	IPAddress				smIPAddress = IPADDRESS_INVALID;
 	
+	subscriber = NULL;
+
+	ORTEInit();
+	ORTEDomainPropDefaultGet(&dp);
+	NTPTIME_BUILD(minimumSeparation,0); 
+	NTPTIME_BUILD(delay,1); //1s
+
+	//initiate event system
+	ORTEDomainInitEvents(&events);
+
+	events.onRegFail = onRegFail;
+
+	//Create application     
+	domain = ORTEDomainAppCreate(ORTE_DEFAULT_DOMAIN,&dp,&events,ORTE_FALSE);
+
+	iec_item_type_type_register(domain);
+
+	//Create publisher
+	NTPTIME_BUILD(persistence,5);
+
+	publisher = ORTEPublicationCreate(
+	domain,
+	fifo_monitor_name,
+	"iec_item_type",
+	&instanceSend,
+	&persistence,
+	strength,
+	NULL,
+	NULL,
+	NULL);
+
+	//if(publisher == NULL){} //check this error
+			
+	//Create subscriber
+	NTPTIME_BUILD(deadline,3);
+
+	subscriber = ORTESubscriptionCreate(
+	domain,
+	IMMEDIATE,
+	BEST_EFFORTS,
+	fifo_control_name,
+	"iec_item_type",
+	&instanceRecv,
+	&deadline,
+	&minimumSeparation,
+	recvCallBack,
+	this,
+	smIPAddress);
+
+	//if(subscriber == NULL){} //check this error
+	///////////////////////////////////Middleware//////////////////////////////////////////////////
+
+	///////////fifo//////////////////
 	strcat(fifo_control_name, "_fifo_client");
 
 	#define MAX_FIFO_SIZE 65535
 	fifo_control_direction = fifo_open(fifo_control_name, MAX_FIFO_SIZE, iec_call_exit_handler);
-		
+	
+	#ifdef USE_RIPC_MIDDLEWARE
+	unsigned long threadid;
 	CreateThread(NULL, 0, LPTHREAD_START_ROUTINE(control_dir_consumer), (void*)&arg, 0, &threadid);
 	///////////////////////////////////Middleware//////////////////////////////////////////////////
+	#endif
+	/////////////////////Middleware/////////////////////////////////////////////////////////////////
+		
 	IT_EXIT;
 }
 		
@@ -118,10 +268,10 @@ MQTT_client_imp::~MQTT_client_imp()
 	IT_IT("MQTT_client_imp::~MQTT_client_imp");
 	
 	fExit = true;
-		
+	
+	#ifdef USE_RIPC_MIDDLEWARE
 	////////Middleware/////////////
 	exit_threads = 1;
-//	Sleep(3000);
 	fifo_close(fifo_control_direction);
 	queue_monitor_dir->close();
 	queue_control_dir->close();
@@ -130,6 +280,11 @@ MQTT_client_imp::~MQTT_client_imp()
 	session2->close();
 	delete session2;
 	////////Middleware/////////////
+	#endif
+	///////////////////////////////////Middleware//////////////////////////////////////////////////
+	ORTEDomainAppDestroy(domain);
+    domain = NULL;
+	////////////////////////////////////Middleware//////////////////////////////////////////////////
 	IT_EXIT;
 }
 
@@ -167,10 +322,30 @@ int MQTT_client_imp::Update()
 			item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
 
 			//Send in monitor direction
+			#ifdef USE_RIPC_MIDDLEWARE
 			////////Middleware/////////////
 			//publishing data
 			queue_monitor_dir->put(&item_to_send, sizeof(struct iec_item));
 			////////Middleware/////////////
+			#endif
+
+			//Send in monitor direction
+			//prepare published data
+			memset(&instanceSend,0x00, sizeof(iec_item_type));
+
+			instanceSend.iec_type = item_to_send.iec_type;
+			memcpy(&(instanceSend.iec_obj), &(item_to_send.iec_obj), sizeof(struct iec_object));
+			instanceSend.cause = item_to_send.cause;
+			instanceSend.msg_id = item_to_send.msg_id;
+			instanceSend.ioa_control_center = item_to_send.ioa_control_center;
+			instanceSend.casdu = item_to_send.casdu;
+			instanceSend.is_neg = item_to_send.is_neg;
+			instanceSend.checksum = item_to_send.checksum;
+
+			ORTEPublicationSend(publisher);
+
+			Sleep(200);
+
 			break;
 		}
 		
@@ -1040,11 +1215,29 @@ static int mqtt_message_cb(MqttClient *client, MqttMessage *msg,
 			//Send in monitor direction
 			fprintf(stderr,"Sending message %u th\n", n_msg_sent);
 			fflush(stderr);
-				
+			
+			#ifdef USE_RIPC_MIDDLEWARE
 			////////Middleware/////////////
 			//publishing data
 			parent_class->queue_monitor_dir->put(&item_to_send, sizeof(struct iec_item));
 			////////Middleware/////////////
+			#endif
+
+			//Send in monitor direction
+			//prepare published data
+			memset(&(parent_class->instanceSend),0x00, sizeof(iec_item_type));
+
+			parent_class->instanceSend.iec_type = item_to_send.iec_type;
+			memcpy(&(parent_class->instanceSend.iec_obj), &(item_to_send.iec_obj), sizeof(struct iec_object));
+			parent_class->instanceSend.cause = item_to_send.cause;
+			parent_class->instanceSend.msg_id = item_to_send.msg_id;
+			parent_class->instanceSend.ioa_control_center = item_to_send.ioa_control_center;
+			parent_class->instanceSend.casdu = item_to_send.casdu;
+			parent_class->instanceSend.is_neg = item_to_send.is_neg;
+			parent_class->instanceSend.checksum = item_to_send.checksum;
+
+			ORTEPublicationSend(parent_class->publisher);
+
 			n_msg_sent++;
 		}
 	}
