@@ -515,10 +515,22 @@ void Modbus_driver_Instance::get_items_from_local_fifo(void)
 		}
 
 		////////////////////////////////Send in gloabal monitor direction/////////////////
-		//fifo_put(fifo_global_monitor_direction, (char *)p_item, sizeof(struct iec_item));
-		if(fifo_global_monitor_direction)
+		if(global_publisher)
 		{
-			fifo_global_monitor_direction->put(p_item, sizeof(struct iec_item));
+			//Send in monitor direction
+			//prepare published data
+			memset(&global_instanceSend,0x00, sizeof(iec_item_type));
+
+			global_instanceSend.iec_type = p_item->iec_type;
+			memcpy(&(global_instanceSend.iec_obj), &(p_item->iec_obj), sizeof(struct iec_object));
+			global_instanceSend.cause = p_item->cause;
+			global_instanceSend.msg_id = p_item->msg_id;
+			global_instanceSend.ioa_control_center = p_item->ioa_control_center;
+			global_instanceSend.casdu = p_item->casdu;
+			global_instanceSend.is_neg = p_item->is_neg;
+			global_instanceSend.checksum = p_item->checksum;
+
+			ORTEPublicationSend(global_publisher);
 		}
 		//////////////////////////////////////////////////////////////////////////////////
 

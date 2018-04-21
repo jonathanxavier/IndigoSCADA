@@ -13,6 +13,7 @@
 #include "mqtt_client_instance.h"
 #include "mqtt_clientdriverthread.h"
 
+#ifdef USE_RIPC_MIDDLEWARE
 ////////////////////Middleware/////////////////////////////////////////////
 int exit_consumer = 0;
 
@@ -35,6 +36,82 @@ void consumer(void* pParam)
 	}
 }
 ////////////////////Middleware/////////////////////////////////////////////
+#endif
+
+/////////////////////////////////////Middleware///////////////////////////////////////////
+Boolean  quite=ORTE_FALSE;
+int	regfail=0;
+
+//event system
+void onRegFail(void *param) 
+{
+  printf("registration to a manager failed\n");
+  regfail = 1;
+}
+
+void rebuild_iec_item_message(struct iec_item *item2, iec_item_type *item1)
+{
+	unsigned char checksum;
+
+	///////////////Rebuild struct iec_item//////////////////////////////////
+	item2->iec_type = item1->iec_type;
+	memcpy(&(item2->iec_obj), &(item1->iec_obj), sizeof(struct iec_object));
+	item2->cause = item1->cause;
+	item2->msg_id = item1->msg_id;
+	item2->ioa_control_center = item1->ioa_control_center;
+	item2->casdu = item1->casdu;
+	item2->is_neg = item1->is_neg;
+	item2->checksum = item1->checksum;
+	///////and check the 1 byte checksum////////////////////////////////////
+	checksum = clearCrc((unsigned char *)item2, sizeof(struct iec_item));
+
+	//fprintf(stderr,"new checksum = %u\n", checksum);
+
+	//if checksum is 0 then there are no errors
+	if(checksum != 0)
+	{
+		//log error message
+		ExitProcess(0);
+	}
+
+	/*
+	fprintf(stderr,"iec_type = %u\n", item2->iec_type);
+	fprintf(stderr,"iec_obj = %x\n", item2->iec_obj);
+	fprintf(stderr,"cause = %u\n", item2->cause);
+	fprintf(stderr,"msg_id =%u\n", item2->msg_id);
+	fprintf(stderr,"ioa_control_center = %u\n", item2->ioa_control_center);
+	fprintf(stderr,"casdu =%u\n", item2->casdu);
+	fprintf(stderr,"is_neg = %u\n", item2->is_neg);
+	fprintf(stderr,"checksum = %u\n", item2->checksum);
+	*/
+}
+
+void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackParam) 
+{
+	MQTT_client_Instance * cl = (MQTT_client_Instance*)recvCallBackParam;
+	iec_item_type *item1 = (iec_item_type*)vinstance;
+
+	switch (info->status) 
+	{
+		case NEW_DATA:
+		{
+		  if(!quite)
+		  {
+			  struct iec_item item2;
+			  rebuild_iec_item_message(&item2, item1);
+			  //TODO: detect losts messages when item2.msg_id are NOT consecutive
+			  fifo_put(cl->fifo_monitor_direction, (char *)&item2, sizeof(struct iec_item));
+		  }
+		}
+		break;
+		case DEADLINE:
+		{
+			//printf("deadline occurred\n");
+		}
+		break;
+	}
+}
+////////////////////////////////Middleware//////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////////
 //This global data is not a problem bucause each
@@ -266,10 +343,22 @@ void MQTT_client_Instance::QueryResponse(QObject *p, const QString &c, int id, Q
 				item_to_send.msg_id = msg_sent_in_control_direction++;
 				item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
 				///////////////////////////////////////////////////////////////////////////////////////////
-
+				
+				#ifdef USE_RIPC_MIDDLEWARE
 				////////////////////Middleware/////////////////////////////////////////////
 				//publishing data
 				queue_control_dir->put(&item_to_send, sizeof(struct iec_item));
+				//////////////////////////Middleware/////////////////////////////////////////
+				#endif
+				////////////////////Middleware/////////////////////////////////////////////
+				//prepare published data
+				memset(&instanceSend,0x00, sizeof(iec_item_type));
+				instanceSend.iec_type = item_to_send.iec_type;
+				memcpy(&(instanceSend.iec_obj), &(item_to_send.iec_obj), sizeof(struct iec_object));
+				instanceSend.msg_id = item_to_send.msg_id;
+				instanceSend.checksum = item_to_send.checksum;
+
+				ORTEPublicationSend(publisher);
 				//////////////////////////Middleware/////////////////////////////////////////
 			}
 		}
@@ -691,10 +780,23 @@ void MQTT_client_Instance::Tick()
 			item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
 			///////////////////////////////////////////////////////////////////////////////////////////
 
+			#ifdef USE_RIPC_MIDDLEWARE
 			//////////////Middleware///////////////////////////////////////
 			//publishing data
 			queue_control_dir->put(&item_to_send, sizeof(struct iec_item));
 			//////////////Middleware///////////////////////////////////////
+			#endif
+
+			////////////////////Middleware/////////////////////////////////////////////
+			//prepare published data
+			memset(&instanceSend,0x00, sizeof(iec_item_type));
+			instanceSend.iec_type = item_to_send.iec_type;
+			memcpy(&(instanceSend.iec_obj), &(item_to_send.iec_obj), sizeof(struct iec_object));
+			instanceSend.msg_id = item_to_send.msg_id;
+			instanceSend.checksum = item_to_send.checksum;
+
+			ORTEPublicationSend(publisher);
+			//////////////////////////Middleware/////////////////////////////////////////
 
 			fprintf(stderr, "State = STATE_ASK_GENERAL_INTERROGATION\n");
 			fflush(stderr);
@@ -773,10 +875,22 @@ void MQTT_client_Instance::get_items_from_local_fifo(void)
 		}
 
 		////////////////////////////////Send in gloabal monitor direction/////////////////
-		//fifo_put(fifo_global_monitor_direction, (char *)p_item, sizeof(struct iec_item));
-		if(fifo_global_monitor_direction)
+		if(global_publisher)
 		{
-			fifo_global_monitor_direction->put(p_item, sizeof(struct iec_item));
+			//Send in monitor direction
+			//prepare published data
+			memset(&global_instanceSend,0x00, sizeof(iec_item_type));
+
+			global_instanceSend.iec_type = p_item->iec_type;
+			memcpy(&(global_instanceSend.iec_obj), &(p_item->iec_obj), sizeof(struct iec_object));
+			global_instanceSend.cause = p_item->cause;
+			global_instanceSend.msg_id = p_item->msg_id;
+			global_instanceSend.ioa_control_center = p_item->ioa_control_center;
+			global_instanceSend.casdu = p_item->casdu;
+			global_instanceSend.is_neg = p_item->is_neg;
+			global_instanceSend.checksum = p_item->checksum;
+
+			ORTEPublicationSend(global_publisher);
 		}
 		//////////////////////////////////////////////////////////////////////////////////
 		

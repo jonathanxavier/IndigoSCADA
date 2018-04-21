@@ -28,6 +28,7 @@
 #include "mqttnet.h"
 ////////////////////////////
 
+#ifdef USE_RIPC_MIDDLEWARE
 ////////Middleware/////////////
 #include "RIPCThread.h"
 #include "RIPCFactory.h"
@@ -36,6 +37,14 @@
 #include "RIPCClientFactory.h"
 #include "ripc.h"
 ///////////////////////////////
+#endif
+
+////////////////////////////Middleware///////////////////////////////////////////////////////
+#include "iec_item_type.h"
+extern void onRegFail(void *param);
+extern void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackParam); 
+/////////////////////////////////////////////////////////////////////////////////////////////
+
 #include "fifoc.h"
 
 struct structItem
@@ -51,6 +60,7 @@ struct structItem
 	unsigned int hash_key;
 };
 
+#ifdef USE_RIPC_MIDDLEWARE
 ////////Middleware/////////////
 typedef class MQTT_client_imp* par;
 
@@ -58,6 +68,7 @@ struct subs_args{
 	par parent;
 };
 ////////Middleware/////////////
+#endif
 
 class MQTT_client_imp
 {
@@ -82,8 +93,11 @@ class MQTT_client_imp
 	 /////////////Middleware///////////////////////////////
 	 u_int n_msg_sent_monitor_dir;
 	 u_int n_msg_sent_control_dir;
-	 int exit_threads;
+
 	 fifo_h fifo_control_direction;
+
+	 #ifdef USE_RIPC_MIDDLEWARE
+	 int exit_threads;
 	 int          port;
 	 char const*  hostname;
 	 RIPCFactory* factory1;
@@ -94,6 +108,18 @@ class MQTT_client_imp
 	 RIPCQueue*   queue_control_dir;
 	 struct subs_args arg;
 	 //////////////////////////////////////////////////////
+	 #endif
+
+	 /////////////////////Middleware/////////////////////////
+	 int received_command_callback;
+	 ORTEDomain              *domain;
+	 ORTEDomainProp          dp; 
+	 static ORTEPublication  *publisher;
+	 ORTESubscription        *subscriber;
+	 static iec_item_type    instanceSend;
+	 iec_item_type		    instanceRecv;
+	 ORTEDomainAppEvents     events;
+	 //////////////////////////////end//Middleware///////////
 
 	 int MQTTStart(char* SubscribeTopicName, char*UserName, char* Password, int Port, char* ClientID);
 	 int MQTTStop();

@@ -19,6 +19,8 @@
 #include "realtimedb.h"
 #include "historicdb.h"
 #include "fifoc.h"
+
+#ifdef USE_RIPC_MIDDLEWARE
 ////////Middleware////////////
 #include "RIPCThread.h"
 #include "RIPCFactory.h"
@@ -26,7 +28,21 @@
 #include "RIPCServerFactory.h"
 #include "RIPCClientFactory.h"
 #include "ripc.h"
+
+typedef class Monitor* par;
+
+struct subs_args{
+	par parent;
+};
+
 //////////////////////////////
+#endif
+
+////////////////////////////Middleware///////////////////////////////////////////////////////
+#include "iec_item_type.h"
+extern void onRegFail(void *param);
+extern void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackParam); 
+/////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <map>
 class SamplePoint;
@@ -35,12 +51,6 @@ class MessageDisplay;
 class Driver;
 class Dispatcher;
 struct NotificationData;
-
-typedef class Monitor* par;
-
-struct subs_args{
-	par parent;
-};
 
 class Monitor : public QObject
 {
@@ -95,10 +105,18 @@ class Monitor : public QObject
 	QSDatabase *ResDb;
 	/////////////////middleware//////////////
 	fifo_h fifo_control_direction;
+
+	#ifdef USE_RIPC_MIDDLEWARE
 	struct subs_args arg;
 	int exit_command_thread;
 	RIPCQueue* queue_control_dir;
+	#endif
 	/////////////////////////////////////////
+	//////Middleware/////////////
+    ORTEDomain *domain;
+	ORTESubscription *subscriber;
+	iec_item_type    instanceRecv;
+	/////////////////////////////
 	//
 	public slots:
 	//

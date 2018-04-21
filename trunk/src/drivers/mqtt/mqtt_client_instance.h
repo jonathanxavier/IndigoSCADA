@@ -18,6 +18,8 @@
 #include "clear_crc_eight.h"
 #include "iec104types.h"
 #include "iec_item.h"
+
+#ifdef USE_RIPC_MIDDLEWARE
 ////////////////////////////Middleware/////////////////////////////////////////////////////////////
 #include "RIPCThread.h"
 #include "RIPCFactory.h"
@@ -26,13 +28,6 @@
 #include "RIPCClientFactory.h"
 #include "ripc.h"
 /////////////////////////////////////////////////////////////////////////////////////////////
-
-/////////////////////////fifo///////////////////////////////////////////
-extern void iec_call_exit_handler(int line, char* file, char* reason);
-#include "fifoc.h"
-#define MAX_FIFO_SIZE 65535
-////////////////////////////////////////////////////////////////////////
-
 ////////////////////////////Middleware/////////////////////////////////////////////////////////////
 struct subs_args{
 	RIPCQueue* queue_monitor_dir;
@@ -42,6 +37,20 @@ struct subs_args{
 void consumer(void* pParam);
 extern int exit_consumer;
 /////////////////////////////////////////////////////////////////////////////////////////////
+#endif
+
+////////////////////////////Middleware/////////////////////////////////////////////////////////////
+#include "iec_item_type.h"
+extern void onRegFail(void *param);
+extern Boolean  quite;
+extern void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackParam); 
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/////////////////////////fifo///////////////////////////////////////////
+extern void iec_call_exit_handler(int line, char* file, char* reason);
+#include "fifoc.h"
+#define MAX_FIFO_SIZE 65535
+////////////////////////////////////////////////////////////////////////
 
 typedef QMap<int, QString> IOANameMap;
 
@@ -92,6 +101,7 @@ class MQTT_CLIENT_DRV MQTT_client_Instance : public DriverInstance
 
 	Track* Values;
 
+	#ifdef USE_RIPC_MIDDLEWARE
 	/////////////Middleware///////////////////////////////
     int          port;
     char const*  hostname;
@@ -103,6 +113,7 @@ class MQTT_CLIENT_DRV MQTT_client_Instance : public DriverInstance
 	RIPCQueue*   queue_control_dir;
 	struct subs_args arg;
 	//////////////////////////////////////////////////////
+	#endif
 
 	enum // states for the state machine
 	{
@@ -149,6 +160,7 @@ class MQTT_CLIENT_DRV MQTT_client_Instance : public DriverInstance
         strcat(fifo_monitor_name, str_instance_id);
         strcat(fifo_monitor_name, "mqtt");
 
+		#ifdef USE_RIPC_MIDDLEWARE
 		port = 6000;
 		hostname = "localhost";
 
@@ -160,7 +172,65 @@ class MQTT_CLIENT_DRV MQTT_client_Instance : public DriverInstance
 		queue_control_dir = session2->createQueue(fifo_control_name);
 
 		arg.queue_monitor_dir = queue_monitor_dir;
+		#endif
 		///////////////////////////////////Middleware//////////////////////////////////////////////////
+
+		/////////////////////Middleware/////////////////////////////////////////////////////////////////
+		ORTEDomainProp          dp; 
+		ORTESubscription        *s = NULL;
+		int32_t                 strength = 1;
+		NtpTime                 persistence,deadline,minimumSeparation,delay;
+		Boolean                 havePublisher = ORTE_FALSE;
+		Boolean                 haveSubscriber = ORTE_FALSE;
+		IPAddress				smIPAddress = IPADDRESS_INVALID;
+		ORTEDomainAppEvents     events;
+
+		ORTEInit();
+		ORTEDomainPropDefaultGet(&dp);
+		NTPTIME_BUILD(minimumSeparation, 0); //0 s
+		NTPTIME_BUILD(delay, 1); //1 s
+
+		//initiate event system
+		ORTEDomainInitEvents(&events);
+
+		events.onRegFail = onRegFail;
+
+		//Create application     
+		domain = ORTEDomainAppCreate(ORTE_DEFAULT_DOMAIN,&dp,&events,ORTE_FALSE);
+
+		iec_item_type_type_register(domain);
+
+		//Create publisher
+		NTPTIME_BUILD(persistence, 5); //5 s
+		
+		publisher = ORTEPublicationCreate(
+		domain,
+		fifo_control_name,
+		"iec_item_type",
+		&instanceSend,
+		&persistence,
+		strength,
+		NULL,
+		NULL,
+		NULL);
+
+		//Create subscriber
+		NTPTIME_BUILD(deadline,3);
+
+		subscriber = ORTESubscriptionCreate(
+		domain,
+		IMMEDIATE,
+		BEST_EFFORTS,
+		fifo_monitor_name,
+		"iec_item_type",
+		&instanceRecv,
+		&deadline,
+		&minimumSeparation,
+		recvCallBack,
+		this,
+		smIPAddress);
+		///////////////////////////////////Middleware//////////////////////////////////////////////////
+
 
 		/////////////////////////////////////local fifo//////////////////////////////////////////////////////////
 		const size_t max_fifo_queue_size = MAX_FIFO_SIZE;
@@ -168,15 +238,16 @@ class MQTT_CLIENT_DRV MQTT_client_Instance : public DriverInstance
 		strcat(fifo_monitor_name, "_fifo_");
 
 		fifo_monitor_direction = fifo_open(fifo_monitor_name, max_fifo_queue_size, iec_call_exit_handler);
-
-		arg.fifo_monitor_direction = fifo_monitor_direction;
 		///////////////////////////////////////////////////////////////////////////////////////////////////
 
+		#ifdef USE_RIPC_MIDDLEWARE
+		arg.fifo_monitor_direction = fifo_monitor_direction;
 		/////////////////////Middleware/////////////////////////////////////////////////////////////////
 		unsigned long threadid;
 	
 		CreateThread(NULL, 0, LPTHREAD_START_ROUTINE(consumer), (void*)&arg, 0, &threadid);
 		/////////////////////Middleware/////////////////////////////////////////////////////////////////
+		#endif
 	};
 
 	~MQTT_client_Instance()
@@ -194,9 +265,9 @@ class MQTT_CLIENT_DRV MQTT_client_Instance : public DriverInstance
 			free(Config_db);
 		}
 
+		#ifdef USE_RIPC_MIDDLEWARE
 		///////////////////////////////////Middleware//////////////////////////////////////////////////
 		exit_consumer = 1;
-//		Sleep(3000);
 		fifo_close(fifo_monitor_direction);
 		queue_monitor_dir->close();
 		queue_control_dir->close();
@@ -204,6 +275,12 @@ class MQTT_CLIENT_DRV MQTT_client_Instance : public DriverInstance
 		session2->close();
 		delete session1;
 		delete session2;
+		///////////////////////////////////Middleware//////////////////////////////////////////////////
+		#endif
+
+		///////////////////////////////////Middleware//////////////////////////////////////////////////
+		ORTEDomainAppDestroy(domain);
+        domain = NULL;
 		///////////////////////////////////Middleware//////////////////////////////////////////////////
 	};
 
@@ -217,6 +294,14 @@ class MQTT_CLIENT_DRV MQTT_client_Instance : public DriverInstance
 	Driver* ParentDriver;
 	QString unit_name;
 	int instanceID; //Equals to "line concept" of a SCADA driver
+
+	//////Middleware/////////////
+    ORTEDomain *domain;
+	ORTEPublication *publisher;
+	ORTESubscription *subscriber;
+	iec_item_type    instanceSend;
+	iec_item_type    instanceRecv;
+	/////////////////////////////
 
 	////////////////local fifo///////////
 	fifo_h fifo_monitor_direction;
