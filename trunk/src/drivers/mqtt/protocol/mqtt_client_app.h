@@ -111,14 +111,11 @@ class MQTT_client_imp
 	 #endif
 
 	 /////////////////////Middleware/////////////////////////
-	 int received_command_callback;
-	 ORTEDomain              *domain;
-	 ORTEDomainProp          dp; 
-	 static ORTEPublication  *publisher;
-	 ORTESubscription        *subscriber;
-	 static iec_item_type    instanceSend;
+	 ORTEDomain             *domain;
+	 ORTEPublication		*publisher;
+	 ORTESubscription       *subscriber;
+	 iec_item_type			instanceSend;
 	 iec_item_type		    instanceRecv;
-	 ORTEDomainAppEvents     events;
 	 //////////////////////////////end//Middleware///////////
 
 	 int MQTTStart(char* SubscribeTopicName, char*UserName, char* Password, int Port, char* ClientID);

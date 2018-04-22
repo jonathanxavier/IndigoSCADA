@@ -18,6 +18,8 @@
 #include "clear_crc_eight.h"
 #include "iec104types.h"
 #include "iec_item.h"
+
+#ifdef USE_RIPC_MIDDLEWARE
 ////////Middleware////////////
 #include "RIPCThread.h"
 #include "RIPCFactory.h"
@@ -26,12 +28,6 @@
 #include "RIPCClientFactory.h"
 #include "ripc.h"
 //////////////////////////////
-
-/////////////////////////fifo///////////////////////////////////////////
-extern void iec_call_exit_handler(int line, char* file, char* reason);
-#include "fifoc.h"
-#define MAX_FIFO_SIZE 65535
-////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////Middleware//////////////////////////////////
 struct subs_args{
@@ -42,6 +38,21 @@ struct subs_args{
 void consumer(void* pParam);
 extern int exit_consumer;
 ////////////////////////////Middleware//////////////////////////////////
+#endif
+
+////////////////////////////Middleware/////////////////////////////////////////////////////////////
+#include "iec_item_type.h"
+extern void onRegFail(void *param);
+extern Boolean  quite;
+extern void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackParam); 
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/////////////////////////fifo///////////////////////////////////////////
+extern void iec_call_exit_handler(int line, char* file, char* reason);
+#include "fifoc.h"
+#define MAX_FIFO_SIZE 65535
+////////////////////////////////////////////////////////////////////////
+
 
 class Iec104DriverThread;
 
@@ -89,6 +100,7 @@ class IEC_104_DRIVERDRV Iec104driver_Instance : public DriverInstance
 	//
 	Track* Values;
 
+	#ifdef USE_RIPC_MIDDLEWARE
 	/////////////Middleware///////////////////////////////
     int          port;
     char const*  hostname;
@@ -100,6 +112,7 @@ class IEC_104_DRIVERDRV Iec104driver_Instance : public DriverInstance
 	RIPCQueue*   queue_control_dir;
 	struct subs_args arg;
 	//////////////////////////////////////////////////////
+	#endif
 
 	enum // states for the state machine
 	{
@@ -144,6 +157,7 @@ class IEC_104_DRIVERDRV Iec104driver_Instance : public DriverInstance
         strcat(fifo_monitor_name, str_instance_id);
         strcat(fifo_monitor_name, "iec104");
 
+		#ifdef USE_RIPC_MIDDLEWARE
 		port = 6000;
 		hostname = "localhost";
 
@@ -155,6 +169,63 @@ class IEC_104_DRIVERDRV Iec104driver_Instance : public DriverInstance
 		queue_control_dir = session2->createQueue(fifo_control_name);
 
 		arg.queue_monitor_dir = queue_monitor_dir;
+		#endif
+		///////////////////////////////////Middleware//////////////////////////////////////////////////
+
+		/////////////////////Middleware/////////////////////////////////////////////////////////////////
+		ORTEDomainProp          dp; 
+		ORTESubscription        *s = NULL;
+		int32_t                 strength = 1;
+		NtpTime                 persistence,deadline,minimumSeparation,delay;
+		Boolean                 havePublisher = ORTE_FALSE;
+		Boolean                 haveSubscriber = ORTE_FALSE;
+		IPAddress				smIPAddress = IPADDRESS_INVALID;
+		ORTEDomainAppEvents     events;
+
+		ORTEInit();
+		ORTEDomainPropDefaultGet(&dp);
+		NTPTIME_BUILD(minimumSeparation, 0); //0 s
+		NTPTIME_BUILD(delay, 1); //1 s
+
+		//initiate event system
+		ORTEDomainInitEvents(&events);
+
+		events.onRegFail = onRegFail;
+
+		//Create application     
+		domain = ORTEDomainAppCreate(ORTE_DEFAULT_DOMAIN,&dp,&events,ORTE_FALSE);
+
+		iec_item_type_type_register(domain);
+
+		//Create publisher
+		NTPTIME_BUILD(persistence, 5); //5 s
+		
+		publisher = ORTEPublicationCreate(
+		domain,
+		fifo_control_name,
+		"iec_item_type",
+		&instanceSend,
+		&persistence,
+		strength,
+		NULL,
+		NULL,
+		NULL);
+
+		//Create subscriber
+		NTPTIME_BUILD(deadline,3);
+
+		subscriber = ORTESubscriptionCreate(
+		domain,
+		IMMEDIATE,
+		BEST_EFFORTS,
+		fifo_monitor_name,
+		"iec_item_type",
+		&instanceRecv,
+		&deadline,
+		&minimumSeparation,
+		recvCallBack,
+		this,
+		smIPAddress);
 		///////////////////////////////////Middleware//////////////////////////////////////////////////
 
 		/////////////////////////////////////local fifo//////////////////////////////////////////////////////////
@@ -164,6 +235,7 @@ class IEC_104_DRIVERDRV Iec104driver_Instance : public DriverInstance
 
 		fifo_monitor_direction = fifo_open(fifo_monitor_name, max_fifo_queue_size, iec_call_exit_handler);
 
+		#ifdef USE_RIPC_MIDDLEWARE
 		arg.fifo_monitor_direction = fifo_monitor_direction;
 		///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -172,6 +244,7 @@ class IEC_104_DRIVERDRV Iec104driver_Instance : public DriverInstance
 	
 		CreateThread(NULL, 0, LPTHREAD_START_ROUTINE(consumer), (void*)&arg, 0, &threadid);
 		/////////////////////Middleware/////////////////////////////////////////////////////////////////
+		#endif
 	};
 
 	~Iec104driver_Instance()
@@ -184,9 +257,9 @@ class IEC_104_DRIVERDRV Iec104driver_Instance : public DriverInstance
 			Values = NULL;
 		}
 
+		#ifdef USE_RIPC_MIDDLEWARE
 		///////////////////////////////////Middleware//////////////////////////////////////////////////
 		exit_consumer = 1;
-//		Sleep(3000);
 		fifo_close(fifo_monitor_direction);
 		queue_monitor_dir->close();
 		queue_control_dir->close();
@@ -194,6 +267,12 @@ class IEC_104_DRIVERDRV Iec104driver_Instance : public DriverInstance
 		session2->close();
 		delete session1;
 		delete session2;
+		///////////////////////////////////Middleware//////////////////////////////////////////////////
+		#endif
+
+		///////////////////////////////////Middleware//////////////////////////////////////////////////
+		ORTEDomainAppDestroy(domain);
+        domain = NULL;
 		///////////////////////////////////Middleware//////////////////////////////////////////////////
 	};
 	//
@@ -207,6 +286,14 @@ class IEC_104_DRIVERDRV Iec104driver_Instance : public DriverInstance
 	Driver* ParentDriver;
 	QString unit_name;
     int instanceID; //Equals to "line concept" of a SCADA driver
+
+	//////Middleware/////////////
+    ORTEDomain *domain;
+	ORTEPublication *publisher;
+	ORTESubscription *subscriber;
+	iec_item_type    instanceSend;
+	iec_item_type    instanceRecv;
+	/////////////////////////////
 
 	////////////////local fifo///////////
 	fifo_h fifo_monitor_direction;

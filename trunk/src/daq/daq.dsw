@@ -182,6 +182,9 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name opc_ua_server
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name rtps_mngr
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -396,6 +399,21 @@ Package=<4>
 
 ###############################################################################
 
+Project: "librtps"="..\middleware\rtps\librtps\msvc\librtps.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name pthread
+    End Project Dependency
+}}}
+
+###############################################################################
+
 Project: "lightopc_lib"="..\drivers\opc_server_da\lo-0.888\LightOPC\lightopc.dsp" - Package Owner=<4>
 
 Package=<5>
@@ -469,6 +487,9 @@ Package=<4>
     End Project Dependency
     Begin Project Dependency
     Project_Dep_Name ripcclient
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name librtps
     End Project Dependency
 }}}
 
@@ -639,6 +660,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "pthread"="..\common\pthreads-w32-2-8-0\pthread.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "qui"="..\hmi_designer\designer\uilib\qui.dsp" - Package Owner=<4>
 
 Package=<5>
@@ -737,6 +770,21 @@ Package=<5>
 
 Package=<4>
 {{{
+}}}
+
+###############################################################################
+
+Project: "rtps_mngr"="..\middleware\rtps\manager\mcvs\rtps_mngr.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name librtps
+    End Project Dependency
 }}}
 
 ###############################################################################

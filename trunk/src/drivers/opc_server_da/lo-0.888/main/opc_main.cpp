@@ -308,6 +308,7 @@ inline void cleanup_common(void)
 }
 
 //Interface to field//////////////////////////////////////////////////////////////////////////
+#ifdef USE_RIPC_MIDDLEWARE
 ////////Middleware////////////
 #include "RIPCThread.h"
 #include "RIPCFactory.h"
@@ -316,10 +317,14 @@ inline void cleanup_common(void)
 #include "RIPCClientFactory.h"
 #include "ripc.h"
 //////////////////////////////
+#endif
+
 #include "fifoc.h"
 fifo_h fifo_control_direction; 
 fifo_h fifo_monitor_direction; 
 //////////////////////////////////////////////////////////////////////////////////////////////
+
+#ifdef USE_RIPC_MIDDLEWARE
 /////////////Middleware///////////////////////////////
 RIPCFactory* factory1;
 RIPCFactory* factory2;
@@ -327,9 +332,22 @@ RIPCSession* session1;
 RIPCSession* session2;
 RIPCQueue* queue_monitor_dir;	//queue in monitor direction: SCADA<------------- RTU
 RIPCQueue* queue_control_dir;	//queue in control direction: SCADA-------------> RTU
+#endif
 int exit_threads;
 int n_msg_sent_control_dir;
 //////////////////////////////////////////////////////
+
+////////////////////////////Middleware///////////////////////////////////////////////////////
+#include "iec_item_type.h"
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/////////////////////Middleware/////////////////////////
+ORTEDomain              *domain;
+ORTEPublication			*publisher;
+ORTESubscription        *subscriber;
+iec_item_type			instanceSend;
+iec_item_type		    instanceRecv;
+//////////////////////////////end//Middleware///////////
 
 #include "iec104types.h"
 #include "iec_item.h"
@@ -392,15 +410,32 @@ void control_dir_consumer(void* pParam)
 			fprintf(stderr,"Sending message %u th\n", n_msg_sent_control_dir);
 			fflush(stderr);
 
+			#ifdef USE_RIPC_MIDDLEWARE
 			//publishing data
 			queue_control_dir->put(&item_to_send, sizeof(struct iec_item));
-			
+			#endif
+
+			//Send in monitor direction
+			//prepare published data
+			memset(&instanceSend,0x00, sizeof(iec_item_type));
+
+			instanceSend.iec_type = item_to_send.iec_type;
+			memcpy(&instanceSend.iec_obj, &(item_to_send.iec_obj), sizeof(struct iec_object));
+			instanceSend.cause = item_to_send.cause;
+			instanceSend.msg_id = item_to_send.msg_id;
+			instanceSend.ioa_control_center = item_to_send.ioa_control_center;
+			instanceSend.casdu = item_to_send.casdu;
+			instanceSend.is_neg = item_to_send.is_neg;
+			instanceSend.checksum = item_to_send.checksum;
+
+			ORTEPublicationSend(publisher);
+						
 			n_msg_sent_control_dir++;
 		}
 	}
 }
 
-
+#ifdef USE_RIPC_MIDDLEWARE
 void monitoring_dir_consumer(void* pParam)
 {
 	struct iec_item item;
@@ -412,33 +447,113 @@ void monitoring_dir_consumer(void* pParam)
 		{
 			break;
 		}
-
+		
 		queue_monitor_dir->get(objDesc);
 
 		fifo_put(fifo_monitor_direction, (char*)&item, sizeof(struct iec_item));
 	}
 }
+#endif
+
+/////////////////////////////////////Middleware///////////////////////////////////////////
+Boolean  quite = ORTE_FALSE;
+int	regfail=0;
+
+//event system
+void onRegFail(void *param) 
+{
+  printf("registration to a manager failed\n");
+  regfail = 1;
+}
+
+void rebuild_iec_item_message(struct iec_item *item2, iec_item_type *item1)
+{
+	unsigned char checksum;
+
+	///////////////Rebuild struct iec_item//////////////////////////////////
+	item2->iec_type = item1->iec_type;
+	memcpy(&(item2->iec_obj), &(item1->iec_obj), sizeof(struct iec_object));
+	item2->cause = item1->cause;
+	item2->msg_id = item1->msg_id;
+	item2->ioa_control_center = item1->ioa_control_center;
+	item2->casdu = item1->casdu;
+	item2->is_neg = item1->is_neg;
+	item2->checksum = item1->checksum;
+	///////and check the 1 byte checksum////////////////////////////////////
+	checksum = clearCrc((unsigned char *)item2, sizeof(struct iec_item));
+
+//	fprintf(stderr,"new checksum = %u\n", checksum);
+
+	//if checksum is 0 then there are no errors
+	if(checksum != 0)
+	{
+		//log error message
+		ExitProcess(0);
+	}
+
+//	fprintf(stderr,"iec_type = %u\n", item2->iec_type);
+//	fprintf(stderr,"iec_obj = %x\n", item2->iec_obj);
+//	fprintf(stderr,"cause = %u\n", item2->cause);
+//	fprintf(stderr,"msg_id =%u\n", item2->msg_id);
+//	fprintf(stderr,"ioa_control_center = %u\n", item2->ioa_control_center);
+//	fprintf(stderr,"casdu =%u\n", item2->casdu);
+//	fprintf(stderr,"is_neg = %u\n", item2->is_neg);
+//	fprintf(stderr,"checksum = %u\n", item2->checksum);
+}
+
+void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackParam) 
+{
+	iec_item_type *item1 = (iec_item_type*)vinstance;
+
+	switch (info->status) 
+	{
+		case NEW_DATA:
+		{
+		  if(!quite)
+		  {
+			  struct iec_item item2;
+			  rebuild_iec_item_message(&item2, item1);
+			  fifo_put(fifo_monitor_direction, (char*)&item2, sizeof(struct iec_item));
+		  }
+		}
+		break;
+		case DEADLINE:
+		{
+			//printf("deadline occurred\n");
+		}
+		break;
+	}
+}
+////////////////////////////////Middleware/////////////////////////////////////
+
 
 inline void cleanup_all(DWORD objid)
 {
-  if (FAILED(CoRevokeClassObject(objid)))
-    UL_WARNING((LOGID, "CoRevokeClassObject() failed..."));
-  driver_destroy();
-  CoUninitialize();
-  cleanup_common();
+	if (FAILED(CoRevokeClassObject(objid)))
+	UL_WARNING((LOGID, "CoRevokeClassObject() failed..."));
+	driver_destroy();
+	CoUninitialize();
+	cleanup_common();
 
-  exit_threads = 1;
+	exit_threads = 1;
 
-  ///IPC close///////////////////////
-  fifo_close(fifo_monitor_direction);
-  fifo_close(fifo_control_direction);
-  ///////////////////////////////////
-  queue_monitor_dir->close();
-  queue_control_dir->close();
-  session1->close();
-  session2->close();
-  delete session1;
-  delete session2;
+	///IPC close///////////////////////
+	fifo_close(fifo_monitor_direction);
+	fifo_close(fifo_control_direction);
+	///////////////////////////////////
+
+	#ifdef USE_RIPC_MIDDLEWARE
+	queue_monitor_dir->close();
+	queue_control_dir->close();
+	session1->close();
+	session2->close();
+	delete session1;
+	delete session2;
+	#endif
+	///////////////////////////////////Middleware//////////////////////////////////////////////////
+	ORTEDomainAppDestroy(domain);
+	domain = NULL;
+	////////////////////////////////////Middleware//////////////////////////////////////////////////
 }
 
 ////////////////////////////apa///////////////////////////////////
@@ -687,14 +802,77 @@ int opc_main(HINSTANCE hInstance, int argc, char *argv[]) {
   devp->idnum = 1;
   //////////////////////////////////////////////////////////////
 
+  #ifdef USE_RIPC_MIDDLEWARE
 	factory1 = RIPCClientFactory::getInstance();
 	factory2 = RIPCClientFactory::getInstance();
 	session1 = factory1->create("localhost", 6000);
 	session2 = factory2->create("localhost", 6000);
 	queue_monitor_dir = session1->createQueue("fifo_global_monitor_direction");
 	queue_control_dir = session2->createQueue("fifo_global_control_direction");
+  #endif
 
   //////////////////////init fifos//////////////////////////////
+
+	/////////////////////Middleware/////////////////////////////////////////////////////////////////
+	int32_t                 strength = 1;
+	NtpTime                 persistence, deadline, minimumSeparation, delay;
+	IPAddress				smIPAddress = IPADDRESS_INVALID;
+	ORTEDomainProp          dp; 
+	ORTEDomainAppEvents     events;
+	
+	publisher = NULL;
+	subscriber = NULL;
+
+	ORTEInit();
+	ORTEDomainPropDefaultGet(&dp);
+	NTPTIME_BUILD(minimumSeparation,0); 
+	NTPTIME_BUILD(delay,1); //1s
+
+	//initiate event system
+	ORTEDomainInitEvents(&events);
+
+	events.onRegFail = onRegFail;
+
+	//Create application     
+	domain = ORTEDomainAppCreate(ORTE_DEFAULT_DOMAIN,&dp,&events,ORTE_FALSE);
+
+	iec_item_type_type_register(domain);
+
+	//Create publisher
+	NTPTIME_BUILD(persistence,5);
+
+	publisher = ORTEPublicationCreate(
+	domain,
+	"fifo_global_control_direction",
+	"iec_item_type",
+	&instanceSend,
+	&persistence,
+	strength,
+	NULL,
+	NULL,
+	NULL);
+
+	//if(publisher == NULL){} //check this error
+			
+	//Create subscriber
+	NTPTIME_BUILD(deadline,3);
+
+	subscriber = ORTESubscriptionCreate(
+	domain,
+	IMMEDIATE,
+	BEST_EFFORTS,
+	"fifo_global_monitor_direction",
+	"iec_item_type",
+	&instanceRecv,
+	&deadline,
+	&minimumSeparation,
+	recvCallBack,
+	NULL,
+	smIPAddress);
+
+	//if(subscriber == NULL){} //check this error
+	///////////////////////////////////Middleware//////////////////////////////////////////////////
+
   	char fifo_monitor_direction_name[70];
 	char fifo_control_direction_name[70];
 
@@ -725,7 +903,9 @@ int opc_main(HINSTANCE hInstance, int argc, char *argv[]) {
 	unsigned long threadid;
 	CreateThread(NULL, 0, LPTHREAD_START_ROUTINE(control_dir_consumer), NULL, 0, &threadid);
 	
+	#ifdef USE_RIPC_MIDDLEWARE
 	CreateThread(NULL, 0, LPTHREAD_START_ROUTINE(monitoring_dir_consumer), NULL, 0, &threadid);
+	#endif
 	//////////////////////////////////////////////////////////////
 
     //////////////////////////OPC server time stamp hour adjustment//////////////////////

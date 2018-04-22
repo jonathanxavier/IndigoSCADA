@@ -109,9 +109,7 @@ void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackPa
 		  {
 			  struct iec_item item2;
 			  rebuild_iec_item_message(&item2, item1);
-			  cl->received_command_callback = 1;
 			  cl->check_for_commands(&item2);
-			  cl->received_command_callback = 0;
 		  }
 		}
 		break;
@@ -123,12 +121,6 @@ void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackPa
 	}
 }
 ////////////////////////////////Middleware/////////////////////////////////////
-
-////////////////////////////////Middleware/////////////////
-iec_item_type MQTT_client_imp::instanceSend;
-ORTEPublication* MQTT_client_imp::publisher = NULL;
-////////////////////////////////Middleware/////////////////
-
 
 extern int gl_timeout_connection_with_parent;
 
@@ -189,12 +181,13 @@ MQTT_client_imp::MQTT_client_imp(char* broker_host_name, char* line_number)
 	#endif
 
 	/////////////////////Middleware/////////////////////////////////////////////////////////////////
-	received_command_callback = 0;
-
 	int32_t                 strength = 1;
 	NtpTime                 persistence, deadline, minimumSeparation, delay;
 	IPAddress				smIPAddress = IPADDRESS_INVALID;
+	ORTEDomainProp          dp; 
+	ORTEDomainAppEvents     events;
 	
+	publisher = NULL;
 	subscriber = NULL;
 
 	ORTEInit();
