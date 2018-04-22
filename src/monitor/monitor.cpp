@@ -126,9 +126,7 @@ void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackPa
 		  {
 			  struct iec_item item2;
 			  rebuild_iec_item_message(&item2, item1);
-			  //cl->received_command_callback = 1;
 			  fifo_put(cl->fifo_control_direction, (char*)&item2, sizeof(struct iec_item));
-			  //cl->received_command_callback = 0;
 		  }
 		}
 		break;
