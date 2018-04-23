@@ -240,13 +240,13 @@ MQTT_client_imp::MQTT_client_imp(char* broker_host_name, char* line_number)
 	//if(subscriber == NULL){} //check this error
 	///////////////////////////////////Middleware//////////////////////////////////////////////////
 
+	#ifdef USE_RIPC_MIDDLEWARE
 	///////////fifo//////////////////
 	strcat(fifo_control_name, "_fifo_client");
 
 	#define MAX_FIFO_SIZE 65535
 	fifo_control_direction = fifo_open(fifo_control_name, MAX_FIFO_SIZE, iec_call_exit_handler);
-	
-	#ifdef USE_RIPC_MIDDLEWARE
+		
 	unsigned long threadid;
 	CreateThread(NULL, 0, LPTHREAD_START_ROUTINE(control_dir_consumer), (void*)&arg, 0, &threadid);
 	///////////////////////////////////Middleware//////////////////////////////////////////////////

@@ -94,9 +94,9 @@ class MQTT_client_imp
 	 u_int n_msg_sent_monitor_dir;
 	 u_int n_msg_sent_control_dir;
 
-	 fifo_h fifo_control_direction;
-
 	 #ifdef USE_RIPC_MIDDLEWARE
+	 fifo_h fifo_control_direction;
+	 
 	 int exit_threads;
 	 int          port;
 	 char const*  hostname;
