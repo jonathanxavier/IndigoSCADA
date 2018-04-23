@@ -23,15 +23,11 @@
 #include "itrace.h"
 #include <modbus.h>
 
-////////Middleware/////////////
-#include "RIPCThread.h"
-#include "RIPCFactory.h"
-#include "RIPCSession.h"
-#include "RIPCServerFactory.h"
-#include "RIPCClientFactory.h"
-#include "ripc.h"
-///////////////////////////////
-#include "fifoc.h"
+#include "iec_item_type.h" //Middleware
+////////////////////////////Middleware///////////////////////////////////////////////////////
+extern void onRegFail(void *param);
+extern void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackParam); 
+/////////////////////////////////////////////////////////////////////////////////////////////
 
 struct modbusContext
 {
@@ -77,14 +73,6 @@ enum {
 #define FC_REPORT_SLAVE_ID           0x11
 #define FC_WRITE_AND_READ_REGISTERS  0x17
 
-////////Middleware/////////////
-typedef class modbus_imp* par;
-
-struct subs_args{
-	par parent;
-};
-
-////////Middleware/////////////
 
 class modbus_imp
 {
@@ -96,20 +84,17 @@ class modbus_imp
 	/////////////////////////////////////////////////
 	int g_dwNumItems;
 	struct modbusDbRecord* Config_db;
+	/////////////////////Middleware/////////////////////////
+	ORTEDomain              *domain;
+	ORTEPublication			*publisher;
+	ORTESubscription        *subscriber;
+	iec_item_type			instanceSend;
+	iec_item_type		    instanceRecv;
+	//////////////////////////////end//Middleware///////////
+
 	/////////////Middleware///////////////////////////////
 	u_int n_msg_sent_monitor_dir;
 	u_int n_msg_sent_control_dir;
-	int exit_threads;
-	fifo_h fifo_control_direction;
-    int          port;
-    char const*  hostname;
-    RIPCFactory* factory1;
-	RIPCFactory* factory2;
-	RIPCSession* session1;
-	RIPCSession* session2;
-	RIPCQueue*   queue_monitor_dir;
-	RIPCQueue*   queue_control_dir;
-	struct subs_args arg;
 	//////////////////////////////////////////////////////
 	bool fExit;
 	unsigned long pollingTime;
@@ -141,8 +126,6 @@ class modbus_imp
 	
 	////////////////////Middleware//////////////////////
 	void check_for_commands(struct iec_item *item);
-	void alloc_command_resources(void);
-	void free_command_resources(void);
 	void get_utc_host_time(struct cp56time2a* time);
 	void get_local_host_time(struct cp56time2a* time);
 	////////////////////////////////////////////////
