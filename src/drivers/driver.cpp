@@ -358,8 +358,20 @@ void DriverInstance::PostList(const QString &name, IECValueList &list)
 QStringList DriverInstance::EnabledUnits;          // this is the list of enabled units
 DriverInstance::DriverProps DriverInstance::Props; // properties dictionary
 QMutex DriverInstance::Lock; // mutex lock
-fifo_h DriverInstance::fifo_global_monitor_direction;
-fifo_h DriverInstance::fifo_global_control_direction;
+
+#ifdef USE_RIPC_MIDDLEWARE
+RIPCFactory* DriverInstance::global_factory1;
+RIPCFactory* DriverInstance::global_factory2;
+RIPCSession* DriverInstance::global_session1;
+RIPCSession* DriverInstance::global_session2;
+RIPCQueue* DriverInstance::fifo_global_monitor_direction;
+RIPCQueue* DriverInstance::fifo_global_control_direction;
+#endif
+
+////////////////////////////////Middleware/////////////////
+iec_item_type DriverInstance::global_instanceSend;
+ORTEPublication* DriverInstance::global_publisher = NULL;
+////////////////////////////////Middleware/////////////////
 //
 QString DriverInstance::FormUnitList() // build the lists for SQL transaction filtering
 {

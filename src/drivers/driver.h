@@ -23,7 +23,18 @@
 #include "common.h"
 #include "results.h"
 #include "IndentedTrace.h"
-#include "fifoc.h"
+
+#ifdef USE_RIPC_MIDDLEWARE
+////////Middleware////////////
+#include "RIPCThread.h"
+#include "RIPCFactory.h"
+#include "RIPCSession.h"
+#include "RIPCServerFactory.h"
+#include "RIPCClientFactory.h"
+#include "ripc.h"
+//////////////////////////////
+#endif
+#include "iec_item_type.h"
 //
 // base class for driver class
 // this class has two functions
@@ -202,9 +213,20 @@ class QSEXPORT DriverInstance : public QObject // the actual driver bits
 	static DriverProps Props; // the properites and semaphores
 	//
 	////////////////gloabal fifo///////////
-	static fifo_h fifo_global_monitor_direction;
-	static fifo_h fifo_global_control_direction;
+	#ifdef USE_RIPC_MIDDLEWARE
+	/////////////Middleware///////////////////////////////
+    static RIPCFactory* global_factory1;
+	static RIPCFactory* global_factory2;
+	static RIPCSession* global_session1;
+	static RIPCSession* global_session2;
+	static RIPCQueue* fifo_global_monitor_direction;
+	static RIPCQueue* fifo_global_control_direction;
+	#endif
 	///////////////////////////////////////
+	//////Middleware/////////////
+	static ORTEPublication *global_publisher;
+	static iec_item_type    global_instanceSend;
+	/////////////////////////////
 	//
 	void AddProp(const QString &k,const QString &v) // add a property
 	{
