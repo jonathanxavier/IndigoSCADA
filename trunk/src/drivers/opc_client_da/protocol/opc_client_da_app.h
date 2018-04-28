@@ -33,6 +33,7 @@
 #include "opcerror.h"
 #include "itrace.h"
 
+#ifdef USE_RIPC_MIDDLEWARE
 ////////Middleware/////////////
 #include "RIPCThread.h"
 #include "RIPCFactory.h"
@@ -42,6 +43,7 @@
 #include "ripc.h"
 ///////////////////////////////
 #include "fifoc.h"
+#endif
 
 struct structItem
 {
@@ -69,6 +71,7 @@ enum opc_client_states {
 
 #define ITEM_WRITTEN_AT_A_TIME 1
 
+#ifdef USE_RIPC_MIDDLEWARE
 ////////Middleware/////////////
 typedef class Opc_client_da_imp* par;
 
@@ -76,6 +79,14 @@ struct subs_args{
 	par parent;
 };
 ////////Middleware/////////////
+#endif
+
+#include "iec_item_type.h" //Middleware
+
+////////////////////////////Middleware///////////////////////////////////////////////////////
+extern void onRegFail(void *param);
+extern void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackParam); 
+/////////////////////////////////////////////////////////////////////////////////////////////
 
 class Opc_client_da_imp
 {
@@ -128,6 +139,8 @@ class Opc_client_da_imp
 	 /////////////Middleware///////////////////////////////
 	 u_int n_msg_sent_monitor_dir;
 	 u_int n_msg_sent_control_dir;
+
+	 #ifdef USE_RIPC_MIDDLEWARE
 	 int exit_threads;
 	 fifo_h fifo_control_direction;
 	 int          port;
@@ -140,6 +153,16 @@ class Opc_client_da_imp
 	 RIPCQueue*   queue_control_dir;
 	 struct subs_args arg;
 	 //////////////////////////////////////////////////////
+	 #endif
+
+	 /////////////////////Middleware/////////////////////////////////////////////////////////////////
+	 int received_command_callback;
+	 ORTEDomain              *domain;
+	 static ORTEPublication  *publisher;
+	 ORTESubscription        *subscriber;
+	 static iec_item_type    instanceSend;
+	 iec_item_type		     instanceRecv;
+	 ///////////////////////////////////Middleware//////////////////////////////////////////////////
 
 	 int OpcStart(char* OpcServerProgID, char* OpcclassId, char* OpcUpdateRate, char* OpcPercentDeadband);
 	 int OpcStop();
