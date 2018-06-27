@@ -937,8 +937,270 @@ int modbus_imp::PollItems(void)
 		else if(Config_db[rowNumber].modbus_function_read == FC_READ_INPUT_REGISTERS)
 		{
 			//0x04
-			printf("Function %x not supported\n", 0x04);
-		
+			if((Config_db[rowNumber].modbus_type == VT_I4) || (Config_db[rowNumber].modbus_type == VT_UI4)|| (Config_db[rowNumber].modbus_type == VT_R4))
+			{
+				int registers = 2; //read 32 bits
+
+				int address = Config_db[rowNumber].modbus_address;
+
+				rc = modbus_read_input_registers(ctx, address, registers, tab_rp_registers);
+
+				printf("modbus_read_input_registers: ");
+
+				if (rc != registers) 
+				{
+                    comm_error_counter++;
+					
+                    continue;
+				}
+
+				if(Config_db[rowNumber].iec_type_read == M_ME_TF_1)
+				{
+					float real;
+
+					real = modbus_get_float(tab_rp_registers);
+
+					printf("Get float: %f\n", real);
+
+					if(ABS(Config_db[rowNumber].last_value.f - real) > Config_db[rowNumber].deadband)
+					{
+						Config_db[rowNumber].last_value.f = real;
+
+						send_item = true;
+					}
+					else
+					{
+						send_item = false;
+					}
+
+					item_to_send.iec_obj.ioa = Config_db[rowNumber].ioa_control_center;
+
+					item_to_send.cause = 0x03;
+
+					item_to_send.iec_type = M_ME_TF_1;
+					
+					get_local_host_time(&actual_time);
+
+					item_to_send.iec_obj.o.type36.mv = real;
+					item_to_send.iec_obj.o.type36.time = actual_time;
+					item_to_send.iec_obj.o.type36.iv = 0;
+				}
+				else if(Config_db[rowNumber].iec_type_read == M_IT_TB_1)
+				{
+					int integer32;
+					integer32 = modbus_get_int(tab_rp_registers);
+
+					printf("Get integer: %d\n", integer32);
+
+					if(ABS(Config_db[rowNumber].last_value.a - integer32) > (int)Config_db[rowNumber].deadband)
+					{
+						Config_db[rowNumber].last_value.a = integer32;
+
+						send_item = true;
+					}
+					else
+					{
+						send_item = false;
+					}
+
+					item_to_send.iec_obj.ioa = Config_db[rowNumber].ioa_control_center;
+
+					item_to_send.cause = 0x03;
+
+					item_to_send.iec_type = M_IT_TB_1;
+					
+					get_local_host_time(&actual_time);
+
+					item_to_send.iec_obj.o.type37.counter = integer32;
+					item_to_send.iec_obj.o.type37.time = actual_time;
+					item_to_send.iec_obj.o.type37.iv = 0;
+				}
+				else if(Config_db[rowNumber].iec_type_read == M_ME_TO_1)
+				{
+					unsigned int uinteger32;
+					uinteger32 = modbus_get_uint(tab_rp_registers);
+
+					printf("Get unsigned integer: %d\n", uinteger32);
+
+					if(ABS(Config_db[rowNumber].last_value.ua - uinteger32) > (int)Config_db[rowNumber].deadband)
+					{
+						Config_db[rowNumber].last_value.ua = uinteger32;
+
+						send_item = true;
+					}
+					else
+					{
+						send_item = false;
+					}
+
+					item_to_send.iec_obj.ioa = Config_db[rowNumber].ioa_control_center;
+
+					item_to_send.cause = 0x03;
+
+					item_to_send.iec_type = M_ME_TO_1;
+					
+					get_local_host_time(&actual_time);
+
+					item_to_send.iec_obj.o.type151.mv = uinteger32;
+					item_to_send.iec_obj.o.type151.time = actual_time;
+					item_to_send.iec_obj.o.type151.iv = 0;
+				}
+			}
+			else if(Config_db[rowNumber].modbus_type == VT_I2)
+			{
+				int registers = 1; //read 16 bits
+
+				int address = Config_db[rowNumber].modbus_address;
+				
+				if(Config_db[rowNumber].iec_type_read == M_ME_TE_1)
+				{
+					rc = modbus_read_input_registers(ctx, address, registers, tab_rp_registers);
+					printf("modbus_read_input_registers: ");
+
+					if (rc != registers) 
+					{
+						comm_error_counter++;
+						
+						continue;
+					}
+					
+					short integer16;
+					integer16 = tab_rp_registers[0];
+
+					printf("Get integer: %d\n", integer16);
+
+					if(ABS(Config_db[rowNumber].last_value.a - integer16) > (short)Config_db[rowNumber].deadband)
+					{
+						Config_db[rowNumber].last_value.a = integer16;
+
+						send_item = true;
+					}
+					else
+					{
+						send_item = false;
+					}
+
+					item_to_send.iec_obj.ioa = Config_db[rowNumber].ioa_control_center;
+
+					item_to_send.cause = 0x03;
+
+					item_to_send.iec_type = M_ME_TE_1;
+					
+					get_local_host_time(&actual_time);
+
+					item_to_send.iec_obj.o.type35.mv = integer16;
+					item_to_send.iec_obj.o.type35.time = actual_time;
+					item_to_send.iec_obj.o.type35.iv = 0;
+
+				}
+				else if(item_to_send.iec_type = M_SP_TB_1)
+				{
+					if(stored_address == 0 || stored_address != address)
+					{
+						stored_address = address;
+						rc = modbus_read_input_registers(ctx, address, registers, tab_rp_registers);
+						printf("modbus_read_input_registers: ");
+
+						if (rc != registers) 
+						{
+							comm_error_counter++;
+							
+							continue;
+						}
+
+						memcpy(stored_tab_rp_registers, tab_rp_registers, nb_points * sizeof(uint16_t));
+					}
+					else
+					{
+						memcpy(tab_rp_registers, stored_tab_rp_registers, nb_points * sizeof(uint16_t));
+					}
+					
+					unsigned short integer16;
+					integer16 = tab_rp_registers[0];
+
+					//uint8_t value = get_bit_from_word(integer16, Config_db[rowNumber].offset_bit);				
+					//get a bit value from a word
+					uint8_t value = integer16&(1 << Config_db[rowNumber].offset_bit)  ? 1 : 0;				
+					
+					printf("get bit %d from word: value = %d\n", Config_db[rowNumber].offset_bit, (int)value);
+
+					if(Config_db[rowNumber].last_value.a != value)
+					{
+						Config_db[rowNumber].last_value.a = value;
+
+						send_item = true;
+					}
+					else
+					{
+						send_item = false;
+					}
+					
+					item_to_send.iec_obj.ioa = Config_db[rowNumber].ioa_control_center;
+
+					item_to_send.cause = 0x03;
+				
+					item_to_send.iec_type = M_SP_TB_1;
+					
+					get_local_host_time(&actual_time);
+
+					item_to_send.iec_obj.o.type30.sp = value;
+					item_to_send.iec_obj.o.type30.time = actual_time;
+					item_to_send.iec_obj.o.type30.iv = 0;
+					
+					IT_COMMENT1("Value = %d", value);
+				}
+			}
+			else if(Config_db[rowNumber].modbus_type == VT_UI2)
+			{
+				int registers = 1; //read 16 bits
+
+				int address = Config_db[rowNumber].modbus_address;
+				
+				if(Config_db[rowNumber].iec_type_read == M_ME_TQ_1)
+				{
+					rc = modbus_read_input_registers(ctx, address, registers, tab_rp_registers);
+					printf("modbus_read_input_registers: ");
+
+					if (rc != registers) 
+					{
+						comm_error_counter++;
+						
+						continue;
+					}
+					
+					unsigned short uinteger16;
+					uinteger16 = tab_rp_registers[0];
+
+					printf("Get unsigned integer: %d\n", uinteger16);
+
+					if(ABS(Config_db[rowNumber].last_value.ua - uinteger16) > (short)Config_db[rowNumber].deadband)
+					{
+						Config_db[rowNumber].last_value.ua = uinteger16;
+
+						send_item = true;
+					}
+					else
+					{
+						send_item = false;
+					}
+
+					item_to_send.iec_obj.ioa = Config_db[rowNumber].ioa_control_center;
+
+					item_to_send.cause = 0x03;
+
+					item_to_send.iec_type = M_ME_TQ_1;
+					
+					get_local_host_time(&actual_time);
+
+					item_to_send.iec_obj.o.type153.mv = uinteger16;
+					item_to_send.iec_obj.o.type153.time = actual_time;
+					item_to_send.iec_obj.o.type153.iv = 0;
+				}
+			}
+			else
+			{
+				printf("Modbus type %d not supported with FC_READ_INPUT_REGISTERS", Config_db[rowNumber].modbus_type);
+			}
 		}
 		else if(Config_db[rowNumber].modbus_function_read == FC_READ_EXCEPTION_STATUS)
 		{
@@ -1501,8 +1763,8 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 								int address = Config_db[rowNumber].modbus_address;
 
 								int rc;
-								rc = modbus_read_registers(ctx, address, registers, tab_rp_registers);
-								printf("modbus_read_registers: ");
+								rc = modbus_read_input_registers(ctx, address, registers, tab_rp_registers);
+								printf("modbus_read_input_registers: ");
 
 								if (rc == registers) 
 								{
