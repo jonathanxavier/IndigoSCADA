@@ -61,7 +61,7 @@ struct args{
 
 void PipeWorker(void* pParam);
 
-#define RUNTIME_USAGE "Run time usage: %s -a server IP address -p server TCP port -d serial device -b serial baud -c serial databits -e serial stopbit -f serial parity -s server_id -l line number -t polling time\n"
+#define RUNTIME_USAGE "Run time usage: %s -a server IP address -p server TCP port -d serial device -b serial baud -c serial databits -e serial stopbit -f serial parity -l line number -t polling time\n"
 
 void usage(char** argv)
 {
@@ -81,7 +81,7 @@ int main( int argc, char **argv )
     char data_bit[5];/* Data bit, eg. 8 */
     char stop_bit[5];/* Stop bit, eg. 1 */
     char parity[5];/* Parity: 'N', 'O', 'E' */
-	char server_id[5];
+	
 
 	char line_number[80];
 	char polling_time[80];
@@ -100,7 +100,6 @@ int main( int argc, char **argv )
     data_bit[0] = '\0';
     stop_bit[0] = '\0';
     parity[0] = '\0';
-	server_id[0] = '\0';
 	//
 	line_number[0] = '\0';
 	polling_time[0] = '\0';
@@ -141,9 +140,6 @@ int main( int argc, char **argv )
 			case 'l' :
 			strcpy(line_number, optarg);
 			break;
-			case 's' :
-			strcpy(server_id, optarg);
-			break;
 			case 't' :
 			strcpy(polling_time, optarg);
 			break;
@@ -173,14 +169,7 @@ int main( int argc, char **argv )
 		fflush(stderr);
 		return EXIT_FAILURE;
 	}
-
-	if(strlen(server_id) == 0)
-	{
-		fprintf(stderr,"server_id is not known\n");
-		fflush(stderr);
-		return EXIT_FAILURE;
-	}
-
+	
 	pollingTime = atoi(polling_time);
 
 	if(strlen(modbusServerAddress) > 0 && strlen(modbusServerPort) > 0)
@@ -189,10 +178,7 @@ int main( int argc, char **argv )
 		strcat(NewConsoleTitle, modbusServerAddress);
 		strcat(NewConsoleTitle, " PORT ");
 		strcat(NewConsoleTitle, modbusServerPort);
-
-		strcat(NewConsoleTitle, " SERVER_ID ");
-		strcat(NewConsoleTitle, server_id);
-
+	
 		use_context = TCP;
 	}
 	else
@@ -210,9 +196,6 @@ int main( int argc, char **argv )
 
 		strcat(NewConsoleTitle, " PARITY ");
 		strcat(NewConsoleTitle, parity);
-
-		strcat(NewConsoleTitle, " SERVER_ID ");
-		strcat(NewConsoleTitle, server_id);
 
 		use_context = RTU;
 	}
@@ -251,8 +234,7 @@ int main( int argc, char **argv )
 	struct modbusContext my_ctx;
 
 	my_ctx.use_context = use_context;
-	my_ctx.server_id = atoi(server_id);
-
+	
 	if(use_context == TCP)
 	{
 		//MODBUS TCP

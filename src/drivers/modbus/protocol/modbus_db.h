@@ -33,6 +33,7 @@ enum MODBUS_TYPE {
 struct modbusDbRecord
 {
 	//////////////////MODBUS RTU part/////////////////////////////////////////
+	int slave_id;				//Slave ID of RTU
 	int modbus_function_read;	//modbus funtion to read
 	int modbus_function_write;	//modbus funtion to write
 	int modbus_address;	//address of the memory to fetch
