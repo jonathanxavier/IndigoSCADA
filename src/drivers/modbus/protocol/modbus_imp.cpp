@@ -1780,8 +1780,8 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 								modbus_set_slave(ctx, Config_db[rowNumber].slave_id);
 
 								int rc;
-								rc = modbus_read_input_registers(ctx, address, registers, tab_rp_registers);
-								printf("modbus_read_input_registers: ");
+								rc = modbus_read_registers(ctx, address, registers, tab_rp_registers);
+								printf("modbus_read_registers: ");
 
 								if (rc == registers) 
 								{
