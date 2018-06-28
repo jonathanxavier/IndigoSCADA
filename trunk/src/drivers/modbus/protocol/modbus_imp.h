@@ -50,8 +50,6 @@ struct modbusContext
     uint8_t stop_bit;
     /* Parity: 'N', 'O', 'E' */
     char parity;
-
-	int server_id; //ID of the RTU slave
 };
 
 enum {

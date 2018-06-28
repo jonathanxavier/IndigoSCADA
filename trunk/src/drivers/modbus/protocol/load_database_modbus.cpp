@@ -45,38 +45,46 @@ static int db_callback(void *NotUsed, int argc, char **argv, char **azColName)
 			case 0:
 			{
 				//column 1 in table modbus_table
-				//modbus_function_read
+				//slave ID
 				if(argv[i] != NULL)
-					gl_Config_db[gl_row_counter].modbus_function_read = atoi(argv[i]);
+					gl_Config_db[gl_row_counter].slave_id = atoi(argv[i]);
 			}
 			break;
 			case 1:
 			{
 				//column 2 in table modbus_table
-				//modbus_function_write
+				//modbus_function_read
 				if(argv[i] != NULL)
-					gl_Config_db[gl_row_counter].modbus_function_write = atoi(argv[i]);
+					gl_Config_db[gl_row_counter].modbus_function_read = atoi(argv[i]);
 			}
 			break;
 			case 2:
 			{
 				//column 3 in table modbus_table
-				//modbus_address
+				//modbus_function_write
 				if(argv[i] != NULL)
-					gl_Config_db[gl_row_counter].modbus_address = atoi(argv[i]);
+					gl_Config_db[gl_row_counter].modbus_function_write = atoi(argv[i]);
 			}
 			break;
 			case 3:
 			{
 				//column 4 in table modbus_table
-				//offset_bit
+				//modbus_address
 				if(argv[i] != NULL)
-					gl_Config_db[gl_row_counter].offset_bit = atoi(argv[i]);
+					gl_Config_db[gl_row_counter].modbus_address = atoi(argv[i]);
 			}
 			break;
 			case 4:
 			{
 				//column 5 in table modbus_table
+				//offset_bit
+				if(argv[i] != NULL)
+					gl_Config_db[gl_row_counter].offset_bit = atoi(argv[i]);
+			}
+			break;
+			case 5:
+			{
+				//column 6 in table modbus_table
 				//modbus_type expressed like an OPC type
 				if(argv[i] != NULL)
 				{
@@ -135,17 +143,17 @@ static int db_callback(void *NotUsed, int argc, char **argv, char **azColName)
 				}
 			}
 			break;
-			case 5:
+			case 6:
 			{
-				//column 6 in table modbus_table
+				//column 7 in table modbus_table
 				//ioa_control_center Unstructured
 				if(argv[i] != NULL)
 					gl_Config_db[gl_row_counter].ioa_control_center = atoi(argv[i]);
 			}
 			break;
-			case 6:
+			case 7:
 			{
-				//column 7 in table modbus_table
+				//column 8 in table modbus_table
 				//iec_type_read
 				if(argv[i] != NULL)
 				{
@@ -174,11 +182,11 @@ static int db_callback(void *NotUsed, int argc, char **argv, char **azColName)
 				}
 			}	
 			break;
-			case 7:
+			case 8:
 			{
 				if(argv[i] != NULL)
 				{
-					//column 8 in table modbus_table
+					//column 9 in table modbus_table
 					//iec_type_write
 					if(strcmp(argv[i], "C_SC_TA_1") == 0)
 					{
@@ -205,9 +213,9 @@ static int db_callback(void *NotUsed, int argc, char **argv, char **azColName)
 				}
 			}	
 			break;
-			case 8:
+			case 9:
 			{
-				//column 9 in table modbus_table
+				//column 10 in table modbus_table
 				//deadband
 				if(argv[i] != NULL)
 					gl_Config_db[gl_row_counter].deadband = (float)atof(argv[i]);

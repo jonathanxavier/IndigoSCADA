@@ -108,7 +108,6 @@ fExit(false),pollingTime(polling_time), general_interrogation(true), is_connecte
 {   
 	lineNumber = atoi(line_number);
 	my_modbus_context.use_context = my_ctx->use_context;
-	my_modbus_context.server_id = my_ctx->server_id;
 
 	if(my_modbus_context.use_context == TCP)
 	{
@@ -215,8 +214,6 @@ fExit(false),pollingTime(polling_time), general_interrogation(true), is_connecte
 	modbus_set_debug(ctx, TRUE);
 
     modbus_set_error_recovery(ctx,(modbus_error_recovery_mode)(MODBUS_ERROR_RECOVERY_LINK | MODBUS_ERROR_RECOVERY_PROTOCOL));
-
-    modbus_set_slave(ctx, my_modbus_context.server_id);
 
     if (modbus_connect(ctx) == -1) 
 	{
@@ -570,6 +567,8 @@ int modbus_imp::PollItems(void)
 
 				int address = Config_db[rowNumber].modbus_address;
 
+				modbus_set_slave(ctx, Config_db[rowNumber].slave_id);
+
 				rc = modbus_read_bits(ctx, address, bit_size, tab_rp_bits);
 
 				if (rc != 1) 
@@ -623,6 +622,8 @@ int modbus_imp::PollItems(void)
 
 				int address = Config_db[rowNumber].modbus_address;
 
+				modbus_set_slave(ctx, Config_db[rowNumber].slave_id);
+
 				rc = modbus_read_input_bits(ctx, address, bit_size, tab_rp_bits);
 
 				if (rc != 1) 
@@ -674,6 +675,8 @@ int modbus_imp::PollItems(void)
 				int registers = 2; //read 32 bits
 
 				int address = Config_db[rowNumber].modbus_address;
+
+				modbus_set_slave(ctx, Config_db[rowNumber].slave_id);
 
 				rc = modbus_read_registers(ctx, address, registers, tab_rp_registers);
 
@@ -783,6 +786,8 @@ int modbus_imp::PollItems(void)
 				int registers = 1; //read 16 bits
 
 				int address = Config_db[rowNumber].modbus_address;
+
+				modbus_set_slave(ctx, Config_db[rowNumber].slave_id);
 				
 				if(Config_db[rowNumber].iec_type_read == M_ME_TE_1)
 				{
@@ -887,6 +892,8 @@ int modbus_imp::PollItems(void)
 				int registers = 1; //read 16 bits
 
 				int address = Config_db[rowNumber].modbus_address;
+
+				modbus_set_slave(ctx, Config_db[rowNumber].slave_id);
 				
 				if(Config_db[rowNumber].iec_type_read == M_ME_TQ_1)
 				{
@@ -942,6 +949,8 @@ int modbus_imp::PollItems(void)
 				int registers = 2; //read 32 bits
 
 				int address = Config_db[rowNumber].modbus_address;
+
+				modbus_set_slave(ctx, Config_db[rowNumber].slave_id);
 
 				rc = modbus_read_input_registers(ctx, address, registers, tab_rp_registers);
 
@@ -1052,6 +1061,8 @@ int modbus_imp::PollItems(void)
 
 				int address = Config_db[rowNumber].modbus_address;
 				
+				modbus_set_slave(ctx, Config_db[rowNumber].slave_id);
+
 				if(Config_db[rowNumber].iec_type_read == M_ME_TE_1)
 				{
 					rc = modbus_read_input_registers(ctx, address, registers, tab_rp_registers);
@@ -1156,6 +1167,8 @@ int modbus_imp::PollItems(void)
 
 				int address = Config_db[rowNumber].modbus_address;
 				
+				modbus_set_slave(ctx, Config_db[rowNumber].slave_id);
+
 				if(Config_db[rowNumber].iec_type_read == M_ME_TQ_1)
 				{
 					rc = modbus_read_input_registers(ctx, address, registers, tab_rp_registers);
@@ -1735,6 +1748,8 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 								int rc;
 
 								int address = Config_db[rowNumber].modbus_address;
+
+								modbus_set_slave(ctx, Config_db[rowNumber].slave_id);
 								
 								rc = modbus_write_bit(ctx, address, cmd_val.v);
 
@@ -1761,6 +1776,8 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 								int registers = 1; //read 16 bits
 
 								int address = Config_db[rowNumber].modbus_address;
+
+								modbus_set_slave(ctx, Config_db[rowNumber].slave_id);
 
 								int rc;
 								rc = modbus_read_input_registers(ctx, address, registers, tab_rp_registers);
@@ -1835,6 +1852,8 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 
 								int address = Config_db[rowNumber].modbus_address;
 
+								modbus_set_slave(ctx, Config_db[rowNumber].slave_id);
+
 								// Many registers
 								int rc;
 								rc = modbus_write_registers(ctx, address, registers, tab_rp_registers);
@@ -1873,6 +1892,8 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 
 								int address = Config_db[rowNumber].modbus_address;
 
+								modbus_set_slave(ctx, Config_db[rowNumber].slave_id);
+
 								// Many registers
 								int rc;
 								rc = modbus_write_registers(ctx, address, registers, tab_rp_registers);
@@ -1910,6 +1931,8 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 								int registers = 1; //we write 16 bits
 
 								int address = Config_db[rowNumber].modbus_address;
+
+								modbus_set_slave(ctx, Config_db[rowNumber].slave_id);
 
 								// Many registers
 								int rc;
