@@ -27,7 +27,8 @@ enum MODBUS_TYPE {
 	VT_UI2	= 18,
 	VT_UI4	= 19,
 	VT_I8	= 20,
-	VT_UI8	= 21
+	VT_UI8	= 21,
+	VT_R4SWAP = 22
 };
 
 struct modbusDbRecord

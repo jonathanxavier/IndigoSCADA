@@ -670,7 +670,11 @@ int modbus_imp::PollItems(void)
 		else if(Config_db[rowNumber].modbus_function_read == FC_READ_HOLDING_REGISTERS)
 		{
 			//0x03
-			if((Config_db[rowNumber].modbus_type == VT_I4) || (Config_db[rowNumber].modbus_type == VT_UI4)|| (Config_db[rowNumber].modbus_type == VT_R4))
+			if((Config_db[rowNumber].modbus_type == VT_I4) || 
+			   (Config_db[rowNumber].modbus_type == VT_UI4)|| 
+			   (Config_db[rowNumber].modbus_type == VT_R4) ||
+			   (Config_db[rowNumber].modbus_type == VT_R4SWAP)
+			   )
 			{
 				int registers = 2; //read 32 bits
 
@@ -693,7 +697,20 @@ int modbus_imp::PollItems(void)
 				{
 					float real;
 
-					real = modbus_get_float(tab_rp_registers);
+					if(Config_db[rowNumber].modbus_type == VT_R4)
+					{
+						real = modbus_get_float(tab_rp_registers);
+					}
+					else if(Config_db[rowNumber].modbus_type == VT_R4SWAP)
+					{
+					    // swap LSB and MSB
+						uint16_t tmp1 = tab_rp_registers[0];
+						uint16_t tmp2 = tab_rp_registers[1];
+						tab_rp_registers[0] = tmp2;
+						tab_rp_registers[1] = tmp1;
+
+						real = modbus_get_float(&tab_rp_registers[0]);
+					}
 
 					printf("Get float: %f\n", real);
 
@@ -944,7 +961,11 @@ int modbus_imp::PollItems(void)
 		else if(Config_db[rowNumber].modbus_function_read == FC_READ_INPUT_REGISTERS)
 		{
 			//0x04
-			if((Config_db[rowNumber].modbus_type == VT_I4) || (Config_db[rowNumber].modbus_type == VT_UI4)|| (Config_db[rowNumber].modbus_type == VT_R4))
+			if((Config_db[rowNumber].modbus_type == VT_I4) || 
+			   (Config_db[rowNumber].modbus_type == VT_UI4)|| 
+			   (Config_db[rowNumber].modbus_type == VT_R4) ||
+			   (Config_db[rowNumber].modbus_type == VT_R4SWAP)
+			   )
 			{
 				int registers = 2; //read 32 bits
 
@@ -967,7 +988,20 @@ int modbus_imp::PollItems(void)
 				{
 					float real;
 
-					real = modbus_get_float(tab_rp_registers);
+					if(Config_db[rowNumber].modbus_type == VT_R4)
+					{
+						real = modbus_get_float(tab_rp_registers);
+					}
+					else if(Config_db[rowNumber].modbus_type == VT_R4SWAP)
+					{
+					    // swap LSB and MSB
+						uint16_t tmp1 = tab_rp_registers[0];
+						uint16_t tmp2 = tab_rp_registers[1];
+						tab_rp_registers[0] = tmp2;
+						tab_rp_registers[1] = tmp1;
+
+						real = modbus_get_float(&tab_rp_registers[0]);
+					}
 
 					printf("Get float: %f\n", real);
 
@@ -1847,6 +1881,38 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 							if(Config_db[rowNumber].modbus_type == VT_R4)
 							{
 								modbus_set_float(cmd_val.f, tab_rp_registers);
+
+								int registers = 2; //we write 32 bits
+
+								int address = Config_db[rowNumber].modbus_address;
+
+								modbus_set_slave(ctx, Config_db[rowNumber].slave_id);
+
+								// Many registers
+								int rc;
+								rc = modbus_write_registers(ctx, address, registers, tab_rp_registers);
+
+								printf("modbus_write_registers: ");
+
+								if (rc == registers) 
+								{
+									printf("OK\n");
+								} 
+								else 
+								{
+									printf("FAILED\n");
+									//error
+								}
+							}
+							else if(Config_db[rowNumber].modbus_type == VT_R4SWAP)
+							{
+								modbus_set_float(cmd_val.f, tab_rp_registers);
+
+								// swap LSB and MSB
+								uint16_t tmp1 = tab_rp_registers[0];
+								uint16_t tmp2 = tab_rp_registers[1];
+								tab_rp_registers[0] = tmp2;
+								tab_rp_registers[1] = tmp1;
 
 								int registers = 2; //we write 32 bits
 
