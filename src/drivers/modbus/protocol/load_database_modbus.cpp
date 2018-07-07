@@ -112,6 +112,10 @@ static int db_callback(void *NotUsed, int argc, char **argv, char **azColName)
 					{
 						gl_Config_db[gl_row_counter].modbus_type = VT_R4;
 					}
+					else if(strcmp(argv[i], "VT_R4SWAP") == 0)
+					{
+						gl_Config_db[gl_row_counter].modbus_type = VT_R4SWAP;
+					}
 					else if(strcmp(argv[i], "VT_R8") == 0)
 					{
 						gl_Config_db[gl_row_counter].modbus_type = VT_R8;
