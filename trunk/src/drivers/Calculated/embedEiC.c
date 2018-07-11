@@ -60,7 +60,7 @@ extern int exit_loop;
 
 extern void post_value(void);
 
-int scan_rate_of_interpreter_loop = 500;
+int scan_rate_of_interpreter_loop = 1000;
 
 void scan_rate(void){ Sleep(scan_rate_of_interpreter_loop);}
 
