@@ -651,7 +651,7 @@ void CalculatedInstance::Tick()
 			unsigned char rc = clearCrc((unsigned char *)buf, sizeof(struct scada_point));
 			if(rc != 0)
 			{
-				ExitProcess(1);
+				//ExitProcess(1);
 			}
 			
 			if(p_item->write_to_driver)
@@ -689,6 +689,10 @@ void CalculatedInstance::Tick()
 			}
 			else
 			{
+				printf("p_item->name = %s\n", p_item->name);
+				printf("p_item->tag = %s\n", p_item->tag);
+				printf("p_item->current_value = %lf\n", p_item->current_value);
+				
 				PostValue(p_item->name, p_item->tag, p_item->current_value); //Post the value directly in memory database
 			}
 		}

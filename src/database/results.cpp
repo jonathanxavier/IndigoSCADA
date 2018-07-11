@@ -493,13 +493,13 @@ void Results::Update(const QString &name, const QString &tag, IECValue &value) /
 	{
 		IT_COMMENT3("update Sample %s tag %s : %lf",(const char *) name,(const char *)tag, get_value_iec_value(value));
 
-		//if(mut)
-		//{
-		//	ins_mutex_acquire(mut);
+		if(mut)
+		{
+			ins_mutex_acquire(mut);
 			//scada_db[(*i).second.db_idx].previous_value = scada_db[(*i).second.db_idx].current_value;
-		//	scada_db[(*i).second.db_idx].current_value = get_value_iec_value(value);
-		//	ins_mutex_release(mut);
-		//}
+			scada_db[(*i).second.db_idx].current_value = get_value_iec_value(value);
+			ins_mutex_release(mut);
+		}
 		//
 		int state = (*i).second.UpdateTag(tag,value, (*i).second.Type); // update the tags
 		int laststate = state; // track exit from alarm condition
