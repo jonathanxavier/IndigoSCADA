@@ -689,9 +689,9 @@ void CalculatedInstance::Tick()
 			}
 			else
 			{
-				printf("p_item->name = %s\n", p_item->name);
-				printf("p_item->tag = %s\n", p_item->tag);
-				printf("p_item->current_value = %lf\n", p_item->current_value);
+				//printf("p_item->name = %s\n", p_item->name);
+				//printf("p_item->tag = %s\n", p_item->tag);
+				//printf("p_item->current_value = %lf\n", p_item->current_value);
 				
 				PostValue(p_item->name, p_item->tag, p_item->current_value); //Post the value directly in memory database
 			}
