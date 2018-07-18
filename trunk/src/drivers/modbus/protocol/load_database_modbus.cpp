@@ -77,14 +77,6 @@ static int db_callback(void *NotUsed, int argc, char **argv, char **azColName)
 			case 4:
 			{
 				//column 5 in table modbus_table
-				//offset_bit
-				if(argv[i] != NULL)
-					gl_Config_db[gl_row_counter].offset_bit = atoi(argv[i]);
-			}
-			break;
-			case 5:
-			{
-				//column 6 in table modbus_table
 				//modbus_type expressed like an OPC type
 				if(argv[i] != NULL)
 				{
@@ -147,79 +139,17 @@ static int db_callback(void *NotUsed, int argc, char **argv, char **azColName)
 				}
 			}
 			break;
-			case 6:
+			case 5:
 			{
-				//column 7 in table modbus_table
+				//column 6 in table modbus_table
 				//ioa_control_center Unstructured
 				if(argv[i] != NULL)
 					gl_Config_db[gl_row_counter].ioa_control_center = atoi(argv[i]);
 			}
 			break;
-			case 7:
+			case 6:
 			{
-				//column 8 in table modbus_table
-				//iec_type_read
-				if(argv[i] != NULL)
-				{
-					if(strcmp(argv[i], "M_ME_TF_1") == 0)
-					{
-						gl_Config_db[gl_row_counter].iec_type_read = M_ME_TF_1;
-					}
-					else if(strcmp(argv[i], "M_SP_TB_1") == 0)
-					{
-						gl_Config_db[gl_row_counter].iec_type_read = M_SP_TB_1;
-					}
-					else if(strcmp(argv[i], "M_IT_TB_1") == 0)
-					{
-						gl_Config_db[gl_row_counter].iec_type_read = M_IT_TB_1;
-					}
-					else if(strcmp(argv[i], "M_ME_TE_1") == 0)
-					{
-						gl_Config_db[gl_row_counter].iec_type_read = M_ME_TE_1;
-					}
-					else
-					{
-						fprintf(stderr,"IEC type %s from I/O list NOT supported\n", argv[i]);
-						fflush(stderr);
-						//ExitProcess(0);
-					}
-				}
-			}	
-			break;
-			case 8:
-			{
-				if(argv[i] != NULL)
-				{
-					//column 9 in table modbus_table
-					//iec_type_write
-					if(strcmp(argv[i], "C_SC_TA_1") == 0)
-					{
-						gl_Config_db[gl_row_counter].iec_type_write = C_SC_TA_1;
-					}
-					else if(strcmp(argv[i], "C_BO_TA_1") == 0)
-					{
-						gl_Config_db[gl_row_counter].iec_type_write = C_BO_TA_1;
-					}
-					else if(strcmp(argv[i], "C_SE_TC_1") == 0)
-					{
-						gl_Config_db[gl_row_counter].iec_type_write = C_SE_TC_1;
-					}
-					else if(strcmp(argv[i], "C_SE_TB_1") == 0)
-					{
-						gl_Config_db[gl_row_counter].iec_type_write = C_SE_TB_1;
-					}
-					else
-					{
-						fprintf(stderr,"IEC type %s from I/O list NOT supported\n", argv[i]);
-						fflush(stderr);
-						//ExitProcess(0);
-					}
-				}
-			}	
-			break;
-			case 9:
-			{
-				//column 10 in table modbus_table
+				//column 7 in table modbus_table
 				//deadband
 				if(argv[i] != NULL)
 					gl_Config_db[gl_row_counter].deadband = (float)atof(argv[i]);

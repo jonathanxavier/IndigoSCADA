@@ -38,12 +38,9 @@ struct modbusDbRecord
 	int modbus_function_read;	//modbus funtion to read
 	int modbus_function_write;	//modbus funtion to write
 	int modbus_address;	//address of the memory to fetch
-	int offset_bit; //offset bit
 	int modbus_type; //modbus type expressed like an OPC type, eg. VT_BOOL
 	//////////////control center part/////////////////////////////////////////
 	unsigned int ioa_control_center; //unique inside CASDU
-	unsigned int iec_type_read;   //IEC 104 type to read
-	unsigned int iec_type_write;   //IEC 104 type to write
 	float deadband; //Deadband for analog values
 	union {
 		unsigned int ua;
