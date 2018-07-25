@@ -37,7 +37,6 @@ class Modbus_driver_Instance;
 
 struct InstanceCfg // friend to anyone
 {
-	QString ServerID;
 	int context; //TCP or RTU
 	//MODBUS TCP
 	QString MODBUSServerIPAddress;  // MODBUS server IP address (slave)
@@ -56,13 +55,13 @@ struct InstanceCfg // friend to anyone
 		RTU = 1
 	};
 
-	InstanceCfg() :ServerID(""), 
+	InstanceCfg() : 
 	SampleTime(1000),MODBUSServerIPAddress(""),MODBUSServerTCPPort(""),
 	context(TCP),SerialDevice(""), Baud(""), DataBits(""), StopBit(""), Parity("")
 	{
 	};
 
-	InstanceCfg(const InstanceCfg &m) : ServerID(m.ServerID),
+	InstanceCfg(const InstanceCfg &m) :
 		SampleTime(m.SampleTime),MODBUSServerIPAddress(m.MODBUSServerIPAddress),
 		MODBUSServerTCPPort(m.MODBUSServerTCPPort),
 		context(m.context),SerialDevice(m.SerialDevice), 

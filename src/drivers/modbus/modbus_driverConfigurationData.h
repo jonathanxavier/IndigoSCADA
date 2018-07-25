@@ -43,7 +43,6 @@ public:
     QLineEdit* SerialDevice;
     QLineEdit* MODBUSServerIPPortText;
     QLineEdit* MODBUSServerIPAddressText;
-    QLineEdit* ServerID;
     QLineEdit* Name;
     QLabel* textLabel2;
     QSpinBox* Baud;

@@ -64,9 +64,6 @@ Modbus_driverConfigurationData::Modbus_driverConfigurationData( QWidget* parent,
     MODBUSServerIPAddressText = new QLineEdit( this, "MODBUSServerIPAddressText" );
     MODBUSServerIPAddressText->setGeometry( QRect( 170, 190, 200, 20 ) );
 
-    ServerID = new QLineEdit( this, "ServerID" );
-    ServerID->setGeometry( QRect( 170, 150, 200, 20 ) );
-
     Name = new QLineEdit( this, "Name" );
     Name->setEnabled( FALSE );
     Name->setGeometry( QRect( 170, 110, 200, 20 ) );
@@ -160,7 +157,6 @@ void Modbus_driverConfigurationData::languageChange()
     textLabel9->setText( tr( "Data bits" ) );
     textLabel10->setText( tr( "Stop bit" ) );
     textLabel11->setText( tr( "Parity" ) );
-    textLabel2->setText( tr( "Server ID" ) );
     buttonGroup1->setTitle( tr( "MODBUS Context" ) );
     TCPButton->setText( tr( "TCP" ) );
     RTUButton->setText( tr( "RTU" ) );

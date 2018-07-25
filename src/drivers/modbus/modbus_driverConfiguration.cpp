@@ -77,13 +77,13 @@ void Modbus_driverConfiguration::OkClicked()
 		MODBUSServerIPPortText->setText("502");
 
 		cmd = "insert into PROPS values('"+Name->text() +"','" + Receipe + "','" + 
-		NItems->text() + " " + PollInterval->text() + " " + ServerID->text() +" "+ MODBUSServerIPAddressText->text() + " " + MODBUSServerIPPortText->text() +
+		NItems->text() + " " + PollInterval->text() + " " + MODBUSServerIPAddressText->text() + " " + MODBUSServerIPPortText->text() +
 		" " + SerialDevice->text() + " " + Baud->text() + " " + DataBits->text() +" "+ StopBit->text() +" "+ Parity->currentText() +	"');";
 	}
 	else if(context == TCP)
 	{
 		cmd = "insert into PROPS values('"+Name->text() +"','" + Receipe + "','" + 
-		NItems->text() + " " + PollInterval->text() + " " + ServerID->text() +" "+ MODBUSServerIPAddressText->text() + " " + MODBUSServerIPPortText->text() +"');";
+		NItems->text() + " " + PollInterval->text() + " " + MODBUSServerIPAddressText->text() + " " + MODBUSServerIPPortText->text() +"');";
 	}
 
 	GetConfigureDb()->DoExec(0,cmd,0);
@@ -118,8 +118,6 @@ void Modbus_driverConfiguration::QueryResponse (QObject *p, const QString &c, in
 				NItems->setValue(n);
 				is >> n;
 				PollInterval->setValue(n);
-				is >> t;
-				ServerID->setText(t);
 				is >> MODBUSServerIPAddress;
 				is >> MODBUSServerIPPort;
 				is >> t;
@@ -160,7 +158,6 @@ void Modbus_driverConfiguration::QueryResponse (QObject *p, const QString &c, in
 				GetConfigureDb()->DoExec(0,cmd,0);
 				NItems->setValue(8);
 				PollInterval->setValue(1000);
-				ServerID->setText("1");
 				MODBUSServerIPAddressText->setText("");
 				MODBUSServerIPPortText->setText("");
 				SerialDevice->setText("COM1");

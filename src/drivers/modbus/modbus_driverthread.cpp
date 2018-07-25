@@ -49,8 +49,6 @@ void Modbus_DriverThread::run()
 		strcat(pCommandLine, line_number);
 		strcat(pCommandLine, " -t ");
 		strcat(pCommandLine, polling_time);
-		strcat(pCommandLine, " -s ");
-		strcat(pCommandLine, ((Modbus_driver_Instance*)Parent)->Cfg.ServerID);
 	}
 	else if(((Modbus_driver_Instance*)Parent)->Cfg.context == InstanceCfg::RTU)
 	{
@@ -70,8 +68,6 @@ void Modbus_DriverThread::run()
 		strcat(pCommandLine, line_number);
 		strcat(pCommandLine, " -t ");
 		strcat(pCommandLine, polling_time);
-		strcat(pCommandLine, " -s ");
-		strcat(pCommandLine, ((Modbus_driver_Instance*)Parent)->Cfg.ServerID);
 	}
 		
 	strcpy(pWorkingDir, GetScadaHomeDirectory());
