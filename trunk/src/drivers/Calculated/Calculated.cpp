@@ -543,36 +543,40 @@ void CalculatedInstance::QueryResponse (QObject *p, const QString &c, int id, QO
 		break;
 		case tUnit:
 		{
+			QSTransaction &t = GetConfigureDb()->CurrentTransaction();
+
 			if(GetConfigureDb()->GetNumberResults() > 0)
 			{
-				/*
-				//Generazione del COMANDO OPC/////////////////////////////////////////////
+				//Generazione del COMANDO /////////////////////////////////////////////
 				unsigned char parametri[sizeof(dispatcher_extra_params)];
 				dispatcher_extra_params* params = (dispatcher_extra_params *) parametri;
 
 				memset(parametri, 0, sizeof(dispatcher_extra_params));
-							
-				params->value = p_item->current_value;
-
+				
+				if(strlen((const char*)t.Data1) > 0)
+				{
+					params->value = atof((const char*)t.Data1);
+				}
+				
 				QString unit_name = GetConfigureDb()->GetString("UNIT");
 				
 				strcpy(params->string1, (const char*)unit_name); //driver instance
 
-				if(strlen(p_item->name) < 30)
+				
+				if(strlen((const char*)t.Data2) > 0)
 				{
-					strcpy(params->string2, p_item->name);
+					strcpy(params->string2, (const char*)t.Data2);
 				}
-				else
-				{
-					printf("reduce OPC point name to 30 characters\n");
-				}
-
+				
 				//NEXT instruction NOT used HERE
 				//strcpy(params->string3, (const char *)Value->text()); //For writing the string
-								
-				GetDispatcher()->DoExec(NotificationEvent::CMD_SEND_COMMAND_TO_UNIT, (char *)parametri, sizeof(dispatcher_extra_params));  //broadcast to all tcp clients
+				
+				struct cp56time2a actual_time;
+				get_utc_host_time(&actual_time);
+				params->time_stamp = actual_time;
 
-				*/
+				GetDispatcher()->DoExec(NotificationEvent::CMD_SEND_COMMAND_TO_UNIT, (char *)parametri, sizeof(dispatcher_extra_params));  //broadcast to all tcp clients
+				
 			}
 		} 
 		break;
@@ -656,9 +660,18 @@ void CalculatedInstance::Tick()
 			
 			if(p_item->write_to_driver)
 			{
-				//QString cmd = "select UNIT from SAMPLE where NAME='"+ QString(p_item->name) +"';";
-				//GetConfigureDb()->DoExec(this,cmd,tUnit); // kick it off
+				QString cmd = "select UNIT from SAMPLE where NAME='"+ QString(p_item->name) +"';";
 
+				QString value;
+				
+				value.sprintf("%f", p_item->current_value);
+
+				QString name;
+				name.sprintf("%s", p_item->name);
+
+				GetConfigureDb()->DoExec(this,cmd,tUnit, value, name); // kick it off
+
+				/*
 				//Generazione del COMANDO OPC/////////////////////////////////////////////
 				unsigned char parametri[sizeof(dispatcher_extra_params)];
 				dispatcher_extra_params* params = (dispatcher_extra_params *) parametri;
@@ -686,6 +699,7 @@ void CalculatedInstance::Tick()
 				params->time_stamp = actual_time;
 								
 				GetDispatcher()->DoExec(NotificationEvent::CMD_SEND_COMMAND_TO_UNIT, (char *)parametri, sizeof(dispatcher_extra_params));  //broadcast to all tcp clients
+				*/
 			}
 			else
 			{
