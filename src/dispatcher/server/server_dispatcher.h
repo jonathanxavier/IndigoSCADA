@@ -49,13 +49,17 @@ class dispServer {
     socket_t*        localAcceptSock;
     dbThread         localAcceptThread;
     dbThread         globalAcceptThread;
+	dbThread         WDThread;
+	static			 watchDogCounter;
 
     static void thread_proc serverThread(void* arg);
     static void thread_proc acceptLocalThread(void* arg);
     static void thread_proc acceptGlobalThread(void* arg);
+	static void thread_proc watchDogThread(void* arg);
 
     void serveClient();
     void acceptConnection(socket_t* sock);
+	void watchDog(void);
 
     bool authenticate(char* buf);
 
