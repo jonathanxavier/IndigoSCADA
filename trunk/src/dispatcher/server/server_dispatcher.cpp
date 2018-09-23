@@ -33,6 +33,8 @@
 
 dispServer* dispServer::chain;
 
+int dispServer::watchDogCounter;
+
 void thread_proc dispServer::serverThread(void* arg)
 {
     IT_IT("dispServer::serverThread");
@@ -54,6 +56,14 @@ void thread_proc dispServer::acceptGlobalThread(void* arg)
 
 	dispServer* server = (dispServer*)arg;
     server->acceptConnection(server->globalAcceptSock);
+}
+
+void thread_proc dispServer::watchDogThread(void* arg)
+{
+    IT_IT("dispServer::watchDogThread");
+
+	dispServer* server = (dispServer*)arg;
+    server->watchDog();
 }
 
 dispServer::dispServer(char_t const* serverURL,
@@ -140,6 +150,10 @@ void dispServer::start()
 	{ 
 		localAcceptThread.create(acceptLocalThread, this);
     }
+
+	
+	WDThread.create(watchDogThread, this);
+
 }
 
 void dispServer::stop()
@@ -161,6 +175,8 @@ void dispServer::stop()
 		delete localAcceptSock;
 		localAcceptSock = NULL;
     }
+
+	WDThread.join();
 
     dbCriticalSection cs(mutex);
     cancelSession = true;
@@ -245,6 +261,8 @@ void dispServer::serveClient()
 				IT_COMMENT1("session = %p", session);
 				//IT_DUMP_STR((char_t *)msg, length);
 
+				//printf("req.cmd = %d,msg = %s\n", req.cmd, (char_t *)msg);
+
 				#ifdef SECURE_SERVER
 //------------------------------------------------------------------------------------------------------------
 // step 4 msg signature checking. Offers some degree of protection against naive crackers or worms
@@ -311,6 +329,12 @@ void dispServer::serveClient()
 					    for (spp = &activeList; *spp != NULL; spp = &(*spp)->next)
 						{
 							(*spp)->sock->write(buf, len);
+						}
+
+						if(req.cmd == 128)
+						{
+							//MONITOR_TICK_NOTIFY
+							watchDogCounter = 0;
 						}
 
 					}//exit critical section
@@ -381,6 +405,27 @@ void dispServer::acceptConnection(socket_t* acceptSock)
 		}
     }
 }
+
+void dispServer::watchDog(void)
+{
+    IT_IT("dispServer::watchDog");
+	
+	while (true) 
+	{
+		watchDogCounter++;
+
+		printf("wdg %d   \r", watchDogCounter);
+
+		if(watchDogCounter > 120)
+		{
+			ExitProcess(1);
+		}
+
+		Sleep(1000);
+    }
+}
+
+
 
 #include "inifile.h"
 
