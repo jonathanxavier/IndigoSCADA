@@ -144,7 +144,7 @@ void myDisplay(char *msg)
     fprintf(stdout,"$>: %s",msg);
 }
 
-double Calc(char *b, int *fres)
+double Calc(char *b, int *fres, char *cline)
 {
   //char **argv = {"script.c"};
   char *argv[3];
@@ -156,7 +156,8 @@ double Calc(char *b, int *fres)
   stdClib();
 
   /* pass EiC the following command line switches */
-  EiC_switches(CLINE);
+  //EiC_switches(CLINE);
+  EiC_switches(cline);
 
   /* you can also set the function used to display EiC's error and warning
      messages */

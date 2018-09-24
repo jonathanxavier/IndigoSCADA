@@ -253,7 +253,7 @@ extern "C"
 	int processed_id;
 	int exit_loop;
 
-	double Calc(char *, int *);
+	double Calc(char *, int *, char *cline);
 };
 
 /*
@@ -311,8 +311,14 @@ void WorkerProc(void* pParam)
 	DWORD exitcode = 0;
 
 	//script.c si trova nella directory C:\scada\scripts
+
+	const int nBufferSize = 500;
+	char scada_home_dir[nBufferSize+1];
+	strcpy(scada_home_dir, GetScadaHomeDirectory());
 	
-	Calc("script.c", &err); //start loop of interpreter
+	char cline[520];
+	sprintf(cline, "-I%s\\scripts\\include -I%s\\scripts -D_EiC", scada_home_dir, scada_home_dir);
+	Calc("script.c", &err, cline); //start loop of interpreter
 
 	//_endthread();
 
