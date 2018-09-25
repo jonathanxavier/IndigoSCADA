@@ -95,6 +95,14 @@ void _error_print(modbus_t *ctx, const char *context)
             fprintf(stderr, "\n");
         }
     }
+
+	//apa+++ 25-09-2018
+	//fprintf(stderr, "errno %d\n", errno);
+	if(errno == EMBBADDATA  ||
+		errno == 10060 )
+	{
+		ExitProcess(0);
+	}
 }
 
 int _sleep_and_flush(modbus_t *ctx)
@@ -120,11 +128,7 @@ int modbus_flush(modbus_t *ctx)
     int rc = ctx->backend->flush(ctx);
     if (rc != -1 && ctx->debug) {
         printf("%d bytes flushed\n", rc);
-		//apa+++ 24-09-2018
-		if(rc == 0)
-		{
-			ExitProcess(0);
-		}
+
     }
     return rc;
 }
