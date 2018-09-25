@@ -86,7 +86,11 @@ void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackPa
 		  {
 			  struct iec_item item2;
 			  rebuild_iec_item_message(&item2, item1);
-			  cl->check_for_commands(&item2);
+
+			  if(cl->is_connected)
+			  {
+				cl->check_for_commands(&item2);
+			  }
 		  }
 		}
 		break;
@@ -1632,7 +1636,7 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 					}
 					break;
 				}
-					
+
 				if(Config_db[rowNumber].modbus_function_write == FC_WRITE_SINGLE_COIL)
 				{
 					if(Config_db[rowNumber].modbus_type == VT_BOOL)
