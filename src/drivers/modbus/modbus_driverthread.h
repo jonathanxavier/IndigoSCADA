@@ -59,6 +59,7 @@ class MODBUS_DRIVERDRV Modbus_DriverThread : public DriverThread
 	}
 
     void TerminateProtocol(); // parent requests the thread close
+	void TerminateChild();
     //PROCESS_INFORMATION* getProcInfo(void);
 
 	protected:
