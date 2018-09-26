@@ -916,6 +916,7 @@ void Modbus_driver_Instance::get_items_from_local_fifo(void)
 
 	if(wait_for_message > 60) //60 seconds
 	{
+		wait_for_message = 0;
 		//Terminate child process
 		pConnect->TerminateChild();
 	}
