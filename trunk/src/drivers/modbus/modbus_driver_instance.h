@@ -126,12 +126,13 @@ class MODBUS_DRIVERDRV Modbus_driver_Instance : public DriverInstance
 	public:
 	Modbus_DriverThread *pConnect;
 	unsigned int msg_sent_in_control_direction;
+	unsigned int wait_for_message;
 	//
 	Modbus_driver_Instance(Driver *parent, const QString &name, int instance_id) : 
 	DriverInstance(parent,name),fFail(0), Countdown(1),
 	State(STATE_RESET),InTick(0),Retry(0),Sp(0),IecItems(1), Values(NULL),
 	ParentDriver(parent),msg_sent_in_control_direction(0), instanceID(instance_id),
-    pConnect(NULL)
+    pConnect(NULL), wait_for_message(0)
 	{
 		IT_IT("Modbus_driver_Instance::Modbus_driver_Instance");
 		connect (GetConfigureDb (),
@@ -285,7 +286,7 @@ class MODBUS_DRIVERDRV Modbus_driver_Instance : public DriverInstance
 	Driver* ParentDriver;
 	QString unit_name;
     int instanceID; //Equals to "line concept" of a SCADA driver
-
+	
 	//////Middleware/////////////
     ORTEDomain *domain;
 	ORTEPublication *publisher;

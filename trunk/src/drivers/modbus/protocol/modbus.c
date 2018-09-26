@@ -95,14 +95,6 @@ void _error_print(modbus_t *ctx, const char *context)
             fprintf(stderr, "\n");
         }
     }
-
-	//apa+++ 25-09-2018
-	//fprintf(stderr, "errno %d\n", errno);
-	if(errno == EMBBADDATA  ||
-		errno == 10060 )
-	{
-		ExitProcess(0);
-	}
 }
 
 int _sleep_and_flush(modbus_t *ctx)
