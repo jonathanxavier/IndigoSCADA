@@ -70,9 +70,8 @@ class CALCULATED_API CalculatedInstance : public DriverInstance // the unit inte
 	Q_OBJECT
 	//
 	//
-	int Interval; // the re calculation interval
-	int Countdown; // count down track
-	int StartWait; // we wait two sample intervals
+//	int Countdown; // count down track
+//	int StartWait; // we wait two sample intervals
 	//
 	struct ExpItem
 	{
@@ -93,6 +92,7 @@ class CALCULATED_API CalculatedInstance : public DriverInstance // the unit inte
 	int nSamplePoints;
 	//
 	public:
+	int Interval; // the re calculation interval
 	fifo_h p_fifo_script;
 	//struct scada_point* p_item;
 	//
