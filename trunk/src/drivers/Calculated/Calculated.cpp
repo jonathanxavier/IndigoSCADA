@@ -238,14 +238,15 @@ void CalculatedInstance::Start() // start everything under this driver's control
 	"' and (IKEY = '(default)' or IKEY='"+ GetReceipeName() + "') order by IKEY desc;"; 
 	// get the properties SKEY = unit name IKEY = receipe name
 	GetConfigureDb()->DoExec(this,pc,tUnitProperties);
-	Countdown = 0;
-	StartWait = 0;
+//	Countdown = 0;
+//	StartWait = 0;
 };
 
 extern "C"
 { 
 	int numSamplePoints;
 	void post_value(void);
+	void scan_rate(void);
 	//char processed_name[35];
 	//char processed_tag[20];
 	//double processed_value;
@@ -277,25 +278,6 @@ void CalculatedInstance::Command(const QString &,const QString &) // process a c
 {
 
 }
-
-/*
-extern "C"
-{ 
-	DWORD this_;
-
-	void post_value(void)
-	{
-		printf("processed_name = %s\n", processed_name);
-		printf("processed_tag = %s\n", processed_tag);
-		printf("processed_value = %lf\n", processed_value);
-
-		((CalculatedInstance*)this_)->PostValue(processed_name, processed_tag, processed_value);
-	}
-};
-*/
-
-/////fine variabili e funzioni condivise con l'interprete EiC
-
 //
 // clock tick interval in milliseconds
 // 
@@ -335,6 +317,18 @@ void WorkerProc(void* pParam)
 extern "C"
 { 
 	DWORD this_;
+
+	void scan_rate(void)
+	{ 
+		int sec = ((CalculatedInstance*)this_)->Interval;
+
+		if(sec == 0)
+		{
+			sec = 1;
+		}
+
+		Sleep(sec*1000);
+	}
 
 	//This fuction is called inside interpreted thread
 	void post_value(void)
@@ -476,7 +470,7 @@ void CalculatedInstance::QueryResponse (QObject *p, const QString &c, int id, QO
 				QString s = GetConfigureDb()->GetString("DVAL");
 				QTextIStream is(&s);
 				is >> Interval;
-				Countdown = Interval;
+//				Countdown = Interval;
 				pTimer->start(LN_TICK); // start the timer
 			}
 			else

@@ -59,10 +59,7 @@ extern int processed_id;
 extern int exit_loop;
 
 extern void post_value(void);
-
-int scan_rate_of_interpreter_loop = 1000;
-
-void scan_rate(void){ Sleep(scan_rate_of_interpreter_loop);}
+extern void scan_rate(void);
 
 #include "mythread.h"
 
