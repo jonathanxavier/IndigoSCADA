@@ -47,15 +47,10 @@ void CalculatedConfigure::OkClicked()
 	QTextOStream os(&s);
 	os << ReCalculateInterval->text();         
 	//
-	QString cmd = "delete from PROPS where SKEY='" + Name->text() + "' and IKEY='" + Receipe + "';";
-	GetConfigureDb()->DoExec(0,cmd,0); // delete the old value
-	cmd = "insert into PROPS values('" + Name->text() + "','" + Receipe + "','" + s + "');";
-	GetConfigureDb()->DoExec(0,cmd,0);
-	QSAuditTrail(this,caption(), tr("Edited:") + Name->text());
-
-	Calculated::pDriver->CreateNewUnit(this, Name->text());
+	QString pc = "select * from PROPS where SKEY='" + Name->text() + "' and IKEY='(default)';"; 
+	// get the properties SKEY = unit name IKEY = receipe name
+	GetConfigureDb()->DoExec(this,pc,tOkClicked, Name->text(), s);
 	//
-	accept();
 }
 
 void CalculatedConfigure::QueryResponse (QObject *p, const QString &c, int id, QObject*) // handles database responses
@@ -77,6 +72,29 @@ void CalculatedConfigure::QueryResponse (QObject *p, const QString &c, int id, Q
 			{
 				fNew = true;
 			};
+		};
+		break;
+		case tOkClicked: // properties for the unit / receipe 
+		{
+			QSTransaction &t = GetConfigureDb()->CurrentTransaction();
+
+			if(GetConfigureDb()->GetNumberResults() > 0)
+			{
+				QString cmd = "delete from PROPS where SKEY='" + t.Data1 + "' and IKEY='" + Receipe + "';";
+				GetConfigureDb()->DoExec(0,cmd,0); // delete the old value
+				cmd = "insert into PROPS values('" + t.Data1 + "','" + Receipe + "','" + t.Data2 + "');";
+				GetConfigureDb()->DoExec(0,cmd,0);
+			}
+			else
+			{
+				QString cmd = "insert into PROPS values('" + t.Data1 + "','" + Receipe + "','" + t.Data2 + "');";
+				GetConfigureDb()->DoExec(0,cmd,0);
+				QSAuditTrail(this,caption(), tr("Edited:") + t.Data1);
+
+				Calculated::pDriver->CreateNewUnit(this, t.Data1);
+			}
+
+			accept();
 		};
 		break;
 		default:

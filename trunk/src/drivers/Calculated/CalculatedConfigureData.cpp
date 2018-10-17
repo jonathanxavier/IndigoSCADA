@@ -96,8 +96,8 @@ CalculatedConfigureData::CalculatedConfigureData(QWidget *parent, const char *na
 	ReCalculateInterval->setMidLineWidth( 0 );
 	ReCalculateInterval->QFrame::setMargin( 0 );
 	#endif
-	ReCalculateInterval->setRange( 0, 300 );
-	ReCalculateInterval->setSteps( 10, 0 );
+	ReCalculateInterval->setRange( 1, 300 );
+	ReCalculateInterval->setSteps( 1, 0 );
 	ReCalculateInterval->setPrefix( "" );
 	ReCalculateInterval->setSuffix( "" );
 	ReCalculateInterval->setSpecialValueText( "" );
