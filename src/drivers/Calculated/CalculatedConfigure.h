@@ -10,7 +10,7 @@ Last generated: Mon Sep 11 13:54:09 2000
 class CalculatedConfigure : public CalculatedConfigureData
 {
 	Q_OBJECT
-	enum{tItem = 1};
+	enum{tItem = 1, tOkClicked};
 	QString Receipe;
 	bool fNew;
 	public:
