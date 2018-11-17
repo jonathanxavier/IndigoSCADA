@@ -13,6 +13,7 @@
 #include "iec103driver_instance.h"
 #include "iec103driverthread.h"
 
+#ifdef USE_RIPC_MIDDLEWARE
 ////////////////////Middleware/////////////////////////////////////////////
 int exit_consumer = 0;
 
@@ -35,7 +36,7 @@ void consumer(void* pParam)
 	}
 }
 ////////////////////Middleware/////////////////////////////////////////////
-
+#endif
 /*
 *Function:
 *Inputs:none
@@ -275,10 +276,12 @@ void Iec103driver_Instance::QueryResponse(QObject *p, const QString &c, int id, 
 				item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
 				///////////////////////////////////////////////////////////////////////////////////////////
 
+				#ifdef USE_RIPC_MIDDLEWARE
 				////////////////////Middleware/////////////////////////////////////////////
 				//publishing data
 				queue_control_dir->put(&item_to_send, sizeof(struct iec_item));
 				//////////////////////////Middleware/////////////////////////////////////////
+				#endif
 			}
 		}
 		break;
@@ -424,11 +427,13 @@ void Iec103driver_Instance::Tick()
 			item_to_send.msg_id = msg_sent_in_control_direction++;
 			item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
 			///////////////////////////////////////////////////////////////////////////////////////////
-			
+
+			#ifdef USE_RIPC_MIDDLEWARE
 			////////////////////Middleware/////////////////////////////////////////////
 			//publishing data
 			queue_control_dir->put(&item_to_send, sizeof(struct iec_item));
 			////////////////////Middleware/////////////////////////////////////////////
+			#endif
 			
 			State = STATE_GENERAL_INTERROGATION_DONE;
 		}
