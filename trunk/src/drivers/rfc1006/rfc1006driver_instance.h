@@ -18,6 +18,7 @@
 #include "clear_crc_eight.h"
 #include "iec104types.h"
 #include "iec_item.h"
+#ifdef USE_RIPC_MIDDLEWARE
 ////////////////////////////Middleware/////////////////////////////////////////////////////////////
 #include "RIPCThread.h"
 #include "RIPCFactory.h"
@@ -26,6 +27,7 @@
 #include "RIPCClientFactory.h"
 #include "ripc.h"
 /////////////////////////////////////////////////////////////////////////////////////////////
+#endif
 
 /////////////////////////fifo///////////////////////////////////////////
 extern void iec_call_exit_handler(int line, char* file, char* reason);
@@ -33,6 +35,7 @@ extern void iec_call_exit_handler(int line, char* file, char* reason);
 #define MAX_FIFO_SIZE 65535
 ////////////////////////////////////////////////////////////////////////
 
+#ifdef USE_RIPC_MIDDLEWARE
 ////////////////////////////Middleware//////////////////////////////////
 struct subs_args{
 	RIPCQueue* queue_monitor_dir;
@@ -42,6 +45,7 @@ struct subs_args{
 void consumer(void* pParam);
 extern int exit_consumer;
 ////////////////////////////Middleware//////////////////////////////////
+#endif
 
 class Rfc1006DriverThread;
 
@@ -89,6 +93,7 @@ class RFC1006DRIVERDRV Rfc1006driver_Instance : public DriverInstance
 	//
 	Track* Values;
 
+	#ifdef USE_RIPC_MIDDLEWARE
 	/////////////Middleware///////////////////////////////
     int          port;
     char const*  hostname;
@@ -100,6 +105,7 @@ class RFC1006DRIVERDRV Rfc1006driver_Instance : public DriverInstance
 	RIPCQueue*   queue_control_dir;
 	struct subs_args arg;
 	//////////////////////////////////////////////////////
+	#endif
 
 	enum // states for the state machine
 	{
@@ -130,6 +136,7 @@ class RFC1006DRIVERDRV Rfc1006driver_Instance : public DriverInstance
 		connect(pTimer,SIGNAL(timeout()),this,SLOT(Tick()));
 		pTimer->start(1000); // start with a 1 second timer
 
+		#ifdef USE_RIPC_MIDDLEWARE
 		/////////////////////Middleware/////////////////////////////////////////////////////////////////
 		char fifo_control_name[150];
 		char str_instance_id[20];
@@ -172,6 +179,7 @@ class RFC1006DRIVERDRV Rfc1006driver_Instance : public DriverInstance
 	
 		CreateThread(NULL, 0, LPTHREAD_START_ROUTINE(consumer), (void*)&arg, 0, &threadid);
 		/////////////////////Middleware/////////////////////////////////////////////////////////////////
+		#endif
 	};
 
 	~Rfc1006driver_Instance()
@@ -184,6 +192,7 @@ class RFC1006DRIVERDRV Rfc1006driver_Instance : public DriverInstance
 			Values = NULL;
 		}
 
+		#ifdef USE_RIPC_MIDDLEWARE
 		///////////////////////////////////Middleware//////////////////////////////////////////////////
 		exit_consumer = 1;
 //		Sleep(3000);
@@ -195,6 +204,7 @@ class RFC1006DRIVERDRV Rfc1006driver_Instance : public DriverInstance
 		delete session1;
 		delete session2;
 		///////////////////////////////////Middleware//////////////////////////////////////////////////
+		#endif
 	};
 	//
 	void Fail(const QString &s)

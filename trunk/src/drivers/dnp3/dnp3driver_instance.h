@@ -19,12 +19,14 @@
 #include "iec104types.h"
 #include "iec_item.h"
 ////////////////////////////Middleware/////////////////////////////////////////////////////////////
+#ifdef USE_RIPC_MIDDLEWARE
 #include "RIPCThread.h"
 #include "RIPCFactory.h"
 #include "RIPCSession.h"
 #include "RIPCServerFactory.h"
 #include "RIPCClientFactory.h"
 #include "ripc.h"
+#endif
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////fifo//////////////////////////////////////////////
@@ -34,10 +36,12 @@ extern void iec_call_exit_handler(int line, char* file, char* reason);
 /////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////Middleware/////////////////////////////////////////////////////////////
+#ifdef USE_RIPC_MIDDLEWARE
 struct subs_args{
 	RIPCQueue* queue_monitor_dir;
 	fifo_h fifo_monitor_direction;
 };
+#endif
 
 void consumer(void* pParam);
 extern int exit_consumer;
@@ -91,6 +95,7 @@ class DNP_3_DRIVERDRV Dnp3driver_Instance : public DriverInstance
 	Track* Values;
 
 	/////////////Middleware///////////////////////////////
+	#ifdef USE_RIPC_MIDDLEWARE
     int          port;
     char const*  hostname;
     RIPCFactory* factory1;
@@ -100,6 +105,7 @@ class DNP_3_DRIVERDRV Dnp3driver_Instance : public DriverInstance
 	RIPCQueue*   queue_monitor_dir;
 	RIPCQueue*   queue_control_dir;
 	struct subs_args arg;
+	#endif
 	//////////////////////////////////////////////////////
 
 	enum // states for the state machine
@@ -132,6 +138,7 @@ class DNP_3_DRIVERDRV Dnp3driver_Instance : public DriverInstance
 		pTimer->start(1000); // start with a 1 second timer
 
 		/////////////////////Middleware/////////////////////////////////////////////////////////////////
+		#ifdef USE_RIPC_MIDDLEWARE
 		char fifo_control_name[150];
 		char str_instance_id[20];
         itoa(instance_id + 1, str_instance_id, 10);
@@ -173,6 +180,7 @@ class DNP_3_DRIVERDRV Dnp3driver_Instance : public DriverInstance
 	
 		CreateThread(NULL, 0, LPTHREAD_START_ROUTINE(consumer), (void*)&arg, 0, &threadid);
 		/////////////////////Middleware////////////////////////////////////////////////////
+		#endif
 	};
 
 	~Dnp3driver_Instance()
@@ -185,6 +193,7 @@ class DNP_3_DRIVERDRV Dnp3driver_Instance : public DriverInstance
 			Values = NULL;
 		}
 
+		#ifdef USE_RIPC_MIDDLEWARE
 		///////////////////////////////////Middleware//////////////////////////////////////////////////
 		exit_consumer = 1;
 		//Sleep(3000);
@@ -196,6 +205,7 @@ class DNP_3_DRIVERDRV Dnp3driver_Instance : public DriverInstance
 		delete session1;
 		delete session2;
 		///////////////////////////////////Middleware//////////////////////////////////////////////////
+		#endif
 	};
 	//
 	void Fail(const QString &s)

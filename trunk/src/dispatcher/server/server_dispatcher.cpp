@@ -406,6 +406,8 @@ void dispServer::acceptConnection(socket_t* acceptSock)
     }
 }
 
+#define TIMEOUT 60
+
 void dispServer::watchDog(void)
 {
     IT_IT("dispServer::watchDog");
@@ -416,7 +418,7 @@ void dispServer::watchDog(void)
 
 		printf("wdg %d   \r", watchDogCounter);
 
-		if(watchDogCounter > 120)
+		if(watchDogCounter > TIMEOUT)
 		{
 			ExitProcess(1);
 		}
