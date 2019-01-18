@@ -26,6 +26,7 @@
 #include "psinglepointled.h"
 #include "pdoublepointled.h"
 #include "elswitch.h"
+#include "pmeter.h"
 
 void HMI_manager::setParent( QDialog *parent )
 {
@@ -409,6 +410,46 @@ void HMI_manager::setInitialValuesAndLimits()
 
 		delete l; // delete the list, not the objects
 	}
+
+	{
+		QObjectList *l = dialog_parent->queryList( "PMeter" );
+
+		QObjectListIt it( *l ); // iterate
+
+		QObject *obj;
+
+		while((obj = it.current()) != 0) 
+		{
+			// for each found object...
+			++it;
+
+			QString name = obj->name();
+
+			int idx = name.find('_');
+			name.truncate(idx);
+
+			WidgetDict::value_type pr(name, obj);
+			PMeter_dictionary.insert(pr); // put in the dictionary
+			
+			QString widget_type = "PMeter";
+
+			// get the alarm limits
+			//QString cmd = "select * from TAGS where NAME='"+name+"' and RECEIPE='"+GetReceipeName()+"';";
+			//GetConfigureDb()->DoExec(this, cmd, tTagLimits, widget_type, name);
+
+			/*
+			double val = 0.0;
+
+			((PMeter*)obj)->setMinValue(-500.0);
+
+			((PMeter*)obj)->setMaxValue(1000.0);
+
+			((PMeter*)obj)->setValue(val);
+			*/
+		}
+
+		delete l; // delete the list, not the objects
+	}
 }
 
 void HMI_manager::doUpdateTags(QString &s, double &v, WidgetDict &dict)
@@ -652,6 +693,10 @@ void HMI_manager::doUpdateTags(QString &s, double &v, WidgetDict &dict)
 		{
 			((PThermometer*)obj)->setValue(v);
 		}
+		else if(obj->isA( "PMeter" ))
+		{
+			((PMeter*)obj)->setValue(v);
+		}
 		else
 		{
 			//error
@@ -685,6 +730,7 @@ void HMI_manager::UpdateTags()
 		doUpdateTags(s, v, Breaker_dictionary);
 		doUpdateTags(s, v, PTank_dictionary);
 		doUpdateTags(s, v, PThermometer_dictionary);
+		doUpdateTags(s, v, PMeter_dictionary);
 	}
 };
 
@@ -1313,6 +1359,40 @@ void HMI_manager::RightClicked(QString &class_name, QString &widget_name) // sho
 		if(found)
 		{
 			InspectMenu((PLCDNumber*)obj, sample_point_name, ack);
+
+			return;
+		}
+	}
+	else if(class_name == QString("PMeter"))
+	{
+		QObjectList *l = dialog_parent->queryList("PMeter");
+
+		QObjectListIt it( *l ); // iterate
+
+		QObject *obj;
+
+		while((obj = it.current()) != 0) 
+		{
+			// for each found object...
+			++it;
+
+			if(widget_name == obj->name())
+			{
+				int idx = widget_name.find('_');
+				widget_name.truncate(idx);
+				sample_point_name = widget_name;
+				
+				found = true;
+
+				break;
+			}
+		}
+
+		delete l; // delete the list, not the objects
+
+		if(found)
+		{
+			InspectMenu((PMeter*)obj, sample_point_name, ack);
 
 			return;
 		}
