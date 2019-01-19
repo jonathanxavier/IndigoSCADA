@@ -366,6 +366,9 @@ void Results::ConfigQueryResponse (QObject *p,const QString &c, int id, QObject*
 						#ifdef UNIX
 						QString cmd = s.mid(1) + "&";
 						system((const char *)cmd); // runs in the background
+						#else
+						QString cmd = s.mid(1);
+						system((const char *)cmd);
 						#endif
 					}   
 					else
@@ -396,6 +399,9 @@ void Results::ConfigQueryResponse (QObject *p,const QString &c, int id, QObject*
 						// one good reason NEVER EVER to run the monitoring system as root
 						#ifdef UNIX
 						QString cmd = s.mid(1) + "&";
+						system((const char *)cmd);
+						#else
+						QString cmd = s.mid(1);
 						system((const char *)cmd);
 						#endif
 					}   
@@ -547,7 +553,7 @@ void Results::UpdateEnd(const QString &name)
 			(*i).second.AlarmEvents = 0; // reset the track
 		};
 
-		/*
+		
 		//
 		// trigger a measure action
 		// 
@@ -581,7 +587,7 @@ void Results::UpdateEnd(const QString &name)
 				(*i).second.alarmtime = QDateTime::currentDateTime();
 			};
 		};
-		*/
+		
 		//
 		//
 		//
