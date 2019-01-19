@@ -425,6 +425,12 @@ public:
 
     virtual bool event(QEvent *);
 
+	////////start apa added/////////////////////
+	long curve1; // QwtPlot keys
+	double x[1000], y[1000];
+	int plot_index;
+	/////////end apa added//////////////////////
+
 public slots:
     void clear();
 

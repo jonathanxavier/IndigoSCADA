@@ -41,6 +41,7 @@ class HMI_manager : public QObject
 	WidgetDict PThermometer_dictionary;
 	WidgetDict QPushButton_dictionary;
 	WidgetDict PMeter_dictionary;
+	WidgetDict QwtPlot_dictionary;
 
 	void doUpdateTags(QString &s, double &v, WidgetDict &dict);
 	void doUpdateSamplePoint(QString &s, int state, int ack_flag, WidgetDict &dict);
