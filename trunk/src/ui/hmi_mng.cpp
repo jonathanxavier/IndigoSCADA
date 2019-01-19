@@ -27,6 +27,7 @@
 #include "pdoublepointled.h"
 #include "elswitch.h"
 #include "pmeter.h"
+#include "qwt_plot.h"
 
 void HMI_manager::setParent( QDialog *parent )
 {
@@ -450,6 +451,39 @@ void HMI_manager::setInitialValuesAndLimits()
 
 		delete l; // delete the list, not the objects
 	}
+
+	{
+		QObjectList *l = dialog_parent->queryList( "QwtPlot" );
+
+		QObjectListIt it( *l ); // iterate
+
+		QObject *obj;
+
+		while((obj = it.current()) != 0) 
+		{
+			// for each found object...
+			++it;
+
+			QString name = obj->name();
+
+			int idx = name.find('_');
+			name.truncate(idx);
+
+			WidgetDict::value_type pr(name, obj);
+			QwtPlot_dictionary.insert(pr); // put in the dictionary
+			
+			QString widget_type = "QwtPlot";
+
+			// get the alarm limits
+			//QString cmd = "select * from TAGS where NAME='"+name+"' and RECEIPE='"+GetReceipeName()+"';";
+			//GetConfigureDb()->DoExec(this, cmd, tTagLimits, widget_type, name);
+
+			((QwtPlot*)obj)->curve1 = ((QwtPlot*)obj)->insertCurve("Graph 1");
+			((QwtPlot*)obj)->plot_index = 0;
+		}
+
+		delete l; // delete the list, not the objects
+	}
 }
 
 void HMI_manager::doUpdateTags(QString &s, double &v, WidgetDict &dict)
@@ -697,6 +731,18 @@ void HMI_manager::doUpdateTags(QString &s, double &v, WidgetDict &dict)
 		{
 			((PMeter*)obj)->setValue(v);
 		}
+		else if(obj->isA( "QwtPlot" ))
+		{
+			((QwtPlot*)obj)->x[((QwtPlot*)obj)->plot_index] = ((QwtPlot*)obj)->plot_index;
+			((QwtPlot*)obj)->y[((QwtPlot*)obj)->plot_index] = v;
+			((QwtPlot*)obj)->plot_index++;
+			if(((QwtPlot*)obj)->plot_index == 1000) ((QwtPlot*)obj)->plot_index = 0;
+			// copy the data into the curves
+			((QwtPlot*)obj)->setCurveData(((QwtPlot*)obj)->curve1, ((QwtPlot*)obj)->x, ((QwtPlot*)obj)->y, ((QwtPlot*)obj)->plot_index);
+
+			// finally, refresh the plot
+			((QwtPlot*)obj)->replot();
+		}
 		else
 		{
 			//error
@@ -731,6 +777,7 @@ void HMI_manager::UpdateTags()
 		doUpdateTags(s, v, PTank_dictionary);
 		doUpdateTags(s, v, PThermometer_dictionary);
 		doUpdateTags(s, v, PMeter_dictionary);
+		doUpdateTags(s, v, QwtPlot_dictionary);
 	}
 };
 
