@@ -179,6 +179,50 @@ void SampleCfg::Rename()
 		// update any properties
 		QString cmd = "update PROPS set IKEY='" + dlg.GetName() + "' where SKEY ='SAMPLEPROPS' and IKEY='"+Name->text()+"';";
 		GetConfigureDb()->DoExec(this,cmd,tConfigLoad);
+
+		// update the current database
+		cmd ="update TAGS_DB set NAME='"+dlg.GetName()+"' where NAME='"+Name->text()+"';";
+		GetCurrentDb ()->DoExec (0,cmd,0);
+		//
+		cmd ="update CVAL_DB set NAME='"+dlg.GetName()+"' where NAME='"+Name->text()+"';";
+		GetCurrentDb ()->DoExec (0,cmd,0);
+		//
+		cmd ="drop table " + Name->text () + ";";
+		GetResultDb ()->DoExec (0,cmd,0);
+		GetHistoricResultDb()->DoExec (0,cmd,0);
+
+		//
+		// create the table
+		//
+
+		QStringList l;
+
+		l << VALUE_TAG;
+		
+		cmd = "create table "+ dlg.GetName() + " ( TIMEDATE " + DATE_TIME_COL_TYPE + ",STATE int4";
+		
+		for(unsigned ii = 0; ii < l.count(); ii++)
+		{
+			cmd += "," + l[ii] + " real8";
+		}
+
+		cmd += " );";
+
+		GetResultDb()->DoExec(0,cmd,0); //FastDB
+
+		if(GetHistoricResultDb() != NULL)
+		{
+			GetHistoricResultDb()->DoExec(0,cmd,0); //GigaBASE
+		}
+
+		cmd = "create index on "+ dlg.GetName() +".TIMEDATE;";
+
+		GetResultDb()->DoExec(0,cmd,0);//FastDB
+
+		if(GetHistoricResultDb() != NULL)
+		{
+			GetHistoricResultDb()->DoExec(0,cmd,0); //GigaBASE
+		}
 		//
 		// Unit configurations and alarm groups and receipes cannot be easily updated
 		// it is expected that rename is used after auto generation of sample points upon
