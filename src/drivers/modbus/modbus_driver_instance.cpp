@@ -595,6 +595,7 @@ void Modbus_driver_Instance::get_items_from_local_fifo(void)
 		}
 			
 		wait_for_message = 0;
+		msg_received_in_monitor_direction++;
 
 		//printf("Receiving %d th message \n", p_item->msg_id);
 		printf("Receiving %d th modbus message from line = %d\n", p_item->msg_id, instanceID + 1);
@@ -914,9 +915,10 @@ void Modbus_driver_Instance::get_items_from_local_fifo(void)
 		}
 	}
 
-	if(wait_for_message > 60) //60 seconds
+	if(msg_received_in_monitor_direction && (wait_for_message > 60)) //60 seconds
 	{
 		wait_for_message = 0;
+		msg_received_in_monitor_direction = 0;
 		//Terminate child process
 		pConnect->TerminateChild();
 	}

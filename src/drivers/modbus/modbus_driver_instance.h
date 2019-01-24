@@ -127,12 +127,13 @@ class MODBUS_DRIVERDRV Modbus_driver_Instance : public DriverInstance
 	Modbus_DriverThread *pConnect;
 	unsigned int msg_sent_in_control_direction;
 	unsigned int wait_for_message;
+	unsigned int msg_received_in_monitor_direction;
 	//
 	Modbus_driver_Instance(Driver *parent, const QString &name, int instance_id) : 
 	DriverInstance(parent,name),fFail(0), Countdown(1),
 	State(STATE_RESET),InTick(0),Retry(0),Sp(0),IecItems(1), Values(NULL),
 	ParentDriver(parent),msg_sent_in_control_direction(0), instanceID(instance_id),
-    pConnect(NULL), wait_for_message(0)
+    pConnect(NULL), wait_for_message(0),msg_received_in_monitor_direction(0)
 	{
 		IT_IT("Modbus_driver_Instance::Modbus_driver_Instance");
 		connect (GetConfigureDb (),
