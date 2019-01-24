@@ -369,24 +369,83 @@ void SampleCfg::New ()
 		// delete the config widget
 		RemoveConfig();
 		// 
-		SetComboItem (Unit, tr(NONE_STR));
+		//SetComboItem (Unit, tr(NONE_STR));
 		InputIndex->clear ();
 		InputIndex->insertItem(tr(NONE_STR));
 		InputIndex->setCurrentItem (0);
 		// 
 		Comment->setText (tr(NONE_STR));
 		(void) new QListViewItem(List,dlg.GetName (),tr(NONE_STR));	// add to the list box
-		Enabled->setChecked (0);
-		Fileable->setChecked (0);
+		Enabled->setChecked (1);
+		Fileable->setChecked (1);
 		Retrigger->setChecked(0);
 		AlarmThreshold->setValue(0);
 		//
 		SetListViewItem (List, dlg.GetName ());	// make it the selected item 
 		Name->setText (dlg.GetName ());
+
+		QStringList l;
+
+		l << VALUE_TAG;
+
+		QString initProps = "";
+		QString cmd;
+	
+		cmd = "insert into PROPS values('SAMPLEPROPS','" + dlg.GetName () + "','" + initProps +"');"; // initialise the properties
+		GetConfigureDb()->DoExec(0,cmd,0); // post it off
+		//
+		// add the tags
+
+		for(unsigned i = 0; i < l.count(); i++)
+		{
+			
+			cmd = "insert into TAGS values('" + dlg.GetName () + "','" + l[i] + "',0,0,0,0,0,0,0,0,'(default)',1,0,'','" + Unit->currentText() + "');";
+			
+			GetConfigureDb()->DoExec(0,cmd,0); // add the default tag config
+
+			cmd = "insert into TAGS_DB values('" + dlg.GetName () +"','" + l[i] + "'," + DATETIME_EPOCH + ",0,0,0,0,0,0,0,0);";
+
+			GetCurrentDb()->DoExec(0,cmd,0); // create the tag entry
+		}
+		
+		cmd = "insert into CVAL_DB values('" + dlg.GetName () + // the sample point current value
+		"'," + DATETIME_EPOCH +"," + DATETIME_EPOCH + ",0,0,0,0," + DATETIME_EPOCH + ",0,'(***)'," + DATETIME_EPOCH + ",0);";
+
+		GetCurrentDb()->DoExec(0,cmd,0);
+
+		//
+		// create the table
+		//
+		
+		cmd = "create table "+ dlg.GetName() + " ( TIMEDATE " + DATE_TIME_COL_TYPE + ",STATE int4";
+		
+		for(unsigned ii = 0; ii < l.count(); ii++)
+		{
+			cmd += "," + l[ii] + " real8";
+		}
+
+		cmd += " );";
+
+		GetResultDb()->DoExec(0,cmd,0); //FastDB
+
+		if(GetHistoricResultDb() != NULL)
+		{
+			GetHistoricResultDb()->DoExec(0,cmd,0); //GigaBASE
+		}
+
+		cmd = "create index on "+ dlg.GetName() +".TIMEDATE;";
+
+		GetResultDb()->DoExec(0,cmd,0);//FastDB
+
+		if(GetHistoricResultDb() != NULL)
+		{
+			GetHistoricResultDb()->DoExec(0,cmd,0); //GigaBASE
+		}
+
 		//
 		Build ();		// build the record 
 		GetConfigureDb ()->AddToRecord ("NAME", Name->text ());
-		QString cmd = GetConfigureDb ()->Insert ("SAMPLE");	// generate the update record
+		cmd = GetConfigureDb ()->Insert ("SAMPLE");	// generate the update record
 		GetConfigureDb ()->DoExec (this, cmd, tNew);	// lock the db and action the request
 		//
 		ButtonState (false);
