@@ -1,7 +1,7 @@
 /*
  *                         IndigoSCADA
  *
- *   This software and documentation are Copyright 2002 to 2013 Enscada 
+ *   This software and documentation are Copyright 2002 to 2019 Enscada 
  *   Limited and its licensees. All rights reserved. See file:
  *
  *                     $HOME/LICENSE 
@@ -13,6 +13,9 @@
 #include <qwidget.h>
 #include <qfontmetrics.h>
 #include "elswitch.h"
+
+#include "breaker_closed.xpm"
+#include "breaker_opened.xpm"
 
 /*!
   \brief Constructor
@@ -29,6 +32,9 @@ Breaker::Breaker(QWidget *parent, const char *name)
     setGeometry(0,0,maxwidth+70,80);
     value=false;
     setFocusPolicy(QWidget::StrongFocus);
+
+	lOnpixmap = new QPixmap((const char **)breaker_closed_xpm);
+	lOffpixmap = new QPixmap((const char **)breaker_opened_xpm);
 }
 
 /*!
@@ -72,8 +78,6 @@ void Breaker::keyReleaseEvent(QKeyEvent *e)
 //    }
 }
 
-#include "breaker_closed.xpm"
-#include "breaker_opened.xpm"
 
 /*!
   \brief Repaint the widget
@@ -85,7 +89,8 @@ void Breaker::drawSwitch()
 	if(value)
 	{
 		painter.begin(this);
-		painter.drawPixmap(0, 0, QPixmap((const char **)breaker_closed_xpm));
+		//painter.drawPixmap(0, 0, QPixmap((const char **)breaker_closed_xpm));
+		painter.drawPixmap(0, 0, *lOnpixmap);
 		painter.setFont(QFont("helvetica", 10));
 		painter.setPen(black);
 		//painter.drawText(0, 0, width(), height()-2,
@@ -100,7 +105,8 @@ void Breaker::drawSwitch()
 	else
 	{
 		painter.begin(this);
-		painter.drawPixmap(0, 0, QPixmap((const char **)breaker_opened_xpm));
+		//painter.drawPixmap(0, 0, QPixmap((const char **)breaker_opened_xpm));
+		painter.drawPixmap(0, 0, *lOffpixmap);
 		painter.setFont(QFont("helvetica", 10));
 		painter.setPen(black);
 		//painter.drawText(0, 0, width(), height()-2,
@@ -205,4 +211,55 @@ void Breaker::setOffLabel(QString offstring)
     int maxwidth=QMAX( fm.size(SingleLine,OnString).width(), fm.size(SingleLine,OffString).width());
     setGeometry(rect.x(),rect.y(),maxwidth+70,80);
     update();
+}
+
+/*!
+    \property Breaker::pixmap
+    \brief the label's pixmap
+
+    If no pixmap has been set this will return an invalid pixmap.
+
+    Setting the pixmap clears any previous content
+*/
+
+void Breaker::setOnPixmap( const QPixmap &pixmap )
+{
+    QSize osh = sizeHint();
+
+    if ( !lOnpixmap || lOnpixmap->serialNumber() != pixmap.serialNumber() ) 
+	{
+		if(lOnpixmap)
+		{
+			delete lOnpixmap;
+			lOnpixmap = 0;
+		}
+
+		lOnpixmap = new QPixmap( pixmap );
+    }
+
+    if ( lOnpixmap->depth() == 1 && !lOnpixmap->mask() )
+	lOnpixmap->setMask( *((QBitmap *)lOnpixmap) );
+
+	update();
+}
+
+void Breaker::setOffPixmap( const QPixmap &pixmap )
+{
+    QSize osh = sizeHint();
+
+    if ( !lOffpixmap || lOffpixmap->serialNumber() != pixmap.serialNumber() ) 
+	{
+		if(lOffpixmap)
+		{
+			delete lOffpixmap;
+			lOffpixmap = 0;
+		}
+
+		lOffpixmap = new QPixmap( pixmap );
+    }
+
+    if ( lOffpixmap->depth() == 1 && !lOffpixmap->mask() )
+	lOffpixmap->setMask( *((QBitmap *)lOffpixmap) );
+
+	update();
 }

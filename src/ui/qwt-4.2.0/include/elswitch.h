@@ -31,6 +31,8 @@ class QWT_EXPORT Breaker: public QWidget
     Q_PROPERTY(bool switchValue READ getBreakerValue WRITE setBreakerValue);
     Q_PROPERTY(QString OnLabel READ getOnLabel WRITE setOnLabel);
     Q_PROPERTY(QString OffLabel READ getOffLabel WRITE setOffLabel);
+	Q_PROPERTY( QPixmap Onpixmap READ Onpixmap WRITE setOnPixmap );
+	Q_PROPERTY( QPixmap Offpixmap READ Offpixmap WRITE setOffPixmap );
 
 public:
     Breaker(QWidget *parent=0,const char *name=0);
@@ -76,11 +78,16 @@ public:
 
 	void undoToggle();
 
+	QPixmap     *Onpixmap()	const	{ return lOnpixmap; }
+	QPixmap     *Offpixmap()	const	{ return lOffpixmap; }
+
 public slots:
     void setOnLabel(QString);
     void setOffLabel(QString);
     void setBreakerValue(bool);
 	void setBreakerValueInvalid(bool);
+	void setOnPixmap( const QPixmap & );
+	void setOffPixmap( const QPixmap & );
 
 signals:
     /*!
@@ -99,6 +106,8 @@ protected:
     void drawSwitch();
     void toggleValue();
 	void toggleValueManually();
+	QPixmap    *lOnpixmap;
+	QPixmap    *lOffpixmap;
 };
 
 #endif //ELSWITCH_H
