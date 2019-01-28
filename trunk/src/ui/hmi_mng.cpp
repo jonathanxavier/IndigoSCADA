@@ -132,8 +132,8 @@ void HMI_manager::setInitialValuesAndLimits()
 			QString widget_type = "QwtThermo";
 
 			// get the alarm limits
-			QString cmd = "select * from TAGS where NAME='"+name+"' and RECEIPE='"+GetReceipeName()+"';";
-			GetConfigureDb()->DoExec(this, cmd, tTagLimits, widget_type, name);
+			//QString cmd = "select * from TAGS where NAME='"+name+"' and RECEIPE='"+GetReceipeName()+"';";
+			//GetConfigureDb()->DoExec(this, cmd, tTagLimits, widget_type, name);
 
 			/*
 			double val = 0.0;
@@ -309,8 +309,8 @@ void HMI_manager::setInitialValuesAndLimits()
 			QString widget_type = "PTank";
 
 			// get the alarm limits
-			QString cmd = "select * from TAGS where NAME='"+name+"' and RECEIPE='"+GetReceipeName()+"';";
-			GetConfigureDb()->DoExec(this, cmd, tTagLimits, widget_type, name);
+			//QString cmd = "select * from TAGS where NAME='"+name+"' and RECEIPE='"+GetReceipeName()+"';";
+			//GetConfigureDb()->DoExec(this, cmd, tTagLimits, widget_type, name);
 
 			/*
 			((PTank*)obj)->setMinValue(-500.0);
@@ -345,8 +345,8 @@ void HMI_manager::setInitialValuesAndLimits()
 			QString widget_type = "PThermometer";
 
 			// get the alarm limits
-			QString cmd = "select * from TAGS where NAME='"+name+"' and RECEIPE='"+GetReceipeName()+"';";
-			GetConfigureDb()->DoExec(this, cmd, tTagLimits, widget_type, name);
+			//QString cmd = "select * from TAGS where NAME='"+name+"' and RECEIPE='"+GetReceipeName()+"';";
+			//GetConfigureDb()->DoExec(this, cmd, tTagLimits, widget_type, name);
 
 			/*
 			((PThermometer*)obj)->setMinValue(-500.0);
