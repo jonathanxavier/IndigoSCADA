@@ -1616,6 +1616,11 @@ void UserFrameWork::ReceivedNotify(int ntf, const char * data)
 		case  NotificationEvent::MONITOR_TICK_NOTIFY:
 		{
 			IT_COMMENT("MONITOR_TICK_NOTIFY");
+
+			if(!MonitorRunning)   //apa+++ 29-01-2019
+			{
+				fRequestFetch = true;
+			}
 			
 			// this is a monitor tick 
 			MonitorRunning = true;
@@ -1630,7 +1635,7 @@ void UserFrameWork::ReceivedNotify(int ntf, const char * data)
 				statusBar()->message(message);
 			}
 
-			MonitorTimeout = MONITOR_TICK_TIME + 2000;			
+			MonitorTimeout = MONITOR_TICK_TIME + 2000;
 		}
 		break;
 		case  NotificationEvent::UPDATE_NOTIFY:
