@@ -50,6 +50,7 @@ extern void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCal
 struct structItem
 {
 	CHAR spname[200]; //Topic name, i.e. Simulated Card/SimulatedNode/Random/R8 as C string
+	CHAR command_topic[200]; //Command Topic name, i.e. Simulated Card/SimulatedNode/Random/R8 as C string
 	unsigned int ioa_control_center;//unique inside CASDU
 	unsigned int io_list_iec_type; //IEC 104 type
 	int readable;

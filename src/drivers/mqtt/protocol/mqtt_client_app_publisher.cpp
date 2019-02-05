@@ -606,7 +606,7 @@ void MQTT_client_imp_publisher::monitoring_dir_consumer(struct iec_item *p_item)
 			break;
 		}
 		
-		printf("Message for sample point %s, value: %s\n", Item[item].spname, command_string);
+		printf("Publish topic %s, value: %s\n", Item[item].spname, command_string);
 
 		//write MQTT message///////////////////////////////////////////////////
 		/* Publish Topic */
@@ -708,8 +708,7 @@ static int mqtt_message_cb(MqttClient *client, MqttMessage *msg,
         /* Print incoming message */
         PRINTF("MQTT Message: Topic %s, Qos %d, Len %u\n",
             buf, msg->qos, msg->total_len);
-		
-		
+				
 		//////////////////////////////////////////////////////////////////////////
 		//Prepare message in control direction
 		message_hash_key = APHash((char *)buf, len);
@@ -720,7 +719,7 @@ static int mqtt_message_cb(MqttClient *client, MqttMessage *msg,
 			{
 				item_to_send.iec_obj.ioa = parent_class->Item[dw].ioa_control_center;
 
-				//printf("Found topic %s, ioa= %d\n",parent_class->Item[dw].spname, parent_class->Item[dw].ioa_control_center);
+				//printf("Found command topic %s, ioa= %d\n",parent_class->Item[dw].command_topic, parent_class->Item[dw].ioa_control_center);
 				break;
 			}
 		}
@@ -761,7 +760,7 @@ static int mqtt_message_cb(MqttClient *client, MqttMessage *msg,
 			//IT_COMMENT1("tx ---> 0x%02x\n", c);
 		//	}
 
-		//Send in monitor direction
+		//Send in control direction
 		fprintf(stderr,"Sending message %u th\n", n_msg_sent);
 		fflush(stderr);
 		
