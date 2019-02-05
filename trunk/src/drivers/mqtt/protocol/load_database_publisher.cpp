@@ -51,16 +51,24 @@ static int db_callback(void *NotUsed, int argc, char **argv, char **azColName)
 			case 1:
 			{
 				//column 2 in table mqtt_client_table
+				//mqtt_topic_for_command
+				if(argv[i] != NULL)
+					strcpy(gl_Config_db[gl_row_counter].command_topic, argv[i]);
+			}
+			break;
+			case 2:
+			{
+				//column 3 in table mqtt_client_table
 				//ioa_control_center Unstructured
 				if(argv[i] != NULL)
 					gl_Config_db[gl_row_counter].ioa_control_center = atoi(argv[i]);
 			}
 			break;
-			case 2:
+			case 3:
 			{
 				if(argv[i] != NULL)
 				{
-					//column 3 in table mqtt_client_table
+					//column 4 in table mqtt_client_table
 					//iec_type
 					if(strcmp(argv[i], "M_ME_TF_1") == 0)
 					{
@@ -99,41 +107,41 @@ static int db_callback(void *NotUsed, int argc, char **argv, char **azColName)
 				}
 			}	
 			break;
-			case 3:
+			case 4:
 			{
-				//column 4 in table mqtt_client_table
+				//column 5 in table mqtt_client_table
 				//readable
 				if(argv[i] != NULL)
 					gl_Config_db[gl_row_counter].readable = atoi(argv[i]);
 			}
 			break;
-			case 4:
+			case 5:
 			{
-				//column 5 in table mqtt_client_table
+				//column 6 in table mqtt_client_table
 				//writeable
 				if(argv[i] != NULL)
 					gl_Config_db[gl_row_counter].writeable = atoi(argv[i]);
 			}
 			break;
-			case 5:
+			case 6:
 			{
-				//column 6 in table mqtt_client_table
+				//column 7 in table mqtt_client_table
 				//HiHiLimit
 				if(argv[i] != NULL)
 					gl_Config_db[gl_row_counter].max_measure = (float)atof(argv[i]);
 			}
 			break;
-			case 6:
+			case 7:
 			{
-				//column 7 in table mqtt_client_table
+				//column 8 in table mqtt_client_table
 				//LoLoLimit
 				if(argv[i] != NULL)
 					gl_Config_db[gl_row_counter].min_measure = (float)atof(argv[i]);				
 			}
 			break;
-			case 7:
+			case 8:
 			{
-				//column 8 in table mqtt_client_table
+				//column 9 in table mqtt_client_table
 				//opc_type in OPC format 
 				if(argv[i] != NULL)
 					strcpy(gl_Config_db[gl_row_counter].opc_type, argv[i]);
@@ -176,6 +184,7 @@ int MQTT_client_imp_publisher::AddItems()
 
 	strcat(db_name, "\\project\\");
 	strcat(db_name, BrokerHostName);
+	strcat(db_name, "_publisher");
 	strcat(db_name, ".db");
 
 	rc = sqlite3_open(db_name, &db);
@@ -223,10 +232,10 @@ int MQTT_client_imp_publisher::AddItems()
 
 	Item = (struct structItem*)calloc(1, g_dwNumItems*sizeof(struct structItem));
 
-	//|----------------MQTT Topic -------------|---ioa_control_center---|---io_list_iec_type---|--min--|--max--|
-	//	Simulated Card.Simulated Node.Random.Ra			1					31			
-	//	Simulated Card.Simulated Node.Random.Rb			2					30					Engineering values (min and max)
-	//	Simulated Card.Simulated Node.Random.Rc			3					46					of measure or set point
+	//|----------------MQTT Topic -------------|----------------MQTT Command Topic -------------|---ioa_control_center---|---io_list_iec_type---|--min--|--max--|
+	//	Simulated Card.Simulated Node.Random.Ra  Simulated Card.Simulated Node.Random.CommandRa					1					31			
+	//	Simulated Card.Simulated Node.Random.Rb	 Simulated Card.Simulated Node.Random.CommandRa					2					30					Engineering values (min and max)
+	//	Simulated Card.Simulated Node.Random.Rc	 Simulated Card.Simulated Node.Random.CommandRa					3					46					of measure or set point
 	
 	
 	//////dump for debug////////////////////////////////////////////////////////////////////////////////
@@ -251,7 +260,8 @@ int MQTT_client_imp_publisher::AddItems()
 	for(j = 0; j < n_rows; j++) //loop over each record
 	{
 		strcpy(Item[nTestItem].spname, Config_db[j].spname);
-
+		strcpy(Item[nTestItem].command_topic, Config_db[j].command_topic);
+		
 		//fprintf(stderr,"Item[nTestItem].spname = %s\n", Item[nTestItem].spname);
 		//fflush(stderr);
 					
@@ -260,9 +270,9 @@ int MQTT_client_imp_publisher::AddItems()
 
 		Item[nTestItem].hash_key = 0;
 
-		if(strlen(Item[nTestItem].spname) > 0)
+		if(strlen(Item[nTestItem].command_topic) > 0)
 		{
-			Item[nTestItem].hash_key = APHash(Item[nTestItem].spname, strlen(Item[nTestItem].spname));
+			Item[nTestItem].hash_key = APHash(Item[nTestItem].command_topic, strlen(Item[nTestItem].command_topic));
 		}
 
 		//ended to read a record
