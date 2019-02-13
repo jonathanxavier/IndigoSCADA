@@ -133,7 +133,7 @@ int main(int argc, char **argv)
 			break;
 			case 'r' :
 				strcpy(Password, optarg);
-				strcat(NewConsoleTitle, optarg);
+				strcat(NewConsoleTitle, "xxxx");
 				strcat(NewConsoleTitle, "   ");
 			break;
 			case 't' :
