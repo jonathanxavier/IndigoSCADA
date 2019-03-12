@@ -382,7 +382,7 @@ void PipeWorker(void* pParam)
 			{
 				fprintf(stderr,"DisconnectNamedPipe failed with error %d\n", GetLastError());
 				fflush(stderr);
-				//ExitProcess(0);
+				ExitProcess(0);
 			}
 
 			if(ConnectNamedPipe(pipeHnds[pipe_id],	&ovrp[pipe_id]) == 0)
