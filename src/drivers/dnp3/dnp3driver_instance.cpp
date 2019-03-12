@@ -1,7 +1,7 @@
 /*
  *                         IndigoSCADA
  *
- *   This software and documentation are Copyright 2002 to 2014 Enscada 
+ *   This software and documentation are Copyright 2002 to 2011 Enscada 
  *   Limited and its licensees. All rights reserved. See file:
  *
  *                     $HOME/LICENSE 
@@ -10,40 +10,18 @@
  *
  */
 
+
+
 #include "dnp3driver_instance.h"
 #include "dnp3driverthread.h"
 
-////////////////////Middleware/////////////////////////////////////////////
-#ifdef USE_RIPC_MIDDLEWARE
-int exit_consumer = 0;
-
-void consumer(void* pParam)
-{
-	struct subs_args* arg = (struct subs_args*)pParam;
-	struct iec_item item;
-	RIPCObject objDesc(&item, sizeof(struct iec_item));
-
-	while(1)
-	{
-		if(exit_consumer)
-		{
-			break;
-		}
-
-		arg->queue_monitor_dir->get(objDesc);
-
-		fifo_put(arg->fifo_monitor_direction, (char *)&item, sizeof(struct iec_item));
-	}
-}
-////////////////////Middleware/////////////////////////////////////////////
-#endif
 /*
 *Function:
 *Inputs:none
 *Outputs:none
 *Returns:none
 */
-
+#define TICKS_PER_SEC 1
 void Dnp3driver_Instance::Start() 
 {
 	IT_IT("Dnp3driver_Instance::Start");
@@ -282,18 +260,48 @@ void Dnp3driver_Instance::QueryResponse(QObject *p, const QString &c, int id, QO
 				item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
 				///////////////////////////////////////////////////////////////////////////////////////////
 
-				#ifdef USE_RIPC_MIDDLEWARE
 				////////////////////Middleware/////////////////////////////////////////////
-				//publishing data
-				queue_control_dir->put(&item_to_send, sizeof(struct iec_item));
+				//prepare published data
+				memset(&instanceSend,0x00, sizeof(iec_item_type));
+				instanceSend.iec_type = item_to_send.iec_type;
+				memcpy(&(instanceSend.iec_obj), &(item_to_send.iec_obj), sizeof(struct iec_object));
+				instanceSend.msg_id = item_to_send.msg_id;
+				instanceSend.checksum = item_to_send.checksum;
+
+				ORTEPublicationSend(publisher);
 				//////////////////////////Middleware/////////////////////////////////////////
-				#endif
 			}
 		}
 		break;
 		default:
 		break;
 	}
+}
+
+void Dnp3driver_Instance::epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch_in_millisec)
+{
+	struct tm	*ptm;
+	int ms = (int)(epoch_in_millisec%1000);
+	time_t seconds;
+	
+	memset(time, 0x00,sizeof(cp56time2a));
+	seconds = (long)(epoch_in_millisec/1000);
+	ptm = localtime(&seconds);
+		
+    if(ptm)
+	{
+		time->hour = ptm->tm_hour;					//<0.23>
+		time->min = ptm->tm_min;					//<0..59>
+		time->msec = ptm->tm_sec*1000 + ms; //<0.. 59999>
+		time->mday = ptm->tm_mday; //<1..31>
+		time->wday = (ptm->tm_wday == 0) ? ptm->tm_wday + 7 : ptm->tm_wday; //<1..7>
+		time->month = ptm->tm_mon + 1; //<1..12>
+		time->year = ptm->tm_year - 100; //<0.99>
+		time->iv = 0; //<0..1> Invalid: <0> is valid, <1> is invalid
+		time->su = (u_char)ptm->tm_isdst; //<0..1> SUmmer time: <0> is standard time, <1> is summer time
+	}
+
+    return;
 }
 
 /*
@@ -432,13 +440,17 @@ void Dnp3driver_Instance::Tick()
 			item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
 			///////////////////////////////////////////////////////////////////////////////////////////
 
-			#ifdef USE_RIPC_MIDDLEWARE
-			//////////////Middleware///////////////////////////////////////
-			//publishing data
-			queue_control_dir->put(&item_to_send, sizeof(struct iec_item));
-			//////////////Middleware///////////////////////////////////////
-			#endif
-			
+			//prepare published data
+			memset(&instanceSend,0x00, sizeof(iec_item_type));
+			instanceSend.iec_type = item_to_send.iec_type;
+			memcpy(&(instanceSend.iec_obj), &(item_to_send.iec_obj), sizeof(struct iec_object));
+			instanceSend.msg_id = item_to_send.msg_id;
+			instanceSend.checksum = item_to_send.checksum;
+
+			//printf("sizeof(struct iec_object) = %d\n", sizeof(struct iec_object));
+
+			ORTEPublicationSend(publisher);
+
 			State = STATE_GENERAL_INTERROGATION_DONE;
 		}
 		break;
@@ -538,7 +550,7 @@ void Dnp3driver_Instance::get_items_from_local_fifo(void)
 
 				iec_type1 var = p_item->iec_obj.o.type1;
 				
-				IECValue v(VALUE_TAG, &var, M_SP_NA_1);
+				SpValue v(VALUE_TAG, &var, M_SP_NA_1);
 				TODO:05-07-2011 Get name here
 				post_val(v, name);
 
@@ -556,7 +568,7 @@ void Dnp3driver_Instance::get_items_from_local_fifo(void)
 
 				iec_type3 var = p_item->iec_obj.o.type3;
 				
-				IECValue v(VALUE_TAG, &var, M_DP_NA_1);
+				SpValue v(VALUE_TAG, &var, M_DP_NA_1);
 				TODO:05-07-2011 Get name here
 				post_val(v, name);
 
@@ -577,7 +589,7 @@ void Dnp3driver_Instance::get_items_from_local_fifo(void)
 
 				iec_type9 var = p_item->iec_obj.o.type9;
 				
-				IECValue v(VALUE_TAG, &var, M_ME_NA_1);
+				SpValue v(VALUE_TAG, &var, M_ME_NA_1);
 				TODO:05-07-2011 Get name here
 				post_val(v, name);
 
@@ -595,7 +607,7 @@ void Dnp3driver_Instance::get_items_from_local_fifo(void)
 
 				iec_type11 var = p_item->iec_obj.o.type11;
 				
-				IECValue v(VALUE_TAG, &var, M_ME_NB_1);
+				SpValue v(VALUE_TAG, &var, M_ME_NB_1);
 				TODO:05-07-2011 Get name here
 				post_val(v, name);
 
@@ -612,7 +624,7 @@ void Dnp3driver_Instance::get_items_from_local_fifo(void)
 
 				iec_type13 var = p_item->iec_obj.o.type13;
 				
-				IECValue v(VALUE_TAG, &var, M_ME_NC_1);
+				SpValue v(VALUE_TAG, &var, M_ME_NC_1);
 				TODO:05-07-2011 Get name here
 				post_val(v, name);
 
@@ -629,7 +641,7 @@ void Dnp3driver_Instance::get_items_from_local_fifo(void)
 
 				iec_type30 var = p_item->iec_obj.o.type30;
 				
-				IECValue v(VALUE_TAG, &var, M_SP_TB_1);
+				SpValue v(VALUE_TAG, &var, M_SP_TB_1);
 				TODO:05-07-2011 Get name here
 				post_val(v, name);
 
@@ -646,7 +658,7 @@ void Dnp3driver_Instance::get_items_from_local_fifo(void)
 
 				iec_type31 var = p_item->iec_obj.o.type31;
 				
-				IECValue v(VALUE_TAG, &var, M_DP_TB_1);
+				SpValue v(VALUE_TAG, &var, M_DP_TB_1);
 				TODO:05-07-2011 Get name here
 				post_val(v, name);
 
@@ -668,7 +680,7 @@ void Dnp3driver_Instance::get_items_from_local_fifo(void)
 
 				iec_type34 var = p_item->iec_obj.o.type34;
 				
-				IECValue v(VALUE_TAG, &var, M_ME_TD_1);
+				SpValue v(VALUE_TAG, &var, M_ME_TD_1);
 				TODO:05-07-2011 Get name here
 				post_val(v, name);
 
@@ -685,7 +697,7 @@ void Dnp3driver_Instance::get_items_from_local_fifo(void)
 
 				iec_type35 var = p_item->iec_obj.o.type35;
 				
-				IECValue v(VALUE_TAG, &var, M_ME_TE_1);
+				SpValue v(VALUE_TAG, &var, M_ME_TE_1);
 				TODO:05-07-2011 Get name here
 				post_val(v, name);
 
@@ -702,7 +714,7 @@ void Dnp3driver_Instance::get_items_from_local_fifo(void)
 
 				iec_type36 var = p_item->iec_obj.o.type36;
 				
-				IECValue v(VALUE_TAG, &var, M_ME_TF_1);
+				SpValue v(VALUE_TAG, &var, M_ME_TF_1);
 				TODO:05-07-2011 Get name here
 				post_val(v, name);
 
@@ -719,7 +731,7 @@ void Dnp3driver_Instance::get_items_from_local_fifo(void)
 
 				iec_type150 var = p_item->iec_obj.o.type150;
 				
-				IECValue v(VALUE_TAG, &var, M_ME_TN_1);
+				SpValue v(VALUE_TAG, &var, M_ME_TN_1);
 				TODO:05-07-2011 Get name here
 				post_val(v, name);
 
@@ -736,7 +748,7 @@ void Dnp3driver_Instance::get_items_from_local_fifo(void)
 
 				iec_type37 var = p_item->iec_obj.o.type37;
 				
-				IECValue v(VALUE_TAG, &var, M_ME_TN_1);
+				SpValue v(VALUE_TAG, &var, M_ME_TN_1);
 				TODO:05-07-2011 Get name here
 				post_val(v, name);
 
@@ -803,6 +815,7 @@ void Dnp3driver_Instance::get_items_from_local_fifo(void)
 *Returns:none
 */
 
+//Realtime method
 bool Dnp3driver_Instance::event(QEvent *e)
 {
 	IT_IT("Dnp3driver_Instance::event");
@@ -833,7 +846,6 @@ bool Dnp3driver_Instance::event(QEvent *e)
 
 		return true;
 	}
-
 	return QObject::event(e);
 };
 
@@ -936,6 +948,78 @@ void Dnp3driver_Instance::Command(const QString & name, BYTE cmd, LPVOID lpPa, D
 }
 
 /////////////////////////////////////Middleware///////////////////////////////////////////
+Boolean  quite=ORTE_FALSE;
+int	regfail=0;
+
+//event system
+void onRegFail(void *param) 
+{
+  printf("registration to a manager failed\n");
+  regfail = 1;
+}
+
+void rebuild_iec_item_message(struct iec_item *item2, iec_item_type *item1)
+{
+	unsigned char checksum;
+
+	///////////////Rebuild struct iec_item//////////////////////////////////
+	item2->iec_type = item1->iec_type;
+	memcpy(&(item2->iec_obj), &(item1->iec_obj), sizeof(struct iec_object));
+	item2->cause = item1->cause;
+	item2->msg_id = item1->msg_id;
+	item2->ioa_control_center = item1->ioa_control_center;
+	item2->casdu = item1->casdu;
+	item2->is_neg = item1->is_neg;
+	item2->checksum = item1->checksum;
+	///////and check the 1 byte checksum////////////////////////////////////
+	checksum = clearCrc((unsigned char *)item2, sizeof(struct iec_item));
+
+//	fprintf(stderr,"new checksum = %u\n", checksum);
+
+	//if checksum is 0 then there are no errors
+	if(checksum != 0)
+	{
+		//log error message
+		ExitProcess(0);
+	}
+
+	/*
+	fprintf(stderr,"iec_type = %u\n", item2->iec_type);
+	fprintf(stderr,"iec_obj = %x\n", item2->iec_obj);
+	fprintf(stderr,"cause = %u\n", item2->cause);
+	fprintf(stderr,"msg_id =%u\n", item2->msg_id);
+	fprintf(stderr,"ioa_control_center = %u\n", item2->ioa_control_center);
+	fprintf(stderr,"casdu =%u\n", item2->casdu);
+	fprintf(stderr,"is_neg = %u\n", item2->is_neg);
+	fprintf(stderr,"checksum = %u\n", item2->checksum);
+	*/
+}
+
+void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackParam) 
+{
+	Dnp3driver_Instance * cl = (Dnp3driver_Instance*)recvCallBackParam;
+	iec_item_type *item1 = (iec_item_type*)vinstance;
+
+	switch (info->status) 
+	{
+		case NEW_DATA:
+		{
+		  if(!quite)
+		  {
+			  struct iec_item item2;
+			  rebuild_iec_item_message(&item2, item1);
+			  //TODO: detect losts messages when item2.msg_id are NOT consecutive
+			  fifo_put(cl->fifo_monitor_direction, (char *)&item2, sizeof(struct iec_item));
+		  }
+		}
+		break;
+		case DEADLINE:
+		{
+			printf("deadline occurred\n");
+		}
+		break;
+	}
+}
 
 #include <time.h>
 #include <sys/timeb.h>
@@ -963,35 +1047,8 @@ void Dnp3driver_Instance::get_utc_host_time(struct cp56time2a* time)
 	IT_EXIT;
     return;
 }
-
-void Dnp3driver_Instance::epoch_to_cp56time2a(cp56time2a *time, signed __int64 epoch_in_millisec)
-{
-	struct tm	*ptm;
-	int ms = (int)(epoch_in_millisec%1000);
-	time_t seconds;
-	
-	memset(time, 0x00,sizeof(cp56time2a));
-	seconds = (long)(epoch_in_millisec/1000);
-	ptm = localtime(&seconds);
-		
-    if(ptm)
-	{
-		time->hour = ptm->tm_hour;					//<0.23>
-		time->min = ptm->tm_min;					//<0..59>
-		time->msec = ptm->tm_sec*1000 + ms; //<0.. 59999>
-		time->mday = ptm->tm_mday; //<1..31>
-		time->wday = (ptm->tm_wday == 0) ? ptm->tm_wday + 7 : ptm->tm_wday; //<1..7>
-		time->month = ptm->tm_mon + 1; //<1..12>
-		time->year = ptm->tm_year - 100; //<0.99>
-		time->iv = 0; //<0..1> Invalid: <0> is valid, <1> is invalid
-		time->su = (u_char)ptm->tm_isdst; //<0..1> SUmmer time: <0> is standard time, <1> is summer time
-	}
-
-    return;
-}
 /////////////////////////////////////Middleware/////////////////////////////////////////////
 
-#include <signal.h>
 
 char* get_date_time()
 {
@@ -1061,4 +1118,3 @@ void iec_call_exit_handler(int line, char* file, char* reason)
 
 	IT_EXIT;
 }
-

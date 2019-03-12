@@ -15,6 +15,7 @@
 #include "iec104types.h"
 #include "iec_item.h"
 #include "clear_crc_eight.h"
+#include "iec_item_type.h" //Middleware
 //////////////////////////////////////////////////////
 
 #include <stdio.h>
@@ -32,6 +33,11 @@ CustomDb::CustomDb() :
 
 ////////////////////////////////////////////apa+++////////////////////////////////////////////
 #define ABS(x) ((x) >= 0 ? (x) : -(x))
+
+/////////////////////////////////Globals remove ASAP/////////////
+extern iec_item_type* gl_instanceSend;
+extern ORTEPublication* gl_publisher;
+/////////////////////////////////////////////////////////////////
 
 #define QUALITY_ONLINE 0x01
 
@@ -285,11 +291,25 @@ void CustomDb::changePoint(   DnpAddr_t      addr,
 		//IT_COMMENT1("tx ---> 0x%02x\n", c);
 	//	}
 
+	Sleep(10); //Without delay there is missing of messages in the loading
+
 	//Send in monitor direction
 	fprintf(stderr,"Sending message %u th\n", n_sent_items);
 	fflush(stderr);
 
 	//prepare published data
+	memset(gl_instanceSend,0x00, sizeof(iec_item_type));
+	
+	gl_instanceSend->iec_type = item_to_send.iec_type;
+	memcpy(&(gl_instanceSend->iec_obj), &(item_to_send.iec_obj), sizeof(struct iec_object));
+	gl_instanceSend->cause = item_to_send.cause;
+	gl_instanceSend->msg_id = item_to_send.msg_id;
+	gl_instanceSend->ioa_control_center = item_to_send.ioa_control_center;
+	gl_instanceSend->casdu = item_to_send.casdu;
+	gl_instanceSend->is_neg = item_to_send.is_neg;
+	gl_instanceSend->checksum = item_to_send.checksum;
+
+	ORTEPublicationSend(gl_publisher);
 
 	n_sent_items++;
 }

@@ -1,7 +1,7 @@
 /*
  *                         IndigoSCADA
  *
- *   This software and documentation are Copyright 2002 to 2013 Enscada 
+ *   This software and documentation are Copyright 2002 to 2009 Enscada 
  *   Limited and its licensees. All rights reserved. See file:
  *
  *                     $HOME/LICENSE 
@@ -9,6 +9,7 @@
  *   for full copyright notice and license terms. 
  *
  */
+#include "iec_item_type.h" //Middleware
 #include <time.h>
 #include <stdio.h>
 #include <string.h>
@@ -27,9 +28,88 @@
 extern int gl_timeout_connection_with_parent;
 
 ////////////////////////////Middleware///////////////////////////////////////////////////////
+Boolean  quite = ORTE_FALSE;
+int	regfail=0;
+
+//event system
+void onRegFail(void *param) 
+{
+  printf("registration to a manager failed\n");
+  regfail = 1;
+}
+
+void rebuild_iec_item_message(struct iec_item *item2, iec_item_type *item1)
+{
+	unsigned char checksum;
+
+	///////////////Rebuild struct iec_item//////////////////////////////////
+	item2->iec_type = item1->iec_type;
+	memcpy(&(item2->iec_obj), &(item1->iec_obj), sizeof(struct iec_object));
+	item2->cause = item1->cause;
+	item2->msg_id = item1->msg_id;
+	item2->ioa_control_center = item1->ioa_control_center;
+	item2->casdu = item1->casdu;
+	item2->is_neg = item1->is_neg;
+	item2->checksum = item1->checksum;
+	///////and check the 1 byte checksum////////////////////////////////////
+	checksum = clearCrc((unsigned char *)item2, sizeof(struct iec_item));
+
+//	fprintf(stderr,"new checksum = %u\n", checksum);
+
+	//if checksum is 0 then there are no errors
+	if(checksum != 0)
+	{
+		//log error message
+		ExitProcess(0);
+	}
+
+	fprintf(stderr,"iec_type = %u\n", item2->iec_type);
+	fprintf(stderr,"iec_obj = %x\n", item2->iec_obj);
+	fprintf(stderr,"cause = %u\n", item2->cause);
+	fprintf(stderr,"msg_id =%u\n", item2->msg_id);
+	fprintf(stderr,"ioa_control_center = %u\n", item2->ioa_control_center);
+	fprintf(stderr,"casdu =%u\n", item2->casdu);
+	fprintf(stderr,"is_neg = %u\n", item2->is_neg);
+	fprintf(stderr,"checksum = %u\n", item2->checksum);
+}
+
+void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackParam) 
+{
+	DNP3MasterApp * cl = (DNP3MasterApp*)recvCallBackParam;
+	iec_item_type *item1 = (iec_item_type*)vinstance;
+
+	switch (info->status) 
+	{
+		case NEW_DATA:
+		{
+		  if(!quite)
+		  {
+			  struct iec_item item2;
+			  rebuild_iec_item_message(&item2, item1);
+			  cl->received_command_callback = 1;
+			  cl->check_for_commands(&item2);
+			  cl->received_command_callback = 0;
+		  }
+		}
+		break;
+		case DEADLINE:
+		{
+			printf("deadline occurred\n");
+		}
+		break;
+	}
+}
 ////////////////////////////////Middleware/////////////////////////////////////
 
+////////////////////////////////Middleware/////////////////
+iec_item_type DNP3MasterApp::instanceSend;
+ORTEPublication* DNP3MasterApp::publisher = NULL;
+////////////////////////////////Middleware/////////////////
 
+//Global to remove ASAP///////////////////////
+iec_item_type* gl_instanceSend;
+ORTEPublication* gl_publisher;
+//////////////////////////////////////////////
 
 //   
 //  Class constructor.   
@@ -57,19 +137,76 @@ lineNumber(atoi(line_number))
 	db.nIOA_BI = nIOA_BI;
 	db.nIOA_BO = nIOA_BO;
 	db.nIOA_CI = nIOA_CI;
-	
-	received_command = -1;
 
+	received_command = -1;
+	
 	/////////////////////Middleware/////////////////////////////////////////////////////////////////
+	received_command_callback = 0;
+
+	int32_t                 strength = 1;
+	NtpTime                 persistence, deadline, minimumSeparation, delay;
+	IPAddress				smIPAddress = IPADDRESS_INVALID;
+	
+	subscriber = NULL;
+
+	ORTEInit();
+	ORTEDomainPropDefaultGet(&dp);
+	NTPTIME_BUILD(minimumSeparation,0); 
+	NTPTIME_BUILD(delay,1); //1s
+
+	//initiate event system
+	ORTEDomainInitEvents(&events);
+
+	events.onRegFail = onRegFail;
+
+	//Create application     
+	domain = ORTEDomainAppCreate(ORTE_DEFAULT_DOMAIN,&dp,&events,ORTE_FALSE);
+
+	iec_item_type_type_register(domain);
+
+	//Create publisher
+	NTPTIME_BUILD(persistence,5);
+
 	char fifo_monitor_name[150];
 	strcpy(fifo_monitor_name,"fifo_monitor_direction");
 	strcat(fifo_monitor_name, line_number);
 	strcat(fifo_monitor_name, "dnp3");
+
+	publisher = ORTEPublicationCreate(
+	domain,
+	fifo_monitor_name,
+	"iec_item_type",
+	&instanceSend,
+	&persistence,
+	strength,
+	NULL,
+	NULL,
+	NULL);
+
+	//if(publisher == NULL){} //check this error
 	
 	char fifo_control_name[150];
 	strcpy(fifo_control_name,"fifo_control_direction");
 	strcat(fifo_control_name, line_number);
 	strcat(fifo_control_name, "dnp3");
+
+	//Create subscriber
+	NTPTIME_BUILD(deadline,3);
+
+	subscriber = ORTESubscriptionCreate(
+	domain,
+	IMMEDIATE,
+	BEST_EFFORTS,
+	fifo_control_name,
+	"iec_item_type",
+	&instanceRecv,
+	&deadline,
+	&minimumSeparation,
+	recvCallBack,
+	this,
+	smIPAddress);
+
+	//if(subscriber == NULL){} //check this error
 	///////////////////////////////////Middleware//////////////////////////////////////////////////
 
 	if(OpenLink(dnp3ServerAddress, atoi(dnp3ServerPort)))
@@ -99,6 +236,11 @@ lineNumber(atoi(line_number))
 		datalinkConfig.tx_p                  = tx_var;
 		datalinkConfig.debugLevel_p          = &debugLevel;
 
+		////////////remove ASAP/////////////////////////
+		//Pass instanceSend and publisher as parameters to Factory calls through Master class
+		gl_instanceSend = &instanceSend;
+		gl_publisher = publisher;
+		////////////////////////////////////////////////
 		master_p = new Master(masterConfig, datalinkConfig, &stationConfig, 1, &db, &timer);
 	}
 }   
@@ -230,7 +372,7 @@ void DNP3MasterApp::check_for_commands(struct iec_item *queued_item)
 	{ 
 		fprintf(stderr,"Receiving %d th message \n", queued_item->msg_id);
 		fflush(stderr);
-					
+
 		/////////////////////write command///////////////////////////////////////////////////////////
 		if(queued_item->iec_type == C_SC_TA_1
 			|| queued_item->iec_type == C_DC_TA_1
@@ -249,6 +391,9 @@ void DNP3MasterApp::check_for_commands(struct iec_item *queued_item)
 
 			//Command execution
 			received_command = queued_item->iec_type;
+
+			fprintf(stderr,"Receiving command for ioa %d\n", queued_item->iec_obj.ioa);
+			fflush(stderr);
 		}
 		else if(queued_item->iec_type == C_EX_IT_1)
 		{
@@ -347,6 +492,21 @@ int DNP3MasterApp::run(void)
 
 					//Send in monitor direction
 					//prepare published data
+					memset(&instanceSend,0x00, sizeof(iec_item_type));
+
+					instanceSend.iec_type = item_to_send.iec_type;
+					memcpy(&(instanceSend.iec_obj), &(item_to_send.iec_obj), sizeof(struct iec_object));
+					instanceSend.cause = item_to_send.cause;
+					instanceSend.msg_id = item_to_send.msg_id;
+					instanceSend.ioa_control_center = item_to_send.ioa_control_center;
+					instanceSend.casdu = item_to_send.casdu;
+					instanceSend.is_neg = item_to_send.is_neg;
+					instanceSend.checksum = item_to_send.checksum;
+
+					ORTEPublicationSend(publisher);
+
+					//Send in monitor direction
+					//prepare published data
 
 					CloseLink();
 			
@@ -431,6 +591,12 @@ int DNP3MasterApp::run(void)
 				datalinkConfig.tx_p                  = tx_var;
 				datalinkConfig.debugLevel_p          = &debugLevel;
 
+				////////////remove ASAP/////////////////////////
+				//Pass instanceSend and publisher as parameters to Factory calls through Master class
+				gl_instanceSend = &instanceSend;
+				gl_publisher = publisher;
+				////////////////////////////////////////////////
+
 				master_p = new Master(masterConfig, datalinkConfig, &stationConfig, 1, &db, &timer);
 			}
 		}
@@ -438,7 +604,6 @@ int DNP3MasterApp::run(void)
 
 	return 0;
 }
-
 
 #include <time.h>
 #include <sys/timeb.h>
