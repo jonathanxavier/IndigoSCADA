@@ -48,6 +48,13 @@ extern int exit_consumer;
 ////////////////////////////Middleware//////////////////////////////////
 #endif
 
+////////////////////////////Middleware/////////////////////////////////////////////////////////////
+#include "iec_item_type.h"
+extern void onRegFail(void *param);
+extern Boolean  quite;
+extern void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackParam); 
+/////////////////////////////////////////////////////////////////////////////////////////////
+
 class Iec61850DriverThread;
 
 class IEC61850DRIVERDRV Iec61850driver_Instance : public DriverInstance 
@@ -138,7 +145,6 @@ class IEC61850DRIVERDRV Iec61850driver_Instance : public DriverInstance
 		connect(pTimer,SIGNAL(timeout()),this,SLOT(Tick()));
 		pTimer->start(1000); // start with a 1 second timer
 
-		#ifdef USE_RIPC_MIDDLEWARE
 		/////////////////////Middleware/////////////////////////////////////////////////////////////////
 		char fifo_control_name[150];
 		char str_instance_id[20];
@@ -153,6 +159,7 @@ class IEC61850DRIVERDRV Iec61850driver_Instance : public DriverInstance
         strcat(fifo_monitor_name, str_instance_id);
         strcat(fifo_monitor_name, "iec61850");
 
+		#ifdef USE_RIPC_MIDDLEWARE
 		port = 6000;
 		hostname = "localhost";
 
@@ -164,6 +171,63 @@ class IEC61850DRIVERDRV Iec61850driver_Instance : public DriverInstance
 		queue_control_dir = session2->createQueue(fifo_control_name);
 
 		arg.queue_monitor_dir = queue_monitor_dir;
+		#endif
+		///////////////////////////////////Middleware//////////////////////////////////////////////////
+
+		/////////////////////Middleware/////////////////////////////////////////////////////////////////
+		ORTEDomainProp          dp; 
+		ORTESubscription        *s = NULL;
+		int32_t                 strength = 1;
+		NtpTime                 persistence,deadline,minimumSeparation,delay;
+		Boolean                 havePublisher = ORTE_FALSE;
+		Boolean                 haveSubscriber = ORTE_FALSE;
+		IPAddress				smIPAddress = IPADDRESS_INVALID;
+		ORTEDomainAppEvents     events;
+
+		ORTEInit();
+		ORTEDomainPropDefaultGet(&dp);
+		NTPTIME_BUILD(minimumSeparation, 0); //0 s
+		NTPTIME_BUILD(delay, 1); //1 s
+
+		//initiate event system
+		ORTEDomainInitEvents(&events);
+
+		events.onRegFail = onRegFail;
+
+		//Create application     
+		domain = ORTEDomainAppCreate(ORTE_DEFAULT_DOMAIN,&dp,&events,ORTE_FALSE);
+
+		iec_item_type_type_register(domain);
+
+		//Create publisher
+		NTPTIME_BUILD(persistence, 5); //5 s
+		
+		publisher = ORTEPublicationCreate(
+		domain,
+		fifo_control_name,
+		"iec_item_type",
+		&instanceSend,
+		&persistence,
+		strength,
+		NULL,
+		NULL,
+		NULL);
+
+		//Create subscriber
+		NTPTIME_BUILD(deadline,3);
+
+		subscriber = ORTESubscriptionCreate(
+		domain,
+		IMMEDIATE,
+		BEST_EFFORTS,
+		fifo_monitor_name,
+		"iec_item_type",
+		&instanceRecv,
+		&deadline,
+		&minimumSeparation,
+		recvCallBack,
+		this,
+		smIPAddress);
 		///////////////////////////////////Middleware//////////////////////////////////////////////////
 
 		/////////////////////////////////////local fifo//////////////////////////////////////////////////////////
@@ -173,6 +237,7 @@ class IEC61850DRIVERDRV Iec61850driver_Instance : public DriverInstance
 
 		fifo_monitor_direction = fifo_open(fifo_monitor_name, max_fifo_queue_size, iec_call_exit_handler);
 
+		#ifdef USE_RIPC_MIDDLEWARE
 		arg.fifo_monitor_direction = fifo_monitor_direction;
 		///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -207,6 +272,11 @@ class IEC61850DRIVERDRV Iec61850driver_Instance : public DriverInstance
 		delete session2;
 		///////////////////////////////////Middleware//////////////////////////////////////////////////
 		#endif
+
+		///////////////////////////////////Middleware//////////////////////////////////////////////////
+		ORTEDomainAppDestroy(domain);
+        domain = NULL;
+		///////////////////////////////////Middleware//////////////////////////////////////////////////
 	};
 	//
 	void Fail(const QString &s)
@@ -219,6 +289,14 @@ class IEC61850DRIVERDRV Iec61850driver_Instance : public DriverInstance
 	Driver* ParentDriver;
 	QString unit_name;
     int instanceID; //Equals to "line concept" of a SCADA driver
+
+	//////Middleware/////////////
+    ORTEDomain *domain;
+	ORTEPublication *publisher;
+	ORTESubscription *subscriber;
+	iec_item_type    instanceSend;
+	iec_item_type    instanceRecv;
+	/////////////////////////////
 
 	////////////////local fifo///////////
 	fifo_h fifo_monitor_direction;
