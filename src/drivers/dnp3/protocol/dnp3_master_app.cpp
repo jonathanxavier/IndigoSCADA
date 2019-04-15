@@ -94,7 +94,7 @@ void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackPa
 		break;
 		case DEADLINE:
 		{
-			printf("deadline occurred\n");
+			//printf("deadline occurred\n");
 		}
 		break;
 	}
@@ -468,6 +468,7 @@ int DNP3MasterApp::run(void)
 
 					master_p->rxData(&bytes, 0);
 				}
+				/*
 				else
 				{
 					fprintf(stderr,"dnp3 on line %d exiting...., due to lack of connection with server\n", lineNumber);
@@ -524,6 +525,7 @@ int DNP3MasterApp::run(void)
 
 					break; //exit inner loop
 				}
+				*/
 
 				if(received_command == C_SC_TA_1
 				|| received_command == C_DC_TA_1
