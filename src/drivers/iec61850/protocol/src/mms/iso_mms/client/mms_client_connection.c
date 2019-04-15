@@ -631,6 +631,8 @@ MmsConnection_getVariableAccessAttributes(MmsConnection self,
 {
 	ByteBuffer payload;
 	MmsTypeSpecification* typeSpec = NULL;
+	int count; //apa+++
+
 	ByteBuffer_wrap(&payload, self->buffer, 0, MMS_BUFFER_SIZE);
 	
 	self->lastInvokeId++;
@@ -642,9 +644,14 @@ MmsConnection_getVariableAccessAttributes(MmsConnection self,
 
 	IsoClientConnection_sendMessage(self->isoClient, &payload);
 
+	count = 0;
 	/* poll callback handler TODO poll with timeout */
 	while (self->connectionState == MMS_CON_WAITING)
+	{
+		count++; //apa+++
+		if(count > 200) exit(0); //apa+++
 		Thread_sleep(1);
+	}
 
 	if (self->connectionState == MMS_CON_RESPONSE_PENDING) {
 

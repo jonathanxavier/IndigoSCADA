@@ -150,6 +150,9 @@ mmsClient_parseGetVariableAccessAttributesResponse(ByteBuffer* message, uint32_t
 
 	asn_dec_rval_t rval;
 
+	if(message == NULL) //apa+++
+		return typeSpec; //apa+++
+
 	rval = ber_decode(NULL, &asn_DEF_MmsPdu,
 			(void**) &mmsPdu, ByteBuffer_getBuffer(message), ByteBuffer_getSize(message));
 
