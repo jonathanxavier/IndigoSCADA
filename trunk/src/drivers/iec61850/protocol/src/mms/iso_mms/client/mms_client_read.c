@@ -49,6 +49,9 @@ mmsClient_parseReadResponse(ByteBuffer* message, uint32_t* invokeId)
 
 	asn_dec_rval_t rval;
 
+	if(message == NULL) //apa+++
+		return valueList; //apa+++
+
 	rval = ber_decode(NULL, &asn_DEF_MmsPdu,
 			(void**) &mmsPdu, ByteBuffer_getBuffer(message), ByteBuffer_getSize(message));
 
