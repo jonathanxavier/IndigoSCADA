@@ -33,6 +33,12 @@ extern "C" {
 #endif
 //////////////////////////////////////////
 
+#include "iec_item_type.h" //Middleware
+////////////////////////////Middleware///////////////////////////////////////////////////////
+extern void onRegFail(void *param);
+extern void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackParam); 
+/////////////////////////////////////////////////////////////////////////////////////////////
+
 struct structItem
 {
 	char spname[200]; //Item ID of IEC61850 server, i.e. LLN0$ST$Health$stVal as C string
@@ -77,13 +83,12 @@ enum client_states {
 class IEC61850_client_imp
 {
 	public:
-
-	IEC61850_client_imp(char* server_address, char* server_tcp_port, char* polling_time, char* line_number, char* mms_domain)
+	
+	IEC61850_client_imp(char* server_address, char* server_tcp_port, char* polling_time, char* line_number)
 	{ 
 		IT_IT("IEC61850_client_imp::IEC61850_client_imp");
 
 		strcpy(ServerIPAddress, server_address);
-		//strcpy(mmsDomain, mms_domain); //NOTE: mms_domain is not used
 		tcpPort = atoi(server_tcp_port);
 		pollingTime = atoi(polling_time);
 
@@ -93,19 +98,76 @@ class IEC61850_client_imp
 		timer_starts_at_epoch = 0;
 		nameList = NULL;
 		g_dwNumItems = 0;
-						
+		is_connected = false;
 		/////////////////////Middleware/////////////////////////////////////////////////////////////////
+		int32_t                 strength = 1;
+		NtpTime                 persistence, deadline, minimumSeparation, delay;
+		IPAddress				smIPAddress = IPADDRESS_INVALID;
+		ORTEDomainProp          dp; 
+		ORTEDomainAppEvents     events;
+
+		publisher = NULL;
+		subscriber = NULL;
+
+		ORTEInit();
+		ORTEDomainPropDefaultGet(&dp);
+		NTPTIME_BUILD(minimumSeparation,0); 
+		NTPTIME_BUILD(delay,1); //1s
+
+		//initiate event system
+		ORTEDomainInitEvents(&events);
+
+		events.onRegFail = onRegFail;
+
+		//Create application     
+		domain = ORTEDomainAppCreate(ORTE_DEFAULT_DOMAIN,&dp,&events,ORTE_FALSE);
+
+		iec_item_type_type_register(domain);
+
+		//Create publisher
+		NTPTIME_BUILD(persistence,5);
+
 		char fifo_monitor_name[150];
 		strcpy(fifo_monitor_name,"fifo_monitor_direction");
 		strcat(fifo_monitor_name, line_number);
 		strcat(fifo_monitor_name, "iec61850");
+
+		publisher = ORTEPublicationCreate(
+		domain,
+		fifo_monitor_name,
+		"iec_item_type",
+		&instanceSend,
+		&persistence,
+		strength,
+		NULL,
+		NULL,
+		NULL);
+
+		//if(publisher == NULL){} //check this error
 		
 		char fifo_control_name[150];
 		strcpy(fifo_control_name,"fifo_control_direction");
 		strcat(fifo_control_name, line_number);
 		strcat(fifo_control_name, "iec61850");
-		///////////////////////////////////Middleware//////////////////////////////////////////////////
 
+		//Create subscriber
+		NTPTIME_BUILD(deadline,3);
+
+		subscriber = ORTESubscriptionCreate(
+		domain,
+		IMMEDIATE,
+		BEST_EFFORTS,
+		fifo_control_name,
+		"iec_item_type",
+		&instanceRecv,
+		&deadline,
+		&minimumSeparation,
+		recvCallBack,
+		this,
+		smIPAddress);
+
+		//if(subscriber == NULL){} //check this error
+		///////////////////////////////////Middleware//////////////////////////////////////////////////
 		IT_EXIT;
 	};
 		
@@ -114,6 +176,10 @@ class IEC61850_client_imp
 		IT_IT("IEC61850_client_imp::~IEC61850_client_imp");
 		stop_thread();
 		Sleep(1000);
+		///////////////////////////////////Middleware//////////////////////////////////////////////////
+		ORTEDomainAppDestroy(domain);
+		domain = NULL;
+		////////////////////////////////////Middleware//////////////////////////////////////////////////
 		IT_EXIT;
 	}
 
@@ -124,7 +190,7 @@ class IEC61850_client_imp
 	 struct structItem* Item; //IEC61850 client items vector, indexed from 0
 	 unsigned int g_dwNumItems;
 	 int pollingTime;
-
+	 bool is_connected;
 	/////////////////////MMS//////////////////////
 	MmsValue* value;
 	LinkedList nameList;
@@ -138,8 +204,18 @@ class IEC61850_client_imp
 	char mmsDomain[100];
 	//////////////////////////////////////////////
 
-	 /////////////////////Middleware/////////////////////////////////////////////////////////////////
-	 ///////////////////////////////////Middleware//////////////////////////////////////////////////
+    /////////////////////Middleware/////////////////////////
+    ORTEDomain              *domain;
+    ORTEPublication			*publisher;
+    ORTESubscription        *subscriber;
+    iec_item_type			instanceSend;
+    iec_item_type		    instanceRecv;
+    //////////////////////////////end//Middleware///////////
+
+    /////////////Middleware///////////////////////////////
+    u_int n_msg_sent_monitor_dir;
+    u_int n_msg_sent_control_dir;
+    //////////////////////////////////////////////////////
 	 int Start();
 	 int Stop();
 	 int AddItems();
