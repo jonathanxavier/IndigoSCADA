@@ -67,7 +67,7 @@ char *optarg;
 //Default server_TCP_port is 102
 
 #define RUNTIME_USAGE "Run time usage: %s -a server_IP_address -p server_TCP_port -l\
- line_number -t polling_time_in_ms -d mms_domain -e dump_variables\n"
+ line_number -t polling_time_in_ms -e dump_variables\n"
 
 void usage(char** argv)
 {
@@ -88,8 +88,7 @@ int main(int argc, char **argv)
 	char NewConsoleTitle[500];
 	char dumpFlag[80];
 	SYSTEMTIME oT;
-	char mms_domain[80];
-		
+			
 	IT_IT("main IEC61850 client");
 
 	//version control///////////////////////////////////////////////////////////////
@@ -111,11 +110,10 @@ int main(int argc, char **argv)
 	dumpFlag[0] = '\0';
 	line_number[0] = '\0';
 	polling_time[0] = '\0';
-	mms_domain[0] = '\0';
-
+	
 	strcpy(NewConsoleTitle, "iec61850client ");
 		
-	while( ( c = getopt ( argc, argv, "a:p:l:t:d:e:?" )) != EOF ) {
+	while( ( c = getopt ( argc, argv, "a:p:l:t:e:?" )) != EOF ) {
 		switch ( c ) {
 			case 'a' :
 				strcpy(iec61850ServerAddress, optarg);
@@ -137,11 +135,6 @@ int main(int argc, char **argv)
 			case 't' :
 				strcpy(polling_time, optarg);
 				strcat(NewConsoleTitle, " polling time ");
-				strcat(NewConsoleTitle, optarg);
-			break;
-			case 'd' :
-				strcpy(mms_domain, optarg);
-				strcat(NewConsoleTitle, " MMS domain ");
 				strcat(NewConsoleTitle, optarg);
 			break;
 			case 'e' :
@@ -189,15 +182,6 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 
-	/*
-	if(strlen(mms_domain) == 0)
-	{
-		fprintf(stderr,"mms_domain is not known\n");
-		fflush(stderr);
-		return EXIT_FAILURE;
-	}
-	*/
-
 	if(strlen(line_number) > 0)
 	{
 		if(!IsSingleInstance(line_number))
@@ -224,7 +208,7 @@ int main(int argc, char **argv)
 	/////////////////end keep alive////////////////////////////////////////////////
 	
 	//Alloc IEC61850 class and start
-	IEC61850_client_imp* po = new IEC61850_client_imp(iec61850ServerAddress, iec61850ServerPort, polling_time, line_number, mms_domain);
+	IEC61850_client_imp* po = new IEC61850_client_imp(iec61850ServerAddress, iec61850ServerPort, polling_time, line_number);
 
 	// connect to an IEC61850 server
 	int nRet = po->Start();
@@ -350,6 +334,7 @@ void PipeWorker(void* pParam)
 		{
 			fprintf(stderr,"GetOverlapped result failed %d start over\n", GetLastError());
 			fflush(stderr);
+			ExitProcess(0);
 		
 			if(DisconnectNamedPipe(pipeHnds[pipe_id]) == 0)
 			{
