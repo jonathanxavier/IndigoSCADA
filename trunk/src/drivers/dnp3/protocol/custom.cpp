@@ -275,43 +275,50 @@ void CustomDb::changePoint(   DnpAddr_t      addr,
 		break;
 	}
 
-	//IT_COMMENT6("at time: %d_%d_%d_%d_%d_%d", time.hour, time.min, time.msec, time.mday, time.month, time.year);
+	if(pointType == EventInterface::AI || 
+	   pointType == EventInterface::BI ||
+	   pointType == EventInterface::CI ||
+	   pointType == EventInterface::AO ||
+	   pointType == EventInterface::BO)
+	{
+		//IT_COMMENT6("at time: %d_%d_%d_%d_%d_%d", time.hour, time.min, time.msec, time.mday, time.month, time.year);
 
-	item_to_send.msg_id = n_sent_items;
-	item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
+		item_to_send.msg_id = n_sent_items;
+		item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
 
-	//unsigned char buf[sizeof(struct iec_item)];
-	//int len = sizeof(struct iec_item);
-	//memcpy(buf, &item_to_send, len);
-	//	for(j = 0;j < len; j++)
-	//	{
-	//	  unsigned char c = *(buf + j);
-		//fprintf(stderr,"tx ---> 0x%02x\n", c);
-		//fflush(stderr);
-		//IT_COMMENT1("tx ---> 0x%02x\n", c);
-	//	}
+		//unsigned char buf[sizeof(struct iec_item)];
+		//int len = sizeof(struct iec_item);
+		//memcpy(buf, &item_to_send, len);
+		//	for(j = 0;j < len; j++)
+		//	{
+		//	  unsigned char c = *(buf + j);
+			//fprintf(stderr,"tx ---> 0x%02x\n", c);
+			//fflush(stderr);
+			//IT_COMMENT1("tx ---> 0x%02x\n", c);
+		//	}
 
-	Sleep(10); //Without delay there is missing of messages in the loading
+		Sleep(10); //Without delay there is missing of messages in the loading
 
-	//Send in monitor direction
-	fprintf(stderr,"Sending message %u th\n", n_sent_items);
-	fflush(stderr);
+		//Send in monitor direction
+		fprintf(stderr,"Sending message %u th\n", n_sent_items);
+		fflush(stderr);
 
-	//prepare published data
-	memset(gl_instanceSend,0x00, sizeof(iec_item_type));
-	
-	gl_instanceSend->iec_type = item_to_send.iec_type;
-	memcpy(&(gl_instanceSend->iec_obj), &(item_to_send.iec_obj), sizeof(struct iec_object));
-	gl_instanceSend->cause = item_to_send.cause;
-	gl_instanceSend->msg_id = item_to_send.msg_id;
-	gl_instanceSend->ioa_control_center = item_to_send.ioa_control_center;
-	gl_instanceSend->casdu = item_to_send.casdu;
-	gl_instanceSend->is_neg = item_to_send.is_neg;
-	gl_instanceSend->checksum = item_to_send.checksum;
+		//prepare published data
+		memset(gl_instanceSend,0x00, sizeof(iec_item_type));
+		
+		gl_instanceSend->iec_type = item_to_send.iec_type;
+		memcpy(&(gl_instanceSend->iec_obj), &(item_to_send.iec_obj), sizeof(struct iec_object));
+		gl_instanceSend->cause = item_to_send.cause;
+		gl_instanceSend->msg_id = item_to_send.msg_id;
+		gl_instanceSend->ioa_control_center = item_to_send.ioa_control_center;
+		gl_instanceSend->casdu = item_to_send.casdu;
+		gl_instanceSend->is_neg = item_to_send.is_neg;
+		gl_instanceSend->checksum = item_to_send.checksum;
 
-	ORTEPublicationSend(gl_publisher);
+		ORTEPublicationSend(gl_publisher);
 
-	n_sent_items++;
+		n_sent_items++;
+	}
 }
 
 #include <time.h>
