@@ -196,7 +196,7 @@ int IEC61850_client_imp::sendEvents()
 	return 0;
 }
 
-int IEC61850_client_imp::Start()
+int IEC61850_client_imp::Start(char* Password)
 {
 	IT_IT("IEC61850_client_imp::Start");
 	
@@ -209,7 +209,7 @@ int IEC61850_client_imp::Start()
 	// use authentication
 	auth = (struct sAcseAuthenticationParameter*)calloc(1, sizeof(struct sAcseAuthenticationParameter));
 	auth->mechanism = AUTH_PASSWORD;
-	auth->value.password.string = "indigoscada";
+	auth->value.password.string = Password;
 
 	connectionParams = (IsoConnectionParameters *)calloc(1, sizeof(IsoConnectionParameters));
 	connectionParams->acseAuthParameter = auth;
