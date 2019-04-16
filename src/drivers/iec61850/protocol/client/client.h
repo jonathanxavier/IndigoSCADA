@@ -216,7 +216,7 @@ class IEC61850_client_imp
     u_int n_msg_sent_monitor_dir;
     u_int n_msg_sent_control_dir;
     //////////////////////////////////////////////////////
-	 int Start();
+	 int Start(char* Password);
 	 int Stop();
 	 int AddItems();
 	 void LogMessage(HRESULT hr = S_OK, LPCSTR pszError = NULL, const char* name = NULL);

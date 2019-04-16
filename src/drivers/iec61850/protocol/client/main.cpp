@@ -67,7 +67,7 @@ char *optarg;
 //Default server_TCP_port is 102
 
 #define RUNTIME_USAGE "Run time usage: %s -a server_IP_address -p server_TCP_port -l\
- line_number -t polling_time_in_ms -e dump_variables\n"
+ line_number -t polling_time_in_ms -r password -e dump_variables\n"
 
 void usage(char** argv)
 {
@@ -87,6 +87,7 @@ int main(int argc, char **argv)
 	char OldConsoleTitle[500];
 	char NewConsoleTitle[500];
 	char dumpFlag[80];
+	char Password[80];
 	SYSTEMTIME oT;
 			
 	IT_IT("main IEC61850 client");
@@ -110,10 +111,11 @@ int main(int argc, char **argv)
 	dumpFlag[0] = '\0';
 	line_number[0] = '\0';
 	polling_time[0] = '\0';
+	Password[0] = '\0';
 	
 	strcpy(NewConsoleTitle, "iec61850client ");
 		
-	while( ( c = getopt ( argc, argv, "a:p:l:t:e:?" )) != EOF ) {
+	while( ( c = getopt ( argc, argv, "a:p:l:t:r:e:?" )) != EOF ) {
 		switch ( c ) {
 			case 'a' :
 				strcpy(iec61850ServerAddress, optarg);
@@ -136,6 +138,11 @@ int main(int argc, char **argv)
 				strcpy(polling_time, optarg);
 				strcat(NewConsoleTitle, " polling time ");
 				strcat(NewConsoleTitle, optarg);
+			break;
+			case 'r' :
+				strcpy(Password, optarg);
+				strcat(NewConsoleTitle, "xxxx");
+				strcat(NewConsoleTitle, "   ");
 			break;
 			case 'e' :
 				strcpy(dumpFlag, optarg);
@@ -211,7 +218,7 @@ int main(int argc, char **argv)
 	IEC61850_client_imp* po = new IEC61850_client_imp(iec61850ServerAddress, iec61850ServerPort, polling_time, line_number);
 
 	// connect to an IEC61850 server
-	int nRet = po->Start();
+	int nRet = po->Start(Password);
 	
 	if(nRet)
 	{
