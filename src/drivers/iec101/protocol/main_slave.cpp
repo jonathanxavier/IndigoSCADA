@@ -24,14 +24,6 @@
 #include "iec101_imp_srv.h"
 #include <signal.h>
 
-//////////protection///////////////////////
-//#include "vm_detect.h"
-//#include "system_vars.h"
-#include "key.h" //protection key
-
-//#define KEY_PROTECTION
-///////////////////////////////////////////
-
 #define SUPPLIER "@ enscada.com"
 #define APPLICATION "iec101slave.exe"
 
@@ -274,11 +266,6 @@ int main( int argc, char **argv )
 	signal (SIGSEGV, iec101SignalHandler);
 	signal (SIGILL, iec101SignalHandler);
 	signal (SIGINT, iec101SignalHandler);
-	
-	#ifdef KEY_PROTECTION
-	if(get_key())
-	{
-	#endif
 
 	baud_rate = atoi(bits_per_second);
 	
@@ -315,15 +302,6 @@ int main( int argc, char **argv )
 	{
 		delete po;
 	}
-
-	#ifdef KEY_PROTECTION
-	}
-	else
-	{
-	//MessageBox(NULL,"Hardware error #001",""APPLICATION"", MB_OK|MB_ICONSTOP);
-		printf("Error: License key not found on this machine\n");
-	}
-	#endif
 
 	return 0;
 }

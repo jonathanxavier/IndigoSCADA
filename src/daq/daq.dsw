@@ -168,9 +168,6 @@ Package=<4>
     Project_Dep_Name iec61850server
     End Project Dependency
     Begin Project Dependency
-    Project_Dep_Name mserver
-    End Project Dependency
-    Begin Project Dependency
     Project_Dep_Name mqtt_client
     End Project Dependency
     Begin Project Dependency
@@ -184,6 +181,30 @@ Package=<4>
     End Project Dependency
     Begin Project Dependency
     Project_Dep_Name rtps_mngr
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name psqlodbc
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name mqtt_client_publisher
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name iec101master
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name iec101slave
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name iec103master
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name iec104master
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name iec104slave
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name iec103slave
     End Project Dependency
 }}}
 
@@ -318,6 +339,30 @@ Package=<4>
 
 ###############################################################################
 
+Project: "iec101master"="..\drivers\iec101\protocol\iec101master.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "iec101slave"="..\drivers\iec101\protocol\iec101slave.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "iec103driver"="..\drivers\iec103\iec103driver.dsp" - Package Owner=<4>
 
 Package=<5>
@@ -326,9 +371,30 @@ Package=<5>
 
 Package=<4>
 {{{
-    Begin Project Dependency
-    Project_Dep_Name ripcclient
-    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "iec103master"="..\drivers\iec103\protocol\iec103master.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "iec103slave"="..\drivers\iec103\protocol\iec103slave.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
 }}}
 
 ###############################################################################
@@ -341,6 +407,36 @@ Package=<5>
 
 Package=<4>
 {{{
+}}}
+
+###############################################################################
+
+Project: "iec104master"="..\drivers\iec104\protocol\iec104master.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name libevent
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "iec104slave"="..\drivers\iec104\protocol\iec104slave.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name libevent
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -399,6 +495,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "libevent"="..\drivers\iec104\protocol\libevent-1.4.13-stable\WIN32-Prj\libevent.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "librtps"="..\middleware\rtps\librtps\msvc\librtps.dsp" - Package Owner=<4>
 
 Package=<5>
@@ -446,9 +554,6 @@ Package=<5>
 
 Package=<4>
 {{{
-    Begin Project Dependency
-    Project_Dep_Name ripcclient
-    End Project Dependency
 }}}
 
 ###############################################################################
@@ -461,9 +566,6 @@ Package=<5>
 
 Package=<4>
 {{{
-    Begin Project Dependency
-    Project_Dep_Name ripcclient
-    End Project Dependency
 }}}
 
 ###############################################################################
@@ -484,9 +586,6 @@ Package=<4>
     End Project Dependency
     Begin Project Dependency
     Project_Dep_Name fifo
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name ripcclient
     End Project Dependency
     Begin Project Dependency
     Project_Dep_Name librtps
@@ -519,7 +618,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "mserver"="..\middleware\ripc\mserver.dsp" - Package Owner=<4>
+Project: "mqtt_client_publisher"="..\drivers\mqtt\protocol\mqtt_client_publisher.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -527,9 +626,6 @@ Package=<5>
 
 Package=<4>
 {{{
-    Begin Project Dependency
-    Project_Dep_Name ripcserver
-    End Project Dependency
 }}}
 
 ###############################################################################
@@ -566,9 +662,6 @@ Package=<5>
 
 Package=<4>
 {{{
-    Begin Project Dependency
-    Project_Dep_Name ripcclient
-    End Project Dependency
 }}}
 
 ###############################################################################
@@ -739,30 +832,6 @@ Package=<4>
 ###############################################################################
 
 Project: "rfc1006driver"="..\drivers\rfc1006\rfc1006driver.dsp" - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "ripcclient"="..\middleware\ripc\ripcclient.dsp" - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "ripcserver"="..\middleware\ripc\ripcserver.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{

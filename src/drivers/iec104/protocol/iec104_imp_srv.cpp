@@ -459,7 +459,7 @@ int iec104_imp::Stop()
 		fclose(iec_protocol_log_stream);
 	
 	char show_msg[200];
-	sprintf(show_msg, " IndigoSCADA iec104 master End\n");
+	sprintf(show_msg, " IndigoSCADA iec104 server End\n");
 	LogMessage(NULL, show_msg);
 
 	IT_EXIT;
