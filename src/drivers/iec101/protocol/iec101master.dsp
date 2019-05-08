@@ -71,7 +71,7 @@ LINK32=link.exe
 F90=df.exe
 MTL=midl.exe
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\..\..\fifo" /I "..\..\..\bb3" /I "..\..\..\bb3\os_support" /I "..\..\..\utilities" /I "..\..\..\middleware\ripc\inc" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /D "_EVENT_HAVE_GETTIMEOFDAY" /D "RIPC_DLL" /FD /GZ /c
+# ADD CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "..\..\..\fifo" /I "..\..\..\bb3" /I "..\..\..\bb3\os_support" /I "..\..\..\utilities" /I "..\..\..\middleware\rtps\include" /I "..\..\..\common" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /D "_EVENT_HAVE_GETTIMEOFDAY" /D "RIPC_DLL" /FD /GZ /c
 # SUBTRACT CPP /YX
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
@@ -80,7 +80,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib ws2_32.lib rpcrt4.lib fifo.lib snmpapi.lib winmm.lib /nologo /stack:0x200000 /subsystem:console /incremental:no /debug /machine:I386 /out:"c:\scada\bin/iec101master.exe" /pdbtype:sept /libpath:"c:\scada\lib"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib ws2_32.lib rpcrt4.lib fifo.lib snmpapi.lib winmm.lib rtps.lib /nologo /stack:0x200000 /subsystem:console /incremental:no /debug /machine:I386 /out:"c:\scada\bin/iec101master.exe" /pdbtype:sept /libpath:"c:\scada\lib"
 
 !ENDIF 
 
