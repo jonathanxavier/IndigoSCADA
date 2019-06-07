@@ -35,7 +35,7 @@ pChart(NULL),List(NULL),pSm(NULL)
 	SIGNAL (TransactionDone (QObject *, const QString &, int, QObject*)), this,
 	SLOT (ConfigQueryResponse (QObject *, const QString &, int, QObject*)));	// connect to the database
 	//   
-	connect (GetResultDb (),
+	connect (GetHistoricResultDb (),
 	SIGNAL (TransactionDone (QObject *, const QString &, int, QObject*)), this,
 	SLOT (ResultsQueryResponse (QObject *, const QString &, int, QObject*)));	// connect to the database
 	//
@@ -157,9 +157,9 @@ void Multitrace::ResultsQueryResponse (QObject *p,const QString &, int id, QObje
 		{
 			// we have got some data for a sample point - add it to the graph 
 			// find the node in the list - get the list of tags to load from record
-			QSTransaction &t = GetResultDb()->CurrentTransaction();
+			QSTransaction &t = GetHistoricResultDb()->CurrentTransaction();
 			//
-			int n = GetResultDb()->GetNumberResults();
+			int n = GetHistoricResultDb()->GetNumberResults();
 
 			if(n > maxItems)
 			{
@@ -168,10 +168,10 @@ void Multitrace::ResultsQueryResponse (QObject *p,const QString &, int id, QObje
 				statusBar()->message(message);				
 			}
 
-			for(int i = 0; i < n; i++, GetResultDb()->FetchNext())
+			for(int i = 0; i < n; i++, GetHistoricResultDb()->FetchNext())
 			{
 				// which tags do we want
-				QDateTime dt =  IsoDateQDateTime(GetResultDb()->GetIsoDateString("TIMEDATE"));  // time stamp
+				QDateTime dt =  IsoDateQDateTime(GetHistoricResultDb()->GetIsoDateString("TIMEDATE"));  // time stamp
 				SpDict::iterator j = Items.find(t.Data1);
 				if(!(j == Items.end()))
 				{
@@ -184,10 +184,10 @@ void Multitrace::ResultsQueryResponse (QObject *p,const QString &, int id, QObje
 							// if so update the graph
 							QString s = (*j).first + "[" + (*k).first + "]";
 							//IT_COMMENT1("the tag %s isOn and is added", (const char*)s);
-							//cerr << i << " " << (const char *)(*k).first << " " << (const char *)GetResultDb()->GetString((*k).first,i) << endl;
+							//cerr << i << " " << (const char *)(*k).first << " " << (const char *)GetHistoricResultDb()->GetString((*k).first,i) << endl;
 							//
 							bool ok = 0;
-							double v = GetResultDb()->GetDouble((*k).first,&ok);
+							double v = GetHistoricResultDb()->GetDouble((*k).first,&ok);
 							if(ok)
 							{
 								pChart->Add(s,dt,v); // update graph
@@ -508,7 +508,7 @@ void Multitrace::Check()
 					QString cmd = "select TIMEDATE," +  (*k).first + " from " + (*j).first + " where (TIMEDATE > "
 					+ QDATE_TIME_ISO_DATE(t) + ") order by TIMEDATE asc;";
 					
-					GetResultDb()->DoExec(this,cmd,tData,(*j).first); // get the data from the last half hour to kick off
+					GetHistoricResultDb()->DoExec(this,cmd,tData,(*j).first); // get the data from the last half hour to kick off
 				};
 			};
 		};

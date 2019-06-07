@@ -632,7 +632,9 @@ void Results::UpdateEnd(const QString &name)
 
 				
 				// now do it
+				#ifdef SAVEDATA_IN_RESULTDB
 				GetResultDb()->DoExec(0,cmd,0); //in real time database FastDB
+				#endif
 
 				if(GetHistoricResultDb() != NULL)
 				{

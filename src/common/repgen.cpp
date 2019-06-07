@@ -22,6 +22,7 @@
 #ifdef UNIX
 #include <unistd.h>
 #endif
+#include "historicdb.h"
 
 #include <fcntl.h>
 // how to indicate a new page
@@ -62,7 +63,7 @@ ReportGenerator::ReportGenerator(const QString & name,const QString & from,const
 	SIGNAL (TransactionDone (QObject *, const QString &, int, QObject*)), this,
 	SLOT (ConfigQueryResponse (QObject *, const QString &, int, QObject*)));	// connect to the database
 	//
-	connect (GetResultDb (),
+	connect (GetHistoricResultDb (),
 	SIGNAL (TransactionDone (QObject *, const QString &, int, QObject*)), this,
 	SLOT (ResultsQueryResponse (QObject *, const QString &, int, QObject*)));	// connect to the database
 	// start by getting the report from the database
@@ -233,7 +234,7 @@ void ReportGenerator::ConfigQueryResponse (QObject *p,const QString &, int id, Q
 					for(unsigned i = 0; i < Points.count(); i++)
 					{
 						QString cmd = "select * from "+ Points[i] + " where TIMEDATE between " + FromStr + " and " + ToStr + ";";
-						GetResultDb()->DoExec(this,cmd,tResults,Points[i]); //ask for the table
+						GetHistoricResultDb()->DoExec(this,cmd,tResults,Points[i]); //ask for the table
 
 						IT_COMMENT1("Query: %s", (const char *)cmd);
 					}
@@ -833,7 +834,7 @@ void ReportGenerator::ResultsQueryResponse (QObject *p,const QString &, int id, 
 		{
 			//
 			// 
-			QSTransaction &t = GetResultDb()->CurrentTransaction();
+			QSTransaction &t = GetHistoricResultDb()->CurrentTransaction();
 			//
 			//cerr << "Got Results Table For " << (const char *)t.Data1 << endl;
 			//
@@ -849,13 +850,13 @@ void ReportGenerator::ResultsQueryResponse (QObject *p,const QString &, int id, 
 				//
 				// write out the header
 				//
-				int n = GetResultDb()->GetNumberResults();
+				int n = GetHistoricResultDb()->GetNumberResults();
 				//
 				if(n)
 				{
 					// write the results set as space separated 
 					QStringList l;
-					if(GetResultDb()->GetFieldNames(l) > 2)
+					if(GetHistoricResultDb()->GetFieldNames(l) > 2)
 					{
 						os << n << " " << (l.count() + 1) << endl; // date-time field ends up as two fields, space separated
 						os << tr("Date") << " " << tr("Time") << " " << tr("State") << " ";
@@ -865,7 +866,7 @@ void ReportGenerator::ResultsQueryResponse (QObject *p,const QString &, int id, 
 						};
 						os << endl;
 						//
-						for(int i = 0; i < n; i++,GetResultDb()->FetchNext())
+						for(int i = 0; i < n; i++,GetHistoricResultDb()->FetchNext())
 						{
 							for(unsigned j = 0; j < l.count();j++)
 							{
@@ -875,11 +876,11 @@ void ReportGenerator::ResultsQueryResponse (QObject *p,const QString &, int id, 
 								QString s;
 								if(l[j] == "TIMEDATE")
 								{
-									s = GetResultDb()->GetIsoDateString(l[j]);
+									s = GetHistoricResultDb()->GetIsoDateString(l[j]);
 								}
 								else
 								{
-									s = GetResultDb()->GetString(l[j]);
+									s = GetHistoricResultDb()->GetString(l[j]);
 								}
 								
 								if(s.isEmpty())

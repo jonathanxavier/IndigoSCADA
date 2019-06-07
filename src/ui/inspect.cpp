@@ -41,7 +41,7 @@ pSm(NULL),pS(NULL),pHistory(NULL),pChart(NULL)
 	SIGNAL (TransactionDone (QObject *, const QString &, int, QObject*)), this,
 	SLOT (ConfigQueryResponse (QObject *, const QString &, int, QObject*)));	// connect to the database
 	//   
-	connect (GetResultDb (),
+	connect (GetHistoricResultDb (),
 	SIGNAL (TransactionDone (QObject *, const QString &, int, QObject*)), this,
 	SLOT (ResultsQueryResponse (QObject *, const QString &, int, QObject*)));	// connect to the database
 	//
@@ -137,7 +137,7 @@ pSm(NULL),pS(NULL),pHistory(NULL),pChart(NULL)
 
 	QString cmd = "select * from " + Name + " where  (TIMEDATE > " + QDATE_TIME_ISO_DATE(dt) + ") order by TIMEDATE asc;";
 
-	GetResultDb()->DoExec(this,cmd,tResults);
+	GetHistoricResultDb()->DoExec(this,cmd,tResults);
 	//
 	// we need the configuration details 	     
 	cmd = "select * from SAMPLE where NAME = '"+Name+"';";
@@ -223,7 +223,7 @@ void Inspect::ResultsQueryResponse (QObject *p, const QString &c, int id, QObjec
 	{
 		case tResults: //graph initialization
 		{
-			int n = GetResultDb()->GetNumberResults();
+			int n = GetHistoricResultDb()->GetNumberResults();
 			if(n > 0)
 			{
 				pHistory->clear();
@@ -240,7 +240,7 @@ void Inspect::ResultsQueryResponse (QObject *p, const QString &c, int id, QObjec
 				//
 				QStringList l;
 				StateListItem *p;
-				int j = GetResultDb()->GetFieldNames(l);
+				int j = GetHistoricResultDb()->GetFieldNames(l);
 				if(j > 1)
 				{ 
 					QHeader *qh = pHistory->header();
@@ -255,9 +255,9 @@ void Inspect::ResultsQueryResponse (QObject *p, const QString &c, int id, QObjec
 						};
 					}
 						// now add the data
-					for(int k = 0; k < n; k++,GetResultDb()->FetchNext())
+					for(int k = 0; k < n; k++,GetHistoricResultDb()->FetchNext())
 					{
-						QString ds =  GetResultDb()->GetIsoDateString("TIMEDATE");
+						QString ds =  GetHistoricResultDb()->GetIsoDateString("TIMEDATE");
 
 						//////////////////
 						//QString a = QDATE_TIME_ISO_DATE(IsoDateQDateTime(ds));
@@ -268,15 +268,15 @@ void Inspect::ResultsQueryResponse (QObject *p, const QString &c, int id, QObjec
 						p = new StateListItem(pHistory, 
 						ds, // the time stamp as ISO
 						"",
-						GetResultDb()->GetInt("STATE")
+						GetHistoricResultDb()->GetInt("STATE")
 						);
 						// 
 						for(unsigned i = 2; i < l.count(); i++)
 						{
-							double v = atof((const char*)(GetResultDb()->GetString(l[i])));
+							double v = atof((const char*)(GetHistoricResultDb()->GetString(l[i])));
 							QString val = QString::number(v,'f',2); //two decimal points of precision
 							p->setText(i - 1, val); // fill out the data value
-							pChart->Add(l[i], LastTime, GetResultDb()->GetDouble(l[i])); // add to the graph
+							pChart->Add(l[i], LastTime, GetHistoricResultDb()->GetDouble(l[i])); // add to the graph
 						};
 						// 
 					};

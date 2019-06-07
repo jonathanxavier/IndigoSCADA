@@ -23,6 +23,7 @@
 #include <unistd.h>
 #endif
 #include <fcntl.h>
+#include "historicdb.h"
 /*
 *Function:LogReportGenerator
 *Inputs:report name
@@ -37,7 +38,7 @@ LogReportGenerator::LogReportGenerator(const QString &name, const QString &from,
 	From = IsoDateQDateTime(from);
 	To = IsoDateQDateTime(to);
 	//
-	connect (GetResultDb (),
+	connect (GetHistoricResultDb (),
 	SIGNAL (TransactionDone (QObject *, const QString &, int, QObject*)), this,
 	SLOT (ResultsQueryResponse (QObject *, const QString &, int, QObject*)));	// connect to the database
 	//
@@ -54,7 +55,7 @@ LogReportGenerator::LogReportGenerator(const QString &name, const QString &from,
 		cmd = "select * from " + Name + " where TIMEDATE > " + QDATE_TIME_ISO_DATE(From) + " and TIMEDATE < " + QDATE_TIME_ISO_DATE(To) + " and SOURCE='"+ source +"';";
 	}
 
-	GetResultDb()->DoExec(this,cmd,tResults); // kick it off
+	GetHistoricResultDb()->DoExec(this,cmd,tResults); // kick it off
 	//
 };
 /*
@@ -116,13 +117,13 @@ void LogReportGenerator::ResultsQueryResponse(QObject *p,const QString &, int id
 				//
 				// write the data out as table cells
 				// 
-				for(unsigned i = 0; i < GetResultDb()->GetNumberResults(); i++, GetResultDb()->FetchNext())
+				for(unsigned i = 0; i < GetHistoricResultDb()->GetNumberResults(); i++, GetHistoricResultDb()->FetchNext())
 				{
 					// all event logs have the same format
 					os << "<TR>";
-					os << "<TD>" << GetResultDb()->GetIsoDateString("TIMEDATE") << "</TD>"; 
-					os << "<TD>" << UndoEscapeSQLText(GetResultDb()->GetString("SOURCE")) << "</TD>"; 
-					os << "<TD>" << UndoEscapeSQLText(GetResultDb()->GetString("QMESSAGE")) << "</TD>"; 
+					os << "<TD>" << GetHistoricResultDb()->GetIsoDateString("TIMEDATE") << "</TD>"; 
+					os << "<TD>" << UndoEscapeSQLText(GetHistoricResultDb()->GetString("SOURCE")) << "</TD>"; 
+					os << "<TD>" << UndoEscapeSQLText(GetHistoricResultDb()->GetString("QMESSAGE")) << "</TD>"; 
 					os << "</TR>" << endl;
 					//
 					//qApp->processEvents(); // process X/Win events
