@@ -238,7 +238,9 @@ void UnitCfg::QueryResponse (QObject *p, const QString &c, int State, QObject*ca
 				for(;it != list.end();++it)
 				{
 					QString cmd = "drop table "+ (*it) + ";";
+					#ifdef SAVEDATA_IN_RESULTDB
 					GetResultDb()->DoExec(0,cmd,0);
+					#endif
 					GetHistoricResultDb()->DoExec (0,cmd,0);
 				}
 			}

@@ -188,7 +188,9 @@ void SampleCfg::Rename()
 		GetCurrentDb ()->DoExec (0,cmd,0);
 		//
 		cmd ="drop table " + Name->text () + ";";
+		#ifdef SAVEDATA_IN_RESULTDB
 		GetResultDb ()->DoExec (0,cmd,0);
+		#endif
 		GetHistoricResultDb()->DoExec (0,cmd,0);
 
 		//
@@ -208,7 +210,9 @@ void SampleCfg::Rename()
 
 		cmd += " );";
 
+		#ifdef SAVEDATA_IN_RESULTDB
 		GetResultDb()->DoExec(0,cmd,0); //FastDB
+		#endif
 
 		if(GetHistoricResultDb() != NULL)
 		{
@@ -217,7 +221,9 @@ void SampleCfg::Rename()
 
 		cmd = "create index on "+ dlg.GetName() +".TIMEDATE;";
 
+		#ifdef SAVEDATA_IN_RESULTDB
 		GetResultDb()->DoExec(0,cmd,0);//FastDB
+		#endif
 
 		if(GetHistoricResultDb() != NULL)
 		{
@@ -260,7 +266,9 @@ void SampleCfg::Delete ()
 		GetCurrentDb ()->DoExec (0,cmd,0);
 		//
 		cmd ="drop table " + Name->text () + ";";
+		#ifdef SAVEDATA_IN_RESULTDB
 		GetResultDb ()->DoExec (0,cmd,0);
+		#endif
 		GetHistoricResultDb()->DoExec (0,cmd,0);
 
 		if(pCfgDriver)
@@ -426,7 +434,9 @@ void SampleCfg::New ()
 
 		cmd += " );";
 
+		#ifdef SAVEDATA_IN_RESULTDB
 		GetResultDb()->DoExec(0,cmd,0); //FastDB
+		#endif
 
 		if(GetHistoricResultDb() != NULL)
 		{
@@ -435,7 +445,9 @@ void SampleCfg::New ()
 
 		cmd = "create index on "+ dlg.GetName() +".TIMEDATE;";
 
+		#ifdef SAVEDATA_IN_RESULTDB
 		GetResultDb()->DoExec(0,cmd,0);//FastDB
+		#endif
 
 		if(GetHistoricResultDb() != NULL)
 		{

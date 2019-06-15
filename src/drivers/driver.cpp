@@ -127,7 +127,9 @@ void Driver::CreateSamplePoint(const QString &name, QStringList &l,const QString
 
 	cmd += " );";
 
+	#ifdef SAVEDATA_IN_RESULTDB
 	GetResultDb()->DoExec(0,cmd,0); //FastDB
+	#endif
 
 	if(GetHistoricResultDb() != NULL)
 	{
@@ -136,7 +138,9 @@ void Driver::CreateSamplePoint(const QString &name, QStringList &l,const QString
 
 	cmd = "create index on "+name+".TIMEDATE;";
 
+	#ifdef SAVEDATA_IN_RESULTDB
 	GetResultDb()->DoExec(0,cmd,0);//FastDB
+	#endif
 
 	if(GetHistoricResultDb() != NULL)
 	{
