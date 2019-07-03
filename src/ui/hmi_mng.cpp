@@ -28,6 +28,7 @@
 #include "elswitch.h"
 #include "pmeter.h"
 #include "qwt_plot.h"
+#include "double_elswitch.h"
 
 void HMI_manager::setParent( QDialog *parent )
 {
@@ -98,6 +99,32 @@ void HMI_manager::setInitialValuesAndLimits()
 			QString name = obj->name();
 			
 			((Breaker*)obj)->setBreakerValue(false);
+
+			int idx = name.find('_');
+			name.truncate(idx);
+
+			WidgetDict::value_type pr(name, obj);
+			Breaker_dictionary.insert(pr); // put in the dictionary
+		}
+
+		delete l; // delete the list, not the objects
+	}
+
+	{
+		QObjectList *l = dialog_parent->queryList( "DoubleBreaker" );
+
+		QObjectListIt it( *l ); // iterate
+
+		QObject *obj;
+
+		while((obj = it.current()) != 0) 
+		{
+			// for each found object...
+			++it;
+
+			QString name = obj->name();
+			
+			((DoubleBreaker*)obj)->setBreakerValue(0);
 
 			int idx = name.find('_');
 			name.truncate(idx);
@@ -719,6 +746,38 @@ void HMI_manager::doUpdateTags(QString &s, double &v, WidgetDict &dict)
 				break;
 			}
 		}
+		else if(obj->isA( "DoubleBreaker" ))
+		{
+			int i = (int)v;
+
+			switch(i)
+			{
+				case 0:
+				{
+					((DoubleBreaker*)obj)->setBreakerValue(0);
+				}
+				break;
+				case 1:
+				{
+					((DoubleBreaker*)obj)->setBreakerValue(1);
+				}
+				break;
+				case 2:
+				{
+					((DoubleBreaker*)obj)->setBreakerValue(2);
+				}
+				break;
+				case 3:
+				{
+					((DoubleBreaker*)obj)->setBreakerValue(3);
+				}
+				break;
+				default:
+					//White means HMI state none or Invalid
+					((DoubleBreaker*)obj)->setBreakerValueInvalid(1);
+				break;
+			}
+		}
 		else if(obj->isA( "PTank" ))
 		{
 			((PTank*)obj)->setValue(v);
@@ -920,6 +979,19 @@ void HMI_manager::doUpdateSamplePoint(QString &s, int state, int ack_flag, Widge
 			if(state == FailureLevel)
 			{   //Blue means Communication driver error state or Invalid
 				((Breaker*)obj)->setBreakerValueInvalid(false);
+			}
+		}
+		else if(obj->isA( "DoubleBreaker" ))
+		{
+			if(state == NoLevel)
+			{
+				//White means HMI state none or NO or Invalid
+				((DoubleBreaker*)obj)->setBreakerValueInvalid(1);
+			}
+
+			if(state == FailureLevel)
+			{   //Blue means Communication driver error state or Invalid
+				((DoubleBreaker*)obj)->setBreakerValueInvalid(1);
 			}
 		}
 		else
@@ -1198,6 +1270,40 @@ void HMI_manager::RightClicked(QString &class_name, QString &widget_name) // sho
 		if(found)
 		{
 			InspectMenu((Breaker*)obj, sample_point_name, ack);
+
+			return;
+		}
+	}
+	else if(class_name == QString("DoubleBreaker"))
+	{
+		QObjectList *l = dialog_parent->queryList("DoubleBreaker");
+
+		QObjectListIt it( *l ); // iterate
+
+		QObject *obj;
+
+		while((obj = it.current()) != 0) 
+		{
+			// for each found object...
+			++it;
+
+			if(widget_name == obj->name())
+			{
+				int idx = widget_name.find('_');
+				widget_name.truncate(idx);
+				sample_point_name = widget_name;
+				
+				found = true;
+
+				break;
+			}
+		}
+
+		delete l; // delete the list, not the objects
+
+		if(found)
+		{
+			InspectMenu((DoubleBreaker*)obj, sample_point_name, ack);
 
 			return;
 		}

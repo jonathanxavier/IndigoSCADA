@@ -90,15 +90,15 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
+SOURCE=.\src\double_elswitch.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\double_point_led.cpp
 # End Source File
 # Begin Source File
 
 SOURCE=.\src\elswitch.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\include\moc_elswitch.cpp
 # End Source File
 # Begin Source File
 
@@ -340,6 +340,39 @@ SOURCE=.\src\single_point_led.cpp
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
+# Begin Source File
+
+SOURCE=.\include\double_elswitch.h
+
+!IF  "$(CFG)" == "qwt - Win32 Release"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - MOCing double_elswitch.h...
+InputDir=.\include
+InputPath=.\include\double_elswitch.h
+InputName=double_elswitch
+
+"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	%qtdir%\bin\moc.exe "$(InputDir)\$(InputName).h" -o "$(InputDir)\moc_$(InputName).cpp"
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "qwt - Win32 Debug"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - MOCing double_elswitch.h...
+InputDir=.\include
+InputPath=.\include\double_elswitch.h
+InputName=double_elswitch
+
+"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	%qtdir%\bin\moc.exe "$(InputDir)\$(InputName).h" -o "$(InputDir)\moc_$(InputName).cpp"
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
 # Begin Source File
 
 SOURCE=.\include\double_point_led.h
@@ -1363,7 +1396,15 @@ InputName=single_point_led
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=.\include\moc_double_elswitch.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\include\moc_double_point_led.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\moc_elswitch.cpp
 # End Source File
 # Begin Source File
 

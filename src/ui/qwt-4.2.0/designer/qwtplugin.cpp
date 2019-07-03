@@ -31,6 +31,7 @@
 #include "plcdnumber.h"
 #include "pdoublepointled.h"
 #include "elswitch.h"
+#include "double_elswitch.h"
 
 namespace
 {
@@ -112,6 +113,8 @@ QwtPlugin::QwtPlugin()
         "plcdnumbericon.png", "PLCDNumber", "whatsthis"));
 	vec.append(Entry("Breaker", "elswitch.h",
         "pswitchicon.png", "Breaker", "whatsthis"));
+	vec.append(Entry("DoubleBreaker", "double_elswitch.h",
+        "pswitchicon.png", "DoubleBreaker", "whatsthis"));
 
 }
 
@@ -157,6 +160,8 @@ QWidget* QwtPlugin::create(const QString &key,
         return new PTank(parent, name );
 	else if ( key == "Breaker" )
         return new Breaker(parent, name );
+	else if ( key == "DoubleBreaker" )
+        return new DoubleBreaker(parent, name );
 	else if ( key == "PSwitch" )
         return new PSwitch(parent, name );
 	else if ( key == "PMeter" )
