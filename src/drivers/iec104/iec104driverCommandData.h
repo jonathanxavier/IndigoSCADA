@@ -23,6 +23,7 @@ class Iec104driverCommandData : public QDialog
 	protected:
 	QLabel *Name;
 	QLineEdit *Value;
+	QComboBox *Type;
 };
 #endif // Iec104driverCommandData_included
 

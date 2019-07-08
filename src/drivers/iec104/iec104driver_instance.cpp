@@ -317,7 +317,9 @@ void Iec104driver_Instance::QueryResponse(QObject *p, const QString &c, int id, 
 
 			if(GetConfigureDb()->GetNumberResults() > 0)
 			{
-				// 
+				//
+				unsigned char iec_command_type = atoi((const char*)t.Data4);
+
 				int IOACommand = GetConfigureDb()->GetInt("IOA");
 				
 				double command_value = 0.0;
@@ -337,18 +339,40 @@ void Iec104driver_Instance::QueryResponse(QObject *p, const QString &c, int id, 
 
 				printf("Command from %s, IOA = %d, value = %lf\n", (const char*)t.Data2, IOACommand, command_value);
 
-				//Send C_SE_TC_1//////////////////////////////////////////////////////////////////////////
 				struct iec_item item_to_send;
-				memset(&item_to_send,0x00, sizeof(struct iec_item));
-				item_to_send.iec_type = C_SE_TC_1;
-				item_to_send.iec_obj.ioa = IOACommand;
-				item_to_send.iec_obj.o.type63.sv = (float)command_value;
-				
-				item_to_send.iec_obj.o.type63.time = iec_cmd_time;
 
-				item_to_send.msg_id = msg_sent_in_control_direction++;
-				item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
-				///////////////////////////////////////////////////////////////////////////////////////////
+				switch(iec_command_type)
+				{
+					case C_SE_TC_1:
+					{
+						//Send C_SE_TC_1//////////////////////////////////////////////////////////////////////////
+						memset(&item_to_send,0x00, sizeof(struct iec_item));
+						item_to_send.iec_type = C_SE_TC_1;
+						item_to_send.iec_obj.ioa = IOACommand;
+						item_to_send.iec_obj.o.type63.sv = (float)command_value;
+						
+						item_to_send.iec_obj.o.type63.time = iec_cmd_time;
+
+						item_to_send.msg_id = msg_sent_in_control_direction++;
+						item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
+						///////////////////////////////////////////////////////////////////////////////////////////
+					}
+					break;
+					case C_IC_NA_1:
+					{
+						//Send C_IC_NA_1//////////////////////////////////////////////////////////////////////////
+						memset(&item_to_send,0x00, sizeof(struct iec_item));
+						item_to_send.iec_type = C_IC_NA_1;
+						item_to_send.iec_obj.ioa = 0;
+						item_to_send.iec_obj.o.type100.qoi = 1;
+						item_to_send.msg_id = msg_sent_in_control_direction++;
+						item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
+						///////////////////////////////////////////////////////////////////////////////////////////
+					}
+					break;
+					default:
+					break;
+				}
 
 				#ifdef USE_RIPC_MIDDLEWARE
 				////////////////////Middleware/////////////////////////////////////////////
@@ -1007,7 +1031,11 @@ void Iec104driver_Instance::Command(const QString & name, BYTE cmd, LPVOID lpPa,
 		QString cmd_epoch_in_ms = QString(buffer);
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		GetConfigureDb()->DoExec(this, pc, tGetIOAfromSamplePointName, value_for_command, sample_point_name, cmd_epoch_in_ms);
+		QString iec_command_type;
+		iec_command_type.sprintf("%d", params->iec_command_type);
+
+
+		GetConfigureDb()->DoExec(this, pc, tGetIOAfromSamplePointName, value_for_command, sample_point_name, cmd_epoch_in_ms, iec_command_type);
 	}
 }
 

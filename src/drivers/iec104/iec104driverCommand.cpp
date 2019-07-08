@@ -20,6 +20,10 @@ Inherited( parent, name ),Unit_type(unit_type),samplePointName(name)
 
 	Name->setText(name);
 
+	Type->insertItem ("C_SE_TC_1");	// add to the list box
+	Type->insertItem ("C_IC_NA_1");	// add to the list box
+	Type->setCurrentItem (0);
+
 	connect (GetConfigureDb (),
 	SIGNAL (TransactionDone (QObject *, const QString &, int, QObject*)), this,
 	SLOT (QueryResponse (QObject *, const QString &, int, QObject*)));	// connect to the database
@@ -70,6 +74,14 @@ void Iec104driverCommand::QueryResponse (QObject *p, const QString &c, int id, Q
 				struct cp56time2a actual_time;
 				get_utc_host_time(&actual_time);
 				params->time_stamp = actual_time;
+
+				char IECcommandtype[20];
+				strcpy(IECcommandtype, (const char *)Type->currentText());
+				
+				if(strcmp(IECcommandtype, "C_SE_TC_1") == 0)
+					params->iec_command_type = 63;
+				else if(strcmp(IECcommandtype, "C_IC_NA_1") == 0)
+					params->iec_command_type = 100;
 				
 				//Generate IEC command
 				

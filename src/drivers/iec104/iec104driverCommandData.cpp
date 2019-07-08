@@ -133,6 +133,42 @@ Iec104driverCommandData::Iec104driverCommandData(QWidget *parent, const char *na
 	qtarch_Label_21->setMargin( 0 );
 	/////////end 28-10-09///////////////////////////////////////////////
 
+	/////addded 08-07-2019///
+	QLabel *qtarch_Label_22 = new QLabel(this, "Label_21");
+	qtarch_Label_22->setGeometry(10, 120, 100, 30);
+	qtarch_Label_22->setMinimumSize(0, 0);
+	qtarch_Label_22->setMaximumSize(32767, 32767);
+	qtarch_Label_22->setFocusPolicy(QWidget::NoFocus);
+	qtarch_Label_22->setBackgroundMode(QWidget::PaletteBackground);
+	#if QT_VERSION < 300
+	qtarch_Label_22->setFontPropagation(QWidget::SameFont);
+	qtarch_Label_22->setPalettePropagation(QWidget::SameFont);
+	#endif
+	qtarch_Label_22->setFrameStyle( 0 );
+	qtarch_Label_22->setLineWidth( 1 );
+	qtarch_Label_22->setMidLineWidth( 0 );
+	qtarch_Label_22->QFrame::setMargin( 0 );
+	qtarch_Label_22->setText( tr( "Type" ) );
+	qtarch_Label_22->setAlignment( AlignLeft|AlignVCenter|ExpandTabs );
+	qtarch_Label_22->setMargin( 0 );
+
+
+	Type = new QComboBox(FALSE, this, "ComboBox_7");
+	Type->setGeometry(120, 120, 200, 30);
+	Type->setMinimumSize(0, 0);
+	Type->setMaximumSize(32767, 32767);
+	Type->setFocusPolicy(QWidget::StrongFocus);
+	Type->setBackgroundMode(QWidget::NoBackground);
+#if QT_VERSION < 300
+	Type->setFontPropagation(QWidget::SameFont);
+	Type->setPalettePropagation(QWidget::SameFont);
+		#endif
+	Type->setSizeLimit( 10 );
+	Type->setAutoResize( FALSE );
+	Type->setMaxCount( 2147483647 );
+	Type->setAutoCompletion( FALSE );
+	/////////////////////////
+
 	resize(480,280);
 	setMinimumSize(0, 0);
 	setMaximumSize(32767, 32767);

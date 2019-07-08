@@ -92,6 +92,7 @@ typedef struct _dispatcher_extra_params{
 	char string3[20];
 	cp56time2a time_stamp;
 	double value;
+	unsigned char iec_command_type;
 }dispatcher_extra_params;
 
 class QSEXPORT NotificationEvent : public QEvent
