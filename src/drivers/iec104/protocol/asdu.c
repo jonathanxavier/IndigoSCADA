@@ -10105,7 +10105,7 @@ void send_items(struct iecsock *s, struct iec_item* items, int n_items)
 						answer_type = items->iec_obj.o.type100;
 						ioa = items->iec_obj.ioa;
 						//ioa = 0; //deve essere nullo 
-						//answer_type.qoi = 0x14; //Station interrogation
+						answer_type.qoi = 0x14; //Station interrogation
 						answer_unit.type = C_IC_NA_1;
 						answer_unit.num = 1;				
 						answer_unit.sq = 0;				
