@@ -717,7 +717,7 @@ void Iec101driver_Instance::get_items_from_local_fifo(void)
 
 				#else
 
-				value.sprintf("%d", p_item->iec_obj.o.type13.mv);
+				value.sprintf("%f", p_item->iec_obj.o.type13.mv);
 
 				#endif
 			}
