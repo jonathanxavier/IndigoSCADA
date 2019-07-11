@@ -50,7 +50,8 @@ extern void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCal
 /////////////////////////fifo///////////////////////////////////////////
 extern void iec_call_exit_handler(int line, char* file, char* reason);
 #include "fifoc.h"
-#define MAX_FIFO_SIZE 65535
+//#define MAX_FIFO_SIZE 65535
+#define MAX_FIFO_SIZE 70000*(sizeof(struct iec_item))
 ////////////////////////////////////////////////////////////////////////
 
 

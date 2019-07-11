@@ -373,8 +373,7 @@ exit_threads(0),n_msg_sent_monitor_dir(0),n_msg_sent_control_dir(0)
 
 	strcat(fifo_monitor_name, "_fifo_client");
 
-	#define MAX_FIFO_SIZE 65535
-	fifo_monitor_direction = fifo_open(fifo_monitor_name, MAX_FIFO_SIZE, iec_call_exit_handler);
+	fifo_monitor_direction = fifo_open(fifo_monitor_name, MAX_FIFO_SIZE_MONITOR_DIRECTION, iec_call_exit_handler);
 
 	set_fifo_monitor_dir_handle(fifo_monitor_direction);
 	
@@ -384,7 +383,7 @@ exit_threads(0),n_msg_sent_monitor_dir(0),n_msg_sent_control_dir(0)
 
 	strcat(fifo_control_name, "_fifo_client");
 
-	fifo_control_direction = fifo_open(fifo_control_name, MAX_FIFO_SIZE, iec_call_exit_handler);
+	fifo_control_direction = fifo_open(fifo_control_name, MAX_FIFO_SIZE_CONTROL_DIRECTION, iec_call_exit_handler);
 
 	set_fifo_control_dir_handle(fifo_control_direction);
 	
