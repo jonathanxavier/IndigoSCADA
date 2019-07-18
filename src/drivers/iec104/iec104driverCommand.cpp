@@ -20,8 +20,24 @@ Inherited( parent, name ),Unit_type(unit_type),samplePointName(name)
 
 	Name->setText(name);
 
-	Type->insertItem ("C_SE_TC_1");	// add to the list box
 	Type->insertItem ("C_IC_NA_1");	// add to the list box
+
+	Type->insertItem ("C_SC_NA_1");	// add to the list box
+	Type->insertItem ("C_DC_NA_1");	// add to the list box
+
+	Type->insertItem ("C_SC_TA_1");	// add to the list box
+	Type->insertItem ("C_DC_TA_1");	// add to the list box
+
+	Type->insertItem ("C_SE_NA_1");	// add to the list box
+	Type->insertItem ("C_SE_NB_1");	// add to the list box
+	Type->insertItem ("C_SE_NC_1");	// add to the list box
+
+	Type->insertItem ("C_SE_TA_1");	// add to the list box
+	Type->insertItem ("C_SE_TB_1");	// add to the list box
+	Type->insertItem ("C_SE_TC_1");	// add to the list box
+
+	Type->insertItem ("C_CS_NA_1");	// add to the list box
+	
 	Type->setCurrentItem (0);
 
 	connect (GetConfigureDb (),
@@ -77,11 +93,31 @@ void Iec104driverCommand::QueryResponse (QObject *p, const QString &c, int id, Q
 
 				char IECcommandtype[20];
 				strcpy(IECcommandtype, (const char *)Type->currentText());
-				
-				if(strcmp(IECcommandtype, "C_SE_TC_1") == 0)
-					params->iec_command_type = 63;
-				else if(strcmp(IECcommandtype, "C_IC_NA_1") == 0)
+								
+				if(strcmp(IECcommandtype, "C_IC_NA_1") == 0)
 					params->iec_command_type = 100;
+				else if(strcmp(IECcommandtype, "C_SC_NA_1") == 0)
+					params->iec_command_type = 45;
+				else if(strcmp(IECcommandtype, "C_DC_NA_1") == 0)
+					params->iec_command_type = 46;
+				else if(strcmp(IECcommandtype, "C_SC_TA_1") == 0)
+					params->iec_command_type = 58;
+				else if(strcmp(IECcommandtype, "C_DC_TA_1") == 0)
+					params->iec_command_type = 59;
+				else if(strcmp(IECcommandtype, "C_SE_NA_1") == 0)
+					params->iec_command_type = 48;
+				else if(strcmp(IECcommandtype, "C_SE_NB_1") == 0)
+					params->iec_command_type = 49;
+				else if(strcmp(IECcommandtype, "C_SE_NC_1") == 0)
+					params->iec_command_type = 50;
+				else if(strcmp(IECcommandtype, "C_SE_TA_1") == 0)
+					params->iec_command_type = 61;
+				else if(strcmp(IECcommandtype, "C_SE_TB_1") == 0)
+					params->iec_command_type = 62;
+				else if(strcmp(IECcommandtype, "C_SE_TC_1") == 0)
+					params->iec_command_type = 63;
+				else if(strcmp(IECcommandtype, "C_CS_NA_1") == 0)
+					params->iec_command_type = 103;
 				
 				//Generate IEC command
 				

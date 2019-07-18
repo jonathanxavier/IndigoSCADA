@@ -343,6 +343,143 @@ void Iec104driver_Instance::QueryResponse(QObject *p, const QString &c, int id, 
 
 				switch(iec_command_type)
 				{
+					case C_IC_NA_1:
+					{
+						//Send C_IC_NA_1//////////////////////////////////////////////////////////////////////////
+						memset(&item_to_send,0x00, sizeof(struct iec_item));
+						item_to_send.iec_type = C_IC_NA_1;
+						item_to_send.iec_obj.ioa = 0;
+						item_to_send.iec_obj.o.type100.qoi = 1;
+						item_to_send.msg_id = msg_sent_in_control_direction++;
+						item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
+						///////////////////////////////////////////////////////////////////////////////////////////
+					}
+					break;
+					case C_SC_NA_1:
+					{
+						//Send C_SC_NA_1//////////////////////////////////////////////////////////////////////////
+						memset(&item_to_send,0x00, sizeof(struct iec_item));
+						item_to_send.iec_type = C_SC_NA_1;
+						item_to_send.iec_obj.ioa = IOACommand;
+						item_to_send.iec_obj.o.type45.scs = (short)command_value;
+						
+						item_to_send.msg_id = msg_sent_in_control_direction++;
+						item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
+						///////////////////////////////////////////////////////////////////////////////////////////
+					}
+					break;
+					case C_DC_NA_1:
+					{
+						//Send C_DC_NA_1//////////////////////////////////////////////////////////////////////////
+						memset(&item_to_send,0x00, sizeof(struct iec_item));
+						item_to_send.iec_type = C_DC_NA_1;
+						item_to_send.iec_obj.ioa = IOACommand;
+						item_to_send.iec_obj.o.type46.dcs = (short)command_value;
+						
+						item_to_send.msg_id = msg_sent_in_control_direction++;
+						item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
+						///////////////////////////////////////////////////////////////////////////////////////////
+					}
+					break;
+					case C_SC_TA_1:
+					{
+						//Send C_SC_TA_1//////////////////////////////////////////////////////////////////////////
+						memset(&item_to_send,0x00, sizeof(struct iec_item));
+						item_to_send.iec_type = C_SC_TA_1;
+						item_to_send.iec_obj.ioa = IOACommand;
+						item_to_send.iec_obj.o.type58.scs = (short)command_value;
+
+						item_to_send.iec_obj.o.type58.time = iec_cmd_time;
+						
+						item_to_send.msg_id = msg_sent_in_control_direction++;
+						item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
+						///////////////////////////////////////////////////////////////////////////////////////////
+					}
+					break;
+					case C_DC_TA_1:
+					{
+						//Send C_DC_TA_1//////////////////////////////////////////////////////////////////////////
+						memset(&item_to_send,0x00, sizeof(struct iec_item));
+						item_to_send.iec_type = C_DC_TA_1;
+						item_to_send.iec_obj.ioa = IOACommand;
+						item_to_send.iec_obj.o.type59.dcs = (short)command_value;
+
+						item_to_send.iec_obj.o.type59.time = iec_cmd_time;
+						
+						item_to_send.msg_id = msg_sent_in_control_direction++;
+						item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
+						///////////////////////////////////////////////////////////////////////////////////////////
+					}
+					break;
+					case C_SE_NA_1:
+					{
+						//Send C_SE_NA_1//////////////////////////////////////////////////////////////////////////
+						memset(&item_to_send,0x00, sizeof(struct iec_item));
+						item_to_send.iec_type = C_SE_NA_1;
+						item_to_send.iec_obj.ioa = IOACommand;
+						item_to_send.iec_obj.o.type48.sv = (short)command_value;
+						
+						item_to_send.msg_id = msg_sent_in_control_direction++;
+						item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
+						///////////////////////////////////////////////////////////////////////////////////////////
+					}
+					break;
+					case C_SE_NB_1:
+					{
+						//Send C_SE_NB_1//////////////////////////////////////////////////////////////////////////
+						memset(&item_to_send,0x00, sizeof(struct iec_item));
+						item_to_send.iec_type = C_SE_NB_1;
+						item_to_send.iec_obj.ioa = IOACommand;
+						item_to_send.iec_obj.o.type49.sv = (short)command_value;
+						
+						item_to_send.msg_id = msg_sent_in_control_direction++;
+						item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
+						///////////////////////////////////////////////////////////////////////////////////////////
+					}
+					break;
+					case C_SE_NC_1:
+					{
+						//Send C_SE_NC_1//////////////////////////////////////////////////////////////////////////
+						memset(&item_to_send,0x00, sizeof(struct iec_item));
+						item_to_send.iec_type = C_SE_NC_1;
+						item_to_send.iec_obj.ioa = IOACommand;
+						item_to_send.iec_obj.o.type50.sv = (float)command_value;
+									
+						item_to_send.msg_id = msg_sent_in_control_direction++;
+						item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
+						///////////////////////////////////////////////////////////////////////////////////////////
+					}
+					break;
+					case C_SE_TA_1:
+					{
+						//Send C_SE_TA_1//////////////////////////////////////////////////////////////////////////
+						memset(&item_to_send,0x00, sizeof(struct iec_item));
+						item_to_send.iec_type = C_SE_TA_1;
+						item_to_send.iec_obj.ioa = IOACommand;
+						item_to_send.iec_obj.o.type61.sv = (short)command_value;
+						
+						item_to_send.iec_obj.o.type61.time = iec_cmd_time;
+
+						item_to_send.msg_id = msg_sent_in_control_direction++;
+						item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
+						///////////////////////////////////////////////////////////////////////////////////////////
+					}
+					break;
+					case C_SE_TB_1:
+					{
+						//Send C_SE_TB_1//////////////////////////////////////////////////////////////////////////
+						memset(&item_to_send,0x00, sizeof(struct iec_item));
+						item_to_send.iec_type = C_SE_TB_1;
+						item_to_send.iec_obj.ioa = IOACommand;
+						item_to_send.iec_obj.o.type62.sv = (short)command_value;
+						
+						item_to_send.iec_obj.o.type62.time = iec_cmd_time;
+
+						item_to_send.msg_id = msg_sent_in_control_direction++;
+						item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
+						///////////////////////////////////////////////////////////////////////////////////////////
+					}
+					break;
 					case C_SE_TC_1:
 					{
 						//Send C_SE_TC_1//////////////////////////////////////////////////////////////////////////
@@ -358,13 +495,13 @@ void Iec104driver_Instance::QueryResponse(QObject *p, const QString &c, int id, 
 						///////////////////////////////////////////////////////////////////////////////////////////
 					}
 					break;
-					case C_IC_NA_1:
+					case C_CS_NA_1:
 					{
-						//Send C_IC_NA_1//////////////////////////////////////////////////////////////////////////
+						//Send C_CS_NA_1//////////////////////////////////////////////////////////////////////////
 						memset(&item_to_send,0x00, sizeof(struct iec_item));
-						item_to_send.iec_type = C_IC_NA_1;
-						item_to_send.iec_obj.ioa = 0;
-						item_to_send.iec_obj.o.type100.qoi = 1;
+						item_to_send.iec_type = C_CS_NA_1;
+						item_to_send.iec_obj.o.type103.time = iec_cmd_time;
+
 						item_to_send.msg_id = msg_sent_in_control_direction++;
 						item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
 						///////////////////////////////////////////////////////////////////////////////////////////

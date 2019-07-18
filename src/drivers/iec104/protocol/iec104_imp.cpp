@@ -778,7 +778,6 @@ void iec104_imp::check_for_commands(struct iec_item *queued_item)
 			switch(queued_item->iec_type)
 			{
 				case C_SC_TA_1:
-				case C_SC_NA_1:
 				{
 					//time contains the UTC time
 					command_generation_time_in_seconds = epoch_from_cp56time2a(&(queued_item->iec_obj.o.type58.time));
@@ -797,7 +796,6 @@ void iec104_imp::check_for_commands(struct iec_item *queued_item)
 				}
 				break;
 				case C_DC_TA_1:
-				case C_DC_NA_1:
 				{
 					//time contains the UTC time
 					command_generation_time_in_seconds = epoch_from_cp56time2a(&(queued_item->iec_obj.o.type59.time));
@@ -816,7 +814,6 @@ void iec104_imp::check_for_commands(struct iec_item *queued_item)
 				}
 				break;
 				case C_SE_TA_1:
-				case C_SE_NA_1:
 				{
 					//time contains the UTC time
 					command_generation_time_in_seconds = epoch_from_cp56time2a(&(queued_item->iec_obj.o.type61.time));
@@ -835,7 +832,6 @@ void iec104_imp::check_for_commands(struct iec_item *queued_item)
 				}
 				break;
 				case C_SE_TB_1:
-				case C_SE_NB_1:
 				{
 					//time contains the UTC time
 					command_generation_time_in_seconds = epoch_from_cp56time2a(&(queued_item->iec_obj.o.type62.time));
@@ -854,7 +850,6 @@ void iec104_imp::check_for_commands(struct iec_item *queued_item)
 				}
 				break;
 				case C_SE_TC_1:
-				case C_SE_NC_1:
 				{
 					//time contains the UTC time
 					command_generation_time_in_seconds = epoch_from_cp56time2a(&(queued_item->iec_obj.o.type63.time));
@@ -873,7 +868,6 @@ void iec104_imp::check_for_commands(struct iec_item *queued_item)
 				}
 				break;
 				case C_BO_TA_1:
-				case C_BO_NA_1:
 				{
 					//time contains the UTC time
 					command_generation_time_in_seconds = epoch_from_cp56time2a(&(queued_item->iec_obj.o.type64.time));
@@ -889,6 +883,18 @@ void iec104_imp::check_for_commands(struct iec_item *queued_item)
 					queued_item->iec_obj.o.type64.time.iv,
 					queued_item->iec_obj.o.type64.time.su);
 					fflush(stderr);
+				}
+				break;
+				case C_SC_NA_1:
+				case C_DC_NA_1:
+				case C_SE_NA_1:
+				case C_SE_NB_1:
+				case C_SE_NC_1:
+				case C_BO_NA_1:
+				{
+					struct cp56time2a actual_time;
+					get_utc_host_time(&actual_time);
+					command_generation_time_in_seconds = epoch_from_cp56time2a(&actual_time);
 				}
 				break;
 				default:
