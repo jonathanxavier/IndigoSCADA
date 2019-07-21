@@ -64,7 +64,9 @@ QSEXPORT UserDetails & GetUserDetails ();	// return the user setup
 inline void  QSLogAlarm(const QString &src, const QString &msg)
 {	
 	QString cmd = "insert into ALARMS values(" +  DATETIME_NOW  + ",'" + EscapeSQLText(src).left(MAX_LENGHT_OF_STRING) +"','"+ EscapeSQLText(msg).left(MAX_LENGHT_OF_STRING) +"');";	
+	#ifdef SAVEDATA_IN_RESULTDB
 	GetResultDb()->DoExec(0,cmd,0);
+	#endif
 	if(GetHistoricResultDb() != NULL)
 	{
 		GetHistoricResultDb()->DoExec(0,cmd,0);
@@ -78,7 +80,10 @@ inline void  QSLogAlarm(const QString &src, const QString &msg)
 inline void  QSLogEvent(const QString &src, const QString &msg)
 {
 	QString cmd = "insert into EVENTS values("+ DATETIME_NOW + ",'" + EscapeSQLText(src).left(MAX_LENGHT_OF_STRING)+"','"+ EscapeSQLText(msg).left(MAX_LENGHT_OF_STRING)+"');";	
+
+	#ifdef SAVEDATA_IN_RESULTDB
 	GetResultDb()->DoExec(0,cmd,0);
+	#endif
 
 	if(GetHistoricResultDb() != NULL)
 	{
@@ -102,7 +107,9 @@ inline void  QSEvent(const QString &src, const QString &msg)
 inline void  QSAudit(const QString &src, const QString &msg) // audit events - we keep quiet about these
 {	
 	QString cmd = "insert into AUDIT values("+ DATETIME_NOW+ ",'" + EscapeSQLText(src).left(MAX_LENGHT_OF_STRING)+"','"+ EscapeSQLText(msg).left(MAX_LENGHT_OF_STRING)+"');";	
+	#ifdef SAVEDATA_IN_RESULTDB
 	GetResultDb()->DoExec(0,cmd,0);
+	#endif
 	
 	if(GetHistoricResultDb() != NULL)
 	{
