@@ -64,8 +64,7 @@
 #else
 #include "stdint.h"
 #include <stddef.h>
-//#include <stdbool.h>
-typedef enum {false, true} bool;
+#include "stdbool.h"
 #include <string.h>
 
 #ifdef PB_ENABLE_MALLOC
