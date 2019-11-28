@@ -44,8 +44,7 @@ RSC=rc.exe
 F90=df.exe
 MTL=midl.exe
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /GX /O2 /I "." /I "$(QTDIR)\include" /I ".." /I "..\.." /I "..\..\..\common" /I "..\..\..\database" /I "..\..\..\utilities" /I "..\..\..\fifo" /I "..\..\..\configurator\sqlite" /I "..\..\..\middleware\ripc\inc" /I "..\..\..\middleware\rtps\include" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /D "BUILDING_WOLFMQTT" /D "RIPC_DLL" /FD /c
-# SUBTRACT CPP /YX
+# ADD CPP /nologo /MD /W3 /GX /O2 /I "." /I ".." /I "..\.." /I "..\..\..\common" /I "..\..\..\database" /I "..\..\..\utilities" /I "..\..\..\fifo" /I "..\..\..\configurator\sqlite" /I "..\..\..\middleware\ripc\inc" /I "..\..\..\middleware\rtps\include" /I "$(QTDIR)\include" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /D "BUILDING_WOLFMQTT" /D "RIPC_DLL" /FD /c
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -141,7 +140,27 @@ SOURCE=.\mqttnet.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\tahu\src\pb_common.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\tahu\src\pb_decode.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\tahu\src\pb_encode.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\configurator\sqlite\sqlite3.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\tahu\src\tahu.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\tahu\src\tahu.pb.c
 # End Source File
 # End Group
 # End Target
