@@ -48,7 +48,7 @@ bool decode_metric(org_eclipse_tahu_protobuf_Payload_Metric *metric, pb_istream_
 
 	while (pb_decode_tag(&substream, &metric_wire_type, &metric_tag, &metric_eof)) {
 		DEBUG_PRINT(("\teof: %s\n", metric_eof ? "true" : "false"));
-		DEBUG_PRINT(("\t\tBytes Remaining: %zd\n", substream.bytes_left));
+		DEBUG_PRINT(("\t\tBytes Remaining: %d\n", substream.bytes_left));
 		DEBUG_PRINT(("\t\tWiretype: %d\n", metric_wire_type));
 		DEBUG_PRINT(("\t\tTag: %d\n", metric_tag));
 
@@ -167,7 +167,7 @@ bool decode_metric(org_eclipse_tahu_protobuf_Payload_Metric *metric, pb_istream_
 
 					
 					//pb_byte_t dest[string_size[0]+1];
-					dest_pb_byte_t = malloc(string_size[0]+1);
+					dest_pb_byte_t = (pb_byte_t *)malloc(string_size[0]+1);
 					status = pb_read(&substream, dest_pb_byte_t, string_size[0]);
 					if (status) {
 						dest_pb_byte_t[string_size[0]] = '\0';
@@ -347,7 +347,7 @@ bool add_property_to_set(org_eclipse_tahu_protobuf_Payload_PropertySet *property
 		propertyset->values[size-1].which_value = org_eclipse_tahu_protobuf_Payload_PropertyValue_int_value_tag;
 		propertyset->values[size-1].value.int_value = *((int32_t *)value);
 	} else if (datatype == PROPERTY_DATA_TYPE_INT64) {
-		DEBUG_PRINT(("Setting datatype: %d, with value: %zd\n", datatype, *((int64_t *)value)));
+		DEBUG_PRINT(("Setting datatype: %d, with value: %d\n", datatype, *((int64_t *)value)));
 		propertyset->values[size-1].which_value = org_eclipse_tahu_protobuf_Payload_PropertyValue_long_value_tag;
 		propertyset->values[size-1].value.long_value = *((int64_t *)value);
 	} else if (datatype == PROPERTY_DATA_TYPE_UINT8) {
@@ -363,11 +363,11 @@ bool add_property_to_set(org_eclipse_tahu_protobuf_Payload_PropertySet *property
 		propertyset->values[size-1].which_value = org_eclipse_tahu_protobuf_Payload_PropertyValue_long_value_tag;
 		propertyset->values[size-1].value.long_value = *((uint32_t *)value);
 	} else if (datatype == PROPERTY_DATA_TYPE_UINT64) {
-		DEBUG_PRINT(("Setting datatype: %d, with value: %zd\n", datatype, *((uint64_t *)value)));
+		DEBUG_PRINT(("Setting datatype: %d, with value: %d\n", datatype, *((uint64_t *)value)));
 		propertyset->values[size-1].which_value = org_eclipse_tahu_protobuf_Payload_PropertyValue_long_value_tag;
 		propertyset->values[size-1].value.long_value = *((uint64_t *)value);
 	} else if (datatype == PROPERTY_DATA_TYPE_DATETIME) {
-		DEBUG_PRINT(("Setting datatype: %d, with value: %zd\n", datatype, *((uint64_t *)value)));
+		DEBUG_PRINT(("Setting datatype: %d, with value: %d\n", datatype, *((uint64_t *)value)));
 		propertyset->values[size-1].which_value = org_eclipse_tahu_protobuf_Payload_PropertyValue_long_value_tag;
 		propertyset->values[size-1].value.long_value = *((uint64_t *)value);
 	} else if (datatype == PROPERTY_DATA_TYPE_FLOAT) {
@@ -463,59 +463,59 @@ void add_simple_metric(org_eclipse_tahu_protobuf_Payload *payload,
 	// Default dynamically allocated members to NULL
 	payload->metrics[size-1].value.string_value = NULL;
 
-	DEBUG_PRINT(("Setting datatype and value - value size is %zd\n", size_of_value));
+	DEBUG_PRINT(("Setting datatype and value - value size is %d\n", size_of_value));
 	if (datatype == METRIC_DATA_TYPE_UNKNOWN) {
 		fprintf(stderr, "Can't create metric with unknown datatype!\n");
 	} else if (datatype == METRIC_DATA_TYPE_INT8) {
-		DEBUG_PRINT(("Setting datatype: %zd, with value: %d\n", datatype, *((int8_t *)value)));
+		DEBUG_PRINT(("Setting datatype: %d, with value: %d\n", datatype, *((int8_t *)value)));
 		payload->metrics[size-1].which_value = org_eclipse_tahu_protobuf_Payload_Metric_int_value_tag;
 		payload->metrics[size-1].value.int_value = *((int8_t *)value);
 	} else if (datatype == METRIC_DATA_TYPE_INT16) {
-		DEBUG_PRINT(("Setting datatype: %zd, with value: %d\n", datatype, *((int16_t *)value)));
+		DEBUG_PRINT(("Setting datatype: %d, with value: %d\n", datatype, *((int16_t *)value)));
 		payload->metrics[size-1].which_value = org_eclipse_tahu_protobuf_Payload_Metric_int_value_tag;
 		payload->metrics[size-1].value.int_value = *((int16_t *)value);
 	} else if (datatype == METRIC_DATA_TYPE_INT32) {
-		DEBUG_PRINT(("Setting datatype: %zd, with value: %d\n", datatype, *((int32_t *)value)));
+		DEBUG_PRINT(("Setting datatype: %d, with value: %d\n", datatype, *((int32_t *)value)));
 		payload->metrics[size-1].which_value = org_eclipse_tahu_protobuf_Payload_Metric_int_value_tag;
 		payload->metrics[size-1].value.int_value = *((int32_t *)value);
 	} else if (datatype == METRIC_DATA_TYPE_INT64) {
-		DEBUG_PRINT(("Setting datatype: %zd, with value: %zd\n", datatype, *((int64_t *)value)));
+		DEBUG_PRINT(("Setting datatype: %d, with value: %d\n", datatype, *((int64_t *)value)));
 		payload->metrics[size-1].which_value = org_eclipse_tahu_protobuf_Payload_Metric_long_value_tag;
 		payload->metrics[size-1].value.long_value = *((int64_t *)value);
 	} else if (datatype == METRIC_DATA_TYPE_UINT8) {
-		DEBUG_PRINT(("Setting datatype: %zd, with value: %u\n", datatype, *((uint8_t *)value)));
+		DEBUG_PRINT(("Setting datatype: %d, with value: %u\n", datatype, *((uint8_t *)value)));
 		payload->metrics[size-1].which_value = org_eclipse_tahu_protobuf_Payload_Metric_int_value_tag;
 		payload->metrics[size-1].value.int_value = *((uint8_t *)value);
 	} else if (datatype == METRIC_DATA_TYPE_UINT16) {
-		DEBUG_PRINT(("Setting datatype: %zd, with value: %u\n", datatype, *((uint16_t *)value)));
+		DEBUG_PRINT(("Setting datatype: %d, with value: %u\n", datatype, *((uint16_t *)value)));
 		payload->metrics[size-1].which_value = org_eclipse_tahu_protobuf_Payload_Metric_int_value_tag;
 		payload->metrics[size-1].value.int_value = *((uint16_t *)value);
 	} else if (datatype == METRIC_DATA_TYPE_UINT32) {
-		DEBUG_PRINT(("Setting datatype: %zd, with value: %u\n", datatype, *((uint32_t *)value)));
+		DEBUG_PRINT(("Setting datatype: %d, with value: %u\n", datatype, *((uint32_t *)value)));
 		payload->metrics[size-1].which_value = org_eclipse_tahu_protobuf_Payload_Metric_long_value_tag;
 		payload->metrics[size-1].value.long_value = *((uint32_t *)value);
 	} else if (datatype == METRIC_DATA_TYPE_UINT64) {
-		DEBUG_PRINT(("Setting datatype: %zd, with value: %zd\n", datatype, *((uint64_t *)value)));
+		DEBUG_PRINT(("Setting datatype: %d, with value: %d\n", datatype, *((uint64_t *)value)));
 		payload->metrics[size-1].which_value = org_eclipse_tahu_protobuf_Payload_Metric_long_value_tag;
 		payload->metrics[size-1].value.long_value = *((uint64_t *)value);
 	} else if (datatype == METRIC_DATA_TYPE_DATETIME) {
-		DEBUG_PRINT(("Setting datatype: %zd, with value: %zd\n", datatype, *((uint64_t *)value)));
+		DEBUG_PRINT(("Setting datatype: %d, with value: %d\n", datatype, *((uint64_t *)value)));
 		payload->metrics[size-1].which_value = org_eclipse_tahu_protobuf_Payload_Metric_long_value_tag;
 		payload->metrics[size-1].value.long_value = *((uint64_t *)value);
 	} else if (datatype == METRIC_DATA_TYPE_FLOAT) {
-		DEBUG_PRINT(("Setting datatype: %zd, with value: %f\n", datatype, *((float *)value)));
+		DEBUG_PRINT(("Setting datatype: %d, with value: %f\n", datatype, *((float *)value)));
 		payload->metrics[size-1].which_value = org_eclipse_tahu_protobuf_Payload_Metric_float_value_tag;
 		payload->metrics[size-1].value.float_value = *((float *)value);
 	} else if (datatype == METRIC_DATA_TYPE_DOUBLE) {
-		DEBUG_PRINT(("Setting datatype: %zd, with value: %f\n", datatype, *((double *)value)));
+		DEBUG_PRINT(("Setting datatype: %d, with value: %f\n", datatype, *((double *)value)));
 		payload->metrics[size-1].which_value = org_eclipse_tahu_protobuf_Payload_Metric_double_value_tag;
 		payload->metrics[size-1].value.double_value = *((double *)value);
 	} else if (datatype == METRIC_DATA_TYPE_BOOLEAN) {
-		DEBUG_PRINT(("Setting datatype: %zd, with value: %d\n", datatype, *((bool *)value)));
+		DEBUG_PRINT(("Setting datatype: %d, with value: %d\n", datatype, *((bool *)value)));
 		payload->metrics[size-1].which_value = org_eclipse_tahu_protobuf_Payload_Metric_boolean_value_tag;
 		payload->metrics[size-1].value.boolean_value = *((bool *)value);
 	} else if (datatype == METRIC_DATA_TYPE_STRING || datatype == METRIC_DATA_TYPE_TEXT || datatype == METRIC_DATA_TYPE_UUID) {
-		DEBUG_PRINT(("Setting datatype: %zd, with value: %s\n", datatype, (char *)value));
+		DEBUG_PRINT(("Setting datatype: %d, with value: %s\n", datatype, (char *)value));
 		payload->metrics[size-1].which_value = org_eclipse_tahu_protobuf_Payload_Metric_string_value_tag;
 		payload->metrics[size-1].value.string_value = (char *)malloc(size_of_value*sizeof(char));
 		strcpy(payload->metrics[size-1].value.string_value, (char *)value);
@@ -526,11 +526,11 @@ void add_simple_metric(org_eclipse_tahu_protobuf_Payload *payload,
 	} else if (datatype == METRIC_DATA_TYPE_FILE) {
 		DEBUG_PRINT(("Datatype FILE - Not yet supported\n"));
 	} else if (datatype == METRIC_DATA_TYPE_TEMPLATE) {
-		DEBUG_PRINT(("Setting datatype: %zd, with value: %d\n", datatype, *((bool *)value)));
+		DEBUG_PRINT(("Setting datatype: %d, with value: %d\n", datatype, *((bool *)value)));
 		payload->metrics[size-1].which_value = org_eclipse_tahu_protobuf_Payload_Metric_template_value_tag;
 		payload->metrics[size-1].value.template_value = *((org_eclipse_tahu_protobuf_Payload_Template *)value);
 	} else {
-		DEBUG_PRINT(("Unknown datatype %ju\n", datatype));
+		DEBUG_PRINT(("Unknown datatype %u\n", datatype));
 	}
 
 	payload->metrics_count++;
@@ -551,7 +551,7 @@ size_t encode_payload(uint8_t **buffer, size_t buffer_length, org_eclipse_tahu_p
 	DEBUG_PRINT(("Encoding...\n"));
 	node_status = pb_encode(&node_stream, org_eclipse_tahu_protobuf_Payload_fields, payload);
 	message_length = node_stream.bytes_written;
-	DEBUG_PRINT(("Message length: %zd\n", message_length));
+	DEBUG_PRINT(("Message length: %d\n", message_length));
 
         // Error Check
         if (!node_status) {
@@ -580,12 +580,12 @@ bool decode_payload(org_eclipse_tahu_protobuf_Payload *payload, const void *bina
 	pb_byte_t *dest_pb_byte_t;
 
 	pb_istream_t stream = pb_istream_from_buffer(binary_payload, binary_payloadlen);
-	DEBUG_PRINT(("Bytes Remaining: %zd\n", stream.bytes_left));
+	DEBUG_PRINT(("Bytes Remaining: %d\n", stream.bytes_left));
 
 	// Loop over blocks while decoding portions of the payload
 	while (pb_decode_tag(&stream, &payload_wire_type, &payload_tag, &payload_eof)) {
 		DEBUG_PRINT(("payload_eof: %s\n", payload_eof ? "true" : "false"));
-		DEBUG_PRINT(("\tBytes Remaining: %zd\n", stream.bytes_left));
+		DEBUG_PRINT(("\tBytes Remaining: %d\n", stream.bytes_left));
 		DEBUG_PRINT(("\tWiretype: %d\n", payload_wire_type));
 		DEBUG_PRINT(("\tTag: %d\n", payload_tag));
 
@@ -662,7 +662,7 @@ bool decode_payload(org_eclipse_tahu_protobuf_Payload *payload, const void *bina
 					}
 
 					//pb_byte_t dest[string_size[0]+1];
-					dest_pb_byte_t = malloc(string_size[0]+1);
+					dest_pb_byte_t = (pb_byte_t *)malloc(string_size[0]+1);
 					status = pb_read(&stream, dest_pb_byte_t, string_size[0]);
 					if (status) {
 						dest_pb_byte_t[string_size[0]] = '\0';
@@ -778,7 +778,7 @@ uint64_t get_current_timestamp() {
  */
 void get_next_payload(org_eclipse_tahu_protobuf_Payload *payload) {
 	// Initialize payload
-	DEBUG_PRINT(("Current Sequence Number: %zd\n", seq));
+	DEBUG_PRINT(("Current Sequence Number: %d\n", seq));
 	payload->has_timestamp = true;
 	payload->timestamp = get_current_timestamp();
 	payload->metrics_count = 0;
@@ -887,76 +887,76 @@ void init_metric(org_eclipse_tahu_protobuf_Payload_Metric *metric,
 	// Default dynamically allocated members to NULL
 	metric->value.string_value = NULL;
 
-	DEBUG_PRINT(("Setting datatype and value - value size is %zd\n", size_of_value));
+	DEBUG_PRINT(("Setting datatype and value - value size is %d\n", size_of_value));
 	if (datatype == METRIC_DATA_TYPE_UNKNOWN) {
 		fprintf(stderr, "Can't create metric with unknown datatype!\n");
 	} else if (datatype == METRIC_DATA_TYPE_INT8) {
-		DEBUG_PRINT(("Setting datatype: %zd, with value: %d\n", datatype, *((int8_t *)value)));
+		DEBUG_PRINT(("Setting datatype: %d, with value: %d\n", datatype, *((int8_t *)value)));
 		metric->which_value = org_eclipse_tahu_protobuf_Payload_Metric_int_value_tag;
 		metric->value.int_value = *((int8_t *)value);
 	} else if (datatype == METRIC_DATA_TYPE_INT16) {
-		DEBUG_PRINT(("Setting datatype: %zd, with value: %d\n", datatype, *((int16_t *)value)));
+		DEBUG_PRINT(("Setting datatype: %d, with value: %d\n", datatype, *((int16_t *)value)));
 		metric->which_value = org_eclipse_tahu_protobuf_Payload_Metric_int_value_tag;
 		metric->value.int_value = *((int16_t *)value);
 	} else if (datatype == METRIC_DATA_TYPE_INT32) {
-		DEBUG_PRINT(("Setting datatype: %zd, with value: %d\n", datatype, *((int32_t *)value)));
+		DEBUG_PRINT(("Setting datatype: %d, with value: %d\n", datatype, *((int32_t *)value)));
 		metric->which_value = org_eclipse_tahu_protobuf_Payload_Metric_int_value_tag;
 		metric->value.int_value = *((int32_t *)value);
 	} else if (datatype == METRIC_DATA_TYPE_INT64) {
-		DEBUG_PRINT(("Setting datatype: %zd, with value: %zd\n", datatype, *((int64_t *)value)));
+		DEBUG_PRINT(("Setting datatype: %d, with value: %d\n", datatype, *((int64_t *)value)));
 		metric->which_value = org_eclipse_tahu_protobuf_Payload_Metric_long_value_tag;
 		metric->value.long_value = *((int64_t *)value);
 	} else if (datatype == METRIC_DATA_TYPE_UINT8) {
-		DEBUG_PRINT(("Setting datatype: %zd, with value: %u\n", datatype, *((uint8_t *)value)));
+		DEBUG_PRINT(("Setting datatype: %d, with value: %u\n", datatype, *((uint8_t *)value)));
 		metric->which_value = org_eclipse_tahu_protobuf_Payload_Metric_int_value_tag;
 		metric->value.int_value = *((uint8_t *)value);
 	} else if (datatype == METRIC_DATA_TYPE_UINT16) {
-		DEBUG_PRINT(("Setting datatype: %zd, with value: %u\n", datatype, *((uint16_t *)value)));
+		DEBUG_PRINT(("Setting datatype: %d, with value: %u\n", datatype, *((uint16_t *)value)));
 		metric->which_value = org_eclipse_tahu_protobuf_Payload_Metric_int_value_tag;
 		metric->value.int_value = *((uint16_t *)value);
 	} else if (datatype == METRIC_DATA_TYPE_UINT32) {
-		DEBUG_PRINT(("Setting datatype: %zd, with value: %u\n", datatype, *((uint32_t *)value)));
+		DEBUG_PRINT(("Setting datatype: %d, with value: %u\n", datatype, *((uint32_t *)value)));
 		metric->which_value = org_eclipse_tahu_protobuf_Payload_Metric_long_value_tag;
 		metric->value.long_value = *((uint32_t *)value);
 	} else if (datatype == METRIC_DATA_TYPE_UINT64) {
-		DEBUG_PRINT(("Setting datatype: %zd, with value: %zd\n", datatype, *((uint64_t *)value)));
+		DEBUG_PRINT(("Setting datatype: %d, with value: %d\n", datatype, *((uint64_t *)value)));
 		metric->which_value = org_eclipse_tahu_protobuf_Payload_Metric_long_value_tag;
 		metric->value.long_value = *((uint64_t *)value);
 	} else if (datatype == METRIC_DATA_TYPE_DATETIME) {
-		DEBUG_PRINT(("Setting datatype: %zd, with value: %zd\n", datatype, *((uint64_t *)value)));
+		DEBUG_PRINT(("Setting datatype: %d, with value: %d\n", datatype, *((uint64_t *)value)));
 		metric->which_value = org_eclipse_tahu_protobuf_Payload_Metric_long_value_tag;
 		metric->value.long_value = *((uint64_t *)value);
 	} else if (datatype == METRIC_DATA_TYPE_FLOAT) {
-		DEBUG_PRINT(("Setting datatype: %zd, with value: %f\n", datatype, *((float *)value)));
+		DEBUG_PRINT(("Setting datatype: %d, with value: %f\n", datatype, *((float *)value)));
 		metric->which_value = org_eclipse_tahu_protobuf_Payload_Metric_float_value_tag;
 		metric->value.float_value = *((float *)value);
 	} else if (datatype == METRIC_DATA_TYPE_DOUBLE) {
-		DEBUG_PRINT(("Setting datatype: %zd, with value: %f\n", datatype, *((double *)value)));
+		DEBUG_PRINT(("Setting datatype: %d, with value: %f\n", datatype, *((double *)value)));
 		metric->which_value = org_eclipse_tahu_protobuf_Payload_Metric_double_value_tag;
 		metric->value.double_value = *((double *)value);
 	} else if (datatype == METRIC_DATA_TYPE_BOOLEAN) {
-		DEBUG_PRINT(("Setting datatype: %zd, with value: %d\n", datatype, *((bool *)value)));
+		DEBUG_PRINT(("Setting datatype: %d, with value: %d\n", datatype, *((bool *)value)));
 		metric->which_value = org_eclipse_tahu_protobuf_Payload_Metric_boolean_value_tag;
 		metric->value.boolean_value = *((bool *)value);
 	} else if (datatype == METRIC_DATA_TYPE_STRING || datatype == METRIC_DATA_TYPE_TEXT || datatype == METRIC_DATA_TYPE_UUID) {
-		DEBUG_PRINT(("Setting datatype: %zd, with value: %s\n", datatype, (char *)value));
+		DEBUG_PRINT(("Setting datatype: %d, with value: %s\n", datatype, (char *)value));
 		metric->which_value = org_eclipse_tahu_protobuf_Payload_Metric_string_value_tag;
 		metric->value.string_value = (char *)malloc(size_of_value*sizeof(char));
 		strcpy(metric->value.string_value, (char *)value);
 	} else if (datatype == METRIC_DATA_TYPE_BYTES) {
 		fprintf(stderr, "Datatype BYTES - Not yet supported\n");
 	} else if (datatype == METRIC_DATA_TYPE_DATASET) {
-		DEBUG_PRINT(("Setting datatype: %zd, with value: %d\n", datatype, *((bool *)value)));
+		DEBUG_PRINT(("Setting datatype: %d, with value: %d\n", datatype, *((bool *)value)));
 		metric->which_value = org_eclipse_tahu_protobuf_Payload_Metric_dataset_value_tag;
 		metric->value.dataset_value = *((org_eclipse_tahu_protobuf_Payload_DataSet *)value);
 	} else if (datatype == METRIC_DATA_TYPE_FILE) {
 		fprintf(stderr, "Datatype FILE - Not yet supported\n");
 	} else if (datatype == METRIC_DATA_TYPE_TEMPLATE) {
-		DEBUG_PRINT(("Setting datatype: %zd, with # of metrics: %d\n", datatype, ((org_eclipse_tahu_protobuf_Payload_Template *)value)->metrics_count));
+		DEBUG_PRINT(("Setting datatype: %d, with # of metrics: %d\n", datatype, ((org_eclipse_tahu_protobuf_Payload_Template *)value)->metrics_count));
 		metric->which_value = org_eclipse_tahu_protobuf_Payload_Metric_template_value_tag;
 		metric->value.template_value = *((org_eclipse_tahu_protobuf_Payload_Template *)value);
 	} else {
-		fprintf(stderr, "Unknown datatype %ju\n", datatype);
+		fprintf(stderr, "Unknown datatype %u\n", datatype);
 	}
 }
 
@@ -967,11 +967,11 @@ void print_payload(org_eclipse_tahu_protobuf_Payload *payload) {
 	int i=0;
 	fprintf(stdout, "Payload:  has_timestamp: %s\n", payload->has_timestamp ? "true" : "false");
 	if (payload->has_timestamp) {
-		fprintf(stdout, "Payload:  timestamp: %zd\n", payload->timestamp);
+		fprintf(stdout, "Payload:  timestamp: %d\n", payload->timestamp);
 	}
 	fprintf(stdout, "Payload:  has_seq: %s\n", payload->has_seq ? "true" : "false");
 	if (payload->has_seq) {
-		fprintf(stdout, "Payload:  seq: %zd\n", payload->seq);
+		fprintf(stdout, "Payload:  seq: %d\n", payload->seq);
 	}
 	fprintf(stdout, "Payload:  UUID: %s\n", payload->uuid);
 
@@ -981,11 +981,11 @@ void print_payload(org_eclipse_tahu_protobuf_Payload *payload) {
 		fprintf(stdout, "Payload:  Metric %d:  name: %s\n", i, payload->metrics[i].name);
 		fprintf(stdout, "Payload:  Metric %d:  has_alias: %s\n", i, payload->metrics[i].has_alias ? "true" : "false");
 		if (payload->metrics[i].has_alias) {
-			fprintf(stdout, "Payload:  Metric %d:  alias: %zd\n", i, payload->metrics[i].alias);
+			fprintf(stdout, "Payload:  Metric %d:  alias: %d\n", i, payload->metrics[i].alias);
 		}
 		fprintf(stdout, "Payload:  Metric %d:  has_timestamp: %s\n", i, payload->metrics[i].has_timestamp ? "true" : "false");
 		if (payload->metrics[i].has_timestamp) {
-			fprintf(stdout, "Payload:  Metric %d:  timestamp: %zd\n", i, payload->metrics[i].timestamp);
+			fprintf(stdout, "Payload:  Metric %d:  timestamp: %d\n", i, payload->metrics[i].timestamp);
 		}
 		fprintf(stdout, "Payload:  Metric %d:  has_datatype: %s\n", i, payload->metrics[i].has_datatype ? "true" : "false");
 		if (payload->metrics[i].has_datatype) {
@@ -1018,7 +1018,7 @@ void print_payload(org_eclipse_tahu_protobuf_Payload *payload) {
 					payload->metrics[i].datatype == METRIC_DATA_TYPE_INT64 ||
 					payload->metrics[i].datatype == METRIC_DATA_TYPE_UINT64 ||
 					payload->metrics[i].datatype == METRIC_DATA_TYPE_DATETIME) {
-			fprintf(stdout, "Payload:  Metric %d:  datatype: %d, with value: %zd\n", i, payload->metrics[i].datatype, payload->metrics[i].value.long_value);
+			fprintf(stdout, "Payload:  Metric %d:  datatype: %d, with value: %d\n", i, payload->metrics[i].datatype, payload->metrics[i].value.long_value);
 		} else if (payload->metrics[i].datatype == METRIC_DATA_TYPE_FLOAT) {
 			fprintf(stdout, "Payload:  Metric %d:  datatype: %d, with value: %f\n", i, payload->metrics[i].datatype, payload->metrics[i].value.float_value);
 		} else if (payload->metrics[i].datatype == METRIC_DATA_TYPE_DOUBLE) {
@@ -1036,7 +1036,7 @@ void print_payload(org_eclipse_tahu_protobuf_Payload *payload) {
 		} else if (payload->metrics[i].datatype == METRIC_DATA_TYPE_FILE) {
 			fprintf(stdout, "Payload:  Metric %d:  datatype FILE - Not yet supported\n", i);
 		} else if (payload->metrics[i].datatype == METRIC_DATA_TYPE_TEMPLATE) {
-			//fprintf(stdout, "Payload:  Metric %d:  datatype: %d, with value: %zd\n", i, payload->metrics[i].datatype, payload->metrics[i].value.long_value);
+			//fprintf(stdout, "Payload:  Metric %d:  datatype: %d, with value: %d\n", i, payload->metrics[i].datatype, payload->metrics[i].value.long_value);
 			fprintf(stdout, "Payload:  Metric %d:  datatype: %d, with # of metrics: %d\n", i, payload->metrics[i].datatype, payload->metrics[i].value.template_value.metrics_count);
 		} else {
 			fprintf(stdout, "Payload:  Metric %d:  datatype: %d\n", i, payload->metrics[i].datatype);

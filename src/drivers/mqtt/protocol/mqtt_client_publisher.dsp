@@ -141,7 +141,27 @@ SOURCE=.\mqttnet.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\tahu\src\pb_common.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\tahu\src\pb_decode.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\tahu\src\pb_encode.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\configurator\sqlite\sqlite3.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\tahu\src\tahu.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\tahu\src\tahu.pb.c
 # End Source File
 # End Group
 # End Target

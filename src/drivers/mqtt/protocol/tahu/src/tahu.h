@@ -24,6 +24,10 @@
 #ifndef _SPARKPLUGLIB_H_
 #define _SPARKPLUGLIB_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 	// Enable/disable debug messages
 	#define SPARKPLUG_DEBUG 1
 
@@ -205,5 +209,9 @@
 
 	// Display a full Sparkplug Payload
 	extern void print_payload(org_eclipse_tahu_protobuf_Payload *payload);
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 #endif
