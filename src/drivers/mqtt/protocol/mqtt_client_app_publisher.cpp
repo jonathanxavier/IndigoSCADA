@@ -116,6 +116,9 @@ MQTT_client_imp_publisher::MQTT_client_imp_publisher(char* broker_host_name, cha
 	g_dwNumItems = 0;
 	g_dwUpdateRate = 60000; //in milliseconds
 	nThreads = 1;
+
+	sending_buffer_length = 128;
+	sending_binary_buffer = (uint8_t *)malloc(sending_buffer_length * sizeof(uint8_t));
 	
 	/////////////////////Middleware/////////////////////////////////////////////////////////////////
 	char fifo_monitor_name[150];
@@ -193,6 +196,9 @@ MQTT_client_imp_publisher::~MQTT_client_imp_publisher()
 	IT_IT("MQTT_client_imp_publisher::~MQTT_client_imp_publisher");
 	
 	fExit = true;
+
+	if(sending_binary_buffer)
+		free(sending_binary_buffer);
 
 	///////////////////////////////////Middleware//////////////////////////////////////////////////
 	ORTEDomainAppDestroy(domain);
@@ -537,7 +543,7 @@ void MQTT_client_imp_publisher::monitoring_dir_consumer(struct iec_item *p_item)
 		org_eclipse_tahu_protobuf_Payload ddata_payload;
 		get_next_payload(&ddata_payload);
 				
-		char command_string[20];
+		char command_string[100];
 		
 		switch(p_item->iec_type)
 		{
@@ -660,9 +666,7 @@ void MQTT_client_imp_publisher::monitoring_dir_consumer(struct iec_item *p_item)
 
 		// Encode the payload into a binary format so it can be published in the MQTT message.
 		// The binary_buffer must be large enough to hold the contents of the binary payload
-		size_t buffer_length = 128;
-		uint8_t *binary_buffer = (uint8_t *)malloc(buffer_length * sizeof(uint8_t));
-		size_t message_length = encode_payload(&binary_buffer, buffer_length, &ddata_payload);
+		size_t message_length = encode_payload(&sending_binary_buffer, sending_buffer_length, &ddata_payload);
 
 		//write MQTT message///////////////////////////////////////////////////
 		/* Publish Topic */
@@ -674,7 +678,7 @@ void MQTT_client_imp_publisher::monitoring_dir_consumer(struct iec_item *p_item)
 		mqttCtx.publish.duplicate = 0;
 		mqttCtx.publish.topic_name = topic_to_write;
 		mqttCtx.publish.packet_id = mqtt_get_packetid();
-		mqttCtx.publish.buffer = (byte*)binary_buffer;
+		mqttCtx.publish.buffer = (byte*)sending_binary_buffer;
 		mqttCtx.publish.total_len = message_length;
 				
 		rc = MqttClient_Publish(&mqttCtx.client, &mqttCtx.publish);
@@ -684,7 +688,6 @@ void MQTT_client_imp_publisher::monitoring_dir_consumer(struct iec_item *p_item)
 		////////////////////////////////////////////////////////////////////////
 
 		// Free the memory
-		free(binary_buffer);
 		free_payload(&ddata_payload);
 	}
 
@@ -799,48 +802,91 @@ static int mqtt_message_cb(MqttClient *client, MqttMessage *msg,
 			PRINTF("MQTT Message: Done\n");
 		}
 
-		//////////////////////////////////////////////////////////////////////////
-		//Prepare message in control direction
-		item_to_send.iec_type = C_SE_TC_1;
-		//parent_class->epoch_to_cp56time2a(&time, epoch_in_millisec);
-		parent_class->get_local_host_time(&time);
-		item_to_send.iec_obj.o.type63.time = time;
-		item_to_send.iec_obj.o.type63.sv = (float)atof((char *)buf);
-		item_to_send.msg_id = n_msg_sent;
-		item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
+		// Decode the payload
+		org_eclipse_tahu_protobuf_Payload inbound_payload = org_eclipse_tahu_protobuf_Payload_init_zero;
 
-		//unsigned char buf[sizeof(struct iec_item)];
-		//int len = sizeof(struct iec_item);
-		//memcpy(buf, &item_to_send, len);
-		//	for(j = 0;j < len; j++)
-		//	{
-		//	  unsigned char c = *(buf + j);
-			//fprintf(stderr,"tx ---> 0x%02x\n", c);
-			//fflush(stderr);
-			//IT_COMMENT1("tx ---> 0x%02x\n", c);
-		//	}
+		if(!decode_payload(&inbound_payload, msg->buffer, msg->buffer_len)) 
+		{
+			fprintf(stderr, "Failed to decode the payload\n");
+		}
 
-		//Send in control direction
-		fprintf(stderr,"Sending message %u th\n", n_msg_sent);
-		fflush(stderr);
-		
-		//Send in control direction
-		//prepare published data
-		memset(&(parent_class->instanceSend),0x00, sizeof(iec_item_type));
+		// Get the number of metrics in the payload and iterate over them handling them as needed
+		unsigned int i;
+		float value;
 
-		parent_class->instanceSend.iec_type = item_to_send.iec_type;
-		memcpy(&(parent_class->instanceSend.iec_obj), &(item_to_send.iec_obj), sizeof(struct iec_object));
-		parent_class->instanceSend.cause = item_to_send.cause;
-		parent_class->instanceSend.msg_id = item_to_send.msg_id;
-		parent_class->instanceSend.ioa_control_center = item_to_send.ioa_control_center;
-		parent_class->instanceSend.casdu = item_to_send.casdu;
-		parent_class->instanceSend.is_neg = item_to_send.is_neg;
-		parent_class->instanceSend.checksum = item_to_send.checksum;
+		for(i=0; i<inbound_payload.metrics_count; i++) 
+		{
+			if(inbound_payload.metrics[i].datatype == METRIC_DATA_TYPE_BOOLEAN)
+			{
+				int val = inbound_payload.metrics[i].value.boolean_value;
+				value = (float) val;	
+			}
+			else if(inbound_payload.metrics[i].datatype == METRIC_DATA_TYPE_UINT8)
+			{
+				int val = inbound_payload.metrics[i].value.int_value;
+				value = (float)val;
+			}
+			else if(inbound_payload.metrics[i].datatype == METRIC_DATA_TYPE_INT16)
+			{
+				int val = inbound_payload.metrics[i].value.int_value;
+				value = (float) val;
+			}
+			else if(inbound_payload.metrics[i].datatype == METRIC_DATA_TYPE_FLOAT)
+			{
+				value = inbound_payload.metrics[i].value.float_value;
+			}
+			else if(inbound_payload.metrics[i].datatype == METRIC_DATA_TYPE_DOUBLE)
+			{
+				value = (float)inbound_payload.metrics[i].value.double_value;
+			}
+			else if(inbound_payload.metrics[i].datatype == METRIC_DATA_TYPE_INT32)
+			{
+				int val = inbound_payload.metrics[i].value.int_value;
+				value = (float)val;
+			}
 
-		ORTEPublicationSend(parent_class->publisher);
+			//////////////////////////////////////////////////////////////////////////
+			//Prepare message in control direction
+			item_to_send.iec_type = C_SE_TC_1;
+			//parent_class->epoch_to_cp56time2a(&time, epoch_in_millisec);
+			parent_class->get_local_host_time(&time);
+			item_to_send.iec_obj.o.type63.time = time;
+			item_to_send.iec_obj.o.type63.sv = value;
+			item_to_send.msg_id = n_msg_sent;
+			item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
 
-		n_msg_sent++;
-		
+			//unsigned char buf[sizeof(struct iec_item)];
+			//int len = sizeof(struct iec_item);
+			//memcpy(buf, &item_to_send, len);
+			//	for(j = 0;j < len; j++)
+			//	{
+			//	  unsigned char c = *(buf + j);
+				//fprintf(stderr,"tx ---> 0x%02x\n", c);
+				//fflush(stderr);
+				//IT_COMMENT1("tx ---> 0x%02x\n", c);
+			//	}
+
+			//Send in control direction
+			fprintf(stderr,"Sending message %u th\n", n_msg_sent);
+			fflush(stderr);
+			
+			//Send in control direction
+			//prepare published data
+			memset(&(parent_class->instanceSend),0x00, sizeof(iec_item_type));
+
+			parent_class->instanceSend.iec_type = item_to_send.iec_type;
+			memcpy(&(parent_class->instanceSend.iec_obj), &(item_to_send.iec_obj), sizeof(struct iec_object));
+			parent_class->instanceSend.cause = item_to_send.cause;
+			parent_class->instanceSend.msg_id = item_to_send.msg_id;
+			parent_class->instanceSend.ioa_control_center = item_to_send.ioa_control_center;
+			parent_class->instanceSend.casdu = item_to_send.casdu;
+			parent_class->instanceSend.is_neg = item_to_send.is_neg;
+			parent_class->instanceSend.checksum = item_to_send.checksum;
+
+			ORTEPublicationSend(parent_class->publisher);
+
+			n_msg_sent++;
+		}
 	}
 
     /* Return negative to terminate publish processing */

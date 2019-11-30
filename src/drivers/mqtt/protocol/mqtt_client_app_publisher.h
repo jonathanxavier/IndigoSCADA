@@ -90,6 +90,8 @@ class MQTT_client_imp_publisher
 
 	 static struct structItem* Item; //MQTT client topics vector, indexed from 0
 	 struct structItem* Config_db;
+	 size_t sending_buffer_length;
+	 uint8_t *sending_binary_buffer;
 	 /////////////Middleware///////////////////////////////
 	 u_int n_msg_sent_monitor_dir;
 	 u_int n_msg_sent_control_dir;

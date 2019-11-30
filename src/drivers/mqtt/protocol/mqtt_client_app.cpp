@@ -147,6 +147,9 @@ MQTT_client_imp::MQTT_client_imp(char* broker_host_name, char* line_number)
 
 	dump = NULL;
 
+	sending_buffer_length = 128;
+	sending_binary_buffer = (uint8_t *)malloc(sending_buffer_length * sizeof(uint8_t));
+
 	#ifdef USE_RIPC_MIDDLEWARE
 	/////////////////////Middleware/////////////////////////////////////////////////////////////////
     factory1 = NULL;
@@ -260,6 +263,9 @@ MQTT_client_imp::MQTT_client_imp(char* broker_host_name, char* line_number)
 MQTT_client_imp::~MQTT_client_imp()
 {
 	IT_IT("MQTT_client_imp::~MQTT_client_imp");
+
+	if(sending_binary_buffer)
+		free(sending_binary_buffer);
 	
 	fExit = true;
 	
@@ -830,7 +836,12 @@ void MQTT_client_imp::check_for_commands(struct iec_item *queued_item)
 
 			if(delta < MAX_COMMAND_SEND_TIME && delta >= 0)
 			{
-				char command_string[20];
+				// Create the DCMD payload
+				org_eclipse_tahu_protobuf_Payload dcmd_payload;
+
+				get_next_payload(&dcmd_payload);
+
+				char command_string[100];
 
 				double val_to_write = 0.0;
 				
@@ -840,12 +851,18 @@ void MQTT_client_imp::check_for_commands(struct iec_item *queued_item)
 					{
 						val_to_write = queued_item->iec_obj.o.type58.scs;
 						sprintf(command_string, "%f", val_to_write);
+
+						bool value = queued_item->iec_obj.o.type58.scs;
+						add_simple_metric(&dcmd_payload, NULL, false, 0, METRIC_DATA_TYPE_BOOLEAN, false, false, false, &value, sizeof(value));
 					}
 					break;
 					case C_DC_TA_1:
 					{
 						val_to_write = queued_item->iec_obj.o.type59.dcs;
 						sprintf(command_string, "%f", val_to_write);
+
+						uint8_t value = queued_item->iec_obj.o.type59.dcs;
+						add_simple_metric(&dcmd_payload, NULL, false, 0, METRIC_DATA_TYPE_UINT8, false, false, false, &value, sizeof(value));
 					}
 					break;
 					case C_SE_TA_1:
@@ -859,6 +876,8 @@ void MQTT_client_imp::check_for_commands(struct iec_item *queued_item)
 						if(error){ return;}
 
 						sprintf(command_string, "%lf", val_to_write);
+
+						add_simple_metric(&dcmd_payload, NULL, false, 0, METRIC_DATA_TYPE_DOUBLE, false, false, false, &val_to_write, sizeof(val_to_write));
 					}
 					break;
 					case C_SE_TB_1:
@@ -872,30 +891,42 @@ void MQTT_client_imp::check_for_commands(struct iec_item *queued_item)
 						if(error){ return;}
 						
 						sprintf(command_string, "%lf", val_to_write);
+
+						add_simple_metric(&dcmd_payload, NULL, false, 0, METRIC_DATA_TYPE_DOUBLE, false, false, false, &val_to_write, sizeof(val_to_write));
 					}
 					break;
 					case C_SE_TC_1:
 					{
 						val_to_write = queued_item->iec_obj.o.type63.sv;
 						sprintf(command_string, "%lf", val_to_write);
+
+						float value = queued_item->iec_obj.o.type63.sv;
+
+						add_simple_metric(&dcmd_payload, NULL, false, 0, METRIC_DATA_TYPE_FLOAT, false, false, false, &value, sizeof(value));
 					}
 					break;
 					case C_BO_TA_1:
 					{
-						memset(command_string, 0x00, 20);
-						memcpy(command_string, &(queued_item->iec_obj.o.type64.stcd), sizeof(struct iec_stcd));
+						//memset(command_string, 0x00, 20);
+						//memcpy(command_string, &(queued_item->iec_obj.o.type64.stcd), sizeof(struct iec_stcd));
 					}
 					break;
 					case C_SC_NA_1:
 					{
 						val_to_write = queued_item->iec_obj.o.type45.scs;
 						sprintf(command_string, "%lf", val_to_write);
+
+						bool value = queued_item->iec_obj.o.type45.scs;
+						add_simple_metric(&dcmd_payload, NULL, false, 0, METRIC_DATA_TYPE_BOOLEAN, false, false, false, &value, sizeof(value));
 					}
 					break;
 					case C_DC_NA_1:
 					{
 						val_to_write = queued_item->iec_obj.o.type46.dcs;
 						sprintf(command_string, "%lf", val_to_write);
+
+						uint8_t value = queued_item->iec_obj.o.type46.dcs;
+						add_simple_metric(&dcmd_payload, NULL, false, 0, METRIC_DATA_TYPE_UINT8, false, false, false, &value, sizeof(value));
 					}
 					break;
 					case C_SE_NA_1:
@@ -909,6 +940,8 @@ void MQTT_client_imp::check_for_commands(struct iec_item *queued_item)
 						if(error){ return;}
 					
 						sprintf(command_string, "%lf", val_to_write);
+
+						add_simple_metric(&dcmd_payload, NULL, false, 0, METRIC_DATA_TYPE_DOUBLE, false, false, false, &val_to_write, sizeof(val_to_write));
 					}
 					break;
 					case C_SE_NB_1:
@@ -922,18 +955,24 @@ void MQTT_client_imp::check_for_commands(struct iec_item *queued_item)
 						if(error){ return;}
 						
 						sprintf(command_string, "%lf", val_to_write);
+
+						add_simple_metric(&dcmd_payload, NULL, false, 0, METRIC_DATA_TYPE_DOUBLE, false, false, false, &val_to_write, sizeof(val_to_write));
 					}
 					break;
 					case C_SE_NC_1:
 					{
 						val_to_write = queued_item->iec_obj.o.type50.sv;
 						sprintf(command_string, "%lf", val_to_write);
+
+						float value = queued_item->iec_obj.o.type50.sv;
+
+						add_simple_metric(&dcmd_payload, NULL, false, 0, METRIC_DATA_TYPE_FLOAT, false, false, false, &value, sizeof(value));
 					}
 					break;
 					case C_BO_NA_1:
 					{
-						memset(command_string, 0x00, 20);
-						memcpy(command_string, &(queued_item->iec_obj.o.type51.stcd), sizeof(struct iec_stcd));
+						//memset(command_string, 0x00, 20);
+						//memcpy(command_string, &(queued_item->iec_obj.o.type51.stcd), sizeof(struct iec_stcd));
 					}
 					break;
 					default:
@@ -945,6 +984,10 @@ void MQTT_client_imp::check_for_commands(struct iec_item *queued_item)
 				
 				printf("Command for sample point %s, value: %s\n", Item[item].spname, command_string);
 
+				// Encode the payload into a binary format so it can be published in the MQTT message.
+				// The binary_buffer must be large enough to hold the contents of the binary payload
+				size_t message_length = encode_payload(&sending_binary_buffer, sending_buffer_length, &dcmd_payload);
+
 				//write MQTT command///////////////////////////////////////////////////
 				/* Publish Topic */
 				int rc;
@@ -955,14 +998,17 @@ void MQTT_client_imp::check_for_commands(struct iec_item *queued_item)
 				mqttCtx.publish.duplicate = 0;
 				mqttCtx.publish.topic_name = topic_to_write;
 				mqttCtx.publish.packet_id = mqtt_get_packetid();
-				mqttCtx.publish.buffer = (byte*)command_string;
-				mqttCtx.publish.total_len = (word16)XSTRLEN(command_string);
+				mqttCtx.publish.buffer = (byte*)sending_binary_buffer;
+				mqttCtx.publish.total_len = message_length;
 						
 				rc = MqttClient_Publish(&mqttCtx.client, &mqttCtx.publish);
 				
 				printf("MQTT Publish: Topic %s, %s (%d)\n",
 					mqttCtx.publish.topic_name, MqttClient_ReturnCodeToString(rc), rc);
 				////////////////////////////////////////////////////////////////////////
+
+				// Free the memory
+				free_payload(&dcmd_payload);
 			}
 			else
 			{
@@ -1187,10 +1233,7 @@ static int mqtt_message_cb(MqttClient *client, MqttMessage *msg,
 			// Decode the payload
 			org_eclipse_tahu_protobuf_Payload inbound_payload = org_eclipse_tahu_protobuf_Payload_init_zero;
 
-			if(decode_payload(&inbound_payload, msg->buffer, msg->buffer_len)) 
-			{
-			} 
-			else 
+			if(!decode_payload(&inbound_payload, msg->buffer, msg->buffer_len)) 
 			{
 				fprintf(stderr, "Failed to decode the payload\n");
 			}

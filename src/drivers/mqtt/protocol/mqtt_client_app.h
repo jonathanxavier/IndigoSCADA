@@ -83,6 +83,9 @@ class MQTT_client_imp
 	 FILE *dump;
 	 int nThreads;
 
+	 size_t sending_buffer_length;
+	 uint8_t *sending_binary_buffer;
+
 	 static bool fExit;
 	 int opc_client_state_variable;
 	 static double dead_band_percent;
