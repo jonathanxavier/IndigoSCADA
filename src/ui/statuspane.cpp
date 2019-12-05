@@ -28,14 +28,11 @@
 void  StatusPane::UpdateTagsPane()
 {
 //	IT_IT("StatusPane::UpdateTagsPane");
-	
+#ifdef USE_UNSTABLE
 	bool fHaveCleared = false;  
 	int n = GetCurrentDb()->GetNumberResults();
 	GetCurrentDb()->GotoBegin();
-//	if(!n)  //APA commented
-//	{
-//		pTagStatus->clear();
-//	}
+
 	for(int i = 0; i < n ; i++,GetCurrentDb()->FetchNext())
 	{
 		if(Name == GetCurrentDb()->GetString("NAME"))
@@ -68,8 +65,10 @@ void  StatusPane::UpdateTagsPane()
 			p->setText(6,GetCurrentDb()->GetIsoDateString("UPDTIME"));
 			//  
 		};
+		break;
 	};
 	pTagStatus->triggerUpdate();
+#endif //USE_UNSTABLE
 };
 /*
 *Function:UpdateSamplePoint()
