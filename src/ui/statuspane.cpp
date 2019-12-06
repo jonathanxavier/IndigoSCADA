@@ -80,7 +80,7 @@ void  StatusPane::UpdateTagsPane()
 void StatusPane::UpdateSamplePoint()
 {  
 	IT_IT("StatusPane::UpdateSamplePoint");
-	
+#ifdef USE_UNSTABLE	
 	int n = GetCurrentDb()->GetNumberResults();
 	//
 	// status of seleted item
@@ -130,6 +130,7 @@ void StatusPane::UpdateSamplePoint()
 			break;
 		};
 	};
+#endif //USE_UNSTABLE
 };
 /*
 *Function:UpdateTagsLimits
