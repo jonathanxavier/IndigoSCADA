@@ -1945,7 +1945,7 @@ bool dbDatabase::open(char_t const* name, time_t transactionCommitDelay, int ope
             delete mfile;
             cleanupOnOpenError();
             handleError(DatabaseOpenError, "Failed to create database file");
-//			ExitProcess(1); //apa+++ 03-06-2012
+			ExitProcess(1); //apa+++ 03-06-2012
             return false;
         }
         return open(mfile, transactionCommitDelay, true);
@@ -1959,7 +1959,7 @@ bool dbDatabase::open(char_t const* name, time_t transactionCommitDelay, int ope
             delete osfile;
             cleanupOnOpenError();
             handleError(DatabaseOpenError, "Failed to create database file");
-//			ExitProcess(1); //apa+++ 03-06-2012
+			ExitProcess(1); //apa+++ 03-06-2012
             return false;
         }
         return open(osfile,  transactionCommitDelay, true);
