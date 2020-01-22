@@ -40,7 +40,11 @@
 	# define WINVER 0x0501
 	# endif
 #endif
+#if defined(_MSC_VER) && _MSC_VER < 1300 //apa+++
+# include "ws2tcpip.h" //apa+++
+#else //apa+++
 # include <ws2tcpip.h>
+#endif //apa+++
 # define SHUT_RDWR 2
 # define close closesocket
 #else
@@ -68,6 +72,8 @@
 
 #include "modbus-tcp.h"
 #include "modbus-tcp-private.h"
+
+#include "getaddrinfo.h"
 
 #ifdef OS_WIN32
 static int _modbus_tcp_init_win32(void)
@@ -286,61 +292,6 @@ static int _modbus_tcp_connect(modbus_t *ctx)
     return 0;
 }
 
-//start apa+++
-#ifndef HAVE_GETADDRINFO
-
-/* getaddrinfo constants */
-#define AI_PASSIVE	1
-#define AI_CANONNAME	2
-#define AI_NUMERICHOST	4
-
-struct addrinfo {
-	int     ai_flags;
-	int     ai_family;
-	int     ai_socktype;
-	int     ai_protocol;
-	size_t  ai_addrlen;
-	char   *ai_canonname;
-	struct sockaddr  *ai_addr;
-	struct addrinfo  *ai_next;
-};
-static int
-fake_getaddrinfo(const char *hostname, struct addrinfo *ai)
-{
-	struct hostent *he = NULL;
-	struct sockaddr_in *sa;
-	if (hostname) {
-		he = gethostbyname(hostname);
-		if (!he)
-			return (-1);
-	}
-	ai->ai_family = he ? he->h_addrtype : AF_INET;
-	ai->ai_socktype = SOCK_STREAM;
-	ai->ai_protocol = 0;
-	ai->ai_addrlen = sizeof(struct sockaddr_in);
-	if (NULL == (ai->ai_addr = malloc(ai->ai_addrlen)))
-		return (-1);
-	sa = (struct sockaddr_in*)ai->ai_addr;
-	memset(sa, 0, ai->ai_addrlen);
-	if (he) {
-		sa->sin_family = he->h_addrtype;
-		memcpy(&sa->sin_addr, he->h_addr_list[0], he->h_length);
-	} else {
-		sa->sin_family = AF_INET;
-		sa->sin_addr.s_addr = INADDR_ANY;
-	}
-	ai->ai_next = NULL;
-	return (0);
-}
-static void
-fake_freeaddrinfo(struct addrinfo *ai)
-{
-	free(ai->ai_addr);
-}
-#endif
-//end apa+++
-
-
 /* Establishes a modbus TCP PI connection with a Modbus server. */
 static int _modbus_tcp_pi_connect(modbus_t *ctx)
 {
@@ -371,7 +322,8 @@ static int _modbus_tcp_pi_connect(modbus_t *ctx)
     rc = getaddrinfo(ctx_tcp_pi->node, ctx_tcp_pi->service,
                      &ai_hints, &ai_list);
 #else
-	rc = fake_getaddrinfo(ctx_tcp_pi->node, ai_list); //apa+++ Test this!
+	rc = fake_getaddrinfo(ctx_tcp_pi->node, ctx_tcp_pi->service,
+                     &ai_hints, &ai_list); //apa+++ 
 #endif
 
     if (rc != 0)
@@ -534,7 +486,7 @@ int modbus_tcp_pi_listen(modbus_t *ctx, int nb_connection)
 #ifdef HAVE_GETADDRINFO
     rc = getaddrinfo(node, service, &ai_hints, &ai_list);
 #else
-    rc = fake_getaddrinfo(node, ai_list); //apa+++ Test this!
+    rc = fake_getaddrinfo(node, service, &ai_hints, &ai_list); //apa+++
 #endif
 
     if (rc != 0)
