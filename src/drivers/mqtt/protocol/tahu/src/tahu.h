@@ -10,7 +10,7 @@
  * Contributors:
  *   Cirrus Link Solutions - initial implementation
  ********************************************************************************/
-//apa modified, for compiling ANSI C
+//apa modified, for compiling in ANSI C
 #include "tahu.pb.h"
 
 #include <time.h>
