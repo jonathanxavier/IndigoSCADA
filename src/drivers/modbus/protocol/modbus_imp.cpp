@@ -10,7 +10,6 @@
  *
  */
 
-#include "stdint.h"
 #include "iec104types.h"
 #include "iec_item.h"
 #include "clear_crc_eight.h"

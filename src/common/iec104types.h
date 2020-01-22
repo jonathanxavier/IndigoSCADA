@@ -67,6 +67,13 @@
     #pragma pack(1)             /* Byte Alignment   */
 #endif
 
+/*
+ * Basic system type definitions, taken from the BSD file sys/types.h.
+ */
+typedef unsigned char   u_char;
+typedef unsigned short  u_short;
+typedef unsigned int    u_int;
+typedef unsigned long   u_long;
 #ifdef WIN32
 typedef unsigned __int64 u_int64; //MSVC 6.0 does not accept long long
 #elif
