@@ -11,7 +11,6 @@
  */
 
 //////////////////////////apa+++ 19-06-2012///////////
-#include "stdint.h"
 #include "iec104types.h"
 #include "iec_item.h"
 #include "clear_crc_eight.h"

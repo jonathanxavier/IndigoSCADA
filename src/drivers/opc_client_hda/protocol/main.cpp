@@ -18,7 +18,6 @@
 #include <string.h>
 //#include <assert.h>
 #include <errno.h>
-#include "stdint.h"
 #include "iec104types.h"
 #include <signal.h>
 #include "getopt.h"

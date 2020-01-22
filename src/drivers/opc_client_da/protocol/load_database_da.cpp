@@ -18,7 +18,6 @@
 #include <stdio.h>
 #include <stdio.h>
 #include <sqlite3.h>
-#include "stdint.h"
 #include "iec104types.h"
 #include "iec_item.h"
 #include "itrace.h"	
