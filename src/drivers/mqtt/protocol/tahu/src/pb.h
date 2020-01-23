@@ -228,6 +228,10 @@ typedef uint_least8_t pb_byte_t;
  * structures. Fix that by defining PB_FIELD_16BIT or
  * PB_FIELD_32BIT.
  */
+#if defined(_MSC_VER) && _MSC_VER < 1300 //apa+++
+#pragma pack(1)
+#endif
+
 PB_PACKED_STRUCT_START
 typedef struct pb_field_s pb_field_t;
 struct pb_field_s {
@@ -244,6 +248,10 @@ struct pb_field_s {
     const void *ptr;
 } pb_packed;
 PB_PACKED_STRUCT_END
+
+#if defined(_MSC_VER) && _MSC_VER < 1300 //apa+++
+#pragma pack()
+#endif
 
 /* Make sure that the standard integer types are of the expected sizes.
  * Otherwise fixed32/fixed64 fields can break.
