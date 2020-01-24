@@ -42,6 +42,7 @@
 #endif
 #if defined(_MSC_VER) && _MSC_VER < 1300 //apa+++
 # include "ws2tcpip.h" //apa+++
+#include "wspiapi.h" //apa+++
 #else //apa+++
 # include <ws2tcpip.h>
 #endif //apa+++
@@ -72,8 +73,6 @@
 
 #include "modbus-tcp.h"
 #include "modbus-tcp-private.h"
-
-#include "getaddrinfo.h"
 
 #ifdef OS_WIN32
 static int _modbus_tcp_init_win32(void)
@@ -318,13 +317,9 @@ static int _modbus_tcp_pi_connect(modbus_t *ctx)
     ai_hints.ai_next = NULL;
 
     ai_list = NULL;
-#ifdef HAVE_GETADDRINFO
+
     rc = getaddrinfo(ctx_tcp_pi->node, ctx_tcp_pi->service,
                      &ai_hints, &ai_list);
-#else
-	rc = fake_getaddrinfo(ctx_tcp_pi->node, ctx_tcp_pi->service,
-                     &ai_hints, &ai_list); //apa+++ 
-#endif
 
     if (rc != 0)
         return rc;
@@ -349,11 +344,7 @@ static int _modbus_tcp_pi_connect(modbus_t *ctx)
         break;
     }
 
-#ifdef HAVE_GETADDRINFO
     freeaddrinfo(ai_list);
-#else
-	fake_freeaddrinfo(ai_list);
-#endif
 
     if (ctx->s < 0) {
         return -1;
@@ -483,11 +474,8 @@ int modbus_tcp_pi_listen(modbus_t *ctx, int nb_connection)
     ai_hints.ai_next = NULL;
 
     ai_list = NULL;
-#ifdef HAVE_GETADDRINFO
+
     rc = getaddrinfo(node, service, &ai_hints, &ai_list);
-#else
-    rc = fake_getaddrinfo(node, service, &ai_hints, &ai_list); //apa+++
-#endif
 
     if (rc != 0)
         return -1;
@@ -538,11 +526,7 @@ int modbus_tcp_pi_listen(modbus_t *ctx, int nb_connection)
         break;
     }
 
-#ifdef HAVE_GETADDRINFO
     freeaddrinfo(ai_list);
-#else
-	fake_freeaddrinfo(ai_list);
-#endif
 
     if (new_socket < 0) {
         return -1;
