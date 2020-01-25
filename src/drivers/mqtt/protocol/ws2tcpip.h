@@ -161,35 +161,6 @@ typedef struct in_pktinfo IN_PKTINFO;
    in6_addr structure start address, with casts to get the right offsets
    when testing addresses */
 
-//apa+++
-#ifndef s6_addr
-
-struct in6_addr {
-    union {
-        u_char Byte[16];
-        u_short Word[8];
-    } u;
-};
-
-#define in_addr6 in6_addr
-
-/*
-** Defines to match RFC 2553.
-*/
-#define _S6_un     u
-#define _S6_u8     Byte
-#define s6_addr    _S6_un._S6_u8
-
-/*
-** Defines for our implementation.
-*/
-#define s6_bytes   u.Byte
-#define s6_words   u.Word
-
-#endif
-
-//apa+++
-/*
 struct in6_addr {
     union {
         u_char	_S6_u8[16];
@@ -197,7 +168,7 @@ struct in6_addr {
         u_long	_S6_u32[4];
         } _S6_un;
 };
-*/
+
 /* s6_addr is the standard name */
 #define s6_addr		_S6_un._S6_u8
 
@@ -209,6 +180,9 @@ struct in6_addr {
 #define in_addr6	in6_addr
 #define _s6_bytes	_S6_un._S6_u8
 #define _s6_words	_S6_un._S6_u16
+
+#define s6_bytes    _S6_un._S6_u8 //apa+++
+#define s6_words   _S6_un._S6_u16 //apa+++
 
 typedef struct in6_addr IN6_ADDR,  *PIN6_ADDR, *LPIN6_ADDR;
 
