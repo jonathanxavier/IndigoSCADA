@@ -406,7 +406,7 @@ void dispServer::acceptConnection(socket_t* acceptSock)
     }
 }
 
-#define TIMEOUT 60
+#define TIMEOUT 30
 
 void dispServer::watchDog(void)
 {

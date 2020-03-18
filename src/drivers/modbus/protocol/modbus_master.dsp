@@ -103,10 +103,6 @@ SOURCE=..\..\..\utilities\clear_crc_eight.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\getaddrinfo.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\..\utilities\getopt.c
 # End Source File
 # Begin Source File
