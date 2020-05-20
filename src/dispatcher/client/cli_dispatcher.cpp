@@ -58,7 +58,7 @@ int cli_open_dispatcher(char_t const*   server_url,
     if (!sock->is_ok()) {
 	char_t buf[256];
 	sock->get_error_text(buf, sizeof buf);
-	fprintf(stderr, "Failed to connect to server: %s\n", buf);
+	fprintf(stderr, "Failed to connect to dspserver: %s\n", buf);
 	delete sock;
 	return cli_connection_refused;
     }
