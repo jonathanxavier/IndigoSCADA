@@ -206,6 +206,12 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name iec103slave
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name dlms_client
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name dlms_server
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -229,6 +235,30 @@ Package=<4>
 ###############################################################################
 
 Project: "designerlib"="..\hmi_designer\designer\designer\designerlib.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "dlms_client"="..\drivers\dlms\protocol\client\dlms_client.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "dlms_server"="..\drivers\dlms\protocol\server\dlms_server.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
