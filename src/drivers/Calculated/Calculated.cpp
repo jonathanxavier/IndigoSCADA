@@ -292,14 +292,14 @@ void WorkerProc(void* pParam)
 	int err;
 	DWORD exitcode = 0;
 
-	//script.c si trova nella directory C:\scada\scripts
+	//script.c is in folder HOME\scada\project\scripts
 
 	const int nBufferSize = 500;
 	char scada_home_dir[nBufferSize+1];
 	strcpy(scada_home_dir, GetScadaHomeDirectory());
 	
 	char cline[520];
-	sprintf(cline, "-I%s\\scripts\\include -I%s\\scripts -D_EiC", scada_home_dir, scada_home_dir);
+	sprintf(cline, "-I%s\\project\\scripts\\include -I%s\\project\\scripts -D_EiC", scada_home_dir, scada_home_dir);
 	Calc("script.c", &err, cline); //start loop of interpreter
 
 	//_endthread();
