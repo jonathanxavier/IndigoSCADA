@@ -36,6 +36,7 @@ public:
 protected:
     QCheckBox *state;
     QRadioButton *rb21, *rb22, *rb23;
+	QLabel* textLabel1;
 
 	const int nBufferSize;
 	char pExeFile[501];

@@ -465,6 +465,13 @@ ButtonsGroups::ButtonsGroups( QWidget *parent, const char *name )
 	tb1->setOn(FALSE);
     //tb3->setFlat(TRUE);
 
+	textLabel1 = new QLabel( this, "textLabel1" );
+    textLabel1->setGeometry( QRect( 30, 190, 200, 40 ) );
+
+	strcpy(pInitFile, "Project folder:\n");
+	strcat(pInitFile, (const char*)GetScadaProjectDirectory());
+	textLabel1->setText(pInitFile);
+
     // .. and the fourth a button with a menu
 	/*
     QPushButton *tb4 = new QPushButton( "Popup Button", bgrp4, "popup" );
