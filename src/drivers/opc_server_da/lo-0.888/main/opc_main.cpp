@@ -19,6 +19,7 @@
 #include <errno.h>
 #include "device.h"
 #include "unilog.h"
+#include "inifile.h"
 
 #define LOGID logg,0
 #define LOG_FNAME "opc_server_da.log"
@@ -753,20 +754,30 @@ int opc_main(HINSTANCE hInstance, int argc, char *argv[]) {
 	/////////////////////////////
 	int n_rows = 0;
 	int m_columns = 0;
-	char program_path[_MAX_PATH];
 	char db_file[_MAX_FNAME+_MAX_PATH];
 
-	program_path[0] = '\0';
-
-	if(GetModuleFileName(NULL, program_path, _MAX_PATH))
+	//project directory 04-12-2020
+	char project_dir[_MAX_PATH];
+	char ini_file[_MAX_PATH];
+		
+	ini_file[0] = '\0';
+	if(GetModuleFileName(NULL, ini_file, _MAX_PATH))
 	{
-		*(strrchr(program_path, '\\')) = '\0';        // Strip \\filename.exe off path
-		*(strrchr(program_path, '\\')) = '\0';        // Strip \\bin off path
+		*(strrchr(ini_file, '\\')) = '\0';        // Strip \\filename.exe off path
+		*(strrchr(ini_file, '\\')) = '\0';        // Strip \\bin off path
+		
+		strcat(ini_file, "\\bin\\project.ini");
+		Inifile iniFile(ini_file);
+
+		if(iniFile.find("path","project_directory"))
+		{
+			strcpy(project_dir, iniFile.find("path","project_directory"));
+		}
     }
 
-	strcpy(db_file, program_path);
+	strcpy(db_file, project_dir);
 
-	strcat(db_file, "\\project\\opc_server_da.db");
+	strcat(db_file, "\\opc_server_da.db");
 	
 	rc = sqlite3_open(db_file, &db);
 

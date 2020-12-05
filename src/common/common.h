@@ -101,6 +101,9 @@
 
 	QSEXPORT void SetScadaHomeDirectory(const QString &s); //without final slach or backslash
 	QSEXPORT const QString & GetScadaHomeDirectory(); //without final slach or backslash
+
+	QSEXPORT void SetScadaProjectDirectory(const QString &s); //without final slach or backslash; apa 04-12-2020
+	QSEXPORT const QString & GetScadaProjectDirectory(); //without final slach or backslash; apa 04-12-2020
 	//
 	QSEXPORT QString GetAlarmStateName(int state); // get the alarm state names and colours
 	QSEXPORT QColor GetAlarmStateBkColour(int state);
@@ -335,7 +338,7 @@
 		system((const char *)p);
 		#else
 		
-		QString ini_file = GetScadaHomeDirectory() + "\\project\\scada.ini";
+		QString ini_file = GetScadaProjectDirectory() + "\\scada.ini"; //apa 04-12-2020
 		Inifile iniFile((const char*)ini_file);
 
 		if(iniFile.find("path","internet_browser"))

@@ -463,6 +463,7 @@ void PipeWorker(void* pParam)
 		{
 			fprintf(stderr,"GetOverlapped result failed %d start over\n", GetLastError());
 			fflush(stderr);
+			ExitProcess(0); //apa 04-12-2020
 		
 			if(DisconnectNamedPipe(pipeHnds[pipe_id]) == 0)
 			{

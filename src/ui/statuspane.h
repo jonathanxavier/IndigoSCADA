@@ -69,7 +69,7 @@ class StatusPane : public QObject
 
 	void Create(QWidget *parent,Orientation mode = Qt::Vertical)
 	{
-		QString ini_file = GetScadaHomeDirectory() + "\\project\\scada.ini";
+		QString ini_file = GetScadaProjectDirectory() + "\\scada.ini"; //apa 04-12-2020
 		Inifile iniFile((const char*)ini_file);
 
 

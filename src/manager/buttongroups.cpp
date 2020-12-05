@@ -20,8 +20,10 @@
 #include "..\ui\start.xpm"
 #include "..\ui\quit.xpm"
 #include "..\ui\computer.xpm"
+#include "inifile.h"
 
 static QString HomeDirectory = (const char*) 0;
+static QString ProjectDirectory = (const char*) 0; //apa 04-12-2020
 
 void SetScadaHomeDirectory(const QString &s) 
 { 
@@ -52,7 +54,87 @@ void SetScadaHomeDirectory(const QString &s)
 	#endif
 }
 
+void SetScadaProjectDirectory(const QString &s) //apa 04-12-2020
+{ 
+	#ifdef WIN32
+	
+	char path[_MAX_PATH];
+	
+	path[0] = '\0';
+	if(GetModuleFileName(NULL, path, _MAX_PATH))
+	{
+		*(strrchr(path, '\\')) = '\0';        // Strip \\filename.exe off path
+		*(strrchr(path, '\\')) = '\0';        // Strip \\bin off path
+		
+		QString ini_file = QString(path) + "\\bin\\project.ini";
+		Inifile iniFile((const char*)ini_file);
+
+		if(iniFile.find("path","project_directory"))
+		{
+			QString dir;
+			dir = iniFile.find("path","project_directory");
+			ProjectDirectory = dir;
+		}
+		else
+		{
+			//initialize default directory in project.ini
+			FILE * fp = fopen((const char*)ini_file,"w+");
+			fprintf(fp, "[project_directory]\n");
+			fflush(fp);
+			fprintf(fp, "path=%s\\project\n", path);
+			fflush(fp);
+			fclose(fp);
+
+			if(iniFile.find("path","project_directory"))
+			{
+				QString dir;
+				dir = iniFile.find("path","project_directory");
+				ProjectDirectory = dir;
+			}
+		}
+    }
+		
+	#else //UNIX
+
+	char path[256];
+
+	strcpy(path, (const char*)s);
+	
+	*(strrchr(path, '/')) = '\0';        // Strip /filename.exe off path
+	*(strrchr(path, '/')) = '\0';        // Strip /bin off path
+
+	QString ini_file = path + "\\bin\\project.ini";
+	Inifile iniFile((const char*)ini_file);
+
+	if(iniFile.find("path","project_directory"))
+	{
+		QString dir;
+		dir = iniFile.find("path","project_directory");
+        ProjectDirectory = dir;
+	}
+	else
+	{
+		//initialize default directory in project.ini
+		FILE * fp = fopen((const char*)ini_file,"w+");
+		fprintf(fp, "[project_directory]\n");
+		fflush(fp);
+		fprintf(fp, "path=%s\\project\n", path);
+		fflush(fp);
+		fclose(fp);
+
+		if(iniFile.find("path","project_directory"))
+		{
+			QString dir;
+			dir = iniFile.find("path","project_directory");
+			ProjectDirectory = dir;
+		}
+	}
+
+	#endif
+}
+
 const QString & GetScadaHomeDirectory() { return HomeDirectory;};
+const QString & GetScadaProjectDirectory() { return ProjectDirectory;}; //apa 04-12-2020
 
 void ButtonsGroups::WriteLog(char* pMsg)
 {
@@ -416,17 +498,9 @@ ButtonsGroups::ButtonsGroups( QWidget *parent, const char *name )
 	}
 	*/
 
-	pInitFile[0] = '\0';
+	strcpy(pInitFile, (const char*)GetScadaProjectDirectory()); //apa 04-12-2020
 
-	#ifdef WIN32
-	if(GetModuleFileName(NULL, pInitFile, _MAX_PATH))
-	{
-		*(strrchr(pInitFile, '\\')) = '\0';        // Strip \\filename.exe off path
-		*(strrchr(pInitFile, '\\')) = '\0';        // Strip \\bin off path
-    }
-	#endif
-
-	strcat(pInitFile, "\\project\\manager.ini");
+	strcat(pInitFile, "\\manager.ini");
 		
 	pLogFile[0] = '\0';
 

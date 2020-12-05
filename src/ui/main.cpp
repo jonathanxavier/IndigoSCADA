@@ -65,6 +65,7 @@ int main(int argc, char **argv)
 	}
 	
 	SetScadaHomeDirectory(argv[0]);
+	SetScadaProjectDirectory(argv[0]); //apa 04-12-2020
 	
 	QSApplication a(argc, argv);
 	  

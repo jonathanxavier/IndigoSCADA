@@ -22,6 +22,7 @@
 #include "modbus_imp.h"
 #include "stdlib.h"
 #include "string.h"
+#include "inifile.h"
 #endif // _WIN32
 
 static gl_row_counter = 0;
@@ -180,15 +181,27 @@ int modbus_imp::AddItems(void)
 
 	itoa(lineNumber, line_number, 10);
 	
-	#ifdef WIN32
-	if(GetModuleFileName(NULL, database_name, _MAX_PATH))
+	//project directory 04-12-2020
+	char project_dir[_MAX_PATH];
+	char ini_file[_MAX_PATH];
+		
+	ini_file[0] = '\0';
+	if(GetModuleFileName(NULL, ini_file, _MAX_PATH))
 	{
-		*(strrchr(database_name, '\\')) = '\0';        // Strip \\filename.exe off path
-		*(strrchr(database_name, '\\')) = '\0';        // Strip \\bin off path
-	}
-	#endif
+		*(strrchr(ini_file, '\\')) = '\0';        // Strip \\filename.exe off path
+		*(strrchr(ini_file, '\\')) = '\0';        // Strip \\bin off path
+		
+		strcat(ini_file, "\\bin\\project.ini");
+		Inifile iniFile(ini_file);
 
-	strcat(database_name, "\\project\\");
+		if(iniFile.find("path","project_directory"))
+		{
+			strcpy(project_dir, iniFile.find("path","project_directory"));
+		}
+    }
+
+	strcpy(database_name, project_dir);
+	strcat(database_name, "\\");
 	strcat(database_name, "modbus_database");
 	strcat(database_name, line_number);
 	strcat(database_name, ".db");

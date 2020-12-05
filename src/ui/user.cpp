@@ -406,8 +406,8 @@ void UserFrameWork::SetTabs()
 		char file_ext[50];
 		int rt;
 
-		strcpy(buffer01, (const char*)GetScadaHomeDirectory());
-		strcat(buffer01, "\\project\\*.*");
+		strcpy(buffer01, (const char*)GetScadaProjectDirectory()); //apa 04-12-2020
+		strcat(buffer01, "\\*.*");
 		
 		HRicerca = FindFirstFile(buffer01, &DescrittoreF);
 
@@ -423,7 +423,7 @@ void UserFrameWork::SetTabs()
 				{
 					if((DescrittoreF.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
 					{
-						strcpy(buffer02, (const char*)GetScadaHomeDirectory());
+						strcpy(buffer02, (const char*)GetScadaProjectDirectory()); //apa 04-12-2020
 						strcat(buffer02, "\\");
 						strcat(buffer02, DescrittoreF.cFileName);
 
@@ -456,7 +456,8 @@ void UserFrameWork::SetTabs()
 			hmi_mng = (*it).second;
 		
 			QWidgetFactory::loadImages("../Bitmaps");
-			QString map_path = QString("../project/") + (*it).first;
+			//QString map_path = QString("../project/") + (*it).first;
+			QString map_path = GetScadaProjectDirectory() + QString("/") + (*it).first; //apa 04-12-2020
 			QDialog *designerHMI = (QDialog *)QWidgetFactory::create(map_path, hmi_mng);
 
 			if(designerHMI)
@@ -998,7 +999,7 @@ void UserFrameWork::reviewReport() // review an existing report
 		{
 			qApp->processEvents();
 
-			QString ini_file = GetScadaHomeDirectory() + "\\project\\scada.ini";
+			QString ini_file = GetScadaProjectDirectory() + "\\scada.ini"; //apa 04-12-2020
 			Inifile iniFile((const char*)ini_file);
 
 			if(iniFile.find("path","internet_browser"))

@@ -140,7 +140,7 @@ bool OpenRealTimeConnections()	// open the connections with the servers
 	QString DbUserName;
 	QString DbPassword;
 	
-	QString ini_file = GetScadaHomeDirectory() + "\\project\\realtimedb.ini";
+	QString ini_file = GetScadaProjectDirectory() + "\\realtimedb.ini"; //apa 04-12-2020
 	Inifile iniFile((const char*)ini_file);
 
 	if( iniFile.find("user","rtsqlserver") &&
@@ -255,7 +255,7 @@ bool ConnectToRealTimeDatabases()
 	QString DbUserName;
 	QString DbPassword;
 	
-	QString ini_file = GetScadaHomeDirectory() + "\\project\\realtimedb.ini";
+	QString ini_file = GetScadaProjectDirectory() + "\\realtimedb.ini"; //apa 04-12-2020
 	Inifile iniFile((const char*)ini_file);
 
 	if( iniFile.find("user","rtsqlserver") &&
@@ -449,7 +449,7 @@ bool OpenSpareRealTimeConnections()	// open the connections with the servers
 
 	QString spare_val;
 
-	QString scada_ini_file = GetScadaHomeDirectory() + "\\project\\scada.ini";
+	QString scada_ini_file = GetScadaProjectDirectory() + "\\scada.ini"; //apa 04-12-2020
 
 	Inifile scada_iniFile((const char*)scada_ini_file);
 
@@ -464,7 +464,7 @@ bool OpenSpareRealTimeConnections()	// open the connections with the servers
 		QString DbUserName;
 		QString DbPassword;
 		
-		QString ini_file = GetScadaHomeDirectory() + "\\project\\spare_realtimedb.ini";
+		QString ini_file = GetScadaProjectDirectory() + "\\spare_realtimedb.ini"; //apa 04-12-2020
 		Inifile iniFile((const char*)ini_file);
 
 		if( iniFile.find("user","rtsqlserver") &&
@@ -578,7 +578,7 @@ bool ConnectToSpareRealTimeDatabases()
 	QString DbUserName;
 	QString DbPassword;
 	
-	QString ini_file = GetScadaHomeDirectory() + "\\project\\spare_realtimedb.ini";
+	QString ini_file = GetScadaProjectDirectory() + "\\spare_realtimedb.ini"; //apa 04-12-2020
 	Inifile iniFile((const char*)ini_file);
 
 	if( iniFile.find("user","rtsqlserver") &&

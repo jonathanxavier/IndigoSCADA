@@ -21,6 +21,7 @@
 #include "itrace.h"	
 #include "mqtt_client_app_publisher.h"
 #include "GeneralHashFunctions.h"
+#include "inifile.h"
 
 static gl_row_counter = 0;
 static gl_column_counter = 0;
@@ -173,15 +174,27 @@ int MQTT_client_imp_publisher::AddItems()
 
 	char db_name[100];
 
-	#ifdef WIN32
-	if(GetModuleFileName(NULL, db_name, _MAX_PATH))
+	//project directory 04-12-2020
+	char project_dir[_MAX_PATH];
+	char ini_file[_MAX_PATH];
+		
+	ini_file[0] = '\0';
+	if(GetModuleFileName(NULL, ini_file, _MAX_PATH))
 	{
-		*(strrchr(db_name, '\\')) = '\0';        // Strip \\filename.exe off path
-		*(strrchr(db_name, '\\')) = '\0';        // Strip \\bin off path
-	}
-	#endif
+		*(strrchr(ini_file, '\\')) = '\0';        // Strip \\filename.exe off path
+		*(strrchr(ini_file, '\\')) = '\0';        // Strip \\bin off path
+		
+		strcat(ini_file, "\\bin\\project.ini");
+		Inifile iniFile(ini_file);
 
-	strcat(db_name, "\\project\\");
+		if(iniFile.find("path","project_directory"))
+		{
+			strcpy(project_dir, iniFile.find("path","project_directory"));
+		}
+    }
+
+	strcpy(db_name, project_dir);
+	strcat(db_name, "\\");
 	strcat(db_name, BrokerHostName);
 	strcat(db_name, "_publisher");
 	strcat(db_name, ".db");

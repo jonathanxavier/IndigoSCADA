@@ -53,7 +53,7 @@ bool OpenHistoricConnections()	// open the connections with the historical serve
 	QString DbUserName;
 	QString DbPassword;
 			
-	QString ini_file = GetScadaHomeDirectory() + "\\project\\historicdb.ini";
+	QString ini_file = GetScadaProjectDirectory() + "\\historicdb.ini"; //apa 04-12-2020
 	Inifile iniFile((const char*)ini_file);
 	
 	if( iniFile.find("user","sqlserver") &&
@@ -151,7 +151,7 @@ bool ConnectToHistoricDatabases()
 	QString DbUserName;
 	QString DbPassword;
 			
-	QString ini_file = GetScadaHomeDirectory() + "\\project\\historicdb.ini";
+	QString ini_file = GetScadaProjectDirectory() + "\\historicdb.ini"; //apa 04-12-2020
 	Inifile iniFile((const char*)ini_file);
 	
 	if( iniFile.find("user","sqlserver") &&

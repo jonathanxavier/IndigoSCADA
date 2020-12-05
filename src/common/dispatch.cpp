@@ -587,7 +587,7 @@ bool OpenDispatcherConnection()	// open the connections with the dispatcher serv
 	Dispatcher* d = new Dispatcher(); 
 	SetDispatcher(d);
 
-	QString dsp_ini_file = GetScadaHomeDirectory() + "\\project\\dispatcher.ini";
+	QString dsp_ini_file = GetScadaProjectDirectory() + "\\dispatcher.ini"; //apa 04-12-2020
 	Inifile dsp_iniFile((const char*)dsp_ini_file);
 
 	if( dsp_iniFile.find("user","dispatcherserver") &&
@@ -638,7 +638,7 @@ bool ConnectToDispatcher()
 	QString DispatcherUserName;
 	QString DispatcherPassword;
 
-	QString dsp_ini_file = GetScadaHomeDirectory() + "\\project\\dispatcher.ini";
+	QString dsp_ini_file = GetScadaProjectDirectory() + "\\dispatcher.ini"; //apa 04-12-2020
 	Inifile dsp_iniFile((const char*)dsp_ini_file);
 
 	if( dsp_iniFile.find("user","dispatcherserver") &&
@@ -709,7 +709,7 @@ bool OpenSpareDispatcherConnection()	// open the connections with the dispatcher
 	bool res = true;
 	QString spare_val;
 
-	QString scada_ini_file = GetScadaHomeDirectory() + "\\project\\scada.ini";
+	QString scada_ini_file = GetScadaProjectDirectory() + "\\scada.ini"; //apa 04-12-2020
 
 	Inifile scada_iniFile((const char*)scada_ini_file);
 
@@ -726,7 +726,7 @@ bool OpenSpareDispatcherConnection()	// open the connections with the dispatcher
 		Dispatcher* d = new Dispatcher(); 
 		SetSpareDispatcher(d);
 
-		QString dsp_ini_file = GetScadaHomeDirectory() + "\\project\\spare_dispatcher.ini";
+		QString dsp_ini_file = GetScadaProjectDirectory() + "\\spare_dispatcher.ini"; //apa 04-12-2020
 		Inifile dsp_iniFile((const char*)dsp_ini_file);
 
 		if( dsp_iniFile.find("user","dispatcherserver") &&
@@ -782,7 +782,7 @@ bool ConnectToSpareDispatcher()
 	QString DispatcherUserName;
 	QString DispatcherPassword;
 
-	QString dsp_ini_file = GetScadaHomeDirectory() + "\\project\\spare_dispatcher.ini";
+	QString dsp_ini_file = GetScadaProjectDirectory() + "\\spare_dispatcher.ini"; //apa 04-12-2020
 	Inifile dsp_iniFile((const char*)dsp_ini_file);
 
 	if( dsp_iniFile.find("user","dispatcherserver") &&

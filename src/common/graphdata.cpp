@@ -35,7 +35,7 @@ scaleMax(1),scaleStep(2), XRange(0),abscissaDecimalPrecision(0)
 {
 	IT_IT("GraphData::GraphData");
 
-	//QString ini_file = GetScadaHomeDirectory() + "\\project\\scada.ini";
+	//QString ini_file = GetScadaProjectDirectory() + "\\scada.ini"; //apa 04-12-2020
 	//Inifile iniFile((const char*)ini_file);
 
 	//const char* str;

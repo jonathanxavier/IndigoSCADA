@@ -22,6 +22,7 @@
 #include "iec_item.h"
 #include "itrace.h"	
 #include "client.h"
+#include "inifile.h"
 #endif // _WIN32
 
 static gl_row_counter = 0;
@@ -217,15 +218,27 @@ int IEC61850_client_imp::AddItems()
 
 	char db_name[MAX_PATH];
 
-	#ifdef WIN32
-	if(GetModuleFileName(NULL, db_name, _MAX_PATH))
+	//project directory 04-12-2020
+	char project_dir[_MAX_PATH];
+	char ini_file[_MAX_PATH];
+		
+	ini_file[0] = '\0';
+	if(GetModuleFileName(NULL, ini_file, _MAX_PATH))
 	{
-		*(strrchr(db_name, '\\')) = '\0';        // Strip \\filename.exe off path
-		*(strrchr(db_name, '\\')) = '\0';        // Strip \\bin off path
-	}
-	#endif
+		*(strrchr(ini_file, '\\')) = '\0';        // Strip \\filename.exe off path
+		*(strrchr(ini_file, '\\')) = '\0';        // Strip \\bin off path
+		
+		strcat(ini_file, "\\bin\\project.ini");
+		Inifile iniFile(ini_file);
 
-	strcat(db_name, "\\project\\");
+		if(iniFile.find("path","project_directory"))
+		{
+			strcpy(project_dir, iniFile.find("path","project_directory"));
+		}
+    }
+
+	strcpy(db_name, project_dir);
+	strcat(db_name, "\\");
 	strcat(db_name, mmsDomain);
 	strcat(db_name, ".db");
 
@@ -387,17 +400,30 @@ void IEC61850_client_imp::CreateSqlConfigurationFile(void)
 	iec61850_type[0] = '\0';
 	program_path[0] = '\0';
 
-	if(GetModuleFileName(NULL, program_path, _MAX_PATH))
+	//project directory 04-12-2020
+	char project_dir[_MAX_PATH];
+	char ini_file[_MAX_PATH];
+		
+	ini_file[0] = '\0';
+	if(GetModuleFileName(NULL, ini_file, _MAX_PATH))
 	{
-		*(strrchr(program_path, '\\')) = '\0';        // Strip \\filename.exe off path
-		*(strrchr(program_path, '\\')) = '\0';        // Strip \\bin off path
+		*(strrchr(ini_file, '\\')) = '\0';        // Strip \\filename.exe off path
+		*(strrchr(ini_file, '\\')) = '\0';        // Strip \\bin off path
+		
+		strcat(ini_file, "\\bin\\project.ini");
+		Inifile iniFile(ini_file);
+
+		if(iniFile.find("path","project_directory"))
+		{
+			strcpy(project_dir, iniFile.find("path","project_directory"));
+		}
     }
 
 	char sql_file_path[MAX_PATH];
 
-	strcpy(sql_file_path, program_path);
+	strcpy(sql_file_path, project_dir);
 
-	strcat(sql_file_path, "\\project\\"); 
+	strcat(sql_file_path, "\\"); 
 
 	strcat(sql_file_path, mmsDomain);
 

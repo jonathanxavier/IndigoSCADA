@@ -15,7 +15,8 @@
 #include <shellapi.h>
 #include <crtdbg.h>
 #include "opc_client_hda_app.h"
-#include "itrace.h"	
+#include "itrace.h"
+#include "inifile.h"
 #endif // _WIN32
 
 #include <stdio.h>
@@ -98,15 +99,27 @@ int Opc_client_hda_imp::load_database(void)
 
 	char db_name[100];
 
-	#ifdef WIN32
-	if(GetModuleFileName(NULL, db_name, _MAX_PATH))
+	//project directory 04-12-2020
+	char project_dir[_MAX_PATH];
+	char ini_file[_MAX_PATH];
+		
+	ini_file[0] = '\0';
+	if(GetModuleFileName(NULL, ini_file, _MAX_PATH))
 	{
-		*(strrchr(db_name, '\\')) = '\0';        // Strip \\filename.exe off path
-		*(strrchr(db_name, '\\')) = '\0';        // Strip \\bin off path
-	}
-	#endif
+		*(strrchr(ini_file, '\\')) = '\0';        // Strip \\filename.exe off path
+		*(strrchr(ini_file, '\\')) = '\0';        // Strip \\bin off path
+		
+		strcat(ini_file, "\\bin\\project.ini");
+		Inifile iniFile(ini_file);
 
-	strcat(db_name, "\\project\\");
+		if(iniFile.find("path","project_directory"))
+		{
+			strcpy(project_dir, iniFile.find("path","project_directory"));
+		}
+    }
+
+	strcpy(db_name, project_dir);
+	strcat(db_name, "\\");
 	strcat(db_name, opc_server_prog_id);
 	strcat(db_name, ".db");
 

@@ -440,20 +440,28 @@ bool dispServer::authenticate(char* buf)
     char_t* password = (char_t*)buf;
     unpack_str(password, buf);
 
-	char ini_file[256];
-
-	#ifdef WIN32
+	//project directory 04-12-2020
+	char project_dir[_MAX_PATH];
+	char ini_file[_MAX_PATH];
+	
 	ini_file[0] = '\0';
 	if(GetModuleFileName(NULL, ini_file, _MAX_PATH))
 	{
 		*(strrchr(ini_file, '\\')) = '\0';        // Strip \\filename.exe off path
 		*(strrchr(ini_file, '\\')) = '\0';        // Strip \\bin off path
-	}
-	#endif
-	
-	strcat(ini_file, "\\project\\dispatcher.ini");
-	Inifile iniFile(ini_file);
+		
+		strcat(ini_file, "\\bin\\project.ini");
+		Inifile iniFile(ini_file);
 
+		if(iniFile.find("path","project_directory"))
+		{
+			strcpy(project_dir, iniFile.find("path","project_directory"));
+		}
+    }
+
+	strcpy(ini_file, project_dir);
+	strcat(ini_file, "\\dispatcher.ini");
+	Inifile iniFile(ini_file);
 
 	if( iniFile.find("user","dispatcherserver") &&
 		iniFile.find("password","dispatcherserver") )

@@ -29,20 +29,29 @@ SqlServer::SqlServer()
 SqlServer::~SqlServer() 
 {
 	IT_IT("SqlServer::~SqlServer");
-
-	char ini_file[256]; 
-
+	
+	//project directory 04-12-2020
+	char ini_file[_MAX_PATH];
+	char project_dir[_MAX_PATH];
+		
 	ini_file[0] = '\0';
-
-	#ifdef WIN32
 	if(GetModuleFileName(NULL, ini_file, _MAX_PATH))
 	{
 		*(strrchr(ini_file, '\\')) = '\0';        // Strip \\filename.exe off path
 		*(strrchr(ini_file, '\\')) = '\0';        // Strip \\bin off path
+		
+		strcat(ini_file, "\\bin\\project.ini");
+		Inifile iniFile(ini_file);
+
+		if(iniFile.find("path","project_directory"))
+		{
+			strcpy(project_dir, iniFile.find("path","project_directory"));
+		}
     }
-	#endif
+
+	strcpy(ini_file, project_dir);
 	
-	strcat(ini_file, "\\project\\historicdb.ini");
+	strcat(ini_file, "\\historicdb.ini");
 	
 	Inifile iniFile(ini_file);
 
@@ -89,20 +98,29 @@ SqlServer::~SqlServer()
 void SqlServer::run(int argc, char* argv[])
 {
 	IT_IT("SqlServer::run");
-	
-	char ini_file[256];
-	
+		
+	//project directory 04-12-2020
+	char ini_file[_MAX_PATH];
+	char project_dir[_MAX_PATH];
+		
 	ini_file[0] = '\0';
-
-	#ifdef WIN32
 	if(GetModuleFileName(NULL, ini_file, _MAX_PATH))
 	{
 		*(strrchr(ini_file, '\\')) = '\0';        // Strip \\filename.exe off path
 		*(strrchr(ini_file, '\\')) = '\0';        // Strip \\bin off path
-    }
-	#endif
+		
+		strcat(ini_file, "\\bin\\project.ini");
+		Inifile iniFile(ini_file);
 
-	strcat(ini_file, "\\project\\historicdb.ini");
+		if(iniFile.find("path","project_directory"))
+		{
+			strcpy(project_dir, iniFile.find("path","project_directory"));
+		}
+    }
+
+	strcpy(ini_file, project_dir);
+
+	strcat(ini_file, "\\historicdb.ini");
 		
 	Inifile iniFile(ini_file);
 

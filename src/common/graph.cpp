@@ -33,7 +33,7 @@ scaleMax(1),scaleStep(2), timeRange(0)
 {
 	IT_IT("Graph::Graph");
 
-	//QString ini_file = GetScadaHomeDirectory() + "\\project\\scada.ini";
+	//QString ini_file = GetScadaProjectDirectory() + "\\scada.ini"; //apa 04-12-2020
 	//Inifile iniFile((const char*)ini_file);
 
 	//const char* str;

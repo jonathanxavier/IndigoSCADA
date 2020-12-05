@@ -18,6 +18,7 @@
 #include "IndentedTrace.h"
 
 extern void SetScadaHomeDirectory(const QString &s);
+extern void SetScadaProjectDirectory(const QString &s);
 
 int main( int argc, char **argv )
 {
@@ -31,7 +32,8 @@ int main( int argc, char **argv )
 		return stat;
 	}
 
-	SetScadaHomeDirectory(argv[0]);		
+	SetScadaHomeDirectory(argv[0]);
+	SetScadaProjectDirectory(argv[0]); //apa 04-12-2020
 	// 
 	// if the DISPLAY variable is empty or not set then we go into none-GUI mode
 	// this application can run GUI mode or non-GUI mode

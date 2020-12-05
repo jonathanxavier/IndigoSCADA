@@ -21,7 +21,7 @@
 #include "localcli.h"
 #include "giga_enums.h" //APA added
 #include "IndentedTrace.h" //APA added
-
+#include "inifile.h"
 
 #if !defined(_WIN32) && defined(NO_PTHREADS)
 #error Server requires multithreading support
@@ -1802,17 +1802,28 @@ bool dbServer::authenticate(char* buf)
 
 	char ini_file[256]; 
 	
+	//project directory 04-12-2020
+	char ini_file[_MAX_PATH];
+	char project_dir[_MAX_PATH];
+		
 	ini_file[0] = '\0';
-
-	#ifdef WIN32
 	if(GetModuleFileName(NULL, ini_file, _MAX_PATH))
 	{
 		*(strrchr(ini_file, '\\')) = '\0';        // Strip \\filename.exe off path
 		*(strrchr(ini_file, '\\')) = '\0';        // Strip \\bin off path
-    }
-	#endif
+		
+		strcat(ini_file, "\\bin\\project.ini");
+		Inifile iniFile(ini_file);
 
-	strcat(ini_file, "\\project\\historicdb.ini");
+		if(iniFile.find("path","project_directory"))
+		{
+			strcpy(project_dir, iniFile.find("path","project_directory"));
+		}
+    }
+
+	strcpy(ini_file, project_dir);
+
+	strcat(ini_file, "\\historicdb.ini");
 
 	Inifile iniFile(ini_file);
 
@@ -2318,17 +2329,28 @@ bool dbServer::put_db_online(dbSession* session, char_t * msg) //put_db_online i
 		unpack_str(buf, msg);
 
 		char_t dbName[256];
-		dbName[0] = '\0';
 
-		#ifdef WIN32
-		if(GetModuleFileName(NULL, dbName, _MAX_PATH))
+		//project directory 04-12-2020
+		char project_dir[_MAX_PATH];
+		char ini_file[_MAX_PATH];
+			
+		ini_file[0] = '\0';
+		if(GetModuleFileName(NULL, ini_file, _MAX_PATH))
 		{
-			*(strrchr(dbName, '\\')) = '\0';        // Strip \\filename.exe off path
-			*(strrchr(dbName, '\\')) = '\0';        // Strip \\bin off path
-		}
-		#endif
+			*(strrchr(ini_file, '\\')) = '\0';        // Strip \\filename.exe off path
+			*(strrchr(ini_file, '\\')) = '\0';        // Strip \\bin off path
+			
+			strcat(ini_file, "\\bin\\project.ini");
+			Inifile iniFile(ini_file);
 
-		strcat(dbName, "\\project\\");
+			if(iniFile.find("path","project_directory"))
+			{
+				strcpy(project_dir, iniFile.find("path","project_directory"));
+			}
+		}
+
+		strcpy(dbName, project_dir);
+		strcat(dbName, "\\");
 		strcat(dbName, buf);
 		strcat(dbName, ".dbs");
 				

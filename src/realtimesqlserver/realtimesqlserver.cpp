@@ -29,19 +29,27 @@ RealTimeSqlServer::~RealTimeSqlServer()
 {
 	IT_IT("RealTimeSqlServer::~RealTimeSqlServer");
 
-	char ini_file[256]; 
-
+	//project directory 04-12-2020
+	char ini_file[_MAX_PATH];
+	char project_dir[_MAX_PATH];
+		
 	ini_file[0] = '\0';
-
-	#ifdef WIN32
 	if(GetModuleFileName(NULL, ini_file, _MAX_PATH))
 	{
 		*(strrchr(ini_file, '\\')) = '\0';        // Strip \\filename.exe off path
 		*(strrchr(ini_file, '\\')) = '\0';        // Strip \\bin off path
+				
+		strcat(ini_file, "\\bin\\project.ini");
+		Inifile iniFile(ini_file);
+
+		if(iniFile.find("path","project_directory"))
+		{
+			strcpy(project_dir, iniFile.find("path","project_directory"));
+		}
     }
-	#endif
-	
-	strcat(ini_file, "\\project\\realtimedb.ini");
+
+	strcpy(ini_file, project_dir);
+	strcat(ini_file, "\\realtimedb.ini");
 	
 	Inifile iniFile(ini_file);
 
@@ -88,20 +96,28 @@ RealTimeSqlServer::~RealTimeSqlServer()
 void RealTimeSqlServer::run(int argc, char* argv[])
 {
 	IT_IT("RealTimeSqlServer::run");
-	
-	char ini_file[256];
-	
+		
+	//project directory 04-12-2020
+	char ini_file[_MAX_PATH];
+	char project_dir[_MAX_PATH];
+		
 	ini_file[0] = '\0';
-
-	#ifdef WIN32
 	if(GetModuleFileName(NULL, ini_file, _MAX_PATH))
 	{
 		*(strrchr(ini_file, '\\')) = '\0';        // Strip \\filename.exe off path
 		*(strrchr(ini_file, '\\')) = '\0';        // Strip \\bin off path
-    }
-	#endif
+			
+		strcat(ini_file, "\\bin\\project.ini");
+		Inifile iniFile(ini_file);
 
-	strcat(ini_file, "\\project\\realtimedb.ini");
+		if(iniFile.find("path","project_directory"))
+		{
+			strcpy(project_dir, iniFile.find("path","project_directory"));
+		}
+    }
+
+	strcpy(ini_file, project_dir);
+	strcat(ini_file, "\\realtimedb.ini");
 		
 	Inifile iniFile(ini_file);
 

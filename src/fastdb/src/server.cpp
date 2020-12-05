@@ -25,6 +25,7 @@
 #include <ctype.h>
 #include "fastdb_enums.h" //apa added
 #include "IndentedTrace.h" //APA added
+#include "inifile.h"
 
 BEGIN_FASTDB_NAMESPACE
 
@@ -2114,15 +2115,27 @@ bool dbServer::put_db_online(dbSession* session, char_t * msg) //put_db_online i
 
 		strcpy(databaseName, buf);
 
-		#ifdef WIN32
-		if(GetModuleFileName(NULL, dbFileName, _MAX_PATH))
+		//project directory 04-12-2020
+		char project_dir[_MAX_PATH];
+		char ini_file[_MAX_PATH];
+			
+		ini_file[0] = '\0';
+		if(GetModuleFileName(NULL, ini_file, _MAX_PATH))
 		{
-			*(strrchr(dbFileName, '\\')) = '\0';        // Strip \\filename.exe off path
-			*(strrchr(dbFileName, '\\')) = '\0';        // Strip \\bin off path
-		}
-		#endif
+			*(strrchr(ini_file, '\\')) = '\0';        // Strip \\filename.exe off path
+			*(strrchr(ini_file, '\\')) = '\0';        // Strip \\bin off path
+			
+			strcat(ini_file, "\\bin\\project.ini");
+			Inifile iniFile(ini_file);
 
-		strcat(dbFileName, "\\project\\");
+			if(iniFile.find("path","project_directory"))
+			{
+				strcpy(project_dir, iniFile.find("path","project_directory"));
+			}
+		}
+
+		strcpy(dbFileName, project_dir);
+		strcat(dbFileName, "\\");
 		strcat(dbFileName, buf);
 		strcat(dbFileName, ".fdb");
 				

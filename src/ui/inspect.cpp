@@ -61,7 +61,7 @@ pSm(NULL),pS(NULL),pHistory(NULL),pChart(NULL)
 	
 	///////////////////////////////////////////////////////////////////
 
-	QString ini_file = GetScadaHomeDirectory() + "\\project\\scada.ini";
+	QString ini_file = GetScadaProjectDirectory() + "\\scada.ini"; //apa 04-12-2020
 	Inifile iniFile((const char*)ini_file);
 
 	QValueList<int> l;
@@ -480,7 +480,7 @@ void Inspect::Close()
 {
 	IT_IT("Inspect::Close");
 
-	QString ini_file = GetScadaHomeDirectory() + "\\project\\scada.ini";
+	QString ini_file = GetScadaProjectDirectory() + "\\scada.ini"; //apa 04-12-2020
 	Inifile iniFile((const char*)ini_file);
 
 	QValueList<int> vl;
