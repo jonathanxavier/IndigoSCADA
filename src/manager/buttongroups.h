@@ -35,8 +35,7 @@ public:
 
 protected:
     QCheckBox *state;
-    QRadioButton *rb21, *rb22, *rb23;
-	QLabel* textLabel1;
+    QLabel* textLabel1;
 
 	const int nBufferSize;
 	char pExeFile[501];
@@ -49,8 +48,7 @@ protected:
 	bool started;
 
 protected slots:    
-    void slotChangeGrp3State();
-	void slotStartProcesses();
+    void slotStartProcesses();
 	void slotStopProcesses();
 
 };

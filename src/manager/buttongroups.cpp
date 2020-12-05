@@ -25,7 +25,7 @@
 static QString HomeDirectory = (const char*) 0;
 static QString ProjectDirectory = (const char*) 0; //apa 04-12-2020
 
-void SetScadaHomeDirectory(const QString &s) 
+void SetScadaHomeDirectory(void) 
 { 
 	#ifdef WIN32
 	
@@ -54,7 +54,7 @@ void SetScadaHomeDirectory(const QString &s)
 	#endif
 }
 
-void SetScadaProjectDirectory(const QString &s) //apa 04-12-2020
+void SetScadaProjectDirectory(void) //apa 04-12-2020
 { 
 	#ifdef WIN32
 	
@@ -468,9 +468,10 @@ ButtonsGroups::ButtonsGroups( QWidget *parent, const char *name )
 	textLabel1 = new QLabel( this, "textLabel1" );
     textLabel1->setGeometry( QRect( 30, 190, 200, 40 ) );
 
-	strcpy(pInitFile, "Project folder:\n");
-	strcat(pInitFile, (const char*)GetScadaProjectDirectory());
-	textLabel1->setText(pInitFile);
+	char file[_MAX_PATH];
+	strcpy(file, "Project folder:\n");
+	strcat(file, (const char*)GetScadaProjectDirectory());
+	textLabel1->setText(file);
 
     // .. and the fourth a button with a menu
 	/*
@@ -484,26 +485,6 @@ ButtonsGroups::ButtonsGroups( QWidget *parent, const char *name )
 	*/
 
 	/////////////////////////////////////////////////////////////////////////////////
-	/*
-	char pModuleFile[501];
-
-	DWORD dwSize = GetModuleFileName(NULL,pModuleFile,nBufferSize);
-
-	pModuleFile[dwSize] = 0;
-
-	if(dwSize>4&&pModuleFile[dwSize-4]=='.')
-	{
-		sprintf(pExeFile,"%s",pModuleFile);
-		pModuleFile[dwSize-4] = 0;
-		sprintf(pInitFile,"%s.ini",pModuleFile);
-		sprintf(pLogFile,"%s.log",pModuleFile);
-	}
-	else
-	{
-		printf("Invalid module file name: %s\r\n", pModuleFile);
-		return;
-	}
-	*/
 
 	strcpy(pInitFile, (const char*)GetScadaProjectDirectory()); //apa 04-12-2020
 
@@ -532,23 +513,16 @@ ButtonsGroups::ButtonsGroups( QWidget *parent, const char *name )
 	}
 }
 
-/*
- * SLOT slotChangeGrp3State()
- *
- * enables/disables the radiobuttons of the third buttongroup
- */
-
-void ButtonsGroups::slotChangeGrp3State()
-{
-    rb21->setEnabled( state->isChecked() );
-    rb22->setEnabled( state->isChecked() );
-    rb23->setEnabled( state->isChecked() );
-}
-
 void ButtonsGroups::slotStartProcesses()
 {
 	if(started == false)
 	{
+		char file[_MAX_PATH];
+		SetScadaProjectDirectory();
+		strcpy(file, "Project folder:\n");
+		strcat(file, (const char*)GetScadaProjectDirectory());
+		textLabel1->setText(file);
+
 		started = true;
 
 		for(int i = 0;i < 10; i++)
@@ -563,8 +537,7 @@ void ButtonsGroups::slotStopProcesses()
 	if(started == true)
 	{
 		started = false;
-
-		//for(int i = 0;i < 10; i++)
+		
 		for(int i = 10; i >= 0; i--)
 		{
 			EndProcess(i);
