@@ -456,8 +456,7 @@ void UserFrameWork::SetTabs()
 			hmi_mng = (*it).second;
 		
 			QWidgetFactory::loadImages("../Bitmaps");
-			//QString map_path = QString("../project/") + (*it).first;
-			QString map_path = GetScadaProjectDirectory() + QString("/") + (*it).first; //apa 04-12-2020
+			QString map_path = GetScadaProjectDirectory() + QString("\\") + (*it).first; //apa 04-12-2020
 			QDialog *designerHMI = (QDialog *)QWidgetFactory::create(map_path, hmi_mng);
 
 			if(designerHMI)
