@@ -517,12 +517,6 @@ void ButtonsGroups::slotStartProcesses()
 {
 	if(started == false)
 	{
-		char file[_MAX_PATH];
-		SetScadaProjectDirectory();
-		strcpy(file, "Project folder:\n");
-		strcat(file, (const char*)GetScadaProjectDirectory());
-		textLabel1->setText(file);
-
 		started = true;
 
 		for(int i = 0;i < 10; i++)
