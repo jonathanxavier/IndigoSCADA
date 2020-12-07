@@ -60,6 +60,7 @@ class OPC_CLIENT_DADRV Opc_client_da_DriverThread : public DriverThread
 	}
 
     void TerminateProtocol(); // parent requests the thread close
+	void TerminateChild();
     //PROCESS_INFORMATION* getProcInfo(void);
 
 	protected:

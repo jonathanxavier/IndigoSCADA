@@ -466,7 +466,7 @@ ButtonsGroups::ButtonsGroups( QWidget *parent, const char *name )
     //tb3->setFlat(TRUE);
 
 	textLabel1 = new QLabel( this, "textLabel1" );
-    textLabel1->setGeometry( QRect( 30, 190, 200, 40 ) );
+    textLabel1->setGeometry( QRect( 30, 190, 2000, 40 ) );
 
 	char file[_MAX_PATH];
 	strcpy(file, "Project folder:\n");

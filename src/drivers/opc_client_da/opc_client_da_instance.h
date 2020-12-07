@@ -131,11 +131,14 @@ class OPC_CLIENT_DADRV Opc_client_da_Instance : public DriverInstance
 	public:
 	Opc_client_da_DriverThread *pConnect;
 	unsigned int msg_sent_in_control_direction;
+	unsigned int wait_for_message;
+	unsigned int msg_received_in_monitor_direction;
 	//
 	Opc_client_da_Instance(Driver *parent, const QString &name, int instance_id) : 
 	DriverInstance(parent,name),fFail(0), Countdown(1), pConnect(NULL),Config_db(NULL),
 	State(STATE_RESET),InTick(0),Retry(0),Sp(0),OpcItems(1), Values(NULL),
-	ParentDriver(parent),msg_sent_in_control_direction(0), instanceID(instance_id)
+	ParentDriver(parent),msg_sent_in_control_direction(0), instanceID(instance_id),
+	wait_for_message(0),msg_received_in_monitor_direction(0)
 	{
 		IT_IT("Opc_client_da_Instance::Opc_client_da_Instance");
 		connect (GetConfigureDb (),

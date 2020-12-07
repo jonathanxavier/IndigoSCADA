@@ -277,5 +277,19 @@ void Opc_client_da_DriverThread::TerminateProtocol() // parent requests the thre
     fRequestHalt = true;
 };
 
+void Opc_client_da_DriverThread::TerminateChild()
+{
+	IT_IT("Opc_client_da_DriverThread::TerminateChild");
+
+    //stop the child process
+
+	// post a WM_QUIT message first
+	PostThreadMessage(pProcInfo[nIndex].dwThreadId,WM_QUIT,0,0);
+	// sleep for a while so that the process has a chance to terminate itself
+	::Sleep(100);
+	// terminate the process by force
+	TerminateProcess(pProcInfo[nIndex].hProcess,0);
+
+};
 
 

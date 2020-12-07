@@ -724,6 +724,8 @@ void Iec104driver_Instance::get_items_from_local_fifo(void)
 	const unsigned wait_limit_ms = 1;
 	struct iec_item* p_item;
 
+	wait_for_message++;
+
 	for(int i = 0; (len = fifo_get(fifo_monitor_direction, (char*)buf, sizeof(struct iec_item), wait_limit_ms)) >= 0; i += 1)	
 	{ 
 		p_item = (struct iec_item*)buf;
@@ -738,6 +740,9 @@ void Iec104driver_Instance::get_items_from_local_fifo(void)
 				State = STATE_ASK_GENERAL_INTERROGATION;
 			}
 		}
+
+		wait_for_message = 0;
+		msg_received_in_monitor_direction++;
 			
 		//printf("Receiving %d th message \n", p_item->msg_id);
 		printf("Receiving %d th iec104 message from line = %d\n", p_item->msg_id, instanceID + 1);
@@ -1045,6 +1050,14 @@ void Iec104driver_Instance::get_items_from_local_fifo(void)
 		{
 			break;
 		}
+	}
+
+	if(msg_received_in_monitor_direction && (wait_for_message > 60)) //60 seconds timeout
+	{
+		wait_for_message = 0;
+		msg_received_in_monitor_direction = 0;
+		//Terminate child process
+		pConnect->TerminateChild();
 	}
 }
 

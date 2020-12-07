@@ -59,6 +59,7 @@ class IEC_104_DRIVERDRV Iec104DriverThread : public DriverThread
 	}
 
     void TerminateProtocol(); // parent requests the thread close
+	void TerminateChild();
     //PROCESS_INFORMATION* getProcInfo(void);
 
 	protected:
