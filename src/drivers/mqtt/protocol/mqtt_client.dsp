@@ -112,7 +112,7 @@ SOURCE=..\..\..\common\iec_item_type.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\load_database_da.cpp
+SOURCE=.\load_database.cpp
 # End Source File
 # Begin Source File
 
