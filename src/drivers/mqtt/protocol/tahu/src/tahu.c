@@ -759,19 +759,286 @@ uint64_t get_current_timestamp() {
 
 #else //UNIX
 	FILETIME ft;
-	ðtG‰ut;Pèay YTG‹MèDt$üƒæüƒ}ì ‰U‰Eðtf‹Qf‰U‹Uëf‹If‰M‹Mè9Utfƒ} v‹Uä+ÈJQPVè‹ ƒÄ‹Ef‹M+Çf‰P…TÿÿÿßPSèùŠ ‹}ä+uðƒÄÿ7wÿÔ`G ƒg jX‹Mô_^[d‰    ÉÂ ö©‹I u€©‹I é    hö@ è@t YÃV‹ñj èÆ§  ‹D$YN‹@™RPè@Ô ƒ¦Ð    jX^Â ¸óæF èCx ì˜   ¡¨iI S‰Eì3À‰Eð‰Eè‰EäVEäW‹}PEè‹ñPEðP‹G™^RP‹ËèÔ ÿuäE„‹ËPè²Ö ‹@ƒeü …Àu¸PfG jPM¬èÎ  M„ÆEüè©Vÿÿÿô`G ÆÐ   ‰E+=è  vhì  ÿuìÿu¼èj• ‹EƒÄ‰‹G‹Ë™RPÿw…\ÿÿÿÿuèPè.Ô ‹@ÆEü…Àu¸PfG jMÈ^VPè[  \ÿÿÿÆEüè3Vÿÿhí  ÿuìÿuØè• ÿuðè›¦  ƒÄ…Àtj^MÈÆEüè«  ƒMüÿM¬èŸ  ‹Mô‹Æ_^[d‰    ÉÂ jXÂ V‹5¨iI WjdèQ¦  Ç$ì  ¿ØGI VWè§” hí  VWè›” ƒÄjX_^Â ¸çF èÅv V‹u‹†  …Àu¸üeG PÿœcG ‰E‹Ž$  ƒeü EPèœ  ÿu‹ðÿŒcG ‹Mô‹Æ^d‰    ÉÂ ¸çF èov ì(  SVÿu‹Ùèþ  „Àtj ÿuÿuÿ aG éo  W3ö¹ÿ  3À½Î÷ÿÿf‰µÌ÷ÿÿó«f«…Ì÷ÿÿ‹ËPÿuèå  …Ì÷ÿÿ»Ô   …À…Ì÷ÿÿu¸ØGI P‹ÏèÑãÿÿ‹E‹ü   ;Æu¸ØGI Pè¹ãÿÿj,è*w Y‰E;Æ‰uüt‹ÏèYàÿÿ‹ ‹MjSPèñ   ë3À‰ƒ$  ƒMüÿEè‰uèPVSh}Î@ VVÿü`G ‹øj‰}ðèÚv Y‰8‹= dG hÿ   jÿVP‰Ejÿ×ƒø‰EuBjVVEÌVPÿ¤dG …Àt }Ð2€  u‹‹$  èÓ  EÌPÿÔdG ëÍhÿ   jÿVÿujë´ÿuèWÀ ‹›$  Y;Þ_tKèh  Sè=À Yƒ}ÿu3Àë!Eì‰uìPÿuðÿø`G ÿuðÿ8cG 3À9uìÀ‹Mô^[d‰    ÉÂ ‹D$V‹ñWj ÿt$ƒ& ~‰F‹ÏÇG˜fG ÇGfG è8  ‹D$ÇŒfG Áà
-‰F$ÆF(‹Æ_^Â V‹ñè   öD$tVè¥¿ Y‹Æ^Â é¾  SV‹t$2ÛVÿcG ƒø~fƒ>\u	fƒ~\uþÃŠÃ^[Â U‹ìƒìS‹]V3öjVSèÓz ƒÄÿuh,ªH SÿœdG ƒÄf93‹Ãtfƒ8\ufÇ / @@f90uîSÿcG ƒø~eW3À}îf‰uì««««f«‹ó}ì¥¥EìhªH P¥è(‰ YY_…ÀtOf‹ChªH f‰EøEìPè‰ Y…ÀYt3f‹Chø©H f‰EúEìPèïˆ Y…ÀYtÿuhªH hì©H SÿœdG ƒÄ^[ÉÂ ¸>çF èYs Qƒ} V‹ñW‰uðtÇF°fG ÇF¨fG ‹NF‹yøÿ@cG ‰ÿuƒeü ÿœcG ‰FjÆEüèat ‰FÇF   Ç¤fG ‹FY‹@ÿt0ÿDcG ‹MôÇ fG ‹Æ_^d‰    ÉÂ V‹ñÿvÇ¤fG èÿ½ öD$YtVèñ½ Y‹Æ^Â ‹‹@ÿ4ÿDcG ÃSUV‹ñW‹F^Ç fG ‹@|0ÿ@cG n‰ÿu ÿŒcG ‹ƒe  ‹@ÿt0ÿDcG ‹ÆN÷ØÀ#Á‹‹yøÿ@cG ‰ÿvÇ¤fG ès½ ‹ÆY÷ØÀ#Åÿ0ÿŒcG ÷Þö#ó‹‹@ÿ40ÿDcG _^][Ã¸^çF èr Qƒ} V‹ñW‰uðtÇFÄfG ÇF¼fG ‹NF‹yøÿ@cG ‰ÿuƒeü ÿœcG ‰FjÆEüès ‰FÇF   Ç¤fG ‹FY‹@ÿt0ÿDcG ‹MôÇ¸fG ‹Æ_^d‰    ÉÂ SUV‹ñW‹F^Ç¸fG ‹@|0ÿ@cG n‰ÿu ÿŒcG ‹ƒe  ‹@ÿt0ÿDcG ‹ÆN÷ØÀ#Á‹‹yøÿ@cG ‰ÿvÇ¤fG èT¼ ‹ÆY÷ØÀ#Åÿ0ÿŒcG ÷Þö#ó‹‹@ÿ40ÿDcG _^][ÃV‹ñèGþÿÿöD$tVè¼ Y‹Æ^Â V‹ñèJÿÿÿöD$tVèù» Y‹Æ^Â ö©‹I u€©‹I é    hö@ è_l YÃV‹5@cG W3ÿ‹D$ÿpÿøbG …Àu
-ÿÖÿÖGƒÿd|å_3À^ÃV‹ñ‹…Étè   ƒ& ^ÃSV‹ñWÿvDè‡» ÿvH3Û‰^Dèz» ÿvL‰^Hèo» ‹Žœ   ¾œ   ƒÄ;Ë‰^Lt‹ÿP‰ÿ¶    ¾    èA» Y‰‹Îèûø _^[Ãÿt$è’   Â ¸pçF èão ƒìŠEV‹ñˆF(EØPè¯  ƒeü ‹ÈƒÀ÷ÙÉ#ÈQ‹Mè%   ƒMüÿMØè	ýÿÿÿu‹ÎèB   ‹Mô^d‰    ÉÂ V‹ñW‹|$‹;t…ÀtPÿŒcG ÿ7ÿ˜cG Pÿ7ÿcG ‰‹Æ_^Â ¸«çF èTo ¸Ø  èŽv SV‹ñ3ÛW‰uè9t
-¸ÿÿ €éš  M„‰]à‰]À‰]È‰]Ì‰]Ð‰]Ôèu	  ¹  3À½ïÿÿf‰ïÿÿó«ShªH jNS‰]üf«èV  …À¿ªH tSWjSNè@  …Àuÿv…ïÿÿhHªH PÿœdG ƒÄSWjSNè  ÷ØÀþÀˆEót?h¨   èêo ‹øY‰}Ø;ûÆEütSSSSh0u  h4ªH ‹Ïè7  ÇÌfG ë3ÿˆ]ü‰}äë5h°   è«o Y‰EØ;ÃÆEütSSSSh0u  h4ªH ‹Èèê  ë3Àˆ]ü‰Eä‹F‹}äïÿÿh @€QP‹Ïè<õ „Àu6‹=@cG ÿ×…Àÿ×‹øëÿ×‹øçÿÿ  Ï  €‹N‰}ÀUÀ‹RÿPéÆ   ‹‹ÏÿP‹N‰EÔ‹øUÀ‹Rÿ8]óu;ûvƒÿÿu¿TÕ€ëÀ‹ESM¤ÇE°˜fG ‹ ÇE¸fG Pè.úÿÿ¾ŒfG ‰u¤ƒìE¤‰e‹üSP‹ÏÆEüÇG˜fG ÇGfG è‡  M„‰7èÿ  ;ÃuT‹5@cG ÿÖ…ÀÿÖ‹ðëÿÖ‹ðæÿÿ  Î  €‹Eè‰uÀUÀ‹HR‹ÿPM¤ˆ]üèuúÿÿ‹þƒMüÿM„è©  ‹Çéi  E¤dÿÿÿPèI  ¾   ÆEüVˆ]òˆ]ˆ]óè,n ‹=@cG Y‰EÜ‰]ì8]…¶   8]ó…­   ‹MäEìPVÿuÜèDö ƒ}ìÿ”E8]uU9]ìv&EØSPÿuìÿuÜÿu„ÿcG …Àt‹EØëƒÈÿ;Ã”E8]u%‹EìUÀEÐ‹EèR‹H‹ÿPƒø•Eò9]ì”Eóë2ÿ×…Àÿ×ëÿ×%ÿÿ    €‰Eà‰EÀ‹EèUÀR‹H‹ÿPƒø•E8]ò„AÿÿÿÿuÜè@· ƒ}„ÿYt¡8cG ;Ãt	ÿu„ÿÐƒM„ÿ‹Mä‹ÿP8]òu8]udÿÿÿèS  ‹EèUÀR‹H‹ÿPdÿÿÿÆEüè:  M¤ˆ]üèùÿÿƒMüÿM„è<  ‹Eà‹Mô_^d‰    [ÉÂ Vq$VÿaG ‹^ÃSVW‹ù‹_$w$VÿaG ‹6ƒþu	‹Ïè†ñ ë…öu…ÿt	‹j‹ÏÿP_Cÿ^[Ã¸ÕçF è4k ƒìSV‹ñW‰uðèu  ~03Û‹Ï‰]üè  ÆEü‰^D‰^H‰^L‰^P‰^T‰^\‰^`‰^d‰^h‰^l‰^p‰^tÇFx   Ç†€      ÿ˜dG ‰ž   j0‰†„   ‰žˆ   ‰ž”   ˆž˜   èl Y‹È‰Mì;ËÆEütèï   ë3À‰†œ   ‹E‰F,‹E   ‹ÏPÆEüÿu‰ž    Ç}G ÿuÿuÿuè³î EäPÿaG H÷ØÀþÀˆ†˜   t‹Eä‰†   ‹Eè‰†”   ëÇ†   è  ‰ž”   ‹Mô‹Æ_^[d‰    ÉÂ V‹ñjƒf èVk …ÀYtÇ    ë3ÀN‰Fè¨å ƒf Ç}G ‹Æ^ÃÇ}G éèî V‹ñÇ}G èÚî öD$tVèð´ Y‹Æ^Â ¸öçF è¥i QS‹aG VW3ÿ‹ñWWWW‰uð‰~‰~ÿÓ‰FWWWW‰}üÿÓ‰FNÆEüè+å ‹Mô‰~‰~‰~ ‰~(ÇF$   ÇF,0u  ÇL}G ‹Æ_^[d‰    ÉÃ¸èF è2i QV‹ñW‰uðÇL}G ÿvÇEü   èO´ ‹F‹=8cG …ÀYt…ÿtPÿ×ƒf ‹F…Àt…ÿtPÿ×ƒf ‹Mô_^d‰    ÉÃ2ÀÂ V‹ñè“ÿÿÿöD$tVèü³ Y‹Æ^Â Ã°ÃV‹ñè   öD$tVèÜ³ Y‹Æ^Â ¸3èF è‘h QV‹ñ‰uðÇ}G ÇEü   èøÿÿ€eü N0Ç}G è}í ƒMüÿ‹Îèÿÿÿ‹Mô^d‰    ÉÃ¸RèF èDh QQSV‹ñW‰uðè,  ~03Û‹Ï‰]üˆž¨   ÇÜ|G è¿   ƒø…   ‹h†I ;Ëu)jèRi Y‹È‰Mì;ËÆEütèÛýÿÿë3À‹Èˆ]ü‰h†I 9Yu ‹E   Pÿuÿuÿuÿuèì ‹h†I ‹Ù;ût‹ÏèÃì S‹Ïè{   hl†I ÿaG Æ†¨   ë‹E‹Ï   PÿuÿuÿuÿuèÅë ‹E‹Mô‰F,‹Æ_^[d‰    ÉÂ U‹ìƒìƒeô W3À}ø«EüÇEü   PEôPj(j èçê ‹EøƒÄ_ÉÃ‹D$‹P‰Q‹P‰Q‹@P‰AÿaG Â ¸yèF èÿf ƒìSV‹ñ‰uðèAýÿÿ3ÛN0‰]üèÑüÿÿÆEü‰^D‰^H‰^L‰^P‰^T‰^\‰^`‰^d‰^h‰^l‰^p‰^tÇFx   Ç†€      ÿ˜dG ‰ž   j0‰†„   ‰žˆ   ‰ž”   ˆž˜   èÑg Y‹È‰Mì;ËÆEütè½üÿÿë3À‰†œ   EäP‰ž    Ç}G ÿaG …À•À:Ãˆ†˜   t‹Eä‰†   ‹Eè‰†”   ëÇ†   è  ‰ž”   ‹Mô‹Æ^[d‰    ÉÃV‹ñè   öD$tVè.± Y‹Æ^Â ÇÜ|G éGýÿÿƒÈÿÂ ‹A(…Àt‹L$‰°Â V‹ñè   öD$tVèï° Y‹Æ^Â ÇÌfG éýÿÿ¸ŒèF è™e QVW‹ù‰}ðƒÿƒeü wj ‹ÎÇF˜fG ÇFfG è  ‹Mô‹ÇÇŒfG _^d‰    ÉÃ¸ èF èPe QSUVW‹ñƒd$ ‹-8cG ÇD$   ~D$(‹ÏPèù  ‹Gj h€   jj jh   @Pÿ$cG ‹Ø‹;Ãtƒøÿt
-…ítPÿÕƒÿ‰ƒ>ÿuƒ|$hô  ÿübG ÿD$ë¢ƒ>ÿ•ÀƒL$ÿL$(¶ðèòÿÿ‹L$‹Æ_^][d‰    ÉÂ Vj ÿt$‹ñÇF˜fG ÇFfG è±  ÇŒfG ÆF‹Æ^Â €a ÃV‹ñ€~ tVèÒóÿÿY‹ÎèÀñÿÿ^Ã¸´èF èUd QV‹ñ‰uðƒeü Nè¡ñÿÿ‹ƒùÿt¡8cG …ÀtQÿÐƒÿ‹Mô^d‰    ÉÃ¸ßèF èd ì\  SV… ýÿÿW3ÛP‹ñh  ‰]ìÿÀaG E¨NP‰Mðè÷   ‹@˜ûÿÿQSP… ýÿÿPÿaG M¨è"ñÿÿ…˜ûÿÿSPMÐÇEÜ˜fG ÇEäfG èBðÿÿ¿ŒfG ‰}Ð8^(ÇEü   t`E¨MÐPè˜   ÿp‹5aG … ýÿÿPÿÖM¨èÊðÿÿ‹MðE¨SPè   ÿp… ýÿÿPÿÖM¨è©ðÿÿÿuàÿŒcG … ýÿÿPÿœcG ‰Eà‹uEÐSP‹ÎÇF˜fG ÇFfG è8  ‰>ÇEì   MÐˆ]üè_ðÿÿ‹Mô‹Æ_^[d‰    ÉÂ U‹ìƒì,VWEÔ3ÿ‹ñP‰}üè]   ‹@;Çt	Pÿ˜cG ‹øMÔèðÿÿ¡üfG ‹ÎPEüjPÇEü.   è  ‹üfG ;Át;Çr+ÇjPëjQ‹MWVè  ‹E_^ÉÂ ¸éF ènb ƒìLSVW‹=üfG j‰Mð^3ÛVh`ªH MÐ‰]ìèæîÿÿ‹MðWP‰uüè’  MÐ‹øˆ]üèŽïÿÿ‹MðE¨SPèñ   ;=üfG ÇEü   t&9]¸tÿu¸ÿ˜cG ;ør‹MGVWSÿuðèy  ‰uìë‹ME¨VPèì  ‰uìM¨ˆ]üè1ïÿÿ‹Mô‹E_^[d‰    ÉÂ U‹ìƒì,SVEÔW3Û‹ñP‰]üè-ÿÿÿ‹@‹=˜cG ;ÃtPÿ×‹ØMÔèêîÿÿ¡üfG ‹ÎPEüjPÇEü.   è^  ‹üfG ;Át;Ãr€} t@jQë‹F…ÀtPÿ×jÿ5üfG ‹MPVèÂ  ‹E_^[ÉÂ ¸8éF è'a ƒì@SV‹ñ3ÛW‰uð‰]ìèý   „Àtej¿`ªH [MÐSWè™íÿÿƒeü jP‹Îè  ƒMüÿMÐ‹ðè?îÿÿ;5üfG t&SWMÐèkíÿÿ‹MðFVP‰]üèØ  ƒMüÿMÐ‹ðèîÿÿSVj ÿuðëx‹Îè¼   ‹øƒÿÿ‰}ðujSë;ûju‹Ff‹@f-: f÷ØÀ$þ@@PSëC[M´Sh`ªH èíÿÿWP‹ÎÇEü   èn  ƒMüÿM´‹øè§íÿÿŠE„Àu+}ðöØÀS÷Ð#EðWPV‹Mè°   ‹Mô‹E_^[d‰    ÉÂ V‹ñ‹F…Àt!Pÿ˜cG ƒør‹Ffƒ8\ufƒx\ujX^Ã3À^ÃVW3ÿ‹ñWhªH jWè<  …ÀujXëMWhªH jW‹Îè#  …ÀujëåWhø©H jW‹Îè  …ÀujëÍWhhªH jW‹Îèó  …Àt·3À9~•ÀH_^Ã¸TéF èo_ ƒì ƒ} V‹ñ‰uðtÇFgG ÇFgG j ‹Îèè   ‹U‹E‹Mƒeü R‰FPEÔP‰V‰N Ç gG è,  P‹ÎÆEüèè  €eü MÔèiìÿÿ‹Mô‹Æ^d‰    ÉÂ éSìÿÿƒ|$ VW‹|$‹ñt%…ÿÇFgG ÇFgG u3Àë
-‹G‹@D8‹ ‰F$j W‹ÎèÚ   ‹G‰F‹G‰F‹G ‰F Ç gG ‹Æ_^Â V‹ñè–ÿÿÿöD$tVè¼© Y‹Æ^Â V‹ñ‹…Ét¡8cG …ÀtQÿÐƒ& ^Ã¸véF èW^ Qƒ} V‹ñW‰uðtÇF°fG ÇF¨fG ‹NF‹yøÿ@cG ‰ƒeü ƒf jÆEüèg_ ‰FÇF   Ç¤fG ‹FY‹@ÿt0ÿDcG ‹MôÇ fG ‹Æ_^d‰    ÉÂ ¸–éF èÒ] Qƒ} SV‹ñW‰uðtÇF°fG ÇF¨fG ‹F^‹xûÿ@cG ‰ƒeü ƒf jÆEü_Wèß^ ‰F‰~Ç¤fG ‹F‹=DcG Y‹@ÿt0ÿ×‹EÇ fG ÿpÿ˜cG P‹EÿpÿcG ‰F‹‹@ÿt0ÿ×‹Mô‹Æ_^[d‰    ÉÂ V‹ñW‹|$‹F;Gt!…ÀtPÿŒcG ÿwÿ˜cG PÿwÿcG ‰F‹Æ_^Â U‹ìQƒeü V‹ñ‹F…ÀtPÿ˜cG ‹U;üfG u‹Më‹MW<;ø_v+Á‹Ð‹FjH‹MPRè   ‹E^ÉÂ ¸¶éF è™\ Qƒ} V‹ñW‰uðtÇF°fG ÇF¨fG ‹NF‹yøÿ@cG ‰ÿuƒeü ÿuÿcG ‰FjÆEüèž] ‰FÇF   Ç¤fG ‹FY‹@ÿt0ÿDcG ‹MôÇ fG ‹Æ_^d‰    ÉÂ U‹ìVW‹ùƒ tI‹G…ÀtPÿ˜cG ‹M‹üfG ;Êt;Ás‹È;Mr2+M‹ñxÿu‹GÿupPè4  ƒÄ…ÀtNyä¡üfG _^]Â ‹Æëö‹ÂëòVW‹ùƒ t@‹t$;5üfG u‹G…ÀtPÿ˜cG pÿ…ö|‹G‹L$j jpPè   ;üfG uNyá¡üfG _^Â ‹Æë÷U‹ìQSVW‹ùƒ tK‹G…Àu!Eüë
-Pÿ˜cG ‰Eü‹E‹]‹ðÃ;Eüw&‰E‹GSÿupPèx  ƒÄ…ÀtFÿE‹E;EüvÝ¡üfG _^[ÉÂ ‹ÆëõSV‹ñ3ÛW9^t;‹F‹|$;Ãt	Pÿ˜cG ‹Ø;û}#‹F‹L$j jxPè^ÿÿÿ;üfG uGëÝ‹Çë¡üfG _^[Â U‹ìQQS‹]W‹ù3É;Ùu3À9O•ÀéÞ   9OuƒÈÿéÑ   f9Ct
-f‹@@f…Òuö+ÃVÑøH‰Eø‹ð‹G+u;Áu3ÀëPÿ˜cG ‹M+Á‰E‹E;Es‰E‹E;ðs‹ÆP‹ECP‹GHPèu   ƒÄ‰Eü…Àua‹E+Æƒøÿ‰Eüu‹Eð‹EøHÿ;ñrEfƒ|Cþ ë7ƒøu8‹G…ÀtPÿ˜cG ‹M‹UÊH;Èr‹G…ÀtPÿ˜cG ‹Ofƒ|Aþ uƒeü ‹Eü^_[ÉÂ U‹ìSVWè¬   ƒøuÿuÿuÿuÿuPh   ÿ aG é€   ‹u‹= cG 3Û9]u‰]ë+D6ƒÀ$üè‡` ‹ÄSL6SQPV‰EÿuˆSSÿ×‹E‰E9]t(D6ƒÀ$üèW` ‹ÄSL6SQPV‰EÿuˆSSÿ×‹]VSVÿujh   ÿaG eôHH_^[]ÃU‹ìì  €=0HI  u3…ìþÿÿÇ…ìþÿÿ  Pÿ$aG …Àt3Àƒ½üþÿÿ”À£,HI Æ0HI ¡,HI ÉÃ‹Á‹L$‰ˆ  ‹L$‰ˆ  Ç gG Â V‹ñè   öD$tVè–£ Y‹Æ^Â ÇgG Ã¸ÈéF èDX V‹ñÿuFPÿÀbG ‹†  ‰Ej ƒeü jVhÓñ@ Mÿuh  è    ƒøÿ^t	…ÀtjXë3À‹Môd‰    ÉÂ Ã¸ìéF èãW ƒì\öEV‹ñu‹€x u€x t‹Eéô   ‹jÿuMèÿp èºÚÿÿƒeü öE…”   ¸xªH ÇEÀ(fG ‹ÈÇEà fG …Éu¸ØGI SWMj QPMÀè#Oÿÿ‹EÈ»PfG …ÀÆEü‰]t‰E‹f‹AHPè7  ‹‹øE˜Pè…   ‹@ÆEü…Àu‹ÃjMèÿuWPè€ÜÿÿM˜ÆEüèó5ÿÿ€eü MÀèç5ÿÿ_[‹f‹AHPè3  ÿuˆE‹Mèÿu‹p ÿuÿuèÚÿÿPVÿ”dG ƒMüÿMè‹ðèÛÚÿÿ‹Æ‹Mô^d‰    ÉÂ U‹ìQf‹AHƒeü Pÿuè   ‹EÉÂ ¸XêF è˜V ìà   ƒeè SVW‰MìEò¿(fG ¾ fG j PM´‰}´‰uÔèMÿÿ·Ej[PE´hÌªH P‰]üèú  E´hÀªH P…ÿÿÿPè‡  ƒÄ‰E‹Mì…dÿÿÿPÆEüèz  j <ÿÿÿj Q‹ÈÆEüè’PÿÿÿuMŒÆEüQ‹Èè  <ÿÿÿÆEüèÄ4ÿÿdÿÿÿÆEüèµ4ÿÿÿÿÿÆEüè¦4ÿÿƒì(¸xªH ‹Ì‹Ð…Ò‰eì‰9‰q u¸ØGI Uj RPèVMÿÿƒì(Eñ‹Ì‰eÜSPh¬ªH ÆEü	è³=ÿÿƒì(Eó‹Ì‰eäSPh”ªH ÆEü
-è˜=ÿÿƒì(EŒ‹Ì‰eàSPÆEüè›‰ÿÿÿuÆEüèZ Ä¤   ‰]èMŒˆ]üè4ÿÿ€eü M´è4ÿÿ‹Mô‹E_^d‰    [ÉÂ ¸¥êF èU ìØ   SV3ÛW‹ñEóSPM¼ÇE¼(fG ÇEÜ fG èKÿÿ·EPE¼hÌªH P‰]üèz
-  E¼hÀªH P…ÿÿÿPè  ƒÄ‹ø…lÿÿÿ‹ÎPÆEüèü   SDÿÿÿSQ‹ÈÆEüèOÿÿM”WQ‹ÈÆEüèŸ	  DÿÿÿÆEüèJ3ÿÿlÿÿÿÆEüè;3ÿÿÿÿÿÆEüè,3ÿÿjEƒì(‹Ì‰eèjPhÜªH èc<ÿÿƒì(Eò‹Ì‰eäjPh”ªH ÆEüèG<ÿÿƒì(E”‹Ì‰eìjPÆEü	èIˆÿÿÆEüè ƒÄ|M”‹ðˆ]üèÆ2ÿÿƒMüÿM¼èº2ÿÿ‹Môf‹Æ_^d‰    [ÉÂ U‹ìQEV‹qtPEüƒÁpPè–  3À9uü^•ÀÉÂ U‹ìQƒeü V‹uÁ  j Q‹ÎÇ(fG ÇF  fG èžJÿÿ‹Æ^ÉÂ ¸ÀêF èoS ƒìTS3ÛEóSPMÈÇEÈ(fG ÇEè fG è÷Iÿÿ‹E‰]üHH„  -  t6H…  ‹EHt
-ƒèeuèAn jÿuÿ„dG ƒMüÿMÈèã1ÿÿjXéü   W‹}h4HI Wèûo ‹EY£8HI Y‹€  ‰EE SPMÆEüèØ   ‹@;Ãu¸PfG VPWÿˆdG M è‹1ÿÿÿ54HI ¾  ˆ]üVWèvp ¡8HI VƒÀWPèOp ‹5ŒdG ƒÄjWÿÖjfW‰EÿÖ‹8HI ^S9™  tÿuÿdG ÿ54HI h°  jfëPÿdG ÿ54HI h  jWè%p ƒMüÿƒÄMÈèÿ0ÿÿjX_ëÿ54HI ÿÀ`G ƒMüÿMÈèá0ÿÿ3À‹Mô[d‰    ÉÂ ¸!ëF èîQ ì¨   SV‹ñ…tÿÿÿW3Û‹P‰]ìèo  jEó_MÄSP‰}üÇEÄ(fG ÇEä fG èXHÿÿ8]ÆEüu=9]€t8‹…|ÿÿÿ;Ãu¸PfG ‹SSPEœh_  Pè«  PMÄÆEüèÄ0ÿÿÆEüMœë$‹Eœh  Pèþ   PMÄÆEüèž0ÿÿÆEüMœè0ÿÿ9]Ðt5EœSP‹ÎèÎ  SPMÄÆEüèÿcÿÿ;0fG MœÆEü”Eèã/ÿÿ8]t_…LÿÿÿWP‹Îè–  PEœhp£H PÆEüèÉÑÿÿƒÄÿ50fG ‹ÈƒÀÆEü÷ÙÉS#ÈQMÈè¼ÿÿMœÆEüèŽ/ÿÿLÿÿÿÆEüè/ÿÿ‹uEÄSP‹ÎÇ(fG ÇF  fG è©Gÿÿ‰}ìMÄÆEüèT/ÿÿtÿÿÿˆ]üèF/ÿÿ‹Mô‹Æ_^[d‰    ÉÂ ¸¸ëF èQP ì  SV3ÛW‰MìEã¿(fG ¾ fG SPM„‰]Ü‰}„‰u¤èÌFÿÿ‹EìÇEü   ·@HPE„hÌªH Pè¯  ƒÄEë\ÿÿÿ‰½\ÿÿÿSP‰µ|ÿÿÿèFÿÿÿu…\ÿÿÿÆEühðªH Pèx  E„hÀªH P…äþÿÿPè
-  ƒÄ‰Eä‹Mì…”þÿÿPÆEüèøûÿÿSÿÿÿSQ‹ÈÆEüèJÿÿÿuä4ÿÿÿÆEüQ‹Èè–  ÿÿÿÆEü	èA.ÿÿ”þÿÿÆEüè2.ÿÿäþÿÿÆEüè#.ÿÿàýÿÿèÝ EâSPM¬ÆEü
-‰}¬‰uÌèÒEÿÿSEóƒì(ÆEü‹Ì‰eäjPhì¡H è57ÿÿƒì(…4ÿÿÿ‹Ì‰eØjPÆEüè4ƒÿÿàýÿÿÆEüèÚ“ :Ãt{ƒì(Eó‹Ì‰eØjPhÜGI è–Hÿÿƒì(…\ÿÿÿ‹Ì‰eäjPÆEüèï‚ÿÿƒì(E„‹Ì‰eÔjPÆEüèØ‚ÿÿ…¼þÿÿàýÿÿPÆEüèož PM¬ÆEüèÅ-ÿÿ¼þÿÿÆEüè<-ÿÿ9]¸u‹Eìÿp f‹@HPE¬ÿuPèI ƒÄ‹ME¬SP‰9‰q èQEÿÿÇEÜ   M¬ÆEü
-èø,ÿÿàýÿÿÆEüè”’ 4ÿÿÿÆEüèÚ,ÿÿ\ÿÿÿÆEüèË,ÿÿM„ˆ]üèÀ,ÿÿ‹Mô‹E_^d‰    [ÉÂ ¸ëëF èÊM ƒìXSVWEœ‰eðÿu3ÛP‰]ìèUýÿÿ9]¨j_‰}üu)‹uESPhØGI ‹ÎÇ(fG ÇF  fG è5Eÿÿ‰}ìéý   ESPMÄÇEÄ(fG ÇEä fG è
-Dÿÿ‹UÆEü;Óu#9]…œ   9]…“   EœMÄPèŠ,ÿÿé‚   ‹M;Ëu%9]u‹E¤;Ãu¸PfG RPEÄPè¹  ƒÄëZ;ËtV9]u‹E¤;Ãu¸PfG QRPEÄPè“  ƒÄë4;Ët09]t+‹E¤;Ãu¸PfG ÿuQRPEÄPèj  ƒÄë¸–ø@ Ãj3Û_‹uEÄSP‹ÎÇEü   Ç(fG ÇF  fG è¬CÿÿMÄ‰}ìÆEüèW+ÿÿMœˆ]üèL+ÿÿ‹Mô‹Æ_^d‰    [ÉÂ U‹ìQÿuƒeü è   ‹EÉÂ ¸ìF è@L ƒì0ƒeð S‹ÙVWƒ{Du'‹uÃ¨  j S‹ÎÇ(fG ÇF  fG è,Cÿÿ‹Æé•   ƒì(ƒH  ‰eì‹Ì¿(fG ¾ fG j P‰9‰q è CÿÿEÄPèQ> ƒÄ,3ÀÇEü   9EÐu-‹MÃ¨  PS‰9‰q èÑBÿÿ€eü MÄÇEð   èx*ÿÿ‹Eë)‹]PEÄ‹ËP‰;‰s è¥Bÿÿ€eü MÄÇEð   èL*ÿÿ‹Ã‹Mô_^d‰    [ÉÂ U‹ìƒì3ÀÆEäI8E‰EüÆEånÆEæsÆEçtÆEèaÆEélÆEêlÆEëSÆEìhÆEíiÆEîeÆEïlÆEðdˆEñtÆEñ ÆEòWÆEóiÆEôzÆEõaÆEörÆE÷dˆEø‹MEjPEäPè¸Dÿÿ‹EÉÂ ¸CìF èØJ ƒì0ƒeð SVWj »(fG ¿ fG QMÄ‰]Ä‰}äèÑAÿÿjXj\‰Eüƒì(‹Ì‰eìPÿuèÜ~ÿÿMÄèN   ‹uEÄj P‹Î‰‰~ è›AÿÿÇEð   €eü MÄèB)ÿÿ‹Mô‹Æ_^d‰    [ÉÂ ‹L$D$Pÿt$èÜ   Ã¸`ìF è:J ƒì,SV‹ñ3Û9]‰]üt`9^uEPèm)ÿÿëPSMÿu0èrÿÿˆEó‹FH‹ÎPÿu0èrÿÿ8]óuI:Ãuÿu0Njèð\ÿÿÿ50fG E÷ØÀM#ÁSPNèµÿÿƒMüÿMè•(ÿÿ‹Mô^[d‰    ÉÂ, :ÃtÄÿ50fG EÈMjPèæCÿÿÿ50fG ‹ÈƒÀÆEü÷ÙÉS#ÈQNè¸´ÿÿMÈˆ]üèC(ÿÿë ¸tìF è_I ƒì ‹Eƒeì SVW‹}‰Mä‰Eàfƒ? „Ð  fƒ?%…¼  j[ûf‹f=% „ª  3öf;Æ‰uðtHf=# u]ìë-f=* uƒE‹E‹@ü‰Eðëf=- tf=+ tf=0 tf=  uf‹ûf;Æu½9uðu!WèZ Y‰Eðf‹f…ÀtPèPY …ÀYtûëé3Ûfƒ?.uGGfƒ?*u0ƒEG‹EG‹Xüƒeè jhä©H Wè X ƒÄ…Àu,ƒÇÇEè   ëMWè²Y Y‹Øf‹f…ÀtËPèðX …ÀYtÀGGëé·ƒèFt#ƒètHHtƒètƒèuÇEè   ëÇEè   GG·Eè¹c  ;Á€   „®   ƒèC„¥   jY+Á„ƒ   +Á„’   +Átw-Ðÿ  „ƒ   +Á„„   ·ƒøi  „7  ƒèG„ø   ƒè„%  ƒè„  H„ß   H„   H„Ñ   é  -s  t6-Ðÿ  t&ƒèt
-ƒètƒèuœƒE‹E‹@ü…Àt Pè‡G Yë#ƒEj^ë,ƒE‹E‹@ü…Àuj^ëPÿ<cG ‹ðƒþ}j^…ö„Pÿÿÿ…Ût;ó|‹ó;uð–   ‹uðéŽ   ƒ>  9Eð~‹EðÀƒÀ$üè6N ƒE‹ô‹EQQƒÃÝ@øÝ$SÿuðhØ©H Vè}V VèñF ƒÄë2ƒE¾€   ëƒènt2Ht#Htƒètƒètë$ƒEj ^‹EðÃ;Æ|‹ðëöEêtæƒEëäƒEuìëÿEìGGé&ýÿÿÿuì‹MäEÔPèÁ.ÿÿ‹ƒeü Æ@èÇ>ÿÿÿuà‹ ÿuPèƒU ƒMüÿƒÄMÔè§/ÿÿ‹MôeÈd‰    _^[ÉÂ U‹ìQVW‹}‹ñWè+   ‹v‰E;Ætf‹f;HrEë‰uüEü‹‹E_^‰ÉÂ ‹A‹$HI ‹H;ÊtV‹t$f‹6f9qs‹Ië‹Á‹	;Êuí^Â ¸§ìF è«E ƒìTƒeð SVWj »(fG ÿu¿ fG MÈ‰]È‰}èè¢<ÿÿj^ÿu‰uüèžE YPMÌÿuèÛ   VPM èI   ‹uE j P‹ÎÆEü‰‰~ èd<ÿÿÇEð   M ÆEüè$ÿÿ€eü MÈèÿ#ÿÿ‹Mô‹Æ_^[d‰    ÉÃ¸¼ìF èE QSV3Û‹ñ9]W‰uðtÇHfG ÇF @fG ‹‹xþÿ@cG ‰‹E~S‹ÏŠ ‰]üˆè]>ÿÿÿ50fG ‹ÏSÿuè.Xÿÿ‰^‰^‰^‹F ‹@ÿt0 ÿDcG ‹Mô‹Æ_^[d‰    ÉÂ ¡0fG S‹\$V‹ñW+F;Ãwè¹ …Ûv8‹ûj ~‹ÎWèkaÿÿ„Àt%‹F‹V‹L$Bf‹f‰@@AAKuó‹F‰~fƒ$x ‹Æ_^[Â ö©‹I u€©‹I é    hö@ è×? YÃV‹ñhh«H ÿ(aG ‰‹Æ^Ã‹…ÀtPÿ,aG Ã¸ÈìF èãC ƒì‹SV3öW;Æ‰eð‰uü
+	uint64_t now;
+
+	static const uint64_t DIFF_TO_UNIXTIME = 11644473600000L;
+
+	GetSystemTimeAsFileTime(&ft);
+
+	now = (LONGLONG)ft.dwLowDateTime + ((LONGLONG)(ft.dwHighDateTime) << 32L);
+
+	return (now / 10000L) - DIFF_TO_UNIXTIME;
+#endif
+
+}
+
+/*
+ * Get the next empty Payload.  This populates the payload with the next sequence number and current timestamp
+ */
+void get_next_payload(org_eclipse_tahu_protobuf_Payload *payload) {
+	// Initialize payload
+	DEBUG_PRINT(("Current Sequence Number: %d\n", seq));
+	payload->has_timestamp = true;
+	payload->timestamp = get_current_timestamp();
+	payload->metrics_count = 0;
+	payload->metrics = NULL;
+	payload->has_seq = true;
+	payload->seq = seq;
+	payload->uuid = NULL;
+	payload->body = NULL;
+	payload->extensions = NULL;
+
+	// Increment/wrap the sequence number
+	if (seq == 255) {
+		seq = 0;
+	} else {
+		seq++;
+	}
+}
+
+/*
+ * Initialize a Dataset with the values passed in
+ */
+void init_dataset(org_eclipse_tahu_protobuf_Payload_DataSet *dataset,
+			uint64_t num_of_rows,
+			uint64_t num_of_columns,
+			uint32_t *datatypes,
+			const char **column_keys,
+			org_eclipse_tahu_protobuf_Payload_DataSet_Row *row_data) {
+
+	int i,j;
+	// Set the number of columns
+	dataset->has_num_of_columns = true;
+	dataset->num_of_columns = num_of_columns;
+	dataset->columns_count = num_of_columns;
+
+	// Set up the column headers
+	dataset->columns = (char **) calloc(num_of_columns, sizeof(char*));
+
+	for (i=0; i<num_of_columns; i++) {
+		fprintf(stdout, "column_keys[i]: %s\n", column_keys[i]);
+		dataset->columns[i] = (char *)malloc((strlen(column_keys[i])+1)*sizeof(char));
+		strcpy(dataset->columns[i], column_keys[i]);
+	}
+
+	// Set the datatypes of the columns
+	dataset->types_count = num_of_columns;
+	dataset->types = datatypes;
+
+	// Set the rows
+	dataset->rows_count = num_of_rows;
+	dataset->rows = row_data;
+}
+
+/*
+ * Initialize a Metric with the values of the arguments passed in
+ */
+void init_metric(org_eclipse_tahu_protobuf_Payload_Metric *metric,
+			const char *name,
+			bool has_alias,
+			uint64_t alias,
+			uint64_t datatype,
+			bool is_historical,
+			bool is_transient,
+			bool is_null,
+			const void *value,
+			size_t size_of_value) {
+
+	if( name == NULL ) {
+		DEBUG_PRINT(("Name is null"));
+		metric->name = NULL;
+	} else {
+		metric->name = (char *)malloc((strlen(name)+1)*sizeof(char));
+		strcpy(metric->name, name);
+	}
+
+	metric->has_alias = has_alias;
+	if (has_alias) {
+		metric->alias = alias;
+	}
+	if( is_historical && !is_transient )  // JPL 04/04/17... only timestamp historical
+	{
+	  metric->has_timestamp = true;
+	  metric->timestamp = get_current_timestamp();
+	}
+	else
+	{
+	  metric->has_timestamp = false;
+	  metric->timestamp = 0; //get_current_timestamp();
+	}
+	metric->has_datatype = true;
+	metric->datatype = datatype;
+	metric->has_is_historical = is_historical;
+	if (is_historical) {
+		metric->is_historical = is_historical;
+	}
+	metric->has_is_transient = is_transient;
+	if (is_transient) {
+		metric->is_transient = is_transient;
+	}
+	metric->has_is_null = is_null;
+	if (is_null) {
+		metric->is_null = is_null;
+	}
+	metric->has_metadata = false;
+	metric->has_properties = false;
+
+	// Default dynamically allocated members to NULL
+	metric->value.string_value = NULL;
+
+	DEBUG_PRINT(("Setting datatype and value - value size is %d\n", size_of_value));
+	if (datatype == METRIC_DATA_TYPE_UNKNOWN) {
+		fprintf(stderr, "Can't create metric with unknown datatype!\n");
+	} else if (datatype == METRIC_DATA_TYPE_INT8) {
+		DEBUG_PRINT(("Setting datatype: %d, with value: %d\n", datatype, *((int8_t *)value)));
+		metric->which_value = org_eclipse_tahu_protobuf_Payload_Metric_int_value_tag;
+		metric->value.int_value = *((int8_t *)value);
+	} else if (datatype == METRIC_DATA_TYPE_INT16) {
+		DEBUG_PRINT(("Setting datatype: %d, with value: %d\n", datatype, *((int16_t *)value)));
+		metric->which_value = org_eclipse_tahu_protobuf_Payload_Metric_int_value_tag;
+		metric->value.int_value = *((int16_t *)value);
+	} else if (datatype == METRIC_DATA_TYPE_INT32) {
+		DEBUG_PRINT(("Setting datatype: %d, with value: %d\n", datatype, *((int32_t *)value)));
+		metric->which_value = org_eclipse_tahu_protobuf_Payload_Metric_int_value_tag;
+		metric->value.int_value = *((int32_t *)value);
+	} else if (datatype == METRIC_DATA_TYPE_INT64) {
+		DEBUG_PRINT(("Setting datatype: %d, with value: %d\n", datatype, *((int64_t *)value)));
+		metric->which_value = org_eclipse_tahu_protobuf_Payload_Metric_long_value_tag;
+		metric->value.long_value = *((int64_t *)value);
+	} else if (datatype == METRIC_DATA_TYPE_UINT8) {
+		DEBUG_PRINT(("Setting datatype: %d, with value: %u\n", datatype, *((uint8_t *)value)));
+		metric->which_value = org_eclipse_tahu_protobuf_Payload_Metric_int_value_tag;
+		metric->value.int_value = *((uint8_t *)value);
+	} else if (datatype == METRIC_DATA_TYPE_UINT16) {
+		DEBUG_PRINT(("Setting datatype: %d, with value: %u\n", datatype, *((uint16_t *)value)));
+		metric->which_value = org_eclipse_tahu_protobuf_Payload_Metric_int_value_tag;
+		metric->value.int_value = *((uint16_t *)value);
+	} else if (datatype == METRIC_DATA_TYPE_UINT32) {
+		DEBUG_PRINT(("Setting datatype: %d, with value: %u\n", datatype, *((uint32_t *)value)));
+		metric->which_value = org_eclipse_tahu_protobuf_Payload_Metric_long_value_tag;
+		metric->value.long_value = *((uint32_t *)value);
+	} else if (datatype == METRIC_DATA_TYPE_UINT64) {
+		DEBUG_PRINT(("Setting datatype: %d, with value: %d\n", datatype, *((uint64_t *)value)));
+		metric->which_value = org_eclipse_tahu_protobuf_Payload_Metric_long_value_tag;
+		metric->value.long_value = *((uint64_t *)value);
+	} else if (datatype == METRIC_DATA_TYPE_DATETIME) {
+		DEBUG_PRINT(("Setting datatype: %d, with value: %d\n", datatype, *((uint64_t *)value)));
+		metric->which_value = org_eclipse_tahu_protobuf_Payload_Metric_long_value_tag;
+		metric->value.long_value = *((uint64_t *)value);
+	} else if (datatype == METRIC_DATA_TYPE_FLOAT) {
+		DEBUG_PRINT(("Setting datatype: %d, with value: %f\n", datatype, *((float *)value)));
+		metric->which_value = org_eclipse_tahu_protobuf_Payload_Metric_float_value_tag;
+		metric->value.float_value = *((float *)value);
+	} else if (datatype == METRIC_DATA_TYPE_DOUBLE) {
+		DEBUG_PRINT(("Setting datatype: %d, with value: %f\n", datatype, *((double *)value)));
+		metric->which_value = org_eclipse_tahu_protobuf_Payload_Metric_double_value_tag;
+		metric->value.double_value = *((double *)value);
+	} else if (datatype == METRIC_DATA_TYPE_BOOLEAN) {
+		DEBUG_PRINT(("Setting datatype: %d, with value: %d\n", datatype, *((bool *)value)));
+		metric->which_value = org_eclipse_tahu_protobuf_Payload_Metric_boolean_value_tag;
+		metric->value.boolean_value = *((bool *)value);
+	} else if (datatype == METRIC_DATA_TYPE_STRING || datatype == METRIC_DATA_TYPE_TEXT || datatype == METRIC_DATA_TYPE_UUID) {
+		DEBUG_PRINT(("Setting datatype: %d, with value: %s\n", datatype, (char *)value));
+		metric->which_value = org_eclipse_tahu_protobuf_Payload_Metric_string_value_tag;
+		metric->value.string_value = (char *)malloc(size_of_value*sizeof(char));
+		strcpy(metric->value.string_value, (char *)value);
+	} else if (datatype == METRIC_DATA_TYPE_BYTES) {
+		fprintf(stderr, "Datatype BYTES - Not yet supported\n");
+	} else if (datatype == METRIC_DATA_TYPE_DATASET) {
+		DEBUG_PRINT(("Setting datatype: %d, with value: %d\n", datatype, *((bool *)value)));
+		metric->which_value = org_eclipse_tahu_protobuf_Payload_Metric_dataset_value_tag;
+		metric->value.dataset_value = *((org_eclipse_tahu_protobuf_Payload_DataSet *)value);
+	} else if (datatype == METRIC_DATA_TYPE_FILE) {
+		fprintf(stderr, "Datatype FILE - Not yet supported\n");
+	} else if (datatype == METRIC_DATA_TYPE_TEMPLATE) {
+		DEBUG_PRINT(("Setting datatype: %d, with # of metrics: %d\n", datatype, ((org_eclipse_tahu_protobuf_Payload_Template *)value)->metrics_count));
+		metric->which_value = org_eclipse_tahu_protobuf_Payload_Metric_template_value_tag;
+		metric->value.template_value = *((org_eclipse_tahu_protobuf_Payload_Template *)value);
+	} else {
+		fprintf(stderr, "Unknown datatype %u\n", datatype);
+	}
+}
+
+/*
+ * Display a full Sparkplug Payload
+ */
+void print_payload(org_eclipse_tahu_protobuf_Payload *payload) {
+	int i=0;
+	fprintf(stdout, "Payload:  has_timestamp: %s\n", payload->has_timestamp ? "true" : "false");
+	if (payload->has_timestamp) {
+		fprintf(stdout, "Payload:  timestamp: %d\n", payload->timestamp);
+	}
+	fprintf(stdout, "Payload:  has_seq: %s\n", payload->has_seq ? "true" : "false");
+	if (payload->has_seq) {
+		fprintf(stdout, "Payload:  seq: %d\n", payload->seq);
+	}
+	fprintf(stdout, "Payload:  UUID: %s\n", payload->uuid);
+
+	fprintf(stdout, "Payload:  Size of metric array: %d\n", payload->metrics_count);
+
+	for (i=0; i<payload->metrics_count; i++) {
+		fprintf(stdout, "Payload:  Metric %d:  name: %s\n", i, payload->metrics[i].name);
+		fprintf(stdout, "Payload:  Metric %d:  has_alias: %s\n", i, payload->metrics[i].has_alias ? "true" : "false");
+		if (payload->metrics[i].has_alias) {
+			fprintf(stdout, "Payload:  Metric %d:  alias: %d\n", i, payload->metrics[i].alias);
+		}
+		fprintf(stdout, "Payload:  Metric %d:  has_timestamp: %s\n", i, payload->metrics[i].has_timestamp ? "true" : "false");
+		if (payload->metrics[i].has_timestamp) {
+			fprintf(stdout, "Payload:  Metric %d:  timestamp: %d\n", i, payload->metrics[i].timestamp);
+		}
+		fprintf(stdout, "Payload:  Metric %d:  has_datatype: %s\n", i, payload->metrics[i].has_datatype ? "true" : "false");
+		if (payload->metrics[i].has_datatype) {
+			fprintf(stdout, "Payload:  Metric %d:  datatype: %d\n", i, payload->metrics[i].datatype);
+		}
+		fprintf(stdout, "Payload:  Metric %d:  has_is_historical: %s\n", i, payload->metrics[i].has_is_historical ? "true" : "false");
+		if (payload->metrics[i].has_is_historical) {
+			fprintf(stdout, "Payload:  Metric %d:  is_historical: %s\n", i, payload->metrics[i].is_historical ? "true" : "false");
+		}
+		fprintf(stdout, "Payload:  Metric %d:  has_is_transient: %s\n", i, payload->metrics[i].has_is_transient ? "true" : "false");
+		if (payload->metrics[i].has_is_transient) {
+			fprintf(stdout, "Payload:  Metric %d:  is_transient: %s\n", i, payload->metrics[i].is_transient ? "true" : "false");
+		}
+		fprintf(stdout, "Payload:  Metric %d:  has_is_null: %s\n", i, payload->metrics[i].has_is_null ? "true" : "false");
+		if (payload->metrics[i].has_is_null) {
+			fprintf(stdout, "Payload:  Metric %d:  is_null: %s\n", i, payload->metrics[i].is_null ? "true" : "false");
+		}
+		fprintf(stdout, "Payload:  Metric %d:  has_metadata: %s\n", i, payload->metrics[i].has_metadata ? "true" : "false");
+		fprintf(stdout, "Payload:  Metric %d:  has_properties: %s\n", i, payload->metrics[i].has_properties ? "true" : "false");
+
+		if (payload->metrics[i].datatype == METRIC_DATA_TYPE_UNKNOWN) {
+			fprintf(stdout, "Payload:  Metric %d:  datatype: unknown datatype!\n", i);
+		} else if (payload->metrics[i].datatype == METRIC_DATA_TYPE_INT8 ||
+					payload->metrics[i].datatype == METRIC_DATA_TYPE_INT16 ||
+					payload->metrics[i].datatype == METRIC_DATA_TYPE_INT32 ||
+					payload->metrics[i].datatype == METRIC_DATA_TYPE_UINT8 ||
+					payload->metrics[i].datatype == METRIC_DATA_TYPE_UINT16) {
+			fprintf(stdout, "Payload:  Metric %d:  datatype: %d, with value: %d\n", i, payload->metrics[i].datatype, payload->metrics[i].value.int_value);
+		} else if (payload->metrics[i].datatype == METRIC_DATA_TYPE_UINT32 ||
+					payload->metrics[i].datatype == METRIC_DATA_TYPE_INT64 ||
+					payload->metrics[i].datatype == METRIC_DATA_TYPE_UINT64 ||
+					payload->metrics[i].datatype == METRIC_DATA_TYPE_DATETIME) {
+			fprintf(stdout, "Payload:  Metric %d:  datatype: %d, with value: %d\n", i, payload->metrics[i].datatype, payload->metrics[i].value.long_value);
+		} else if (payload->metrics[i].datatype == METRIC_DATA_TYPE_FLOAT) {
+			fprintf(stdout, "Payload:  Metric %d:  datatype: %d, with value: %f\n", i, payload->metrics[i].datatype, payload->metrics[i].value.float_value);
+		} else if (payload->metrics[i].datatype == METRIC_DATA_TYPE_DOUBLE) {
+			fprintf(stdout, "Payload:  Metric %d:  datatype: %d, with value: %f\n", i, payload->metrics[i].datatype, payload->metrics[i].value.double_value);
+		} else if (payload->metrics[i].datatype == METRIC_DATA_TYPE_BOOLEAN) {
+			fprintf(stdout, "Payload:  Metric %d:  datatype: %d, with value: %d\n", i, payload->metrics[i].datatype, payload->metrics[i].value.boolean_value);
+		} else if (payload->metrics[i].datatype == METRIC_DATA_TYPE_STRING ||
+					payload->metrics[i].datatype == METRIC_DATA_TYPE_TEXT ||
+					payload->metrics[i].datatype == METRIC_DATA_TYPE_UUID) {
+			fprintf(stdout, "Payload:  Metric %d:  datatype: %d, with value: %s\n", i, payload->metrics[i].datatype, payload->metrics[i].value.string_value);
+		} else if (payload->metrics[i].datatype == METRIC_DATA_TYPE_BYTES) {
+			fprintf(stdout, "Payload:  Metric %d:  datatype BYTES - Not yet supported\n", i);
+		} else if (payload->metrics[i].datatype == METRIC_DATA_TYPE_DATASET) {
+			fprintf(stdout, "Payload:  Metric %d:  datatype DATASET - Not yet supported\n", i);
+		} else if (payload->metrics[i].datatype == METRIC_DATA_TYPE_FILE) {
+			fprintf(stdout, "Payload:  Metric %d:  datatype FILE - Not yet supported\n", i);
+		} else if (payload->metrics[i].datatype == METRIC_DATA_TYPE_TEMPLATE) {
+			//fprintf(stdout, "Payload:  Metric %d:  datatype: %d, with value: %d\n", i, payload->metrics[i].datatype, payload->metrics[i].value.long_value);
+			fprintf(stdout, "Payload:  Metric %d:  datatype: %d, with # of metrics: %d\n", i, payload->metrics[i].datatype, payload->metrics[i].value.template_value.metrics_count);
+		} else {
+			fprintf(stdout, "Payload:  Metric %d:  datatype: %d\n", i, payload->metrics[i].datatype);
+		}
+	}
+}
