@@ -99,10 +99,6 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
-SOURCE=..\..\middleware\rtps\librtps\cdr.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\utilities\clear_crc_eight.c
 # End Source File
 # Begin Source File
@@ -412,10 +408,6 @@ SOURCE=.\iec103driverthread.h
 # Begin Source File
 
 SOURCE=..\..\common\iec_item_type.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\middleware\rtps\librtps\memmgr.c
 # End Source File
 # Begin Source File
 
