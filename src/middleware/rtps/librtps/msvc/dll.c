@@ -38,6 +38,8 @@
 #include <windows.h>
 //#include "../../include/win32/implement.h"
 
+#include <memmgr.h>
+
 #ifdef _MSC_VER
 /* 
  * lpvReserved yields an unreferenced formal parameter;
@@ -61,6 +63,7 @@ extern "C"
     {
 
     case DLL_PROCESS_ATTACH:
+	  memmgr_init();
       result = pthread_win32_process_attach_np ();
       break;
 
@@ -87,4 +90,3 @@ extern "C"
   return (result);
 
 }				/* DllMain */
-

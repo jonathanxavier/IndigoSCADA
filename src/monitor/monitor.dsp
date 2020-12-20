@@ -92,10 +92,6 @@ LINK32=link.exe
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\middleware\rtps\librtps\cdr.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\utilities\clear_crc_eight.c
 # End Source File
 # Begin Source File

@@ -41,6 +41,8 @@ extern "C" {
 
 //#define ENABLE_MEM_CHECK
 
+#include <memmgr.h> //apa+++
+
 //////////////////////////////////////////////////////////////////////////////
 // Debug
 #define MAX_DEBUG_SECTIONS          100
@@ -49,8 +51,11 @@ extern "C" {
         ((LEVEL) > MAX_DEBUG_LEVEL) ? (void) 0 : \
         ((db_level = (LEVEL)) > debugLevels[SECTION]) ? (void) 0 : db_print
 #ifndef ENABLE_MEM_CHECK
-  #define MALLOC malloc
-  #define FREE   free
+  //#define MALLOC malloc //apa---
+  //#define FREE   free   //apa---
+	#define MALLOC memmgr_alloc
+	#define FREE memmgr_free
+
 #else
   #define MALLOC mem_check_malloc
   #define FREE   mem_check_free

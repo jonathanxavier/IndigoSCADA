@@ -129,6 +129,10 @@ SOURCE=.\librtps.def
 # End Source File
 # Begin Source File
 
+SOURCE=..\memmgr.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\objectEntry.c
 # End Source File
 # Begin Source File

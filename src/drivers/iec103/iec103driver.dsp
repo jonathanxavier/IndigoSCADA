@@ -415,6 +415,10 @@ SOURCE=..\..\common\iec_item_type.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\middleware\rtps\librtps\memmgr.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\moc_iec103driver.cpp
 # End Source File
 # Begin Source File

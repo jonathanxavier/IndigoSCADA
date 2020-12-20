@@ -34,4 +34,12 @@ EXPORTS
     StringToIPAddress                       @33    
     NtpTimeToStringMs                       @34
     NtpTimeToStringUs                       @35
+	CDR_put_ushort							@36
+	CDR_put_long							@37
+	CDR_put_ulong							@38
+	CDR_put_octet							@39
+	CDR_get_ushort							@40
+	CDR_get_long							@41
+	CDR_get_ulong							@42
+	CDR_get_octet							@43
     
