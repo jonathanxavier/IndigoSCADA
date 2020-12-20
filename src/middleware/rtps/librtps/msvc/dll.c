@@ -84,6 +84,7 @@ extern "C"
     case DLL_PROCESS_DETACH:
       (void) pthread_win32_thread_detach_np ();
       result = pthread_win32_process_detach_np ();
+	  memmgr_terminate();
       break;
     }
 

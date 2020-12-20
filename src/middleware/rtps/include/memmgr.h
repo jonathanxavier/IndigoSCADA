@@ -78,6 +78,8 @@ typedef unsigned long ulong;
 //
 void memmgr_init();
 
+void memmgr_terminate();
+
 // 'malloc' clone
 //
 void* memmgr_alloc(ulong nbytes);
@@ -91,5 +93,36 @@ void memmgr_free(void* ap);
 //
 void memmgr_print_stats();
 
+///////////apa+++ thread support///////////////////////////
+#if defined(WIN32)
+#define USE_WIN32_THREADS
+#elif (defined(ENABLE_THREADS) && defined(HAVE_PTHREAD_H) && \
+	   defined(HAVE_PTHREAD_CREATE))
+#define USE_PTHREADS
+#else
+
+#endif
+
+/** A generic lock structure for multithreaded builds. */
+typedef struct ins_mutex_t {
+#if defined(USE_WIN32_THREADS)
+  CRITICAL_SECTION mutex;
+#elif defined(USE_PTHREADS)
+  pthread_mutex_t mutex;
+#else
+  int _unused;
+#endif
+} ins_mutex_t;
+
+
+extern ins_mutex_t *ins_mutex_new(void);
+extern void ins_mutex_init(ins_mutex_t *m);
+extern void ins_mutex_acquire(ins_mutex_t *m);
+extern void ins_mutex_release(ins_mutex_t *m);
+extern void ins_mutex_free(ins_mutex_t *m);
+extern void ins_mutex_uninit(ins_mutex_t *m);
+extern unsigned long ins_get_thread_id(void);
+extern void ins_threads_init(void);
+///////////////////////////////////////////////////////////
 
 #endif // MEMMGR_H
