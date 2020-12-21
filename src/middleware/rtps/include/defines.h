@@ -53,8 +53,8 @@ extern "C" {
 #ifndef ENABLE_MEM_CHECK
   //#define MALLOC malloc //apa---
   //#define FREE   free   //apa---
-	#define MALLOC memmgr_alloc
-	#define FREE memmgr_free
+	#define MALLOC memmgr_alloc_mt
+	#define FREE memmgr_free_mt
 
 #else
   #define MALLOC mem_check_malloc

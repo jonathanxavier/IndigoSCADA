@@ -62,6 +62,7 @@
 // 1. This memory manager is *not thread safe*. Use it only
 //    for single thread/task applications.
 // 
+// apa: added support to multi thread
 
 #define DEBUG_MEMMGR_SUPPORT_STATS 1
 
@@ -84,9 +85,13 @@ void memmgr_terminate();
 //
 void* memmgr_alloc(ulong nbytes);
 
+void* memmgr_alloc_mt(ulong nbytes); //apa+++ multi thread support
+
 // 'free' clone
 //
 void memmgr_free(void* ap);
+
+void memmgr_free_mt(void* ap); //apa+++ multi thread support
 
 // Prints statistics about the current state of the memory
 // manager
@@ -115,14 +120,14 @@ typedef struct ins_mutex_t {
 } ins_mutex_t;
 
 
-extern ins_mutex_t *ins_mutex_new(void);
-extern void ins_mutex_init(ins_mutex_t *m);
-extern void ins_mutex_acquire(ins_mutex_t *m);
-extern void ins_mutex_release(ins_mutex_t *m);
-extern void ins_mutex_free(ins_mutex_t *m);
-extern void ins_mutex_uninit(ins_mutex_t *m);
-extern unsigned long ins_get_thread_id(void);
-extern void ins_threads_init(void);
+ins_mutex_t *ins_mutex_new(void);
+void ins_mutex_init(ins_mutex_t *m);
+void ins_mutex_acquire(ins_mutex_t *m);
+void ins_mutex_release(ins_mutex_t *m);
+void ins_mutex_free(ins_mutex_t *m);
+void ins_mutex_uninit(ins_mutex_t *m);
+unsigned long ins_get_thread_id(void);
+void ins_threads_init(void);
 ///////////////////////////////////////////////////////////
 
 #endif // MEMMGR_H

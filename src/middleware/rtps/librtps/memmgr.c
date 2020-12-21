@@ -7,8 +7,10 @@
 //----------------------------------------------------------------
 //apa modified for adding support to multi threads
 #include <stdio.h>
+#ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#endif
 #include <memmgr.h>
 
 /** mutex for thread to stop the threads hitting data at the same time. */
@@ -160,8 +162,6 @@ void* memmgr_alloc(ulong nbytes)
 
 	//printf("Alloc from pool = %x in thread ID = %d\n", pool, GetCurrentThreadId());
 
-	ins_mutex_acquire(mut);//lock apa+++
-
     // First alloc call, and no free list yet ? Use 'base' for an initial
     // denegerate block of size 0, which points to itself
     //
@@ -192,7 +192,6 @@ void* memmgr_alloc(ulong nbytes)
             }
 
             freep = prevp;
-			ins_mutex_release(mut); //unlock apa+++
             return (void*) (p + 1);
         }
         // Reached end of free list ?
@@ -206,14 +205,23 @@ void* memmgr_alloc(ulong nbytes)
         {
             if ((p = get_mem_from_pool(nquantas)) == 0)
             {
-                #ifdef DEBUG_MEMMGR_FATAL
+                //#ifdef DEBUG_MEMMGR_FATAL
                 printf("!! Memory allocation failed !!\n");
-                #endif
-				ins_mutex_release(mut); //unlock apa+++
+                //#endif
                 return 0;
             }
         }
     }
+}
+
+//apa+++
+void* memmgr_alloc_mt(ulong nbytes)
+{
+	void* p;
+	ins_mutex_acquire(mut);//lock
+	p = memmgr_alloc(nbytes);
+	ins_mutex_release(mut); //unlock
+	return p;
 }
 
 
@@ -228,8 +236,6 @@ void memmgr_free(void* ap)
     mem_header_t* p;
 
 	//printf("Free from pool = %x in thread ID = %d\n", pool, GetCurrentThreadId());
-
-	ins_mutex_acquire(mut);//lock apa+++
 
     // acquire pointer to block header
     block = ((mem_header_t*) ap) - 1;
@@ -273,8 +279,14 @@ void memmgr_free(void* ap)
     }
 
     freep = p;
+}
 
-	ins_mutex_release(mut); //unlock apa+++
+//apa+++
+void memmgr_free_mt(void* ap)
+{
+	ins_mutex_acquire(mut);//lock
+	memmgr_free(ap);
+	ins_mutex_release(mut); //unlock
 }
 
 /////////apa+++ thread support//////////////
