@@ -124,7 +124,7 @@ SOURCE=..\common\dispatch.h
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\common
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\common
 InputPath=..\common\dispatch.h
 InputName=dispatch
 
@@ -138,7 +138,7 @@ InputName=dispatch
 # PROP BASE Ignore_Default_Tool 1
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\common
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\common
 InputPath=..\common\dispatch.h
 InputName=dispatch
 
@@ -182,7 +182,7 @@ SOURCE=..\common\loggen.h
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\common
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\common
 InputPath=..\common\loggen.h
 InputName=loggen
 
@@ -196,7 +196,7 @@ InputName=loggen
 # PROP BASE Ignore_Default_Tool 1
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\common
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\common
 InputPath=..\common\loggen.h
 InputName=loggen
 
@@ -216,7 +216,7 @@ SOURCE=..\common\messages.h
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\common
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\common
 InputPath=..\common\messages.h
 InputName=messages
 
@@ -230,7 +230,7 @@ InputName=messages
 # PROP BASE Ignore_Default_Tool 1
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\common
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\common
 InputPath=..\common\messages.h
 InputName=messages
 
@@ -278,7 +278,7 @@ SOURCE=..\common\printrep.h
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\common
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\common
 InputPath=..\common\printrep.h
 InputName=printrep
 
@@ -292,7 +292,7 @@ InputName=printrep
 # PROP BASE Ignore_Default_Tool 1
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\common
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\common
 InputPath=..\common\printrep.h
 InputName=printrep
 
@@ -316,7 +316,7 @@ SOURCE=..\common\repgen.h
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\common
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\common
 InputPath=..\common\repgen.h
 InputName=repgen
 
@@ -330,7 +330,7 @@ InputName=repgen
 # PROP BASE Ignore_Default_Tool 1
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\common
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\common
 InputPath=..\common\repgen.h
 InputName=repgen
 
@@ -362,6 +362,10 @@ SOURCE=..\common\smplstat.cpp
 
 SOURCE=..\common\smplstat.h
 # End Source File
+# Begin Source File
+
+SOURCE=..\common\time64.c
+# End Source File
 # End Group
 # Begin Group "database"
 
@@ -378,7 +382,7 @@ SOURCE=..\database\dbase.h
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\database
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\database
 InputPath=..\database\dbase.h
 InputName=dbase
 
@@ -392,7 +396,7 @@ InputName=dbase
 # PROP BASE Ignore_Default_Tool 1
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\database
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\database
 InputPath=..\database\dbase.h
 InputName=dbase
 
@@ -476,7 +480,7 @@ SOURCE=..\database\qsfastdb.h
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - MOCing qsfastdb.h...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\database
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\database
 InputPath=..\database\qsfastdb.h
 InputName=qsfastdb
 
@@ -489,7 +493,7 @@ InputName=qsfastdb
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - MOCing qsfastdb.h...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\database
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\database
 InputPath=..\database\qsfastdb.h
 InputName=qsfastdb
 
@@ -513,7 +517,7 @@ SOURCE=..\database\qsgigabase.h
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\database
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\database
 InputPath=..\database\qsgigabase.h
 InputName=qsgigabase
 
@@ -527,7 +531,7 @@ InputName=qsgigabase
 # PROP BASE Ignore_Default_Tool 1
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\database
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\database
 InputPath=..\database\qsgigabase.h
 InputName=qsgigabase
 
@@ -559,7 +563,7 @@ SOURCE=..\database\results.h
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\database
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\database
 InputPath=..\database\results.h
 InputName=results
 
@@ -573,7 +577,7 @@ InputName=results
 # PROP BASE Ignore_Default_Tool 1
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\database
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\database
 InputPath=..\database\results.h
 InputName=results
 
@@ -604,7 +608,7 @@ SOURCE=..\UI\widgets\calendar.h
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\UI\widgets
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\UI\widgets
 InputPath=..\UI\widgets\calendar.h
 InputName=calendar
 
@@ -618,7 +622,7 @@ InputName=calendar
 # PROP BASE Ignore_Default_Tool 1
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\UI\widgets
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\UI\widgets
 InputPath=..\UI\widgets\calendar.h
 InputName=calendar
 
@@ -642,7 +646,7 @@ SOURCE=..\UI\widgets\datenav.h
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\UI\widgets
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\UI\widgets
 InputPath=..\UI\widgets\datenav.h
 InputName=datenav
 
@@ -656,7 +660,7 @@ InputName=datenav
 # PROP BASE Ignore_Default_Tool 1
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\UI\widgets
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\UI\widgets
 InputPath=..\UI\widgets\datenav.h
 InputName=datenav
 
@@ -680,7 +684,7 @@ SOURCE=..\UI\widgets\DateNavigator.h
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\UI\widgets
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\UI\widgets
 InputPath=..\UI\widgets\DateNavigator.h
 InputName=DateNavigator
 
@@ -694,7 +698,7 @@ InputName=DateNavigator
 # PROP BASE Ignore_Default_Tool 1
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\UI\widgets
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\UI\widgets
 InputPath=..\UI\widgets\DateNavigator.h
 InputName=DateNavigator
 
@@ -718,7 +722,7 @@ SOURCE=..\UI\widgets\DateNavigatorData.h
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\UI\widgets
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\UI\widgets
 InputPath=..\UI\widgets\DateNavigatorData.h
 InputName=DateNavigatorData
 
@@ -732,7 +736,7 @@ InputName=DateNavigatorData
 # PROP BASE Ignore_Default_Tool 1
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\UI\widgets
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\UI\widgets
 InputPath=..\UI\widgets\DateNavigatorData.h
 InputName=DateNavigatorData
 
@@ -756,7 +760,7 @@ SOURCE=..\UI\widgets\dateobj.h
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\UI\widgets
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\UI\widgets
 InputPath=..\UI\widgets\dateobj.h
 InputName=dateobj
 
@@ -770,7 +774,7 @@ InputName=dateobj
 # PROP BASE Ignore_Default_Tool 1
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\UI\widgets
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\UI\widgets
 InputPath=..\UI\widgets\dateobj.h
 InputName=dateobj
 
@@ -794,7 +798,7 @@ SOURCE=..\UI\widgets\datepopup.h
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\UI\widgets
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\UI\widgets
 InputPath=..\UI\widgets\datepopup.h
 InputName=datepopup
 
@@ -808,7 +812,7 @@ InputName=datepopup
 # PROP BASE Ignore_Default_Tool 1
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\UI\widgets
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\UI\widgets
 InputPath=..\UI\widgets\datepopup.h
 InputName=datepopup
 
@@ -832,7 +836,7 @@ SOURCE=..\UI\widgets\dclock.h
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\UI\widgets
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\UI\widgets
 InputPath=..\UI\widgets\dclock.h
 InputName=dclock
 
@@ -846,7 +850,7 @@ InputName=dclock
 # PROP BASE Ignore_Default_Tool 1
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\UI\widgets
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\UI\widgets
 InputPath=..\UI\widgets\dclock.h
 InputName=dclock
 
@@ -870,7 +874,7 @@ SOURCE=..\UI\widgets\helpwindow.h
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\UI\widgets
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\UI\widgets
 InputPath=..\UI\widgets\helpwindow.h
 InputName=helpwindow
 
@@ -884,7 +888,7 @@ InputName=helpwindow
 # PROP BASE Ignore_Default_Tool 1
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\UI\widgets
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\UI\widgets
 InputPath=..\UI\widgets\helpwindow.h
 InputName=helpwindow
 
@@ -944,7 +948,7 @@ SOURCE=..\UI\widgets\table.h
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\UI\widgets
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\UI\widgets
 InputPath=..\UI\widgets\table.h
 InputName=table
 
@@ -958,7 +962,7 @@ InputName=table
 # PROP BASE Ignore_Default_Tool 1
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\UI\widgets
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\UI\widgets
 InputPath=..\UI\widgets\table.h
 InputName=table
 
@@ -1007,7 +1011,7 @@ SOURCE=..\drivers\driver.h
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\drivers
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\drivers
 InputPath=..\drivers\driver.h
 InputName=driver
 
@@ -1021,7 +1025,7 @@ InputName=driver
 # PROP BASE Ignore_Default_Tool 1
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\drivers
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\drivers
 InputPath=..\drivers\driver.h
 InputName=driver
 
@@ -1053,7 +1057,7 @@ SOURCE=..\drivers\SerialConnect.h
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\drivers
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\drivers
 InputPath=..\drivers\SerialConnect.h
 InputName=SerialConnect
 
@@ -1067,7 +1071,7 @@ InputName=SerialConnect
 # PROP BASE Ignore_Default_Tool 1
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\indigoscada-code-279-trunk\indigoscada-code-279-trunk\src\drivers
+InputDir=\indigoscada-code-r385-trunk\indigoscada-code-r385-trunk\src\drivers
 InputPath=..\drivers\SerialConnect.h
 InputName=SerialConnect
 
