@@ -13,6 +13,7 @@
 #include "qsgigabase.h"
 #include "gigaclient.h"
 #include "realtimedb.h"
+#include "time64.h"
 
 /*
 *Function:event
@@ -103,11 +104,11 @@ QString  QSGigabase::GetIsoDateString(const QString &ns) // get the string value
 
 	int ms = timedate%1000;
 
-	time_t seconds = timedate/1000;
+	__int64 seconds = timedate/1000;
 
 	//Time stamp in database is UTC
 
-	if((ts = localtime((time_t*)(&seconds))) == NULL)
+	if((ts = localtime64((__int64*)(&seconds))) == NULL)
 	{
 		IT_IT("QSFastdb::GetIsoDateString");
 		IT_COMMENT("Error in localtime function");
