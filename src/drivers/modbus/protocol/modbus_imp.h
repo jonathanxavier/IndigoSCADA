@@ -117,7 +117,7 @@ class modbus_imp
 	int Start(void);
 	void LogMessage(int* error = 0, const char* name = NULL);
 	int Stop(void);
-	time_t epoch_from_cp56time2a(const struct cp56time2a* time);
+	int64_t epoch_from_cp56time2a(const struct cp56time2a* time);
 	int PollItems(void);
 	short rescale_value(double V, double Vmin, double Vmax, int* error);
 	double rescale_value_inv(double A, double Vmin, double Vmax, int* error);

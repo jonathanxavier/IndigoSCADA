@@ -19,6 +19,8 @@
 #include "results.h"
 #include "IndentedTrace.h"
 #include <sptypes.h>
+#include "stdint.h"
+#include "time64.h"
 //
 Results::GroupDict Results::Groups; // alarm group dictionary 
 SamplePointDictWrap Results::EnabledPoints; //<------crash on exit of Monitor applivation 17-05-2005 APA With STLPort no more crash
@@ -652,9 +654,9 @@ void Results::UpdateEnd(const QString &name)
 __int64 Epoch_in_millisec_from_cp56time2a(const struct cp56time2a* time)
 {
 	struct tm	t;
-	long epoch = 0;
+	int64_t epoch = 0;
 	int ms;
-	__int64 epoch_in_milliseconds = 0;
+	int64_t epoch_in_milliseconds = 0;
 	
 	memset(&t, 0x00, sizeof(struct tm));
 	
@@ -668,16 +670,16 @@ __int64 Epoch_in_millisec_from_cp56time2a(const struct cp56time2a* time)
 	t.tm_year = time->year + 100; //from <0..99> to <years from 1900>
 	t.tm_isdst = time->su;
 	
-	epoch = mktime(&t);
+	epoch = mktime64(&t);
 
 	if((epoch == -1) || (time->iv == 1))
 	{
 		epoch = 0;
 	}
 
-	epoch_in_milliseconds = (__int64)epoch;
+	epoch_in_milliseconds = epoch;
 
-	epoch_in_milliseconds = epoch_in_milliseconds*1000 + (__int64)ms; 
+	epoch_in_milliseconds = epoch_in_milliseconds*1000 + (int64_t)ms; 
 
 	return epoch_in_milliseconds;
 }
@@ -688,9 +690,9 @@ QString GetIsoDateString_from_epoch_in_millisec(__int64 epoch_in_millisec)
 	
 	int ms = epoch_in_millisec%1000;
 
-	time_t seconds = epoch_in_millisec/1000;
+	int64_t seconds = epoch_in_millisec/1000;
 
-	if((ts = localtime((time_t*)(&seconds))) == NULL)
+	if((ts = localtime64((int64_t*)(&seconds))) == NULL)
 	{
 		IT_IT("GetIsoDateString_from_epoch_in_millisec");
 		IT_COMMENT("Error in localtime function");

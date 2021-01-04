@@ -137,6 +137,10 @@ SOURCE=.\modbus_imp.cpp
 
 SOURCE=..\..\..\configurator\sqlite\sqlite3.c
 # End Source File
+# Begin Source File
+
+SOURCE=..\..\..\common\time64.c
+# End Source File
 # End Group
 # End Target
 # End Project

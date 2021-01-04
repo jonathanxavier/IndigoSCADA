@@ -17,8 +17,9 @@ Collect common helper routines here
 #include "common.h"
 #include "messages.h"
 #include "general_defines.h"
-#include <time.h>   //APA added for mktime()
 #include "IndentedTrace.h"
+#include "stdint.h"
+#include "time64.h"
 
 typedef std::map<QString,
 #ifdef UNIX 
@@ -485,7 +486,7 @@ DllDict Dlls; // dictionary of Dlls
 		t.tm_min = dt.time().minute();
 		t.tm_sec = dt.time().second();
 		t.tm_isdst = -1; //to force mktime to check for dst
-		time_t tempo_in_sec = mktime(&t);
+		int64_t tempo_in_sec = mktime64(&t);
 		
 		str.sprintf("%ld", tempo_in_sec); 
 
@@ -505,8 +506,8 @@ DllDict Dlls; // dictionary of Dlls
 		
 		QString str;
 		struct tm t;
-		time_t sec;
-		signed __int64 epoc;
+		int64_t sec;
+		int64_t epoc;
 		bool daylight_saving_time = 0;
 
 		t.tm_year = dt.date().year() > 1900 ? dt.date().year() - 1900 : dt.date().year();
@@ -517,7 +518,7 @@ DllDict Dlls; // dictionary of Dlls
 		t.tm_sec = dt.time().second();
 		t.tm_isdst = -1; //to force mktime to check for dst
 
-		sec = mktime(&t);
+		sec = mktime64(&t);
 
 		//daylight_saving_time = t.tm_isdst > 0 ? 1 : 0;
 
@@ -526,7 +527,7 @@ DllDict Dlls; // dictionary of Dlls
 		//	sec = sec - 3600; //apa tolgo un' ora se siamo in ora legale
 		//}
 
-		epoc =  (signed __int64)sec;
+		epoc =  sec;
 
 		epoc =  epoc*1000 + dt.time().msec();
 

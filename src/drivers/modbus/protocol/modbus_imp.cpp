@@ -16,6 +16,7 @@
 #include "modbus_db.h"
 #include "modbus_imp.h"
 #include "stdlib.h"
+#include "time64.h"
 
 #define MAX_KEYLEN 256
 #define MAX_COMMAND_SEND_TIME 60
@@ -458,6 +459,7 @@ void modbus_imp::LogMessage(int* error, const char* name)
 	*/
 }
 
+/*
 #include <time.h>
 #include <sys/timeb.h>
 
@@ -481,6 +483,80 @@ void modbus_imp::get_local_host_time(struct cp56time2a* time)
 
     return;
 }
+*/
+
+uint64_t getTimeInMs()
+{
+	FILETIME ft;
+	uint64_t now;
+
+	static const uint64_t DIFF_TO_UNIXTIME = 11644473600000i64;
+
+	GetSystemTimeAsFileTime(&ft);
+
+	now = (LONGLONG)ft.dwLowDateTime + ((LONGLONG)(ft.dwHighDateTime) << 32i64);
+
+	return (now / 10000i64) - DIFF_TO_UNIXTIME;
+}
+
+void modbus_imp::get_local_host_time(struct cp56time2a* time)
+{
+
+	struct tm	*ptm;
+	int64_t epoch_in_ms;
+	int64_t seconds;
+
+	epoch_in_ms = getTimeInMs();
+
+	seconds = epoch_in_ms/1000;
+
+	ptm = localtime64((int64_t*)(&seconds));
+		
+	time->hour = ptm->tm_hour;					//<0.23>
+	time->min = ptm->tm_min;					//<0..59>
+	time->msec = ptm->tm_sec*1000 + epoch_in_ms%1000; //<0.. 59999>
+	time->mday = ptm->tm_mday; //<1..31>
+	time->wday = (ptm->tm_wday == 0) ? ptm->tm_wday + 7 : ptm->tm_wday; //<1..7>
+	time->month = ptm->tm_mon + 1; //<1..12>
+	time->year = ptm->tm_year - 100; //<0.99>
+	time->iv = 0; //<0..1> Invalid: <0> is valid, <1> is invalid
+	//time->su = (u_char)tb.dstflag; //<0..1> SUmmer time: <0> is standard time, <1> is summer time
+	time->su = 0; //apa fix me
+
+    return;
+}
+
+void modbus_imp::get_utc_host_time(struct cp56time2a* time)
+{
+	struct tm	*ptm;
+	int64_t epoch_in_ms;
+	int64_t seconds;
+
+	IT_IT("get_utc_host_time");
+
+	epoch_in_ms = getTimeInMs();
+
+	seconds = epoch_in_ms/1000;
+
+	ptm = gmtime64((int64_t*)(&seconds));
+		
+	time->hour = ptm->tm_hour;					//<0..23>
+	time->min = ptm->tm_min;					//<0..59>
+	time->msec = ptm->tm_sec*1000 + epoch_in_ms%1000; //<0..59999>
+	time->mday = ptm->tm_mday; //<1..31>
+	time->wday = (ptm->tm_wday == 0) ? ptm->tm_wday + 7 : ptm->tm_wday; //<1..7>
+	time->month = ptm->tm_mon + 1; //<1..12>
+	time->year = ptm->tm_year - 100; //<0.99>
+	time->iv = 0; //<0..1> Invalid: <0> is valid, <1> is invalid
+	//time->su = (u_char)tb.dstflag; //<0..1> SUmmer time: <0> is standard time, <1> is summer time
+	time->su = 0; //apa fix me
+
+	IT_EXIT;
+    return;
+}
+
+
+/*
 
 void modbus_imp::get_utc_host_time(struct cp56time2a* time)
 {
@@ -506,10 +582,12 @@ void modbus_imp::get_utc_host_time(struct cp56time2a* time)
     return;
 }
 
-time_t modbus_imp::epoch_from_cp56time2a(const struct cp56time2a* time)
+*/
+
+int64_t modbus_imp::epoch_from_cp56time2a(const struct cp56time2a* time)
 {
 	struct tm	t;
-	time_t epoch = 0;
+	int64_t epoch = 0;
 	int ms;
 	
 	memset(&t, 0x00, sizeof(struct tm));
@@ -523,7 +601,7 @@ time_t modbus_imp::epoch_from_cp56time2a(const struct cp56time2a* time)
 	t.tm_year = time->year + 100; //from <0..99> to <years from 1900>
 	t.tm_isdst = time->su;
 	
-	epoch = mktime(&t);
+	epoch = mktime64(&t);
 
 	if((epoch == -1) || (time->iv == 1))
 	{
