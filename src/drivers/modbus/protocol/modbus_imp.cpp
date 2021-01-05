@@ -459,32 +459,6 @@ void modbus_imp::LogMessage(int* error, const char* name)
 	*/
 }
 
-/*
-#include <time.h>
-#include <sys/timeb.h>
-
-void modbus_imp::get_local_host_time(struct cp56time2a* time)
-{
-	struct timeb tb;
-	struct tm	*ptm;
-
-    ftime (&tb);
-	ptm = localtime(&tb.time);
-		
-	time->hour = ptm->tm_hour;					//<0.23>
-	time->min = ptm->tm_min;					//<0..59>
-	time->msec = ptm->tm_sec*1000 + tb.millitm; //<0.. 59999>
-	time->mday = ptm->tm_mday; //<1..31>
-	time->wday = (ptm->tm_wday == 0) ? ptm->tm_wday + 7 : ptm->tm_wday; //<1..7>
-	time->month = ptm->tm_mon + 1; //<1..12>
-	time->year = ptm->tm_year - 100; //<0.99>
-	time->iv = 0; //<0..1> Invalid: <0> is valid, <1> is invalid
-	time->su = (u_char)tb.dstflag; //<0..1> SUmmer time: <0> is standard time, <1> is summer time
-
-    return;
-}
-*/
-
 uint64_t getTimeInMs()
 {
 	FILETIME ft;
@@ -514,14 +488,13 @@ void modbus_imp::get_local_host_time(struct cp56time2a* time)
 		
 	time->hour = ptm->tm_hour;					//<0.23>
 	time->min = ptm->tm_min;					//<0..59>
-	time->msec = ptm->tm_sec*1000 + epoch_in_ms%1000; //<0.. 59999>
+	time->msec = ptm->tm_sec*1000 + (unsigned short)(epoch_in_ms%1000); //<0.. 59999>
 	time->mday = ptm->tm_mday; //<1..31>
 	time->wday = (ptm->tm_wday == 0) ? ptm->tm_wday + 7 : ptm->tm_wday; //<1..7>
 	time->month = ptm->tm_mon + 1; //<1..12>
 	time->year = ptm->tm_year - 100; //<0.99>
 	time->iv = 0; //<0..1> Invalid: <0> is valid, <1> is invalid
-	//time->su = (u_char)tb.dstflag; //<0..1> SUmmer time: <0> is standard time, <1> is summer time
-	time->su = 0; //apa fix me
+	time->su = ptm->tm_isdst; //<0..1> SUmmer time: <0> is standard time, <1> is summer time
 
     return;
 }
@@ -542,47 +515,17 @@ void modbus_imp::get_utc_host_time(struct cp56time2a* time)
 		
 	time->hour = ptm->tm_hour;					//<0..23>
 	time->min = ptm->tm_min;					//<0..59>
-	time->msec = ptm->tm_sec*1000 + epoch_in_ms%1000; //<0..59999>
+	time->msec = ptm->tm_sec*1000 + (unsigned short)(epoch_in_ms%1000); //<0..59999>
 	time->mday = ptm->tm_mday; //<1..31>
 	time->wday = (ptm->tm_wday == 0) ? ptm->tm_wday + 7 : ptm->tm_wday; //<1..7>
 	time->month = ptm->tm_mon + 1; //<1..12>
 	time->year = ptm->tm_year - 100; //<0.99>
 	time->iv = 0; //<0..1> Invalid: <0> is valid, <1> is invalid
-	//time->su = (u_char)tb.dstflag; //<0..1> SUmmer time: <0> is standard time, <1> is summer time
-	time->su = 0; //apa fix me
+	time->su = ptm->tm_isdst; //<0..1> SUmmer time: <0> is standard time, <1> is summer time
 
 	IT_EXIT;
     return;
 }
-
-
-/*
-
-void modbus_imp::get_utc_host_time(struct cp56time2a* time)
-{
-	struct timeb tb;
-	struct tm	*ptm;
-		
-	IT_IT("get_utc_host_time");
-
-    ftime (&tb);
-	ptm = gmtime(&tb.time);
-		
-	time->hour = ptm->tm_hour;					//<0..23>
-	time->min = ptm->tm_min;					//<0..59>
-	time->msec = ptm->tm_sec*1000 + tb.millitm; //<0..59999>
-	time->mday = ptm->tm_mday; //<1..31>
-	time->wday = (ptm->tm_wday == 0) ? ptm->tm_wday + 7 : ptm->tm_wday; //<1..7>
-	time->month = ptm->tm_mon + 1; //<1..12>
-	time->year = ptm->tm_year - 100; //<0.99>
-	time->iv = 0; //<0..1> Invalid: <0> is valid, <1> is invalid
-	time->su = (u_char)tb.dstflag; //<0..1> SUmmer time: <0> is standard time, <1> is summer time
-
-	IT_EXIT;
-    return;
-}
-
-*/
 
 int64_t modbus_imp::epoch_from_cp56time2a(const struct cp56time2a* time)
 {
@@ -1451,7 +1394,7 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 			//Check the life time of the command/////////////////////////////////////////////////////////////////
 			//If life time > MAX_COMMAND_SEND_TIME seconds => DO NOT execute the command
 
-			time_t command_generation_time_in_seconds = 0;
+			int64_t command_generation_time_in_seconds = 0;
 
 			switch(queued_item->iec_type)
 			{

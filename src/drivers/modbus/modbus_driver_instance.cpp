@@ -387,6 +387,19 @@ void Modbus_driver_Instance::QueryResponse(QObject *p, const QString &c, int id,
 			}
 		}
 		break;
+		case tSetSamplePointNameIOAMap:
+		{
+			int n = GetConfigureDb()->GetNumberResults();
+			for(int i = 0; i < n; i++,GetConfigureDb()->FetchNext())
+			{
+				int ioa = GetConfigureDb()->GetInt("IOA");
+				QString SamplePointName = UndoEscapeSQLText(GetConfigureDb()->GetString("NAME"));
+				ioa_name_map.insert(ioa, SamplePointName);
+			}
+
+			State = STATE_INIT_DB_DONE;
+		}
+		break;
 		default:
 		break;
 	}
@@ -511,6 +524,19 @@ void Modbus_driver_Instance::Tick()
 	{
 		case STATE_RESET:
 		{
+			State = STATE_INIT_DB;
+		}
+		break;
+		case STATE_INIT_DB:
+		{
+			QString cmd = "select * from TAGS where UNIT='"+ Name + "';";
+			GetConfigureDb()->DoExec(this, cmd, tSetSamplePointNameIOAMap);
+		}
+		break;
+		case STATE_INIT_DB_DONE:
+		{
+			fprintf(stderr, "State = STATE_INIT_DB_DONE\n");
+			fflush(stderr);
 			State = STATE_ASK_GENERAL_INTERROGATION;
 		}
 		break;
@@ -640,133 +666,179 @@ void Modbus_driver_Instance::get_items_from_local_fifo(void)
 		}
 		//////////////////////////////////////////////////////////////////////////////////
 
-		QString value;
+		QString sp_name;
+
+		IOANameMap::Iterator it;
+
+		it = ioa_name_map.find(p_item->iec_obj.ioa);
 
 		switch(p_item->iec_type)
 		{
 			case M_SP_NA_1:
 			{
-				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+				if(it != ioa_name_map.end())
+				{
+					sp_name = it.data();
 
-				iec_type1 var = p_item->iec_obj.o.type1;
+					iec_type1 var = p_item->iec_obj.o.type1;
 				
-				IECValue v(VALUE_TAG, &var, M_SP_NA_1);
-				TODO:05-07-2011 Get name here
-				post_val(v, name);
+					IECValue v(VALUE_TAG, &var, M_SP_NA_1);
+									
+					IECValueList l;
 
-				#else
+					l.insert(l.end(),v);
 
-				value.sprintf("%d", p_item->iec_obj.o.type1.sp);
-
-				#endif
-				
+					PostList(sp_name, l);
+				}
+				else
+				{
+					fprintf(stderr, "Error: not found name of item with ioa = %d\n", p_item->iec_obj.ioa);
+					fflush(stderr);
+				}
 			}
 			break;
 			case M_DP_NA_1:
 			{
-				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+				if(it != ioa_name_map.end())
+				{
+					sp_name = it.data();
 
-				iec_type3 var = p_item->iec_obj.o.type3;
+					iec_type3 var = p_item->iec_obj.o.type3;
 				
-				IECValue v(VALUE_TAG, &var, M_DP_NA_1);
-				TODO:05-07-2011 Get name here
-				post_val(v, name);
+					IECValue v(VALUE_TAG, &var, M_DP_NA_1);
+				
+					IECValueList l;
 
-				#else
+					l.insert(l.end(),v);
 
-				value.sprintf("%d", p_item->iec_obj.o.type3.dp);
+					PostList(sp_name, l);
 
-				#endif
+				}
+				else
+				{
+					fprintf(stderr, "Error: not found name of item with ioa = %d\n", p_item->iec_obj.ioa);
+					fflush(stderr);
+				}
 			}
 			break;
-			//case M_BO_NA_1:
-			//{
-			//}
-			//break;
 			case M_ME_NA_1:
 			{
-				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+				if(it != ioa_name_map.end())
+				{
+					sp_name = it.data();
 
-				iec_type9 var = p_item->iec_obj.o.type9;
+					iec_type9 var = p_item->iec_obj.o.type9;
 				
-				IECValue v(VALUE_TAG, &var, M_ME_NA_1);
-				TODO:05-07-2011 Get name here
-				post_val(v, name);
+					IECValue v(VALUE_TAG, &var, M_ME_NA_1);
+				
+					IECValueList l;
 
-				#else
+					l.insert(l.end(),v);
 
-				value.sprintf("%d", p_item->iec_obj.o.type9.mv);
+					PostList(sp_name, l);
 
-				#endif
+				}
+				else
+				{
+					fprintf(stderr, "Error: not found name of item with ioa = %d\n", p_item->iec_obj.ioa);
+					fflush(stderr);
+				}
 			}
 			break;
 			case M_ME_NB_1:
 			{
+				if(it != ioa_name_map.end())
+				{
+					sp_name = it.data();
+
+					iec_type11 var = p_item->iec_obj.o.type11;
 				
-				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
-
-				iec_type11 var = p_item->iec_obj.o.type11;
+					IECValue v(VALUE_TAG, &var, M_ME_NB_1);
 				
-				IECValue v(VALUE_TAG, &var, M_ME_NB_1);
-				TODO:05-07-2011 Get name here
-				post_val(v, name);
+					IECValueList l;
 
-				#else
+					l.insert(l.end(),v);
 
-				value.sprintf("%d", p_item->iec_obj.o.type11.mv);
+					PostList(sp_name, l);
 
-				#endif
+				}
+				else
+				{
+					fprintf(stderr, "Error: not found name of item with ioa = %d\n", p_item->iec_obj.ioa);
+					fflush(stderr);
+				}
 			}
 			break;
 			case M_ME_NC_1:
 			{
-				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+				if(it != ioa_name_map.end())
+				{
+					sp_name = it.data();
 
-				iec_type13 var = p_item->iec_obj.o.type13;
+					iec_type13 var = p_item->iec_obj.o.type13;
+
+					IECValue v(VALUE_TAG, &var, M_ME_NC_1);
 				
-				IECValue v(VALUE_TAG, &var, M_ME_NC_1);
-				TODO:05-07-2011 Get name here
-				post_val(v, name);
+					IECValueList l;
 
-				#else
+					l.insert(l.end(),v);
 
-				value.sprintf("%d", p_item->iec_obj.o.type13.mv);
+					PostList(sp_name, l);
 
-				#endif
+				}
+				else
+				{
+					fprintf(stderr, "Error: not found name of item with ioa = %d\n", p_item->iec_obj.ioa);
+					fflush(stderr);
+				}
 			}
 			break;
 			case M_SP_TB_1:
 			{
-				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+				if(it != ioa_name_map.end())
+				{
+					sp_name = it.data();
 
-				iec_type30 var = p_item->iec_obj.o.type30;
+					iec_type30 var = p_item->iec_obj.o.type30;
 				
-				IECValue v(VALUE_TAG, &var, M_SP_TB_1);
-				TODO:05-07-2011 Get name here
-				post_val(v, name);
+					IECValue v(VALUE_TAG, &var, M_SP_TB_1);
+				
+					IECValueList l;
 
-				#else
+					l.insert(l.end(),v);
 
-				value.sprintf("%d", p_item->iec_obj.o.type30.sp);
+					PostList(sp_name, l);
 
-				#endif
+				}
+				else
+				{
+					fprintf(stderr, "Error: not found name of item with ioa = %d\n", p_item->iec_obj.ioa);
+					fflush(stderr);
+				}
 			}
 			break;
 			case M_DP_TB_1:
 			{
-				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+				if(it != ioa_name_map.end())
+				{
+					sp_name = it.data();
 
-				iec_type31 var = p_item->iec_obj.o.type31;
+					iec_type31 var = p_item->iec_obj.o.type31;
 				
-				IECValue v(VALUE_TAG, &var, M_DP_TB_1);
-				TODO:05-07-2011 Get name here
-				post_val(v, name);
+					IECValue v(VALUE_TAG, &var, M_DP_TB_1);
+				
+					IECValueList l;
 
-				#else
+					l.insert(l.end(),v);
 
-				value.sprintf("%d", p_item->iec_obj.o.type31.dp);
+					PostList(sp_name, l);
 
-				#endif
+				}
+				else
+				{
+					fprintf(stderr, "Error: not found name of item with ioa = %d\n", p_item->iec_obj.ioa);
+					fflush(stderr);
+				}
 			}
 			break;
 			case M_BO_TB_1:
@@ -776,97 +848,172 @@ void Modbus_driver_Instance::get_items_from_local_fifo(void)
 			break;
 			case M_ME_TD_1:
 			{
-				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
-
-				iec_type34 var = p_item->iec_obj.o.type34;
+				if(it != ioa_name_map.end())
+				{
+					sp_name = it.data();
+	
+					iec_type34 var = p_item->iec_obj.o.type34;
 				
-				IECValue v(VALUE_TAG, &var, M_ME_TD_1);
-				TODO:05-07-2011 Get name here
-				post_val(v, name);
+					IECValue v(VALUE_TAG, &var, M_ME_TD_1);
+				
+					IECValueList l;
 
-				#else
+					l.insert(l.end(),v);
 
-				value.sprintf("%d", p_item->iec_obj.o.type34.mv);
+					PostList(sp_name, l);
 
-				#endif
+				}
+				else
+				{
+					fprintf(stderr, "Error: not found name of item with ioa = %d\n", p_item->iec_obj.ioa);
+					fflush(stderr);
+				}
 			}
 			break;
 			case M_ME_TE_1:
 			{
-				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+				if(it != ioa_name_map.end())
+				{
+					sp_name = it.data();
 
-				iec_type35 var = p_item->iec_obj.o.type35;
+					iec_type35 var = p_item->iec_obj.o.type35;
 				
-				IECValue v(VALUE_TAG, &var, M_ME_TE_1);
-				TODO:05-07-2011 Get name here
-				post_val(v, name);
+					IECValue v(VALUE_TAG, &var, M_ME_TE_1);
+				
+					IECValueList l;
 
-				#else
+					l.insert(l.end(),v);
 
-				value.sprintf("%d", p_item->iec_obj.o.type35.mv);
-
-				#endif
+					PostList(sp_name, l);
+				}
+				else
+				{
+					fprintf(stderr, "Error: not found name of item with ioa = %d\n", p_item->iec_obj.ioa);
+					fflush(stderr);
+				}
 			}
 			break;
 			case M_ME_TF_1:
 			{
-				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+				if(it != ioa_name_map.end())
+				{
+					sp_name = it.data();
 
-				iec_type36 var = p_item->iec_obj.o.type36;
+					iec_type36 var = p_item->iec_obj.o.type36;
 				
-				IECValue v(VALUE_TAG, &var, M_ME_TF_1);
-				TODO:05-07-2011 Get name here
-				post_val(v, name);
+					IECValue v(VALUE_TAG, &var, M_ME_TF_1);
+				
+					IECValueList l;
 
-				#else
+					l.insert(l.end(),v);
 
-				value.sprintf("%f", p_item->iec_obj.o.type36.mv);
-
-				#endif
+					PostList(sp_name, l);
+				}
+				else
+				{
+					fprintf(stderr, "Error: not found name of item with ioa = %d\n", p_item->iec_obj.ioa);
+					fflush(stderr);
+				}
 			}
 			break;
 			case M_ME_TN_1:
 			{
-				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+				if(it != ioa_name_map.end())
+				{
+					sp_name = it.data();
 
-				iec_type150 var = p_item->iec_obj.o.type150;
+					is_type150 var = p_item->iec_obj.o.type150;
 				
-				IECValue v(VALUE_TAG, &var, M_ME_TN_1);
-				TODO:05-07-2011 Get name here
-				post_val(v, name);
+					IECValue v(VALUE_TAG, &var, M_ME_TN_1);
+				
+					IECValueList l;
 
-				#else
+					l.insert(l.end(),v);
 
-				value.sprintf("%lf", p_item->iec_obj.o.type150.mv);
+					PostList(sp_name, l);
 
-				#endif
+				}
+				else
+				{
+					fprintf(stderr, "Error: not found name of item with ioa = %d\n", p_item->iec_obj.ioa);
+					fflush(stderr);
+				}
 			}
 			break;
 			case M_IT_TB_1:
 			{
-				#ifdef USE_IEC_TYPES_AND_IEC_TIME_STAMP
+				if(it != ioa_name_map.end())
+				{
+					sp_name = it.data();
 
-				iec_type37 var = p_item->iec_obj.o.type37;
+					iec_type37 var = p_item->iec_obj.o.type37;
 				
-				IECValue v(VALUE_TAG, &var, M_ME_TN_1);
-				TODO:05-07-2011 Get name here
-				post_val(v, name);
+					IECValue v(VALUE_TAG, &var, M_IT_TB_1);
+				
+					IECValueList l;
 
-				#else
+					l.insert(l.end(),v);
 
-				value.sprintf("%d", p_item->iec_obj.o.type37.counter);
+					PostList(sp_name, l);
 
-				#endif
+				}
+				else
+				{
+					fprintf(stderr, "Error: not found name of item with ioa = %d\n", p_item->iec_obj.ioa);
+					fflush(stderr);
+				}
 			}
 			break;
 			case M_ME_TO_1:
 			{
-				value.sprintf("%d", p_item->iec_obj.o.type151.mv);
+				//value.sprintf("%d", p_item->iec_obj.o.type151.mv);
+
+				if(it != ioa_name_map.end())
+				{
+					sp_name = it.data();
+
+					is_type151 var = p_item->iec_obj.o.type151;
+				
+					IECValue v(VALUE_TAG, &var, M_ME_TO_1);
+				
+					IECValueList l;
+
+					l.insert(l.end(),v);
+
+					PostList(sp_name, l);
+
+				}
+				else
+				{
+					fprintf(stderr, "Error: not found name of item with ioa = %d\n", p_item->iec_obj.ioa);
+					fflush(stderr);
+				}
 			}
 			break;
 			case M_ME_TQ_1:
 			{
-				value.sprintf("%d", p_item->iec_obj.o.type153.mv);
+				//value.sprintf("%d", p_item->iec_obj.o.type153.mv);
+
+				if(it != ioa_name_map.end())
+				{
+					sp_name = it.data();
+
+					is_type153 var = p_item->iec_obj.o.type153;
+				
+					IECValue v(VALUE_TAG, &var, M_ME_TQ_1);
+				
+					IECValueList l;
+
+					l.insert(l.end(),v);
+
+					PostList(sp_name, l);
+
+				}
+				else
+				{
+					fprintf(stderr, "Error: not found name of item with ioa = %d\n", p_item->iec_obj.ioa);
+					fflush(stderr);
+				}
 			}
 			break;
 			case C_EX_IT_1:
@@ -891,24 +1038,10 @@ void Modbus_driver_Instance::get_items_from_local_fifo(void)
 			default:
 			{
 				printf("Not supported type%d \n", p_item->iec_type);
-				value.sprintf("%d", 0);
 			}
 			break;
 		}
 		
-		QString ioa;
-		ioa.sprintf("%d", p_item->iec_obj.ioa);
-
-		#ifdef DEPRECATED_IEC101_CONFIG
-		QString cmd = "select IKEY from PROPS where DVAL='"+ ioa + "' and SKEY='SAMPLEPROPS';";
-		#else
-		QString cmd = "select NAME from TAGS where IOA="+ ioa + " and UNIT='"+ Name + "';";
-		#endif
-		
-		GetConfigureDb()->DoExec(this, cmd, tGetSamplePointNamefromIOA, value, ioa);
-
-		//printf("ioa %s, value %s\n", (const char*)ioa, (const char*)value);
-
 		if(i > 50)
 		{
 			break;

@@ -602,15 +602,19 @@ void Results::UpdateEnd(const QString &name)
 				QString cmd = "insert into " + name + " (TIMEDATE,STATE";
 
 				SamplePoint::TagDict::iterator j = (*i).second.Tags.begin();
+
+				QString datatime_result; //apa+++ 05-01-2021
 				
 				//list the tags
 				for(int kk = 0; !(j == (*i).second.Tags.end());j++,kk++)
 				{
 					cmd += "," + (*j).first; 
+					
+					datatime_result = QDATE_TIME_ISO_DATE((*j).second.updated); //apa+++ 05-01-2021
 				};
 
-				QString datatime_result = QDATE_TIME_ISO_DATE((*i).second.updated);
-				
+				//QString datatime_result = QDATE_TIME_ISO_DATE((*i).second.updated); //apa--- 05-01-2021
+								
 				cmd += ") values( " + datatime_result; // enter the actual update time
 				// the alarm state
 				cmd += "," + QString::number((*i).second.AlarmState); 
@@ -889,7 +893,7 @@ int SamplePoint::UpdateTag(const QString &name, IECValue value, QString Type)
 			__int64 epoch_in_ms = Epoch_in_millisec_from_cp56time2a(&t2);
 			QString isodate = GetIsoDateString_from_epoch_in_millisec(epoch_in_ms);
 
-			//printf("%s\n", (const char*)isodate);
+			//printf("isodate = %s\n", (const char*)isodate);
 			(*i).second.updated = IsoDateMsToQDateTime(isodate);
 		}
 		//////////////////////end 31-10-2010//time stamp management added/////

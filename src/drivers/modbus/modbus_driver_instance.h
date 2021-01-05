@@ -52,6 +52,8 @@ extern void iec_call_exit_handler(int line, char* file, char* reason);
 #define MAX_FIFO_SIZE 65535
 ////////////////////////////////////////////////////////////////////////
 
+typedef QMap<int, QString> IOANameMap;
+
 class Modbus_DriverThread;
 
 class MODBUS_DRIVERDRV Modbus_driver_Instance : public DriverInstance 
@@ -62,7 +64,8 @@ class MODBUS_DRIVERDRV Modbus_driver_Instance : public DriverInstance
 	enum
 	{
 		tUnitProperties = 1,tList, tSamplePointProperties, tListUnits, 
-		tGetSamplePointNamefromIOA, tGetIOAfromSamplePointName
+		tGetSamplePointNamefromIOA, tGetIOAfromSamplePointName,
+		tSetSamplePointNameIOAMap
 	};
 	//
 	//
@@ -78,6 +81,7 @@ class MODBUS_DRIVERDRV Modbus_driver_Instance : public DriverInstance
 	int Sp; //Current sample point index under measurement
 	bool InTick; //tick sentinal
 	int IecItems;
+	IOANameMap ioa_name_map;
 	
 	struct  Track
 	{
@@ -117,6 +121,8 @@ class MODBUS_DRIVERDRV Modbus_driver_Instance : public DriverInstance
 	{
 		STATE_IDLE = 0,
 		STATE_RESET,
+		STATE_INIT_DB,
+		STATE_INIT_DB_DONE,
 		STATE_ASK_GENERAL_INTERROGATION,
 		STATE_GENERAL_INTERROGATION_DONE,
 		STATE_FAIL,
