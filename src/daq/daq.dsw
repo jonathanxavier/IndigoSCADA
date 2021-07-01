@@ -212,6 +212,9 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name dlms_server
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name opc_client_xmlda
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -721,6 +724,18 @@ Package=<4>
 ###############################################################################
 
 Project: "opc_client_hda_driver"="..\drivers\opc_client_hda\opc_client_hda_driver.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "opc_client_xmlda"="..\drivers\opc_client_xml_da\protocol\opc_client_xmlda.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
