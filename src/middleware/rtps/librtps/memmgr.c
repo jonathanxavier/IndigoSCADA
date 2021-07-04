@@ -207,6 +207,7 @@ void* memmgr_alloc(ulong nbytes)
             {
                 //#ifdef DEBUG_MEMMGR_FATAL
                 printf("!! Memory allocation failed !!\n");
+                ExitProcess(0); //exit process
                 //#endif
                 return 0;
             }
