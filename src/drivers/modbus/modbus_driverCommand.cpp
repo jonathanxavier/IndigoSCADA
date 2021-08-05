@@ -3,6 +3,7 @@
 File: Modbus_driverCommand.cpp
 Last generated: Mon May 22 17:14:04 2000
 *********************************************************************/
+#include "time64.h"
 #include "Modbus_driverCommand.h"
 #include <qt.h>
 #include "Modbus_driver.h"
@@ -84,11 +85,26 @@ void Modbus_driverCommand::QueryResponse (QObject *p, const QString &c, int id, 
 	};
 };
 
-#include <time.h>
-#include <sys/timeb.h>
+//#include <time.h>
+//#include <sys/timeb.h>
+
+uint64_t getTimeInMs()
+{
+	FILETIME ft;
+	uint64_t now;
+
+	static const uint64_t DIFF_TO_UNIXTIME = 11644473600000i64;
+
+	GetSystemTimeAsFileTime(&ft);
+
+	now = (LONGLONG)ft.dwLowDateTime + ((LONGLONG)(ft.dwHighDateTime) << 32i64);
+
+	return (now / 10000i64) - DIFF_TO_UNIXTIME;
+}
 
 void Modbus_driverCommand::get_utc_host_time(struct cp56time2a* time)
 {
+/*
 	struct timeb tb;
 	struct tm	*ptm;
 
@@ -104,6 +120,26 @@ void Modbus_driverCommand::get_utc_host_time(struct cp56time2a* time)
 	time->year = ptm->tm_year - 100; //<0..99>
 	time->iv = 0; //<0..1> Invalid: <0> is valid, <1> is invalid
 	time->su = (u_char)tb.dstflag; //<0..1> SUmmer time: <0> is standard time, <1> is summer time
+*/
+	struct tm	*ptm;
+	int64_t epoch_in_ms;
+	int64_t seconds;
+
+	epoch_in_ms = getTimeInMs();
+
+	seconds = epoch_in_ms/1000;
+
+	ptm = gmtime64((int64_t*)(&seconds));
+		
+	time->hour = ptm->tm_hour;					//<0..23>
+	time->min = ptm->tm_min;					//<0..59>
+	time->msec = ptm->tm_sec*1000 + (unsigned short)(epoch_in_ms%1000); //<0..59999>
+	time->mday = ptm->tm_mday; //<1..31>
+	time->wday = (ptm->tm_wday == 0) ? ptm->tm_wday + 7 : ptm->tm_wday; //<1..7>
+	time->month = ptm->tm_mon + 1; //<1..12>
+	time->year = ptm->tm_year - 100; //<0.99>
+	time->iv = 0; //<0..1> Invalid: <0> is valid, <1> is invalid
+	time->su = ptm->tm_isdst; //<0..1> SUmmer time: <0> is standard time, <1> is summer time
 
     return;
 }
