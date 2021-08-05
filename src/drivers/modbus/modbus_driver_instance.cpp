@@ -9,7 +9,7 @@
  *   for full copyright notice and license terms. 
  *
  */
-
+#include "time64.h"
 #include "modbus_driver_instance.h"
 #include "modbus_driverthread.h"
 
@@ -1231,11 +1231,11 @@ void Modbus_driver_Instance::epoch_to_cp56time2a(cp56time2a *time, signed __int6
 {
 	struct tm	*ptm;
 	int ms = (int)(epoch_in_millisec%1000);
-	time_t seconds;
+	int64_t seconds;
 	
 	memset(time, 0x00,sizeof(cp56time2a));
-	seconds = (long)(epoch_in_millisec/1000);
-	ptm = localtime(&seconds);
+	seconds = epoch_in_millisec/1000;
+	ptm = localtime64((int64_t*)(&seconds));
 		
     if(ptm)
 	{
