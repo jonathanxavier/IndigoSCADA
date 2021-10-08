@@ -3,6 +3,7 @@
  *
  *  - How to use simple control models
  *  - How to serve analog measurement data
+ *  - How to serve boolean data
  *  - Using the IedServerConfig object to configure stack features
  */
 
@@ -14,6 +15,7 @@
 #include <math.h>
 
 #include "static_model.h"
+
 
 /* import IEC 61850 device model created from SCL-File */
 extern IedModel iedModel;
@@ -95,6 +97,9 @@ main(int argc, char** argv)
 
 	Timestamp iecTimestamp;
 
+	int cont = 0; //apa+++
+	bool bool_val; //apa+++
+	
     printf("Using libIEC61850 version %s\n", LibIEC61850_getVersionString());
 
     /* Set buffer size for buffered report control blocks to 200000 bytes */
@@ -157,6 +162,7 @@ main(int argc, char** argv)
     signal(SIGINT, sigint_handler);
 
     while (running) {
+	
         uint64_t timestamp = Hal_getTimeInMs();
 
         t += 0.1f;
@@ -187,6 +193,29 @@ main(int argc, char** argv)
 
         IedServer_updateTimestampAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_AnIn4_t, &iecTimestamp);
         IedServer_updateFloatAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_AnIn4_mag_f, an4);
+
+		//apa+++
+		cont = cont + 1;
+		if(cont%2 == 0)
+			bool_val = 1;
+		else
+			bool_val = 0;
+
+        IedServer_updateUTCTimeAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO1_t, &iecTimestamp);
+		IedServer_updateBooleanAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO1_stVal, bool_val);
+        
+        IedServer_updateUTCTimeAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO2_t, &iecTimestamp);
+		IedServer_updateBooleanAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO2_stVal, bool_val);
+        
+
+        IedServer_updateUTCTimeAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO3_t, &iecTimestamp);
+		IedServer_updateBooleanAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO3_stVal, bool_val);
+        
+
+        IedServer_updateUTCTimeAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO4_t, &iecTimestamp);
+		IedServer_updateBooleanAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO4_stVal, bool_val);
+        
+	    /////////////////////////end apa+++///////////////////////
 
         IedServer_unlockDataModel(iedServer);
 

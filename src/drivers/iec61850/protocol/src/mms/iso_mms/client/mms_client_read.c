@@ -300,7 +300,11 @@ mmsClient_parseListOfAccessResults(AccessResult_t** accessResultList, int listSi
             }
         }
         else if (presentType == AccessResult_PR_boolean) {
-            value = MmsValue_newBoolean(accessResultList[i]->choice.boolean);
+			int b = accessResultList[i]->choice.boolean; //apa+++ 
+			if(b == 255)					   //apa+++
+				value = MmsValue_newBoolean(1);//apa+++
+			else							   //apa+++
+				value = MmsValue_newBoolean(0);//apa+++
         }
         else if (presentType == AccessResult_PR_binarytime) {
             int size = accessResultList[i]->choice.binarytime.size;
