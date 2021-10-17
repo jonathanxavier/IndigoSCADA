@@ -41,6 +41,8 @@ RSC=rc.exe
 # PROP Intermediate_Dir "Release"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
+MTL=midl.exe
+F90=df.exe
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
 # ADD CPP /nologo /MD /W3 /GX /O2 /I "$(QTDIR)\include" /I "." /I ".." /I "..\.." /I "..\..\..\common" /I "..\..\..\database" /I "..\..\..\utilities" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /FD /c
 # SUBTRACT CPP /YX
@@ -66,6 +68,8 @@ LINK32=link.exe
 # PROP Intermediate_Dir "Debug"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
+MTL=midl.exe
+F90=df.exe
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
 # ADD CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "$(QTDIR)\include" /I "." /I ".." /I "..\.." /I "..\..\..\common" /I "..\..\..\database" /I "..\..\..\utilities" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FD /D /GZ /c
 # SUBTRACT CPP /YX
@@ -90,10 +94,6 @@ LINK32=link.exe
 # Begin Source File
 
 SOURCE=..\..\..\utilities\clear_crc_eight.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\getopt.c
 # End Source File
 # Begin Source File
 
