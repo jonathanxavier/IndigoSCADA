@@ -41,6 +41,9 @@ class StateListItem // alarm state aware list item
 	void SetState(int s) { State = s;};
 	void SetAckState(bool f) { AckState = f;};
 	void Toggle() { FlashState = !FlashState;}; // toggle if the ack flag is set
+
+	void* operator new (size_t nbytes);
+    void  operator delete(void* p);
 };
 #endif
 

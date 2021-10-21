@@ -13,6 +13,33 @@
 #include "display.h"
 #include "common.h"
 #include "IndentedTrace.h"
+#include "memmgr.h"
+
+#define MALLOC memmgr_alloc
+#define FREE memmgr_free
+
+//#define MALLOC malloc
+//#define FREE free
+
+void* StateListItem::operator new(size_t nbytes)
+{
+  if (nbytes == 0)
+	nbytes = 1;                    // so all alloc's get a distinct address
+
+  void* ans = MALLOC(nbytes + 4);  // overallocate by 4 bytes
+
+  return (char*)ans + 4;           // don't let users see the Pool*
+}
+
+void StateListItem::operator delete(void* p)
+{
+  if (p != NULL) 
+  {
+	  p = (char*)p - 4;              // back off to the Pool*
+	  FREE(p);                     // note: 4 bytes left of the original p
+  }
+}
+
 /*
 *Function:paintCell
 *Inputs:DC bits

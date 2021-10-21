@@ -426,6 +426,10 @@ SOURCE=.\main.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\memmgr.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\multitrace.cpp
 # End Source File
 # Begin Source File
