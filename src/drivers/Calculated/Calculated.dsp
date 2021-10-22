@@ -392,6 +392,10 @@ SOURCE=.\moc_CalculatedInput.cpp
 
 SOURCE=.\moc_CalculatedInputData.cpp
 # End Source File
+# Begin Source File
+
+SOURCE=..\..\common\time64.c
+# End Source File
 # End Group
 # End Target
 # End Project
