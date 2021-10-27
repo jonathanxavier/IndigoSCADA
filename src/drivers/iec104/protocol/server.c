@@ -82,13 +82,13 @@ void disconnect_hook(struct iecsock *s, short reason)
 
 //	clearing_ftwd();
 
-#ifdef REDUNDANT_SYSTEM
+//#ifdef REDUNDANT_SYSTEM
 	#ifdef WIN32
 	ExitProcess(0); //apa+++ on 06-12-2011 To force disconnection of master side on redundant system
 	#elif __unix__
 	exit(0);
 	#endif
-#endif
+//#endif
 
 	IT_EXIT;
 	return;
