@@ -15,7 +15,8 @@ class Iec104driverCommand : public Iec104driverCommandData
 	Q_OBJECT
 	QString Unit_type; // receipe name
 	QString samplePointName;
-	enum {tUnit = 1
+	enum {tUnit = 1,
+		tTags
 	//	, tSerial
 	}; // transaction codes
 	public:

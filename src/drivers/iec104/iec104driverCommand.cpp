@@ -37,12 +37,13 @@ Inherited( parent, name ),Unit_type(unit_type),samplePointName(name)
 	Type->insertItem ("C_SE_TC_1");	// add to the list box
 
 	Type->insertItem ("C_CS_NA_1");	// add to the list box
-	
-	Type->setCurrentItem (0);
 
 	connect (GetConfigureDb (),
 	SIGNAL (TransactionDone (QObject *, const QString &, int, QObject*)), this,
 	SLOT (QueryResponse (QObject *, const QString &, int, QObject*)));	// connect to the database
+
+	QString cmd = "select PARAMS from TAGS where NAME='"+ QString(samplePointName) +"'";
+	GetConfigureDb()->DoExec(this,cmd,tTags);
 }
 
 Iec104driverCommand::~Iec104driverCommand()
@@ -123,9 +124,59 @@ void Iec104driverCommand::QueryResponse (QObject *p, const QString &c, int id, Q
 				
 				GetDispatcher()->DoExec(NotificationEvent::CMD_SEND_COMMAND_TO_UNIT, (char *)parametri, sizeof(dispatcher_extra_params));  //broadcast to all tcp clients
 
+				////////////////Update table TAGS//////////
+				QString cmd;
+				
+				cmd = QString("update TAGS set PARAMS='");
+				cmd += QString(IECcommandtype);
+				cmd += "' where NAME='" + samplePointName + "' and UNIT='"+ unit_name + "';";
+
+				GetConfigureDb()->DoExec(0, cmd , 0);
+				///////////////////////////////////////////
+
 				accept();
 			}
 		} 
+		break;
+		case tTags:
+		{
+			if(GetConfigureDb()->GetNumberResults() > 0)
+			{
+				QString params = GetConfigureDb()->GetString("PARAMS");
+
+				char IECcommandtype[20];
+				strcpy(IECcommandtype, (const char *)params);
+
+				int current_item = 0;
+
+				if(strcmp(IECcommandtype, "C_IC_NA_1") == 0)
+					current_item = 0;
+				else if(strcmp(IECcommandtype, "C_SC_NA_1") == 0)
+					current_item = 1;
+				else if(strcmp(IECcommandtype, "C_DC_NA_1") == 0)
+					current_item = 2;
+				else if(strcmp(IECcommandtype, "C_SC_TA_1") == 0)
+					current_item = 3;
+				else if(strcmp(IECcommandtype, "C_DC_TA_1") == 0)
+					current_item = 4;
+				else if(strcmp(IECcommandtype, "C_SE_NA_1") == 0)
+					current_item = 5;
+				else if(strcmp(IECcommandtype, "C_SE_NB_1") == 0)
+					current_item = 6;
+				else if(strcmp(IECcommandtype, "C_SE_NC_1") == 0)
+					current_item = 7;
+				else if(strcmp(IECcommandtype, "C_SE_TA_1") == 0)
+					current_item = 8;
+				else if(strcmp(IECcommandtype, "C_SE_TB_1") == 0)
+					current_item = 9;
+				else if(strcmp(IECcommandtype, "C_SE_TC_1") == 0)
+					current_item = 10;
+				else if(strcmp(IECcommandtype, "C_CS_NA_1") == 0)
+					current_item = 11;
+
+				Type->setCurrentItem(current_item);
+			}
+		}
 		break;
 		default:
 		break;
