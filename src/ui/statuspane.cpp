@@ -66,7 +66,20 @@ void  StatusPane::UpdateTagsPane()
 			p->setText(4,QString::number(sm.mean()));
 			p->setText(5,QString::number(sm.stdDev()));
 			p->setText(6,GetCurrentDb()->GetIsoDateString("UPDTIME"));
-			//  
+			//
+			//Check if setText worked as expected, apa+++ 30/10/2021
+			if((p->text(0) == QString::null) ||
+			   (p->text(1) == QString::null) ||
+			   (p->text(2) == QString::null) ||
+			   (p->text(3) == QString::null) ||
+			   (p->text(4) == QString::null) ||
+			   (p->text(5) == QString::null) ||
+			   (p->text(6) == QString::null) )
+			{
+				pTagStatus->clear();
+			}
+			
+			break;
 		};
 	};
 	pTagStatus->triggerUpdate();

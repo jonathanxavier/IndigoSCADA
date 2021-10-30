@@ -303,7 +303,7 @@ mmsClient_parseListOfAccessResults(AccessResult_t** accessResultList, int listSi
 			int b = accessResultList[i]->choice.boolean; //apa+++ 
 			if(b == 255)					   //apa+++
 				value = MmsValue_newBoolean(1);//apa+++
-			else							   //apa+++
+			else if(b == 0)					   //apa+++
 				value = MmsValue_newBoolean(0);//apa+++
         }
         else if (presentType == AccessResult_PR_binarytime) {
