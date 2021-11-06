@@ -66,7 +66,8 @@
 
 #define DEBUG_MEMMGR_SUPPORT_STATS 1
 
-#define POOL_SIZE 1024 * 1024
+//#define POOL_SIZE 1024 * 1024 //limited to few connections
+#define POOL_SIZE 1024 * 1024*20
 #define MIN_POOL_ALLOC_QUANTAS 16
 
 
