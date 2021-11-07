@@ -78,7 +78,8 @@ void disconnect_hook(struct iecsock *s, short reason)
 	reset_state_machines();
 
 	send_lost_packet(); //tell consumer (Control Center) that we have lost the connection with SLAVE
-	
+
+	Sleep(2000); //wait that the lost packet goes to the control center
 	ExitProcess(0); //exit process
 
 	IT_EXIT;

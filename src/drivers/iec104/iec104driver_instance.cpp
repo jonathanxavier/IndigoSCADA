@@ -655,7 +655,8 @@ void Iec104driver_Instance::Tick()
 	{
 		case STATE_RESET:
 		{
-			State = STATE_ASK_GENERAL_INTERROGATION;
+			//State = STATE_ASK_GENERAL_INTERROGATION;
+			get_items_from_local_fifo();
 		}
 		break;
 		case STATE_ASK_GENERAL_INTERROGATION:
@@ -739,6 +740,11 @@ void Iec104driver_Instance::get_items_from_local_fifo(void)
 				UnFailUnit(msg);
 				State = STATE_ASK_GENERAL_INTERROGATION;
 			}
+		}
+
+		if(State == STATE_RESET)
+		{
+			State = STATE_ASK_GENERAL_INTERROGATION;
 		}
 
 		wait_for_message = 0;
@@ -1056,6 +1062,12 @@ void Iec104driver_Instance::get_items_from_local_fifo(void)
 	{
 		wait_for_message = 0;
 		msg_received_in_monitor_direction = 0;
+
+		QString msg;
+		msg.sprintf("iec104 master on line %d has been stopped...", instanceID + 1); 
+		FailUnit(msg);
+
+		State = STATE_FAIL;
 		//Terminate child process
 		pConnect->TerminateChild();
 	}

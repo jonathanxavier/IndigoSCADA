@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include "iec104_imp.h"
+#include <signal.h>
 
 int gl_timeout_connection_with_parent = 0;
 
@@ -239,7 +240,7 @@ int main( int argc, char **argv )
 		return EXIT_FAILURE;	
 	}
 	/////////////////end keep alive////////////////////////////////////////////////
-/*
+
 	signal (SIGTERM, iec104SignalHandler);
 #ifdef WIN32
 	signal (SIGBREAK, iec104SignalHandler);
@@ -249,7 +250,7 @@ int main( int argc, char **argv )
 	signal (SIGSEGV, iec104SignalHandler);
 	signal (SIGILL, iec104SignalHandler);
 	signal (SIGINT, iec104SignalHandler);
-*/
+
 	struct iec104Context my_ctx;
 	
 	//iec104 RTU
