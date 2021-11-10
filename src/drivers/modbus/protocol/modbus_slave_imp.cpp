@@ -1,7 +1,7 @@
 /*
  *                         IndigoSCADA
  *
- *   This software and documentation are Copyright 2002 to 2014 Enscada 
+ *   This software and documentation are Copyright 2002 to 2021 Enscada 
  *   Limited and its licensees. All rights reserved. See file:
  *
  *                     $HOME/LICENSE 
@@ -84,11 +84,7 @@ void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackPa
 		  {
 			  struct iec_item item2;
 			  rebuild_iec_item_message(&item2, item1);
-
-			  if(cl->is_connected)
-			  {
-				//cl->check_for_commands(&item2);
-			  }
+			  fifo_put(cl->fifo_monitor_direction, (char*)&item2, sizeof(struct iec_item));
 		  }
 		}
 		break;
@@ -101,6 +97,8 @@ void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackPa
 }
 ////////////////////////////////Middleware/////////////////////////////////////
 
+
+void iec_call_exit_handler(int line, char* file, char* reason);
 
 //   
 //  Class constructor.   
@@ -133,8 +131,11 @@ fExit(false), general_interrogation(true), is_connected(false)
         ctx = modbus_new_rtu(my_modbus_context.serial_device, my_modbus_context.baud, my_modbus_context.parity, my_modbus_context.data_bit, my_modbus_context.stop_bit);
     }
 
-    if (ctx != NULL) 
+    if (ctx != NULL)
 	{
+		#define MAX_FIFO_SIZE 65535
+		fifo_monitor_direction = fifo_open("fifo_local_monitor_dir", MAX_FIFO_SIZE, iec_call_exit_handler);
+
 		/////////////////////Middleware/////////////////////////////////////////////////////////////////
 		int32_t                 strength = 1;
 		NtpTime                 persistence, deadline, minimumSeparation, delay;
@@ -210,8 +211,8 @@ fExit(false), general_interrogation(true), is_connected(false)
 
 	modbus_set_debug(ctx, TRUE);
 
-	mb_mapping = modbus_mapping_new(MODBUS_MAX_READ_BITS, 0,
-                                    MODBUS_MAX_READ_REGISTERS, 0);
+	mb_mapping = modbus_mapping_new(MODBUS_MAX_READ_BITS, MODBUS_MAX_READ_BITS,
+                                    MODBUS_MAX_READ_REGISTERS, MODBUS_MAX_READ_REGISTERS);
     if (mb_mapping == NULL) {
         fprintf(stderr, "Failed to allocate the mapping: %s\n",
                 modbus_strerror(errno));
@@ -236,40 +237,198 @@ modbus_imp::~modbus_imp()
     return;   
 }   
 
-static u_int n_msg_sent = 0;
+char err_msg[100];
 
 int modbus_imp::RunServer(void)
 {
 	IT_IT("modbus_imp::RunServer");
 
 	int rc;
-	
-	/*
-
-	//Allocate and initialize the memory to store the bits
-	#define MAX_BITS_IN_MEMORY_BLOCK 30
-
-	nb_points = MAX_BITS_IN_MEMORY_BLOCK;
-	tab_rp_bits = (uint8_t *) malloc(nb_points * sizeof(uint8_t));
-
-	memset(tab_rp_bits, 0x00, nb_points * sizeof(uint8_t));
-
-	#define MAX_REGISTERS_IN_MEMORY_BLOCK 30
-
-	//Allocate and initialize the memory to store the registers
-	nb_points = MAX_REGISTERS_IN_MEMORY_BLOCK;
-
-	tab_rp_registers = (uint16_t *) malloc(nb_points * sizeof(uint16_t));
-	memset(tab_rp_registers, 0x00, nb_points * sizeof(uint16_t));
-
-	stored_tab_rp_registers = (uint16_t *) malloc(nb_points * sizeof(uint16_t));
-	memset(stored_tab_rp_registers, 0x00, nb_points * sizeof(uint16_t));
-
-	*/
 
 	uint8_t query[MODBUS_TCP_MAX_ADU_LENGTH];
+	struct iec_item one_item;
+	int i, len;
+	const unsigned wait_limit_ms = 1;
 	
     for(;;) {
+
+		/////update slave memory with message riceived in monitor direction////////
+		for(i = 0; (len = fifo_get(fifo_monitor_direction, (char*)&one_item, sizeof(struct iec_item), wait_limit_ms)) >= 0; i += 1)
+		{ 
+			fprintf(stderr,"Receiving %d th message\n", one_item.msg_id);
+			fflush(stderr);
+
+            //unsigned char* pt = (unsigned char*)&one_item;
+			//for(j = 0; j < len; j++)
+			//{ 
+				//unsigned char c = *((unsigned char*)pt + j);
+				//fprintf(stderr,"rx <--- 0x%02x-\n", c);
+				//fflush(stderr);
+				//IT_COMMENT1("fifo rx <--- 0x%02x-", c);
+			//}
+
+			rc = clearCrc((unsigned char *)&one_item, sizeof(struct iec_item));
+			if(rc != 0)
+			{
+				sprintf(err_msg, "Message checksum error");
+				iec_call_exit_handler(__LINE__,__FILE__,err_msg);
+			}
+
+			//Here update slave memory that is made by:
+
+		    //int nb_bits; MODBUS_MAX_READ_BITS
+			//int nb_input_bits; MODBUS_MAX_READ_BITS
+			//int nb_input_registers; MODBUS_MAX_READ_REGISTERS
+			//int nb_registers; MODBUS_MAX_READ_REGISTERS
+			//uint8_t *tab_bits;
+			//uint8_t *tab_input_bits;
+			//uint16_t *tab_input_registers;
+			//uint16_t *tab_registers;
+
+			for(int rowNumber = 0; rowNumber < db_n_rows; rowNumber++)
+			{
+				if(Config_db[rowNumber].modbus_function_read == FC_READ_COILS) //0x01
+				{
+					if(Config_db[rowNumber].modbus_type == VT_BOOL)
+					{
+						if(one_item.iec_obj.ioa == Config_db[rowNumber].ioa_control_center)
+						{
+							int offset = Config_db[rowNumber].modbus_address;
+							mb_mapping->tab_bits[offset] = one_item.iec_obj.o.type30.sp;
+						}
+					}
+				}
+				else if(Config_db[rowNumber].modbus_function_read == FC_READ_DISCRETE_INPUTS) //0x02
+				{
+					if(Config_db[rowNumber].modbus_type == VT_BOOL)
+					{
+						if(one_item.iec_obj.ioa == Config_db[rowNumber].ioa_control_center)
+						{
+							int offset = Config_db[rowNumber].modbus_address;
+							mb_mapping->tab_input_bits[offset] = one_item.iec_obj.o.type30.sp;
+						}
+					}
+				}
+				else if(Config_db[rowNumber].modbus_function_read == FC_READ_HOLDING_REGISTERS) //0x03
+				{
+					if((Config_db[rowNumber].modbus_type == VT_I4) || 
+					   (Config_db[rowNumber].modbus_type == VT_UI4)|| 
+					   (Config_db[rowNumber].modbus_type == VT_R4) ||
+					   (Config_db[rowNumber].modbus_type == VT_R4SWAP)
+					   )
+					{
+						if(one_item.iec_obj.ioa == Config_db[rowNumber].ioa_control_center)
+						{
+							int offset = Config_db[rowNumber].modbus_address;
+
+							if(one_item.iec_type == M_IT_TB_1)
+							{
+								mb_mapping->tab_registers[offset] = one_item.iec_obj.o.type37.counter;
+							}
+
+							if(one_item.iec_type == M_ME_TF_1)
+							{
+								memcpy(&(mb_mapping->tab_registers[offset]),&(one_item.iec_obj.o.type36.mv), sizeof(float));
+							}
+						}
+					}
+					else if(Config_db[rowNumber].modbus_type == VT_I2)
+					{
+						if(one_item.iec_obj.ioa == Config_db[rowNumber].ioa_control_center)
+						{
+							int offset = Config_db[rowNumber].modbus_address;
+							
+							if(one_item.iec_type == M_ME_TE_1)
+							{
+								mb_mapping->tab_registers[offset] = one_item.iec_obj.o.type35.mv;
+							}
+						}
+					}
+					else if(Config_db[rowNumber].modbus_type == VT_UI2)
+					{
+						if(one_item.iec_obj.ioa == Config_db[rowNumber].ioa_control_center)
+						{
+							int offset = Config_db[rowNumber].modbus_address;
+							
+							if(one_item.iec_type == M_ME_TQ_1)
+							{
+								mb_mapping->tab_registers[offset] = one_item.iec_obj.o.type153.mv;
+							}
+						}
+					}
+				}
+				else if(Config_db[rowNumber].modbus_function_read == FC_READ_INPUT_REGISTERS) //0x04
+				{
+					if((Config_db[rowNumber].modbus_type == VT_I4) || 
+					   (Config_db[rowNumber].modbus_type == VT_UI4)|| 
+					   (Config_db[rowNumber].modbus_type == VT_R4) ||
+					   (Config_db[rowNumber].modbus_type == VT_R4SWAP)
+					   )
+					{
+						if(one_item.iec_obj.ioa == Config_db[rowNumber].ioa_control_center)
+						{
+							int offset = Config_db[rowNumber].modbus_address;
+
+							if(one_item.iec_type == M_IT_TB_1)
+							{
+								mb_mapping->tab_input_registers[offset] = one_item.iec_obj.o.type37.counter;
+							}
+
+							if(one_item.iec_type == M_ME_TF_1)
+							{
+								memcpy(&(mb_mapping->tab_input_registers[offset]),&(one_item.iec_obj.o.type36.mv), sizeof(float));
+							}
+						}
+					}
+					else if(Config_db[rowNumber].modbus_type == VT_I2)
+					{
+						if(one_item.iec_obj.ioa == Config_db[rowNumber].ioa_control_center)
+						{
+							int offset = Config_db[rowNumber].modbus_address;
+							
+							if(one_item.iec_type == M_ME_TE_1)
+							{
+								mb_mapping->tab_input_registers[offset] = one_item.iec_obj.o.type35.mv;
+							}
+						}
+					}
+					else if(Config_db[rowNumber].modbus_type == VT_UI2)
+					{
+						if(one_item.iec_obj.ioa == Config_db[rowNumber].ioa_control_center)
+						{
+							int offset = Config_db[rowNumber].modbus_address;
+							
+							if(one_item.iec_type == M_ME_TQ_1)
+							{
+								mb_mapping->tab_input_registers[offset] = one_item.iec_obj.o.type153.mv;
+							}
+						}
+					}
+				}
+				else if(Config_db[rowNumber].modbus_function_read == FC_READ_EXCEPTION_STATUS)
+				{
+					//0x07
+					printf("Function %x not supported\n", 0x07);
+				
+				}
+				else if(Config_db[rowNumber].modbus_function_read == FC_REPORT_SLAVE_ID)
+				{
+					//0x11
+					printf("Function %x not supported\n", 0x11);
+				}
+				else if(Config_db[rowNumber].modbus_function_read == FC_WRITE_AND_READ_REGISTERS)
+				{
+					//0x17
+					printf("Function %x not supported\n", 0x17);
+				}
+				else
+				{
+					printf("Function not supported\n");
+				}
+			}
+		}
+
+		//////////////////////////
 
         rc = modbus_receive(ctx, query);
         if (rc >= 0) 
@@ -327,6 +486,8 @@ int modbus_imp::Stop()
 
 	fprintf(stderr,"Entering Stop()\n");
 	fflush(stderr);
+
+	fifo_close(fifo_monitor_direction);
 
 	/* Free the memory */
     //free(tab_rp_bits);
@@ -474,33 +635,6 @@ int64_t modbus_imp::epoch_from_cp56time2a(const struct cp56time2a* time)
 	return epoch;
 }
 
-#define ABS(x) ((x) >= 0 ? (x) : -(x))
-
-/*
-int modbus_imp::PollItems(void)
-{
-	IT_IT("modbus_imp::PollItems");
-
-	struct iec_item item_to_send;
-	struct cp56time2a actual_time;
-	////////////////////////////////Start protocol implementation///////////////////////////////////
-	int rc;
-    bool send_item;
-	int bit_size;
-    	
-    comm_error_counter = 0;
-
-	int stored_address = 0;
-
-	for(int rowNumber = 0; rowNumber < db_n_rows; rowNumber++)
-			
-
-	IT_EXIT;
-	return 0;
-
-}
-*/
-
 #define _EPSILON_ ((double)(2.220446E-16))
 
 #define DO_NOT_RESCALE
@@ -611,3 +745,74 @@ double modbus_imp::rescale_value_inv(double A, double Vmin, double Vmax, int* er
 
 	#endif //DO_NOT_RESCALE
 }
+
+#include <signal.h>
+
+char* get_date_time()
+{
+	static char sz[128];
+	time_t t = time(NULL);
+	struct tm *ptm = localtime(&t);
+	
+	strftime(sz, sizeof(sz)-2, "%m/%d/%y %H:%M:%S", ptm);
+
+	strcat(sz, "|");
+	return sz;
+}
+
+void iec_call_exit_handler(int line, char* file, char* reason)
+{
+	FILE* fp;
+	char program_path[_MAX_PATH];
+	char log_file[_MAX_FNAME+_MAX_PATH];
+	IT_IT("iec_call_exit_handler");
+
+	program_path[0] = '\0';
+#ifdef WIN32
+	if(GetModuleFileName(NULL, program_path, _MAX_PATH))
+	{
+		*(strrchr(program_path, '\\')) = '\0';        // Strip \\filename.exe off path
+		*(strrchr(program_path, '\\')) = '\0';        // Strip \\bin off path
+    }
+#elif __unix__
+	if(getcwd(program_path, _MAX_PATH))
+	{
+		*(strrchr(program_path, '/')) = '\0';        // Strip \\filename.exe off path
+		*(strrchr(program_path, '/')) = '\0';        // Strip \\bin off path
+    }
+#endif
+
+	strcpy(log_file, program_path);
+
+#ifdef WIN32
+	strcat(log_file, "\\logs\\modbus_slave.log");
+#elif __unix__
+	strcat(log_file, "/logs/modbus_slave.log");	
+#endif
+
+	fp = fopen(log_file, "a");
+
+	if(fp)
+	{
+		if(line && file && reason)
+		{
+			fprintf(fp, "PID:%d time:%s exit process at line: %d, file %s, reason:%s\n", GetCurrentProcessId, get_date_time(), line, file, reason);
+		}
+		else if(line && file)
+		{
+			fprintf(fp, "PID:%d time:%s exit process at line: %d, file %s\n", GetCurrentProcessId, get_date_time(), line, file);
+		}
+		else if(reason)
+		{
+			fprintf(fp, "PID:%d time:%s exit process for reason %s\n", GetCurrentProcessId, get_date_time(), reason);
+		}
+
+		fflush(fp);
+		fclose(fp);
+	}
+
+	raise(SIGABRT);   //raise abort signal which in turn starts automatically a separete thread and call iec104SignalHandler
+
+	IT_EXIT;
+}
+

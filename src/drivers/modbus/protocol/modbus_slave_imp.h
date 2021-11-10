@@ -22,6 +22,7 @@
 #include <time.h>
 #include "itrace.h"
 #include <modbus.h>
+#include "fifoc.h"
 
 #include "iec_item_type.h" //Middleware
 ////////////////////////////Middleware///////////////////////////////////////////////////////
@@ -88,6 +89,8 @@ class modbus_imp
 	ORTESubscription        *subscriber;
 	iec_item_type			instanceSend;
 	iec_item_type		    instanceRecv;
+
+	fifo_h fifo_monitor_direction;
 	//////////////////////////////end//Middleware///////////
 
 	/////////////Middleware///////////////////////////////
