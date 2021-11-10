@@ -44,7 +44,7 @@ RSC=rc.exe
 MTL=midl.exe
 F90=df.exe
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /GX /O2 /I "$(QTDIR)\include" /I "." /I ".." /I "..\.." /I "..\..\..\common" /I "..\..\..\database" /I "..\..\..\utilities" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /FD /c
+# ADD CPP /nologo /MD /W3 /GX /O2 /I "$(QTDIR)\include" /I "." /I ".." /I "..\.." /I "..\..\..\common" /I "..\..\..\database" /I "..\..\..\utilities" /I "..\..\..\configurator\sqlite" /I "..\..\..\fifo" /I "..\..\..\middleware\rtps\include" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /FD /c
 # SUBTRACT CPP /YX
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
@@ -53,7 +53,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib ws2_32.lib winmm.lib /nologo /subsystem:console /machine:I386 /out:"c:\scada\bin/modbus_slave.exe" /libpath:"."
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib ws2_32.lib winmm.lib rtps.lib utilities.lib /nologo /subsystem:console /machine:I386 /out:"c:\scada\bin/modbus_slave.exe" /libpath:"." /libpath:"c:\scada\lib"
 
 !ELSEIF  "$(CFG)" == "modbus_slave - Win32 Debug"
 
@@ -97,6 +97,18 @@ SOURCE=..\..\..\utilities\clear_crc_eight.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\utilities\getopt.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\common\iec_item_type.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\load_database_modbus_slave.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\main_slave.cpp
 # End Source File
 # Begin Source File
@@ -114,6 +126,18 @@ SOURCE=".\modbus-tcp.c"
 # Begin Source File
 
 SOURCE=.\modbus.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\modbus_slave_imp.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\configurator\sqlite\sqlite3.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\common\time64.c
 # End Source File
 # End Group
 # End Target
