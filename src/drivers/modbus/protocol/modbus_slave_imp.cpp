@@ -294,7 +294,12 @@ int modbus_imp::RunServer(void)
 						if(one_item.iec_obj.ioa == Config_db[rowNumber].ioa_control_center)
 						{
 							int offset = Config_db[rowNumber].modbus_address;
-							mb_mapping->tab_bits[offset] = one_item.iec_obj.o.type30.sp;
+
+							if(one_item.iec_type == M_SP_TB_1)
+							{
+								mb_mapping->tab_bits[offset] = one_item.iec_obj.o.type30.sp;
+								break;
+							}
 						}
 					}
 				}
@@ -305,7 +310,12 @@ int modbus_imp::RunServer(void)
 						if(one_item.iec_obj.ioa == Config_db[rowNumber].ioa_control_center)
 						{
 							int offset = Config_db[rowNumber].modbus_address;
-							mb_mapping->tab_input_bits[offset] = one_item.iec_obj.o.type30.sp;
+
+							if(one_item.iec_type == M_SP_TB_1)
+							{
+								mb_mapping->tab_input_bits[offset] = one_item.iec_obj.o.type30.sp;
+								break;
+							}
 						}
 					}
 				}
@@ -324,11 +334,13 @@ int modbus_imp::RunServer(void)
 							if(one_item.iec_type == M_IT_TB_1)
 							{
 								mb_mapping->tab_registers[offset] = one_item.iec_obj.o.type37.counter;
+								break;
 							}
 
 							if(one_item.iec_type == M_ME_TF_1)
 							{
 								memcpy(&(mb_mapping->tab_registers[offset]),&(one_item.iec_obj.o.type36.mv), sizeof(float));
+								break;
 							}
 						}
 					}
@@ -341,6 +353,7 @@ int modbus_imp::RunServer(void)
 							if(one_item.iec_type == M_ME_TE_1)
 							{
 								mb_mapping->tab_registers[offset] = one_item.iec_obj.o.type35.mv;
+								break;
 							}
 						}
 					}
@@ -353,6 +366,7 @@ int modbus_imp::RunServer(void)
 							if(one_item.iec_type == M_ME_TQ_1)
 							{
 								mb_mapping->tab_registers[offset] = one_item.iec_obj.o.type153.mv;
+								break;
 							}
 						}
 					}
@@ -372,11 +386,13 @@ int modbus_imp::RunServer(void)
 							if(one_item.iec_type == M_IT_TB_1)
 							{
 								mb_mapping->tab_input_registers[offset] = one_item.iec_obj.o.type37.counter;
+								break;
 							}
 
 							if(one_item.iec_type == M_ME_TF_1)
 							{
 								memcpy(&(mb_mapping->tab_input_registers[offset]),&(one_item.iec_obj.o.type36.mv), sizeof(float));
+								break;
 							}
 						}
 					}
@@ -389,6 +405,7 @@ int modbus_imp::RunServer(void)
 							if(one_item.iec_type == M_ME_TE_1)
 							{
 								mb_mapping->tab_input_registers[offset] = one_item.iec_obj.o.type35.mv;
+								break;
 							}
 						}
 					}
@@ -401,6 +418,7 @@ int modbus_imp::RunServer(void)
 							if(one_item.iec_type == M_ME_TQ_1)
 							{
 								mb_mapping->tab_input_registers[offset] = one_item.iec_obj.o.type153.mv;
+								break;
 							}
 						}
 					}
@@ -427,9 +445,7 @@ int modbus_imp::RunServer(void)
 				}
 			}
 		}
-
-		//////////////////////////
-
+		
         rc = modbus_receive(ctx, query);
         if (rc >= 0) 
 		{
