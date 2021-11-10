@@ -134,7 +134,7 @@ fExit(false), general_interrogation(true), is_connected(false)
     if (ctx != NULL)
 	{
 		#define MAX_FIFO_SIZE 65535
-		fifo_monitor_direction = fifo_open("fifo_local_monitor_dir", MAX_FIFO_SIZE, iec_call_exit_handler);
+		fifo_monitor_direction = fifo_open("fifo_local_monitor_dir_in_modbus_slave", MAX_FIFO_SIZE, iec_call_exit_handler);
 
 		/////////////////////Middleware/////////////////////////////////////////////////////////////////
 		int32_t                 strength = 1;
