@@ -12,6 +12,7 @@
 #include <windows.h>
 #endif
 #include <memmgr.h>
+#include <malloc.h> //apa+++
 
 /** mutex for thread to stop the threads hitting data at the same time. */
 ins_mutex_t * mut = NULL; //apa+++
@@ -48,7 +49,8 @@ static mem_header_t* freep = 0;
 
 // Static pool for new allocations
 //
-static byte pool[POOL_SIZE] = {0};
+//static byte pool[POOL_SIZE] = {0}; //apa---
+static byte* pool = NULL; //apa+++
 static ulong pool_free_pos = 0;
 
 
@@ -60,12 +62,22 @@ void memmgr_init()
     pool_free_pos = 0;
 
 	mut = ins_mutex_new(); //apa+++
+
+	pool = (byte*)malloc(POOL_SIZE); //apa+++
+
+	memset(pool, 0, POOL_SIZE); //apa+++
+
+	if(pool == NULL) //apa+++
+	{
+		printf("Failure in allocation of pool memory\n"); //apa+++
+	}
 }
 
 //apa+++
 void memmgr_terminate()
 {
 	ins_mutex_free(mut);
+	free(pool);
 }
 
 void memmgr_print_stats()

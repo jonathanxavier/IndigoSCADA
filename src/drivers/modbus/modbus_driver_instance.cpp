@@ -1052,6 +1052,13 @@ void Modbus_driver_Instance::get_items_from_local_fifo(void)
 	{
 		wait_for_message = 0;
 		msg_received_in_monitor_direction = 0;
+
+		QString msg;
+		msg.sprintf("modbus master on line %d has been stopped...", instanceID + 1); 
+		FailUnit(msg);
+
+		State = STATE_FAIL;
+
 		//Terminate child process
 		pConnect->TerminateChild();
 	}
