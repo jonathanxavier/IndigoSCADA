@@ -748,7 +748,7 @@ void Iec104driver_Instance::get_items_from_local_fifo(void)
 		}
 
 		wait_for_message = 0;
-		msg_received_in_monitor_direction++;
+		//msg_received_in_monitor_direction++;
 			
 		//printf("Receiving %d th message \n", p_item->msg_id);
 		printf("Receiving %d th iec104 message from line = %d\n", p_item->msg_id, instanceID + 1);
@@ -1058,10 +1058,11 @@ void Iec104driver_Instance::get_items_from_local_fifo(void)
 		}
 	}
 
-	if(msg_received_in_monitor_direction && (wait_for_message > 60)) //60 seconds timeout
+	//if(msg_received_in_monitor_direction && (wait_for_message > 60)) //60 seconds timeout
+	if(wait_for_message > 60) //60 seconds timeout
 	{
 		wait_for_message = 0;
-		msg_received_in_monitor_direction = 0;
+		//msg_received_in_monitor_direction = 0;
 
 		QString msg;
 		msg.sprintf("iec104 master on line %d has been stopped...", instanceID + 1); 

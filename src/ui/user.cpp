@@ -89,8 +89,8 @@
 //*****************************************************************
 
 // interval between monitor ticks 
-//#define MONITOR_TICK_TIME 2000 //ms
-#define MONITOR_TICK_TIME 100 //ms
+#define MONITOR_TICK_TIME 2000 //ms
+//#define MONITOR_TICK_TIME 100 //ms
 
 /*-Function:UserFrameWork
 *Inputs:none
