@@ -128,6 +128,14 @@ SOURCE=.\isnan.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\owcrypt.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\owcrypt.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\utilities.cpp
 # End Source File
 # Begin Source File

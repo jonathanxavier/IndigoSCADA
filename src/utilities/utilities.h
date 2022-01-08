@@ -36,6 +36,7 @@ extern "C" {
 	 UTILITIES_DLL_EXP_IMP int IsNAN_Double(double);
 	 UTILITIES_DLL_EXP_IMP int IsNAN_Float(float);
 	 UTILITIES_DLL_EXP_IMP int flp_cmp(double x1, double x2);
+	 UTILITIES_DLL_EXP_IMP void my_owcrypt(const char * password, const char * salt, char * encrypted);
 }
 
 

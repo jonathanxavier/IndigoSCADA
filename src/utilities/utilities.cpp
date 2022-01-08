@@ -16,6 +16,7 @@
 #include "isnan.h"
 #include "fcmp.h"
 #include "const.h"
+#include "owcrypt.h"
 
 bool IsSingleInstance (const char* Name)
 {
@@ -54,5 +55,16 @@ int flp_cmp(double x1, double x2)
 	return fcmp(x1, x2, MACHEP);
 }
 
+/*
+ * Usage:
+ *
+ *  char[OWCRYPT_SZ] encrypted;
+ *  my_owcrypt("my_password", "saltsalt$1", encrypted);
+ */
+
+void my_owcrypt(const char * password, const char * salt, char * encrypted)
+{
+	owcrypt(password, salt, encrypted);
+}
 
 #endif
