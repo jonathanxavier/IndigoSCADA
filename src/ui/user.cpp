@@ -404,6 +404,7 @@ void UserFrameWork::SetTabs()
 		HANDLE HRicerca;
 		WIN32_FIND_DATA DescrittoreF;
 		char file_ext[50];
+		char file_name[200];
 		int rt;
 
 		strcpy(buffer01, (const char*)GetScadaProjectDirectory()); //apa 04-12-2020
@@ -436,7 +437,9 @@ void UserFrameWork::SetTabs()
 
 							if(!strcmp(file_ext, MAP_FILE_EXT))
 							{
-								hmi_index = QString(DescrittoreF.cFileName);	
+								strcpy(file_name, DescrittoreF.cFileName);
+								*(strrchr(file_name, '.')) = '\0';
+								hmi_index = QString(file_name);	
 								HMIDict::value_type pr(hmi_index, new HMI_manager);
 								hmi_database.insert(pr); // put in the dictionary					
 							}
@@ -456,7 +459,7 @@ void UserFrameWork::SetTabs()
 			hmi_mng = (*it).second;
 		
 			QWidgetFactory::loadImages("../Bitmaps");
-			QString map_path = GetScadaProjectDirectory() + QString("\\") + (*it).first; //apa 04-12-2020
+			QString map_path = GetScadaProjectDirectory() + QString("\\") + (*it).first + QString(".ui"); //apa 04-12-2020
 			QDialog *designerHMI = (QDialog *)QWidgetFactory::create(map_path, hmi_mng);
 
 			if(designerHMI)
