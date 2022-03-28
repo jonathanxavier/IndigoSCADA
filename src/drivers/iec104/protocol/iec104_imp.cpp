@@ -154,6 +154,8 @@ void monitoring_dir_consumer(void* pParam)
 			parent->queue_monitor_dir->put(&item_to_send, sizeof(struct iec_item));
 			#endif
 
+			Sleep(10); //Without delay there is missing of messages in the loading 27-03-2022
+
 			//Send in monitor direction
 			//prepare published data
 			memset(&(parent->instanceSend),0x00, sizeof(iec_item_type));

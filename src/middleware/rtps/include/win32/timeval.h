@@ -29,7 +29,7 @@ struct timezone {
     int tz_dsttime;     /* type of dst correction */
 };
 
-static inline int gettimeofday(struct timeval *tv, struct timezone *tz)
+static __inline int gettimeofday(struct timeval *tv, struct timezone *tz)
 {
     FILETIME        ft;
     LARGE_INTEGER   li;

@@ -53,7 +53,7 @@ extern void iec_call_exit_handler(int line, char* file, char* reason);
 //#define MAX_FIFO_SIZE 65535
 #define MAX_FIFO_SIZE 70000*(sizeof(struct iec_item))
 ////////////////////////////////////////////////////////////////////////
-
+#define TICK_MS 300
 
 class Iec104DriverThread;
 
@@ -144,7 +144,8 @@ class IEC_104_DRIVERDRV Iec104driver_Instance : public DriverInstance
 
 		pTimer = new QTimer(this);
 		connect(pTimer,SIGNAL(timeout()),this,SLOT(Tick()));
-		pTimer->start(1000); // start with a 1 second timer
+		//pTimer->start(1000); // start with a 1 second timer
+		pTimer->start(TICK_MS); // start with a 300 ms timer
 
 		/////////////////////Middleware/////////////////////////////////////////////////////////////////
 		char fifo_control_name[150];

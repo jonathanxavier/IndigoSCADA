@@ -751,7 +751,8 @@ void Iec104driver_Instance::get_items_from_local_fifo(void)
 		//msg_received_in_monitor_direction++;
 			
 		//printf("Receiving %d th message \n", p_item->msg_id);
-		printf("Receiving %d th iec104 message from line = %d\n", p_item->msg_id, instanceID + 1);
+		//printf("Receiving %d th iec104 message from line = %d\n", p_item->msg_id, instanceID + 1);
+		
 
 		//for (int j = 0; j < len; j++) 
 		//{ 
@@ -1059,7 +1060,7 @@ void Iec104driver_Instance::get_items_from_local_fifo(void)
 	}
 
 	//if(msg_received_in_monitor_direction && (wait_for_message > 60)) //60 seconds timeout
-	if(wait_for_message > 60) //60 seconds timeout
+	if(wait_for_message > 60*1000/TICK_MS) //60 seconds timeout
 	{
 		wait_for_message = 0;
 		//msg_received_in_monitor_direction = 0;

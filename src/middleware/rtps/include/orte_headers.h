@@ -36,7 +36,7 @@ extern "C" {
 
 #if defined _MSC_VER
   #include "orte/ew_types.h"
-#elif defined(HAVE_CONFIG_H) || defined(OMK_FOR_USER)  || defined(OMK_FOR_KERNEL)
+//#elif defined(HAVE_CONFIG_H) || defined(OMK_FOR_USER)  || defined(OMK_FOR_KERNEL)
   #include "orte/orte_config.h"
 #else
   #error ""
@@ -194,7 +194,7 @@ extern "C" {
   #ifndef __GETOPT_H__  //mingw
     #include <win32/getopt.h>
   #endif
-  #ifndef HAVE_TIMEVAL_H
+  #ifdef HAVE_TIMEVAL_H
     #include <win32/timeval.h>
   #endif
   #include <orte/ew_types.h>
