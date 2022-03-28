@@ -31,7 +31,7 @@
 /* Define if is target a unix system */
 /* #undef CONFIG_ORTE_UNIX */
 
-#define HAVE_TIMEVAL_H 1
+//#define HAVE_TIMEVAL_H 1
 
 /* Define if is target windows */
 #define CONFIG_ORTE_WIN 1

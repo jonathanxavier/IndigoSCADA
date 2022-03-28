@@ -77,7 +77,11 @@ void memmgr_init()
 void memmgr_terminate()
 {
 	ins_mutex_free(mut);
-	free(pool);
+
+	if(pool)
+	{
+		free(pool);
+	}
 }
 
 void memmgr_print_stats()

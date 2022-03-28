@@ -194,7 +194,7 @@ extern "C" {
   #ifndef __GETOPT_H__  //mingw
     #include <win32/getopt.h>
   #endif
-  #ifdef HAVE_TIMEVAL_H
+  #ifndef HAVE_TIMEVAL_H
     #include <win32/timeval.h>
   #endif
   #include <orte/ew_types.h>
