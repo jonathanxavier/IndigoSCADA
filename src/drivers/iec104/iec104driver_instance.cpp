@@ -1102,6 +1102,30 @@ void Iec104driver_Instance::get_items_from_local_fifo(void)
 				}
 			}
 			break;
+			case M_IT_NA_1:
+			{
+				if(it != ioa_name_map.end())
+				{
+					sp_name = it.data();
+
+					iec_type15 var = p_item->iec_obj.o.type15;
+				
+					IECValue v(VALUE_TAG, &var, M_IT_NA_1);
+				
+					IECValueList l;
+
+					l.insert(l.end(),v);
+
+					PostList(sp_name, l);
+
+				}
+				else
+				{
+					//fprintf(stderr, "Error: not found name of item with ioa = %d\n", p_item->iec_obj.ioa);
+					//fflush(stderr);
+				}
+			}
+			break;
 			case M_IT_TB_1:
 			{
 				if(it != ioa_name_map.end())
