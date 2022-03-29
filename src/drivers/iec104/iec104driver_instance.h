@@ -55,6 +55,8 @@ extern void iec_call_exit_handler(int line, char* file, char* reason);
 ////////////////////////////////////////////////////////////////////////
 #define TICK_MS 300
 
+typedef QMap<int, QString> IOANameMap;
+
 class Iec104DriverThread;
 
 class IEC_104_DRIVERDRV Iec104driver_Instance : public DriverInstance 
@@ -65,7 +67,8 @@ class IEC_104_DRIVERDRV Iec104driver_Instance : public DriverInstance
 	enum
 	{
 		tUnitProperties = 1,tList, tSamplePointProperties, tListUnits, 
-		tGetSamplePointNamefromIOA, tGetIOAfromSamplePointName
+		tGetSamplePointNamefromIOA, tGetIOAfromSamplePointName,
+		tSetSamplePointNameIOAMap
 	};
 	//
 	//
@@ -80,6 +83,7 @@ class IEC_104_DRIVERDRV Iec104driver_Instance : public DriverInstance
 	int Sp; //Current sample point index under measurement
 	bool InTick; //tick sentinal
 	int IecItems;
+	IOANameMap ioa_name_map;
 	
 	struct  Track
 	{
@@ -122,7 +126,11 @@ class IEC_104_DRIVERDRV Iec104driver_Instance : public DriverInstance
 		STATE_ASK_GENERAL_INTERROGATION,
 		STATE_GENERAL_INTERROGATION_DONE,
 		STATE_FAIL,
-		STATE_RUNNING
+		STATE_RUNNING,
+		STATE_AFTER_RESET,
+		STATE_INIT_DB_DONE,
+		STATE_INIT_DB,
+		STATE_INITIALIZING_DB
 	};
 
 	public:
