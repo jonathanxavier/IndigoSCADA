@@ -47,6 +47,8 @@ struct InstanceCfg // friend to anyone
 	QString DataBits;
 	QString StopBit;
 	QString Parity;
+	QString RTSOnTime;
+	QString RTSOffTime;
 
 	unsigned SampleTime; // sampleing time 
 

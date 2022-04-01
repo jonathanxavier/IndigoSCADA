@@ -35,38 +35,38 @@ Modbus_driverConfigurationData::Modbus_driverConfigurationData( QWidget* parent,
 	setName( "Form1" );
 
     textLabel1 = new QLabel( this, "textLabel1" );
-    textLabel1->setGeometry( QRect( 40, 110, 49, 20 ) );
+    textLabel1->setGeometry( QRect( 40, 90, 49, 20 ) );
 
     textLabel4 = new QLabel( this, "textLabel4" );
-    textLabel4->setGeometry( QRect( 40, 230, 90, 20 ) );
+    textLabel4->setGeometry( QRect( 40, 170, 90, 20 ) );
 
     textLabel7 = new QLabel( this, "textLabel7" );
-    textLabel7->setGeometry( QRect( 40, 270, 90, 20 ) );
+    textLabel7->setGeometry( QRect( 40, 210, 90, 20 ) );
 
     textLabel8 = new QLabel( this, "textLabel8" );
-    textLabel8->setGeometry( QRect( 40, 310, 49, 20 ) );
+    textLabel8->setGeometry( QRect( 40, 250, 49, 20 ) );
 
     textLabel9 = new QLabel( this, "textLabel9" );
-    textLabel9->setGeometry( QRect( 40, 350, 90, 20 ) );
+    textLabel9->setGeometry( QRect( 40, 290, 90, 20 ) );
 
     textLabel10 = new QLabel( this, "textLabel10" );
-    textLabel10->setGeometry( QRect( 40, 390, 90, 20 ) );
+    textLabel10->setGeometry( QRect( 40, 330, 90, 20 ) );
 
     textLabel11 = new QLabel( this, "textLabel11" );
-    textLabel11->setGeometry( QRect( 40, 430, 55, 20 ) );
+    textLabel11->setGeometry( QRect( 40, 370, 55, 20 ) );
 
     SerialDevice = new QLineEdit( this, "SerialDevice" );
-    SerialDevice->setGeometry( QRect( 170, 270, 200, 20 ) );
+    SerialDevice->setGeometry( QRect( 170, 210, 200, 20 ) );
 
     MODBUSServerIPPortText = new QLineEdit( this, "MODBUSServerIPPortText" );
-    MODBUSServerIPPortText->setGeometry( QRect( 170, 230, 200, 20 ) );
+    MODBUSServerIPPortText->setGeometry( QRect( 170, 170, 200, 20 ) );
 
     MODBUSServerIPAddressText = new QLineEdit( this, "MODBUSServerIPAddressText" );
-    MODBUSServerIPAddressText->setGeometry( QRect( 170, 190, 200, 20 ) );
+    MODBUSServerIPAddressText->setGeometry( QRect( 170, 130, 200, 20 ) );
 
     Name = new QLineEdit( this, "Name" );
     Name->setEnabled( FALSE );
-    Name->setGeometry( QRect( 170, 110, 200, 20 ) );
+    Name->setGeometry( QRect( 170, 90, 200, 20 ) );
     Name->setFrameShape( QLineEdit::LineEditPanel );
     Name->setFrameShadow( QLineEdit::Sunken );
 
@@ -74,11 +74,11 @@ Modbus_driverConfigurationData::Modbus_driverConfigurationData( QWidget* parent,
     textLabel2->setGeometry( QRect( 40, 150, 90, 20 ) );
 
     Baud = new QSpinBox( this, "Baud" );
-    Baud->setGeometry( QRect( 170, 310, 200, 20 ) );
+    Baud->setGeometry( QRect( 170, 250, 200, 20 ) );
     Baud->setMaxValue( 200000 );
 
     DataBits = new QSpinBox( this, "DataBits" );
-    DataBits->setGeometry( QRect( 170, 350, 200, 20 ) );
+    DataBits->setGeometry( QRect( 170, 290, 200, 20 ) );
     DataBits->setMaxValue( 8 );
 
     buttonGroup1 = new QButtonGroup( this, "buttonGroup1" );
@@ -92,7 +92,7 @@ Modbus_driverConfigurationData::Modbus_driverConfigurationData( QWidget* parent,
     RTUButton->setGeometry( QRect( 250, 20, 82, 20 ) );
 
     textLabel3 = new QLabel( this, "textLabel3" );
-    textLabel3->setGeometry( QRect( 40, 190, 100, 20 ) );
+    textLabel3->setGeometry( QRect( 40, 130, 100, 20 ) );
 
     HelpButton = new QPushButton( this, "HelpButton" );
     HelpButton->setGeometry( QRect( 170, 550, 82, 26 ) );
@@ -104,7 +104,7 @@ Modbus_driverConfigurationData::Modbus_driverConfigurationData( QWidget* parent,
     OkButton->setGeometry( QRect( 50, 550, 82, 26 ) );
 
     StopBit = new QSpinBox( this, "StopBit" );
-    StopBit->setGeometry( QRect( 170, 390, 200, 20 ) );
+    StopBit->setGeometry( QRect( 170, 330, 200, 20 ) );
     StopBit->setMaxValue( 2 );
 
     PollInterval = new QSpinBox( this, "PollInterval" );
@@ -122,7 +122,22 @@ Modbus_driverConfigurationData::Modbus_driverConfigurationData( QWidget* parent,
     textLabel6->setGeometry( QRect( 40, 510, 110, 20 ) );
 
     Parity = new QComboBox( FALSE, this, "Parity" );
-    Parity->setGeometry( QRect( 170, 430, 200, 20 ) );
+    Parity->setGeometry( QRect( 170, 370, 200, 20 ) );
+
+	RTSOnTime = new QSpinBox( this, "RTS leading time" );
+    RTSOnTime->setGeometry( QRect( 170, 410, 200, 20 ) );
+    RTSOnTime->setMaxValue( 1000 );
+
+	RTSOffTime = new QSpinBox( this, "RTS trailing time" );
+    RTSOffTime->setGeometry( QRect( 170, 450, 200, 20 ) );
+    RTSOffTime->setMaxValue( 1000 );
+
+	textLabel12 = new QLabel( this, "textLabel12" );
+    textLabel12->setGeometry( QRect( 40, 410, 130, 20 ) );
+
+	textLabel13 = new QLabel( this, "textLabel13" );
+    textLabel13->setGeometry( QRect( 40, 450, 130, 20 ) );
+
     languageChange();
     resize( QSize(429, 613).expandedTo(minimumSizeHint()) );
     clearWState( WState_Polished );
@@ -157,6 +172,8 @@ void Modbus_driverConfigurationData::languageChange()
     textLabel9->setText( tr( "Data bits" ) );
     textLabel10->setText( tr( "Stop bit" ) );
     textLabel11->setText( tr( "Parity" ) );
+	textLabel12->setText( tr( "RTS Leading time (ms)" ) );
+	textLabel13->setText( tr( "RTS Trailing time (ms)" ) );
     buttonGroup1->setTitle( tr( "MODBUS Context" ) );
     TCPButton->setText( tr( "TCP" ) );
     RTUButton->setText( tr( "RTU" ) );

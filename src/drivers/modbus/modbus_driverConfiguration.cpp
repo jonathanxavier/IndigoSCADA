@@ -78,7 +78,7 @@ void Modbus_driverConfiguration::OkClicked()
 
 		cmd = "insert into PROPS values('"+Name->text() +"','" + Receipe + "','" + 
 		NItems->text() + " " + PollInterval->text() + " " + MODBUSServerIPAddressText->text() + " " + MODBUSServerIPPortText->text() +
-		" " + SerialDevice->text() + " " + Baud->text() + " " + DataBits->text() +" "+ StopBit->text() +" "+ Parity->currentText() +	"');";
+		" " + SerialDevice->text() + " " + Baud->text() + " " + DataBits->text() +" "+ StopBit->text() +" "+ Parity->currentText() +" "+ RTSOnTime->text() +" "+ RTSOffTime->text() + "');";
 	}
 	else if(context == TCP)
 	{
@@ -130,6 +130,10 @@ void Modbus_driverConfiguration::QueryResponse (QObject *p, const QString &c, in
 				StopBit->setValue(n);
 				is >> t;
 				Parity->setCurrentText(t);
+				is >> n;
+				RTSOnTime->setValue(n);
+				is >> n;
+				RTSOffTime->setValue(n);
 
 				if(strlen((const char*)(SerialDevice->text())) == 0)
 				{
@@ -165,6 +169,8 @@ void Modbus_driverConfiguration::QueryResponse (QObject *p, const QString &c, in
 				DataBits->setValue(8);
 				StopBit->setValue(1);
 				Parity->setCurrentText("N");
+				RTSOnTime->setValue(0);
+				RTSOffTime->setValue(0);
 				RTUButton->toggle();
 			}
 		} 

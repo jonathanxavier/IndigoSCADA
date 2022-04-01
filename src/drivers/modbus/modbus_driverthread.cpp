@@ -68,6 +68,10 @@ void Modbus_DriverThread::run()
 		strcat(pCommandLine, line_number);
 		strcat(pCommandLine, " -t ");
 		strcat(pCommandLine, polling_time);
+		strcat(pCommandLine, " -u ");
+		strcat(pCommandLine, ((Modbus_driver_Instance*)Parent)->Cfg.RTSOnTime);
+		strcat(pCommandLine, " -v ");
+		strcat(pCommandLine, ((Modbus_driver_Instance*)Parent)->Cfg.RTSOffTime);
 	}
 		
 	strcpy(pWorkingDir, GetScadaHomeDirectory());

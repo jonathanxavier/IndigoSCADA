@@ -270,6 +270,8 @@ void Modbus_driver_Instance::QueryResponse(QObject *p, const QString &c, int id,
 				is >> Cfg.DataBits;
 				is >> Cfg.StopBit;
 				is >> Cfg.Parity;
+				is >> Cfg.RTSOnTime;
+				is >> Cfg.RTSOffTime;
 				
 				if(strlen((const char*)Cfg.SerialDevice) == 0)
 				{
@@ -529,6 +531,7 @@ void Modbus_driver_Instance::Tick()
 		break;
 		case STATE_INIT_DB:
 		{
+			State = STATE_INITIALIZING_DB;
 			QString cmd = "select * from TAGS where UNIT='"+ Name + "';";
 			GetConfigureDb()->DoExec(this, cmd, tSetSamplePointNameIOAMap);
 		}
@@ -624,7 +627,7 @@ void Modbus_driver_Instance::get_items_from_local_fifo(void)
 		msg_received_in_monitor_direction++;
 
 		//printf("Receiving %d th message \n", p_item->msg_id);
-		printf("Receiving %d th modbus message from line = %d\n", p_item->msg_id, instanceID + 1);
+		//printf("Receiving %d th modbus message from line = %d\n", p_item->msg_id, instanceID + 1);
 
 		//for (int j = 0; j < len; j++) 
 		//{ 

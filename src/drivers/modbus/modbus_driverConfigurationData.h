@@ -60,6 +60,10 @@ public:
     QLabel* textLabel5;
     QLabel* textLabel6;
     QComboBox* Parity;
+	QSpinBox* RTSOnTime;
+	QSpinBox* RTSOffTime;
+	QLabel* textLabel12;
+	QLabel* textLabel13;
 
 public slots:
     virtual void Help();
