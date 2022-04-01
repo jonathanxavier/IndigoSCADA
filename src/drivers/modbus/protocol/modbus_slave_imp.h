@@ -51,6 +51,8 @@ struct modbusContext
     uint8_t stop_bit;
     /* Parity: 'N', 'O', 'E' */
     char parity;
+	int rtsOnTime; //Leading time RTS in ms
+	int rtsOffTime; //Trailing time RTS in ms
 };
 
 enum {

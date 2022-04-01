@@ -81,6 +81,8 @@ typedef struct _modbus_rtu {
 #if HAVE_DECL_TIOCSRS485
     int serial_mode;
 #endif
+	int rtsOnTime; //ms apa+++
+	int rtsOffTime; //ms apa+++
 } modbus_rtu_t;
 
 #endif /* _MODBUS_RTU_PRIVATE_H_ */

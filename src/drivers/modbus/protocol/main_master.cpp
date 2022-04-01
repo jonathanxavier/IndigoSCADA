@@ -61,7 +61,7 @@ struct args{
 
 void PipeWorker(void* pParam);
 
-#define RUNTIME_USAGE "Run time usage: %s -a server IP address -p server TCP port -d serial device -b serial baud -c serial databits -e serial stopbit -f serial parity -l line number -t polling time\n"
+#define RUNTIME_USAGE "Run time usage: %s -a server IP address -p server TCP port -d serial device -b serial baud -c serial databits -e serial stopbit -f serial parity -l line number -t polling time -u rts on time -v rts off time\n"
 
 void usage(char** argv)
 {
@@ -85,6 +85,8 @@ int main( int argc, char **argv )
 
 	char line_number[80];
 	char polling_time[80];
+	char RTSOnTime[80];
+	char RTSOffTime[80];
 	char OldConsoleTitle[500];
 	char NewConsoleTitle[500];
 	int  c, rc;
@@ -104,6 +106,9 @@ int main( int argc, char **argv )
 	line_number[0] = '\0';
 	polling_time[0] = '\0';
 
+	RTSOnTime[0] = '\0';
+	RTSOffTime[0] = '\0';
+
 	//version control///////////////////////////////////////////////////////////////
 	sprintf(version, ""APPLICATION" - Built on %s %s %s",__DATE__,__TIME__,SUPPLIER);
 	fprintf(stderr, "%s\n", version);
@@ -114,7 +119,7 @@ int main( int argc, char **argv )
 	fflush(stderr);
 	////////////////////////////////////////////////////////////////////////////////
 
-	while( ( c = getopt ( argc, argv, "a:b:c:d:e:f:p:l:s:t:?" )) != EOF ) {
+	while( ( c = getopt ( argc, argv, "a:b:c:d:e:f:p:l:s:t:u:v:?" )) != EOF ) {
 		switch ( c ) {
 			case 'a' :
 			strcpy(modbusServerAddress, optarg);
@@ -142,6 +147,12 @@ int main( int argc, char **argv )
 			break;
 			case 't' :
 			strcpy(polling_time, optarg);
+			break;
+			case 'u':
+			strcpy(RTSOnTime, optarg);
+			break;
+			case 'v':
+			strcpy(RTSOffTime, optarg);
 			break;
 			case '?' :
 			fprintf(stderr, RUNTIME_USAGE, argv[0]);
@@ -205,6 +216,18 @@ int main( int argc, char **argv )
 	strcat(NewConsoleTitle, " polling time ");
 	strcat(NewConsoleTitle, polling_time);
 
+	if(strlen(RTSOnTime) > 0)
+	{
+		strcat(NewConsoleTitle, " rts on time ");
+		strcat(NewConsoleTitle, RTSOnTime);
+	}
+
+	if(strlen(RTSOffTime) > 0)
+	{
+		strcat(NewConsoleTitle, " rts off time ");
+		strcat(NewConsoleTitle, RTSOffTime);
+	}
+
 	if(!IsSingleInstance(NewConsoleTitle))
 	{
 		fprintf(stderr,"Another instance is already running\n");
@@ -249,6 +272,25 @@ int main( int argc, char **argv )
 		my_ctx.data_bit = atoi(data_bit);
 		my_ctx.stop_bit = atoi(stop_bit);
 		my_ctx.parity = parity[0];
+
+		if(strlen(RTSOnTime) > 0)
+		{
+			my_ctx.rtsOnTime = atoi(RTSOnTime);
+		}
+		else
+		{
+			my_ctx.rtsOnTime = 0;
+		}
+
+		if(strlen(RTSOffTime) > 0)
+		{
+			my_ctx.rtsOffTime = atoi(RTSOffTime);
+		}
+		else
+		{
+			my_ctx.rtsOffTime = 0;
+		}
+		
 	}
 	
 	modbus_imp* po = new modbus_imp(&my_ctx, line_number, atoi(polling_time));

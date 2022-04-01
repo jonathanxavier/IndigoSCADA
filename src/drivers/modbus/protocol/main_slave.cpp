@@ -53,10 +53,6 @@ int IsSingleInstance(const char* name)
 
 #include "getopt.h"
 
-struct args{
-	char line_number[80];
-};
-
 #define RUNTIME_USAGE "Run time usage: %s -a server IP address -p server TCP port -d serial device -b serial baud -c serial databits -e serial stopbit -f serial parity\n"
 
 void usage(char** argv)
@@ -79,12 +75,9 @@ int main( int argc, char **argv )
     char parity[5];/* Parity: 'N', 'O', 'E' */
 	
 
-	char line_number[80];
-	char polling_time[80];
 	char OldConsoleTitle[500];
 	char NewConsoleTitle[500];
 	int  c, rc;
-	unsigned long pollingTime = 1000;
 	int use_context = TCP;
 	
 	//TCP
@@ -97,9 +90,7 @@ int main( int argc, char **argv )
     stop_bit[0] = '\0';
     parity[0] = '\0';
 	//
-	line_number[0] = '\0';
-	polling_time[0] = '\0';
-
+	
 	//version control///////////////////////////////////////////////////////////////
 	sprintf(version, ""APPLICATION" - Built on %s %s %s",__DATE__,__TIME__,SUPPLIER);
 	fprintf(stderr, "%s\n", version);
@@ -148,7 +139,7 @@ int main( int argc, char **argv )
 	
 	if(strlen(modbusServerAddress) > 0 && strlen(modbusServerPort) > 0)
 	{
-		strcpy(NewConsoleTitle, "MODBUS TCP address ");
+		strcpy(NewConsoleTitle, "MODBUS SLAVE TCP address ");
 		strcat(NewConsoleTitle, modbusServerAddress);
 		strcat(NewConsoleTitle, " PORT ");
 		strcat(NewConsoleTitle, modbusServerPort);
@@ -157,7 +148,7 @@ int main( int argc, char **argv )
 	}
 	else
 	{
-		strcpy(NewConsoleTitle, "MODBUS RTU device ");
+		strcpy(NewConsoleTitle, "MODBUS SLAVE RTU device ");
 		strcat(NewConsoleTitle, serial_device);
 		strcat(NewConsoleTitle, " BAUD ");
 		strcat(NewConsoleTitle, baud);
@@ -204,6 +195,8 @@ int main( int argc, char **argv )
 		my_ctx.data_bit = atoi(data_bit);
 		my_ctx.stop_bit = atoi(stop_bit);
 		my_ctx.parity = parity[0];
+		my_ctx.rtsOnTime = 0; //not used on slave
+		my_ctx.rtsOffTime = 0; //not used on slave
 	}
 	
 	modbus_imp* po = new modbus_imp(&my_ctx);

@@ -257,12 +257,65 @@ static int win32_ser_read(struct win32_ser *ws, uint8_t *p_msg,
 }
 #endif
 
+#include <math.h> //apa+++
+
 ssize_t _modbus_rtu_send(modbus_t *ctx, const uint8_t *req, int req_length)
 {
 #if defined(_WIN32)
     modbus_rtu_t *ctx_rtu = ctx->backend_data;
     DWORD n_bytes = 0;
-    return (WriteFile(ctx_rtu->w_ser.fd, req, req_length, &n_bytes, NULL)) ? n_bytes : -1;
+	double time_per_char = 11.0*1200.0/((double)ctx_rtu->baud); //apa+++
+	int i_rtsSendTime; //apa+++
+	double rtsSendTime = 0; //apa+++
+	ssize_t return_value; //apa+++
+
+	//apa begin 
+	if(!EscapeCommFunction(ctx_rtu->w_ser.fd, SETRTS))
+	{
+		DWORD error = GetLastError();
+		fprintf(stderr,"Set RTS failed with error = %d\n", error);
+		fflush(stderr);
+	}
+	else
+	{
+		//fprintf(stderr,"rtsOnTime in ms = %d\n", rtsOnTime);
+		//fflush(stderr);
+		Sleep(ctx_rtu->rtsOnTime); //in ms
+	}
+	//apa end
+
+	return_value = (WriteFile(ctx_rtu->w_ser.fd, req, req_length, &n_bytes, NULL)) ? n_bytes : -1;
+
+	//apa begin
+	if(ctx_rtu->rtsOnTime || ctx_rtu->rtsOffTime)
+	{
+		if(n_bytes > 0)
+		{
+			rtsSendTime = time_per_char*(double)n_bytes;
+
+			//fprintf(stderr,"double rtsSendTime in ms = %lf\n", rtsSendTime);
+			//fflush(stderr);
+			i_rtsSendTime = (int)ceil(rtsSendTime);
+			
+			//fprintf(stderr,"rtsSendTime in ms = %d\n", i_rtsSendTime);
+			//fflush(stderr);
+
+			Sleep(i_rtsSendTime); //in ms
+		}
+	}
+
+	Sleep(ctx_rtu->rtsOffTime); //in ms
+	
+	if(!EscapeCommFunction(ctx_rtu->w_ser.fd, CLRRTS))
+	{
+		DWORD error = GetLastError();
+		fprintf(stderr,"Set RTS failed with error = %d\n", error);
+		fflush(stderr);
+	}
+
+	//apa end
+
+    return return_value;
 #else
     return write(ctx->s, req, req_length);
 #endif
@@ -880,7 +933,7 @@ const modbus_backend_t _modbus_rtu_backend = {
 
 modbus_t* modbus_new_rtu(const char *device,
                          int baud, char parity, int data_bit,
-                         int stop_bit)
+                         int stop_bit, int rtsOnTime, int rtsOffTime)
 {
     modbus_t *ctx;
     modbus_rtu_t *ctx_rtu;
@@ -920,6 +973,9 @@ modbus_t* modbus_new_rtu(const char *device,
     }
     ctx_rtu->data_bit = data_bit;
     ctx_rtu->stop_bit = stop_bit;
+
+    ctx_rtu->rtsOnTime = rtsOnTime; //ms apa+++
+	ctx_rtu->rtsOffTime = rtsOffTime; //ms apa+++
 
     return ctx;
 }

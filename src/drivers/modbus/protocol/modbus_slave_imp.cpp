@@ -120,6 +120,8 @@ fExit(false), general_interrogation(true), is_connected(false)
 		my_modbus_context.data_bit = my_ctx->data_bit;
 		my_modbus_context.stop_bit = my_ctx->stop_bit;
 		my_modbus_context.parity = my_ctx->parity;
+		my_modbus_context.rtsOnTime = my_ctx->rtsOnTime;
+		my_modbus_context.rtsOffTime = my_ctx->rtsOffTime;
 	}
 
 	if(my_modbus_context.use_context == TCP) 
@@ -128,7 +130,7 @@ fExit(false), general_interrogation(true), is_connected(false)
     } 
 	else 
 	{
-        ctx = modbus_new_rtu(my_modbus_context.serial_device, my_modbus_context.baud, my_modbus_context.parity, my_modbus_context.data_bit, my_modbus_context.stop_bit);
+        ctx = modbus_new_rtu(my_modbus_context.serial_device, my_modbus_context.baud, my_modbus_context.parity, my_modbus_context.data_bit, my_modbus_context.stop_bit, my_modbus_context.rtsOnTime, my_modbus_context.rtsOffTime);
     }
 
     if (ctx != NULL)
