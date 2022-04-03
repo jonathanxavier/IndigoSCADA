@@ -189,9 +189,12 @@ static descriptor_table<statement_desc> statements;
 END_FASTDB_NAMESPACE
 USE_FASTDB_NAMESPACE
 
-int cli_open_fdb(char const* server_url, 
-             int         max_connect_attempts,
-             int         reconnect_timeout_sec)
+int cli_open_fdb(char const*   server_url,
+             int           max_connect_attempts,
+             int           reconnect_timeout_sec,
+             char_t const* user_name,
+             char_t const* password)
+
 {
     socket_t* sock;
     int n_addresses = 1;
@@ -237,10 +240,35 @@ int cli_open_fdb(char const* server_url,
         delete sock;
         return cli_connection_refused;
     }
-    session_desc* session = sessions.allocate();
-    session->sock = sock;
-    session->stmts = NULL;
-    return session->id;
+
+	size_t msg_size = sizeof(cli_request) + (strlen(user_name) + strlen(password) + 2)*sizeof(char_t);
+
+    dbSmallBuffer buf(msg_size);
+    char* p = buf;
+    cli_request* req = (cli_request*)p;
+    req->length  = msg_size;
+    req->cmd     = cli_cmd_login;
+    req->stmt_id = 0;
+    p += sizeof(cli_request);
+    p = pack_str(p, user_name);
+    p = pack_str(p, password);
+    req->pack();
+    if (sock->write(req, msg_size)) {
+        int4 response;
+        if (!sock->read(&response, sizeof response)) {
+            return cli_network_error;
+        }
+        unpack4(response);
+        if (response == cli_ok) {
+            session_desc* session = sessions.allocate();
+            session->sock = sock;
+            session->stmts = NULL;
+            return session->id;
+        }
+        return response;
+    } else { 
+        return cli_network_error;
+    }
 }
 
 

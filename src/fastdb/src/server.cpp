@@ -1852,6 +1852,7 @@ void dbServer::serveClient()
         cli_request req;
         int4 response = cli_ok;
         bool online = true;
+		bool authenticated = false;
         while (online && session->sock->read(&req, sizeof req)) { 
             req.unpack();
             int length = req.length - sizeof(req);
@@ -1861,7 +1862,18 @@ void dbServer::serveClient()
                     break;
                 }
             }
-            switch(req.cmd) { 
+            switch(req.cmd) {
+				case cli_cmd_login:
+                if (authenticate(msg)) {
+                    authenticated = true;
+                    response = cli_ok;
+                } else {
+                    online = false;
+                    response = cli_login_failed;
+                }
+                pack4(response);
+                online = session->sock->write(&response, sizeof response);
+                break;
               case cli_cmd_close_session:
                 while (session->dropped_tables != NULL) {
                     dbTableDescriptor* next = session->dropped_tables->nextDbTable;
@@ -2222,6 +2234,58 @@ bool dbServer::put_db_offline(dbSession* session) //put_db_offline is APA added
 	response = cli_ok;
 	pack4(response);
 	return session->sock->write(&response, sizeof response);
+}
+
+bool dbServer::authenticate(char* buf)
+{
+	IT_IT("dbServer::authenticate");
+
+    char_t* user = (char_t*)buf;
+    buf = unpack_str(user, buf);
+    char_t* password = (char_t*)buf;
+    unpack_str(password, buf);
+	
+	//project directory 04-12-2020
+	char ini_file[_MAX_PATH];
+	char project_dir[_MAX_PATH];
+		
+	ini_file[0] = '\0';
+	if(GetModuleFileName(NULL, ini_file, _MAX_PATH))
+	{
+		*(strrchr(ini_file, '\\')) = '\0';        // Strip \\filename.exe off path
+		*(strrchr(ini_file, '\\')) = '\0';        // Strip \\bin off path
+		
+		strcat(ini_file, "\\bin\\project.ini");
+		Inifile iniFile(ini_file);
+
+		if(iniFile.find("path","project_directory"))
+		{
+			strcpy(project_dir, iniFile.find("path","project_directory"));
+		}
+    }
+
+	strcpy(ini_file, project_dir);
+
+	strcat(ini_file, "\\realtimedb.ini");
+
+	Inifile iniFile(ini_file);
+
+	if( iniFile.find("user","rtsqlserver") &&
+		iniFile.find("password","rtsqlserver") )
+	{
+	
+		if( !strcmp(user, iniFile.find("user","rtsqlserver")) && 
+			!strcmp(password, iniFile.find("password","rtsqlserver")) )
+		{
+			IT_COMMENT("Login success");
+			return true;
+		}
+	}
+	
+	dbTrace("Login failure \n");
+
+	IT_COMMENT("Login failure");
+	return false;
 }
 
 

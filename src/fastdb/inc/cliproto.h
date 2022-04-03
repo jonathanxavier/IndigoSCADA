@@ -43,6 +43,7 @@ enum cli_commands {
 	cli_cmd_put_db_online,	//APA added
 	cli_cmd_is_db_online,	//APA added
 	cli_cmd_put_db_offline,	//APA added
+	cli_cmd_login, //APA added
     cli_cmd_last
 };
 

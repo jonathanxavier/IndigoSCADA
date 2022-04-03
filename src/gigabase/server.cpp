@@ -1790,7 +1790,6 @@ bool dbServer::alter_index(dbSession* session, char* data)
 bool dbServer::authenticate(char* buf)
 {
 	IT_IT("dbServer::authenticate");
-/*
 
 #ifdef SECURE_SERVER
 //    dbCursor<UserInfo> cursor;
@@ -1799,8 +1798,6 @@ bool dbServer::authenticate(char* buf)
     buf = unpack_str(user, buf);
     char_t* password = (char_t*)buf;
     unpack_str(password, buf);
-
-	char ini_file[256]; 
 	
 	//project directory 04-12-2020
 	char ini_file[_MAX_PATH];
@@ -1856,10 +1853,7 @@ bool dbServer::authenticate(char* buf)
 #else
     return true;
 #endif
-
-*/
-
-	return true;
+	
 }
 
 ///////////////////start here APA added from dbCLI//////////////////////////////////////

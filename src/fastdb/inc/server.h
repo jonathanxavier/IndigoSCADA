@@ -173,6 +173,7 @@ class FASTDB_DLL_ENTRY dbServer {
 	bool is_db_online(dbSession* session); //APA added
 	bool put_db_online(dbSession* session, char * msg);	//put_db_online is APA added
 	bool put_db_offline(dbSession* session); //put_db_offline is APA added
+	bool authenticate(char* buf); //APA added
 
   public:
     static dbServer* find(char const* serverURL);

@@ -53,7 +53,7 @@ static struct { //keep this list aligned with enum cli_result_code in cli.h
 	{ cli_not_all_columns_specified,	"not all colums specified" },
 	{ cli_not_fetched,	"not fetched" },
 	{ cli_already_updated,	"already updated" },
-//	{ cli_login_failed,	"login failed" },
+	{ cli_login_failed,	"login failed" },
 //    { cli_empty_parameter,		"empty_parameter" },
 //    { cli_closed_connection,	"closed_connection" },
     { cli_table_already_exists,	"table already exists" },
@@ -350,19 +350,7 @@ class Fastdb_Thread : QThread
 
 		retry_to_connect_to_server_pending = true;
 	
-		//session_handle = cli_open((const char_t *)Host, 10, 1, (const char_t *)User, (const char_t *)Password, 0);
-		//TODO 22-08-09 Rispristinare l'autenticazione per aprire la connessione al server FastDB
-		session_handle = cli_open_fdb((const char_t *)Host, 10, 1);
-
-		//27-11-09
-
-		//if(session_handle > 1000)
-		//{
-		//	//errore nella cli_open
-		//	error_message += QString("cli_open failed"); 
-		//	fFail = true;
-		//	return;
-		//}
+		session_handle = cli_open_fdb((const char_t *)Host, 10, 1, (const char_t *)User, (const char_t *)Password);
 
 		if (session_handle < 0) {
 			IT_COMMENT1("cli_open failed with code %d", session_handle);

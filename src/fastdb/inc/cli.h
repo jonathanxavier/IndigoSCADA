@@ -78,7 +78,8 @@ enum cli_result_code {
     cli_xml_parse_error = -25,
     cli_backup_failed = -26,
 	cli_put_db_online_failed = -31, //APA added
-	cli_database_is_offline = -32 //APA added
+	cli_database_is_offline = -32, //APA added
+	cli_login_failed = -33 //APA added
 };
     
 enum cli_var_type { 
@@ -184,9 +185,11 @@ typedef struct cli_array_t {
  *     >= 0 - connectiondescriptor to be used in all other cli calls
  *     <  0 - error code as described in cli_result_code enum
  */
-int FASTDB_DLL_ENTRY cli_open_fdb(char const* server_url, 
-                              int         max_connect_attempts,
-                              int         reconnect_timeout_sec);
+int FASTDB_DLL_ENTRY cli_open_fdb(char const*   server_url,
+             int           max_connect_attempts,
+             int           reconnect_timeout_sec,
+             char_t const* user_name,
+             char_t const* password);
 
 enum cli_open_attributes { 
     cli_open_default    = 0x0, 
