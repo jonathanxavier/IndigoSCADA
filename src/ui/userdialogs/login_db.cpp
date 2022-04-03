@@ -27,7 +27,7 @@
 LoginDatabase::LoginDatabase( QWidget* parent, const char* name, bool modal, WFlags fl, bool is_realtimedb)
     : QDialog( parent, name, modal, fl )
 {
-	IsRelatimedb = is_realtimedb;
+	IsRealtimedb = is_realtimedb;
     if ( !name )
 	setName( "LoginDatabase" );
 
@@ -88,7 +88,7 @@ void LoginDatabase::languageChange()
 
 void LoginDatabase::OkClicked()
 {
-    if(IsRelatimedb)
+    if(IsRealtimedb)
 	{
 		//set realtimedb.ini
 		QString ini_file = GetScadaProjectDirectory() + "\\realtimedb.ini";

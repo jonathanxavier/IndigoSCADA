@@ -35,7 +35,7 @@ public:
     QPushButton* pushButton2;
     QLineEdit* lineEdit2;
     QLineEdit* lineEdit1;
-	bool IsRelatimedb;
+	bool IsRealtimedb;
 
 public slots:
     virtual void OkClicked();
