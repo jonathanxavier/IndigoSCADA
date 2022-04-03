@@ -92,6 +92,7 @@ class HistoricBrowsedb : public QMainWindow
 	void returnPressed ( QListViewItem * ); 
 	void valueChanged(int,int);
 	void getMaxItems();
+	void setCredentials();
 
 	//Toolbar slots
 	void first();

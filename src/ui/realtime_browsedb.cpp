@@ -29,7 +29,8 @@
 #include "table_arrow.xpm"
 #include "quit.xpm"
 #include "pencil.xpm"
-#include "helpicon.xpm" 
+#include "helpicon.xpm"
+#include "login_db.h" 
 
 #define MESSAGES_LIMIT 256
 //
@@ -150,7 +151,8 @@ RealTimeBrowsedb::RealTimeBrowsedb(RealTimeDbDict dct) : QMainWindow(0,0,WDestru
 
 	options->insertSeparator();
 	options->insertItem(QPixmap((const char **)pencil_xpm),tr("Maximum records..."),this,SLOT(getMaxItems()));
-
+	options->insertSeparator();
+	options->insertItem(QPixmap((const char **)table_icon),tr("Set credentials..."),this,SLOT(setCredentials()));
 
 	//QPopupMenu *sql_command = new QPopupMenu(this);
 	//sql_command->insertItem(QPixmap((const char **)sql),tr("SQL"),this,SLOT(ExecuteSQLCommand()));
@@ -965,6 +967,27 @@ void RealTimeBrowsedb::getMaxItems()
 		maxItems = (dlg.GetComment()).toLong();
 	};
 };
+
+
+/*
+*Function: setCredentials
+*make a usr entry
+*Inputs:none
+*Outputs:none
+*Returns:none
+*/
+void RealTimeBrowsedb::setCredentials()
+{
+	IT_IT("RealTimeBrowsedb::setCredentials");
+	
+	LoginDatabase dlg(this, 0, FALSE, 0, 1);
+	
+	if(dlg.exec())
+	{
+		
+	};
+};
+
 
 /*-Function: Help
 *Inputs:none

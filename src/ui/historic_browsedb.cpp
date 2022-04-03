@@ -30,6 +30,7 @@
 #include "quit.xpm"
 #include "pencil.xpm"
 #include "helpicon.xpm" 
+#include "login_db.h" 
 
 #define MESSAGES_LIMIT 256
 
@@ -139,6 +140,8 @@ HistoricBrowsedb::HistoricBrowsedb(HistoricDbDict& dct) : QMainWindow(0,0,WDestr
 
 	options->insertSeparator();
 	options->insertItem(QPixmap((const char **)pencil_xpm),tr("Maximum records..."),this,SLOT(getMaxItems()));
+	options->insertSeparator();
+	options->insertItem(QPixmap((const char **)table_icon),tr("Set credentials..."),this,SLOT(setCredentials()));
 
 
 	//QPopupMenu *sql_command = new QPopupMenu(this);
@@ -904,6 +907,25 @@ void HistoricBrowsedb::getMaxItems()
 	if(dlg.exec())
 	{
 		maxItems = (dlg.GetComment()).toLong();
+	};
+};
+
+/*
+*Function: setCredentials
+*make a usr entry
+*Inputs:none
+*Outputs:none
+*Returns:none
+*/
+void HistoricBrowsedb::setCredentials()
+{
+	IT_IT("RealTimeBrowsedb::setCredentials");
+	
+	LoginDatabase dlg(this, 0, FALSE, 0, 0);
+	
+	if(dlg.exec())
+	{
+		
 	};
 };
 
