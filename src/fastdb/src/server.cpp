@@ -1872,7 +1872,8 @@ void dbServer::serveClient()
                     response = cli_login_failed;
                 }
                 pack4(response);
-                online = session->sock->write(&response, sizeof response);
+                //online = session->sock->write(&response, sizeof response);
+				session->sock->write(&response, sizeof response);
                 break;
               case cli_cmd_close_session:
                 while (session->dropped_tables != NULL) {
