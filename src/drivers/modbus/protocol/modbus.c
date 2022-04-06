@@ -119,7 +119,7 @@ int modbus_flush(modbus_t *ctx)
 {
     int rc = ctx->backend->flush(ctx);
     if (rc != -1 && ctx->debug) {
-        printf("%d bytes flushed\n", rc);
+        fprintf(stderr, "%d bytes flushed\n", rc);
 
     }
     return rc;
@@ -169,8 +169,8 @@ static int send_msg(modbus_t *ctx, uint8_t *msg, int msg_length)
 
     if (ctx->debug) {
         for (i = 0; i < msg_length; i++)
-            printf("[%.2X]", msg[i]);
-        printf("\n");
+            fprintf(stderr,"[%.2X]", msg[i]);
+        fprintf(stderr,"\n");
     }
 
     /* In recovery mode, the write command will be issued until to be
@@ -339,9 +339,9 @@ static int receive_msg(modbus_t *ctx, uint8_t *msg, msg_type_t msg_type)
 
     if (ctx->debug) {
         if (msg_type == MSG_INDICATION) {
-            printf("Waiting for a indication...\n");
+            fprintf(stderr, "Waiting for a indication...\n");
         } else {
-            printf("Waiting for a confirmation...\n");
+            fprintf(stderr, "Waiting for a confirmation...\n");
         }
     }
 
@@ -407,7 +407,7 @@ static int receive_msg(modbus_t *ctx, uint8_t *msg, msg_type_t msg_type)
         if (ctx->debug) {
             int i;
             for (i=0; i < rc; i++)
-                printf("<%.2X>", msg[msg_length + i]);
+                fprintf(stderr, "<%.2X>", msg[msg_length + i]);
         }
 
         /* Sums bytes received */
@@ -452,7 +452,7 @@ static int receive_msg(modbus_t *ctx, uint8_t *msg, msg_type_t msg_type)
     }
 
     if (ctx->debug)
-        printf("\n");
+        fprintf(stderr, "\n");
 
     return ctx->backend->check_integrity(ctx, msg, msg_length);
 }

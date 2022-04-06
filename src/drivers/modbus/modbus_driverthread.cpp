@@ -11,6 +11,7 @@
  */
 #include "modbus_driver_instance.h"
 #include "modbus_driverthread.h"
+
 /*
 *Function:run
 *runs the thread
@@ -62,7 +63,7 @@ void Modbus_DriverThread::run()
 		strcat(pCommandLine, ((Modbus_driver_Instance*)Parent)->Cfg.DataBits);
 		strcat(pCommandLine, " -e ");
 		strcat(pCommandLine, ((Modbus_driver_Instance*)Parent)->Cfg.StopBit);
-		strcat(pCommandLine, " -f ");
+		strcat(pCommandLine, " -g ");
 		strcat(pCommandLine, ((Modbus_driver_Instance*)Parent)->Cfg.Parity);
 		strcat(pCommandLine, " -l ");
 		strcat(pCommandLine, line_number);
@@ -72,6 +73,16 @@ void Modbus_DriverThread::run()
 		strcat(pCommandLine, ((Modbus_driver_Instance*)Parent)->Cfg.RTSOnTime);
 		strcat(pCommandLine, " -v ");
 		strcat(pCommandLine, ((Modbus_driver_Instance*)Parent)->Cfg.RTSOffTime);
+	}
+
+	if(((Modbus_driver_Instance*)Parent)->isProtocolLoggingEnabled)
+	{
+		strcat(pCommandLine, " -f "); 
+		strcat(pCommandLine, GetScadaHomeDirectory());
+		strcat(pCommandLine, "\\logs\\modbus");
+		strcat(pCommandLine, "_line_");
+		strcat(pCommandLine, line_number);
+		strcat(pCommandLine, "_");
 	}
 		
 	strcpy(pWorkingDir, GetScadaHomeDirectory());

@@ -46,11 +46,16 @@ void Iec104DriverThread::run()
 	strcat(pCommandLine, ((Iec104driver_Instance*)Parent)->Cfg.IEC104ServerCASDU);
 	strcat(pCommandLine, " -l ");
 	strcat(pCommandLine, line_number);
-	#ifdef INSTRUMENT_MASTER
-	strcat(pCommandLine, " -f "); //apa+++ 11/07/2019
-	strcat(pCommandLine, GetScadaHomeDirectory());//apa+++ 11/07/2019
-	strcat(pCommandLine, "\\logs\\iec104");//apa+++ 11/07/2019
-	#endif
+
+	if(((Iec104driver_Instance*)Parent)->isProtocolLoggingEnabled)
+	{
+		strcat(pCommandLine, " -f "); //apa+++ 11/07/2019
+		strcat(pCommandLine, GetScadaHomeDirectory());//apa+++ 11/07/2019
+		strcat(pCommandLine, "\\logs\\iec104");//apa+++ 11/07/2019
+		strcat(pCommandLine, "_line_");
+		strcat(pCommandLine, line_number);
+		strcat(pCommandLine, "_");
+	}
 			
 	strcpy(pWorkingDir, GetScadaHomeDirectory());
 	strcat(pWorkingDir,"\\bin");

@@ -228,6 +228,8 @@ class QSEXPORT DriverInstance : public QObject // the actual driver bits
 	static iec_item_type    global_instanceSend;
 	/////////////////////////////
 	//
+	int isProtocolLoggingEnabled; // unit has logging of protocol communication active
+	//
 	void AddProp(const QString &k,const QString &v) // add a property
 	{
 		IT_IT("DriverInstance::AddProp");

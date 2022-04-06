@@ -61,7 +61,7 @@ struct args{
 
 void PipeWorker(void* pParam);
 
-#define RUNTIME_USAGE "Run time usage: %s -a server IP address -p server TCP port -d serial device -b serial baud -c serial databits -e serial stopbit -f serial parity -l line number -t polling time -u rts on time -v rts off time\n"
+#define RUNTIME_USAGE "Run time usage: %s -a server IP address -p server TCP port -d serial device -b serial baud -c serial databits -e serial stopbit -g serial parity -l line number -t polling time -u rts on time -v rts off time -f log_file_name\n"
 
 void usage(char** argv)
 {
@@ -92,6 +92,10 @@ int main( int argc, char **argv )
 	int  c, rc;
 	unsigned long pollingTime = 1000;
 	int use_context = TCP;
+
+	FILE *iec_protocol_log_stream = NULL;
+	char iec_optional_log_file_name[80] = {0};
+	char log_file_name[250] = {0};
 	
 	//TCP
 	modbusServerAddress[0] = '\0';
@@ -119,7 +123,7 @@ int main( int argc, char **argv )
 	fflush(stderr);
 	////////////////////////////////////////////////////////////////////////////////
 
-	while( ( c = getopt ( argc, argv, "a:b:c:d:e:f:p:l:s:t:u:v:?" )) != EOF ) {
+	while( ( c = getopt ( argc, argv, "a:b:c:d:e:f:g:p:l:s:t:u:v:?" )) != EOF ) {
 		switch ( c ) {
 			case 'a' :
 			strcpy(modbusServerAddress, optarg);
@@ -136,7 +140,7 @@ int main( int argc, char **argv )
 			case 'e' :
 			strcpy(stop_bit, optarg);
 			break;
-			case 'f' :
+			case 'g' :
 			strcpy(parity, optarg);
 			break;
 			case 'p' :
@@ -153,6 +157,32 @@ int main( int argc, char **argv )
 			break;
 			case 'v':
 			strcpy(RTSOffTime, optarg);
+			break;
+			case 'f' :
+			{
+				struct tm *ptm;
+				time_t t;
+				char log_time_stamp[100];
+
+				t = time(NULL);
+				ptm = localtime(&t);
+
+				sprintf(log_time_stamp, "_%d_%d_%d_%d_%d_%d",
+				ptm->tm_year + 1900,
+				ptm->tm_mon + 1,
+				ptm->tm_mday,
+				ptm->tm_hour,
+				ptm->tm_min,
+				ptm->tm_sec);
+				
+				strcpy(iec_optional_log_file_name, optarg);
+				strcpy(log_file_name, iec_optional_log_file_name);
+				strcat(log_file_name, log_time_stamp);
+				strcat(log_file_name, ".log");
+
+				//Reassign "stderr" to log file
+				iec_protocol_log_stream = freopen(log_file_name, "w", stderr);
+			}
 			break;
 			case '?' :
 			fprintf(stderr, RUNTIME_USAGE, argv[0]);
@@ -463,8 +493,8 @@ void PipeWorker(void* pParam)
 				{ 
 					gl_timeout_connection_with_parent = 0;
 					//fprintf(stderr, "Receive keep alive # %d from front end\n", p_item->msg_id);
-                    fprintf(stderr, "wdg %d\r", p_item->msg_id);
-				    fflush(stderr);
+                    fprintf(stdout, "wdg %d\r", p_item->msg_id);
+				    fflush(stdout);
 				}
 			}
 		}

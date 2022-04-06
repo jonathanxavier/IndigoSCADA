@@ -606,7 +606,7 @@ int modbus_imp::PollItems(void)
 
 				uint8_t value = tab_rp_bits[0];
 
-				printf("modbus_read_bits: value = %d\n", (int)value);
+				fprintf(stderr, "modbus_read_bits: value = %d\n", (int)value);
 
 				if(Config_db[rowNumber].last_value.a != value)
 				{
@@ -661,7 +661,7 @@ int modbus_imp::PollItems(void)
 
 				uint8_t value = tab_rp_bits[0];
 
-				printf("modbus_read_input_bits: value = %d\n", (int)value);
+				fprintf(stderr, "modbus_read_input_bits: value = %d\n", (int)value);
 
 				if(Config_db[rowNumber].last_value.a != value)
 				{
@@ -710,7 +710,7 @@ int modbus_imp::PollItems(void)
 
 				rc = modbus_read_registers(ctx, address, registers, tab_rp_registers);
 
-				printf("modbus_read_registers: ");
+				fprintf(stderr, "modbus_read_registers: ");
 
 				if (rc != registers) 
 				{
@@ -740,7 +740,7 @@ int modbus_imp::PollItems(void)
 						real = modbus_get_float(&tab_rp_registers[0]);
 					}
 
-					printf("Get float: %f\n", real);
+					fprintf(stderr, "Get float: %f\n", real);
 
 					if(ABS(Config_db[rowNumber].last_value.f - real) > Config_db[rowNumber].deadband)
 					{
@@ -770,7 +770,7 @@ int modbus_imp::PollItems(void)
 					int integer32;
 					integer32 = modbus_get_int(tab_rp_registers);
 
-					printf("Get integer: %d\n", integer32);
+					fprintf(stderr, "Get integer: %d\n", integer32);
 
 					if(ABS(Config_db[rowNumber].last_value.a - integer32) > (int)Config_db[rowNumber].deadband)
 					{
@@ -800,7 +800,7 @@ int modbus_imp::PollItems(void)
 					unsigned int uinteger32;
 					uinteger32 = modbus_get_uint(tab_rp_registers);
 
-					printf("Get unsigned integer: %d\n", uinteger32);
+					fprintf(stderr, "Get unsigned integer: %d\n", uinteger32);
 
 					if(ABS(Config_db[rowNumber].last_value.ua - uinteger32) > (int)Config_db[rowNumber].deadband)
 					{
@@ -835,7 +835,7 @@ int modbus_imp::PollItems(void)
 				modbus_set_slave(ctx, Config_db[rowNumber].slave_id);
 								
 				rc = modbus_read_registers(ctx, address, registers, tab_rp_registers);
-				printf("modbus_read_registers: ");
+				fprintf(stderr, "modbus_read_registers: ");
 
 				if (rc != registers) 
 				{
@@ -847,7 +847,7 @@ int modbus_imp::PollItems(void)
 				short integer16;
 				integer16 = tab_rp_registers[0];
 
-				printf("Get integer: %d\n", integer16);
+				fprintf(stderr, "Get integer: %d\n", integer16);
 
 				if(ABS(Config_db[rowNumber].last_value.a - integer16) > (short)Config_db[rowNumber].deadband)
 				{
@@ -881,7 +881,7 @@ int modbus_imp::PollItems(void)
 				modbus_set_slave(ctx, Config_db[rowNumber].slave_id);
 								
 				rc = modbus_read_registers(ctx, address, registers, tab_rp_registers);
-				printf("modbus_read_registers: ");
+				fprintf(stderr, "modbus_read_registers: ");
 
 				if (rc != registers) 
 				{
@@ -893,7 +893,7 @@ int modbus_imp::PollItems(void)
 				unsigned short uinteger16;
 				uinteger16 = tab_rp_registers[0];
 
-				printf("Get unsigned integer: %d\n", uinteger16);
+				fprintf(stderr, "Get unsigned integer: %d\n", uinteger16);
 
 				if(ABS(Config_db[rowNumber].last_value.ua - uinteger16) > (short)Config_db[rowNumber].deadband)
 				{
@@ -940,7 +940,7 @@ int modbus_imp::PollItems(void)
 
 				rc = modbus_read_input_registers(ctx, address, registers, tab_rp_registers);
 
-				printf("modbus_read_input_registers: ");
+				fprintf(stderr, "modbus_read_input_registers: ");
 
 				if (rc != registers) 
 				{
@@ -970,7 +970,7 @@ int modbus_imp::PollItems(void)
 						real = modbus_get_float(&tab_rp_registers[0]);
 					}
 
-					printf("Get float: %f\n", real);
+					fprintf(stderr, "Get float: %f\n", real);
 
 					if(ABS(Config_db[rowNumber].last_value.f - real) > Config_db[rowNumber].deadband)
 					{
@@ -1000,7 +1000,7 @@ int modbus_imp::PollItems(void)
 					int integer32;
 					integer32 = modbus_get_int(tab_rp_registers);
 
-					printf("Get integer: %d\n", integer32);
+					fprintf(stderr, "Get integer: %d\n", integer32);
 
 					if(ABS(Config_db[rowNumber].last_value.a - integer32) > (int)Config_db[rowNumber].deadband)
 					{
@@ -1030,7 +1030,7 @@ int modbus_imp::PollItems(void)
 					unsigned int uinteger32;
 					uinteger32 = modbus_get_uint(tab_rp_registers);
 
-					printf("Get unsigned integer: %d\n", uinteger32);
+					fprintf(stderr, "Get unsigned integer: %d\n", uinteger32);
 
 					if(ABS(Config_db[rowNumber].last_value.ua - uinteger32) > (int)Config_db[rowNumber].deadband)
 					{
@@ -1065,7 +1065,7 @@ int modbus_imp::PollItems(void)
 				modbus_set_slave(ctx, Config_db[rowNumber].slave_id);
 				
 				rc = modbus_read_input_registers(ctx, address, registers, tab_rp_registers);
-				printf("modbus_read_input_registers: ");
+				fprintf(stderr, "modbus_read_input_registers: ");
 
 				if (rc != registers) 
 				{
@@ -1077,7 +1077,7 @@ int modbus_imp::PollItems(void)
 				short integer16;
 				integer16 = tab_rp_registers[0];
 
-				printf("Get integer: %d\n", integer16);
+				fprintf(stderr, "Get integer: %d\n", integer16);
 
 				if(ABS(Config_db[rowNumber].last_value.a - integer16) > (short)Config_db[rowNumber].deadband)
 				{
@@ -1111,7 +1111,7 @@ int modbus_imp::PollItems(void)
 				modbus_set_slave(ctx, Config_db[rowNumber].slave_id);
 				
 				rc = modbus_read_input_registers(ctx, address, registers, tab_rp_registers);
-				printf("modbus_read_input_registers: ");
+				fprintf(stderr, "modbus_read_input_registers: ");
 
 				if (rc != registers) 
 				{
@@ -1123,7 +1123,7 @@ int modbus_imp::PollItems(void)
 				unsigned short uinteger16;
 				uinteger16 = tab_rp_registers[0];
 
-				printf("Get unsigned integer: %d\n", uinteger16);
+				fprintf(stderr, "Get unsigned integer: %d\n", uinteger16);
 
 				if(ABS(Config_db[rowNumber].last_value.ua - uinteger16) > (short)Config_db[rowNumber].deadband)
 				{

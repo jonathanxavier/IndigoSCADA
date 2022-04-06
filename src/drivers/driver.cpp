@@ -207,7 +207,7 @@ void Driver::CheckTags(const QString &Name, const QStringList &currentList, cons
 */
 DriverInstance::DriverInstance(Driver *parent, const QString &name) : 
 QObject(parent,name),Name(name),fTrace(0),fTest(0),
-pending_transactions(0), UnitName(QString::null)
+pending_transactions(0), UnitName(QString::null), isProtocolLoggingEnabled(0)
 {
 	IT_IT("DriverInstance::DriverInstance");
 	
@@ -215,6 +215,15 @@ pending_transactions(0), UnitName(QString::null)
 
 	InQueue.setAutoDelete(true);
 	InQueue.clear();
+
+	QString ini_file = GetScadaProjectDirectory() + "\\scada.ini"; //apa 04-12-2020
+	Inifile iniFile((const char*)ini_file);
+
+	const char* str;
+	if((str = iniFile.find("log_to_file","drivers")) != NULL)
+	{
+		isProtocolLoggingEnabled = atoi(str);
+	}
 };
 /*
 *Function:~DriverInstance
@@ -376,6 +385,7 @@ RIPCQueue* DriverInstance::fifo_global_control_direction;
 iec_item_type DriverInstance::global_instanceSend;
 ORTEPublication* DriverInstance::global_publisher = NULL;
 ////////////////////////////////Middleware/////////////////
+
 //
 QString DriverInstance::FormUnitList() // build the lists for SQL transaction filtering
 {

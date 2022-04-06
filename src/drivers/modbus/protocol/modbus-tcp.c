@@ -275,7 +275,7 @@ static int _modbus_tcp_connect(modbus_t *ctx)
     }
 
     if (ctx->debug) {
-        printf("Connecting to %s\n", ctx_tcp->ip);
+        fprintf(stderr, "Connecting to %s\n", ctx_tcp->ip);
     }
 
     addr.sin_family = AF_INET;
@@ -552,7 +552,7 @@ int modbus_tcp_accept(modbus_t *ctx, int *socket)
     }
 
     if (ctx->debug) {
-        printf("The client connection from %s is accepted\n",
+        fprintf(stderr, "The client connection from %s is accepted\n",
                inet_ntoa(addr.sin_addr));
     }
 
@@ -597,7 +597,7 @@ int modbus_tcp_pi_accept(modbus_t *ctx, int *socket)
     }
 
     if (ctx->debug) {
-        printf("The client connection is accepted.\n");
+        fprintf(stderr, "The client connection is accepted.\n");
     }
 
     return ctx->s;

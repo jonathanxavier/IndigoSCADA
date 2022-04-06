@@ -371,7 +371,7 @@ static int _modbus_rtu_connect(modbus_t *ctx)
     modbus_rtu_t *ctx_rtu = ctx->backend_data;
 
     if (ctx->debug) {
-        printf("Opening %s at %d bauds (%c, %d, %d)\n",
+        fprintf(stderr, "Opening %s at %d bauds (%c, %d, %d)\n",
                ctx_rtu->device, ctx_rtu->baud, ctx_rtu->parity,
                ctx_rtu->data_bit, ctx_rtu->stop_bit);
     }
@@ -901,7 +901,7 @@ int _modbus_rtu_filter_request(modbus_t *ctx, int slave)
     if (slave != ctx->slave && slave != MODBUS_BROADCAST_ADDRESS) {
         /* Ignores the request (not for me) */
         if (ctx->debug) {
-            printf("Request for slave %d ignored (not %d)\n",
+            fprintf(stderr, "Request for slave %d ignored (not %d)\n",
                    slave, ctx->slave);
         }
         return 1;
