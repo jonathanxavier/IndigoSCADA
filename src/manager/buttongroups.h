@@ -50,6 +50,7 @@ protected:
 protected slots:    
     void slotStartProcesses();
 	void slotStopProcesses();
+	void slotSelectFolder();
 
 };
 

@@ -461,9 +461,11 @@ ButtonsGroups::ButtonsGroups( QWidget *parent, const char *name )
 	connect( tb2, SIGNAL( clicked() ), this, SLOT( slotStopProcesses() ) );
 
     // ... and make the third one a flat button
-    QPushButton *tb3 = new QPushButton( "", bgrp4, "flat" );
+    QPushButton *tb3 = new QPushButton( "Set project folder", bgrp4, "flat" );
 	tb1->setOn(FALSE);
     //tb3->setFlat(TRUE);
+
+	connect( tb3, SIGNAL( clicked() ), this, SLOT( slotSelectFolder() ) );
 
 	textLabel1 = new QLabel( this, "textLabel1" );
     textLabel1->setGeometry( QRect( 30, 190, 2000, 40 ) );
@@ -535,6 +537,44 @@ void ButtonsGroups::slotStopProcesses()
 		for(int i = 10; i >= 0; i--)
 		{
 			EndProcess(i);
+		}
+	}
+}
+
+void ButtonsGroups::slotSelectFolder()
+{
+	QFileDialog dialog;
+	dialog.setMode(QFileDialog::DirectoryOnly);
+
+	int res = dialog.exec();
+		
+	if(res)
+	{
+		QString new_dir = dialog.dirPath();
+		//project directory 04-12-2020
+		char ini_file[_MAX_PATH];
+			
+		ini_file[0] = '\0';
+		if(GetModuleFileName(NULL, ini_file, _MAX_PATH))
+		{
+			*(strrchr(ini_file, '\\')) = '\0';        // Strip \\filename.exe off path
+			*(strrchr(ini_file, '\\')) = '\0';        // Strip \\bin off path
+			
+			strcat(ini_file, "\\bin\\project.ini");
+			
+
+			WritePrivateProfileString("project_directory", "path", (const char*)new_dir, ini_file);
+
+			char file[_MAX_PATH];
+			strcpy(file, "Project folder:\n");
+			strcat(file, (const char*)new_dir);
+			textLabel1->setText(file);
+
+			SetScadaProjectDirectory();
+
+			strcpy(pInitFile, (const char*)GetScadaProjectDirectory());
+
+			strcat(pInitFile, "\\manager.ini");
 		}
 	}
 }
