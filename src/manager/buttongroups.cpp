@@ -545,6 +545,7 @@ void ButtonsGroups::slotSelectFolder()
 {
 	QFileDialog dialog;
 	dialog.setMode(QFileDialog::DirectoryOnly);
+	dialog.setCaption(tr("Choose project folder"));
 
 	int res = dialog.exec();
 		
