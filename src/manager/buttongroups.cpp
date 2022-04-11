@@ -462,7 +462,7 @@ ButtonsGroups::ButtonsGroups( QWidget *parent, const char *name )
 
     // ... and make the third one a flat button
     QPushButton *tb3 = new QPushButton( "Set project folder", bgrp4, "flat" );
-	tb1->setOn(FALSE);
+	tb3->setOn(FALSE);
     //tb3->setFlat(TRUE);
 
 	connect( tb3, SIGNAL( clicked() ), this, SLOT( slotSelectFolder() ) );
