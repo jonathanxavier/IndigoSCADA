@@ -552,7 +552,23 @@ void ButtonsGroups::slotSelectFolder()
 	if(res)
 	{
 		QString new_dir = dialog.dirPath();
-		//project directory 04-12-2020
+
+		char new_folder[_MAX_PATH];
+
+		strcpy(new_folder, (const char*)new_dir);
+
+		char *ptr = new_folder;
+
+		while(*ptr)
+		{
+			if(*ptr=='/') 
+			{
+				*ptr='\\';
+			}
+
+			ptr++;
+		}
+		
 		char ini_file[_MAX_PATH];
 			
 		ini_file[0] = '\0';
@@ -564,11 +580,11 @@ void ButtonsGroups::slotSelectFolder()
 			strcat(ini_file, "\\bin\\project.ini");
 			
 
-			WritePrivateProfileString("project_directory", "path", (const char*)new_dir, ini_file);
+			WritePrivateProfileString("project_directory", "path", new_folder, ini_file);
 
 			char file[_MAX_PATH];
 			strcpy(file, "Project folder:\n");
-			strcat(file, (const char*)new_dir);
+			strcat(file, new_folder);
 			textLabel1->setText(file);
 
 			SetScadaProjectDirectory();
