@@ -121,6 +121,8 @@ void LoginDatabase::OkClicked()
 
 		QString msg = tr("User has changed real time database credentials: ") + user + QString(" ") + QString(encrypted);
 		QSLogEvent("HMI",msg);
+
+		accept();
 	
 	}
 	else
@@ -155,5 +157,7 @@ void LoginDatabase::OkClicked()
 
 		QString msg = tr("User has changed historical database credentials: ") + user + QString(" ") + QString(encrypted);
 		QSLogEvent("HMI",msg);
+
+		accept();
 	}
 }
