@@ -1964,27 +1964,26 @@ SOURCE=.\userdialogs\login_db.h
 !IF  "$(CFG)" == "ui - Win32 Debug"
 
 # PROP Ignore_Default_Tool 1
-# Begin Custom Build - Moc'ing $(InputName).h ...
+# Begin Custom Build - MOCing login_db.h...
 InputDir=.\userdialogs
 InputPath=.\userdialogs\login_db.h
 InputName=login_db
 
 "$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	%qtdir%\bin\moc.exe $(InputDir)\$(InputName).h -o $(InputDir)\moc_$(InputName).cpp
+	%qtdir%\bin\moc.exe "$(InputDir)\$(InputName).h" -o "$(InputDir)\moc_$(InputName).cpp"
 
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "ui - Win32 Release"
 
-# PROP BASE Ignore_Default_Tool 1
 # PROP Ignore_Default_Tool 1
-# Begin Custom Build - Moc'ing $(InputName).h ...
+# Begin Custom Build - MOCing login_db.h...
 InputDir=.\userdialogs
 InputPath=.\userdialogs\login_db.h
 InputName=login_db
 
 "$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	%qtdir%\bin\moc.exe $(InputDir)\$(InputName).h -o $(InputDir)\moc_$(InputName).cpp
+	%qtdir%\bin\moc.exe "$(InputDir)\$(InputName).h" -o "$(InputDir)\moc_$(InputName).cpp"
 
 # End Custom Build
 
