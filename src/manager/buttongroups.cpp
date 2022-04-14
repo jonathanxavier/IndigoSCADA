@@ -513,6 +513,26 @@ ButtonsGroups::ButtonsGroups( QWidget *parent, const char *name )
 		sprintf(pTemp, "_beginthread failed, error code = %d", nError);
 		WriteLog(pTemp);
 	}
+
+	//automatic start
+	char pAutomaticStart[500+1];
+
+	GetPrivateProfileString("Settings","AutomaticStart","0",pAutomaticStart, 500,pInitFile);
+
+	int isAutoStart = atoi(pAutomaticStart);
+
+	if(isAutoStart > 0)
+	{
+		if(started == false)
+		{
+			started = true;
+
+			for(int i = 0;i < 10; i++)
+			{
+				StartProcess(i);
+			}
+		}
+	}
 }
 
 void ButtonsGroups::slotStartProcesses()
