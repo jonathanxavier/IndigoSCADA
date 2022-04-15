@@ -54,20 +54,5 @@ QSEXPORT RealTimeDbDict& GetRealTimeDbDict();
 QSEXPORT RealTimeDbDict GetRealTimeDbDict();
 #endif
 //
-/////////////////////spare host real time databases/////////////////////////////
-//
-// open the spare databases
-QSEXPORT bool OpenSpareRealTimeConnections ();	
-QSEXPORT bool ConnectToSpareRealTimeDatabases();
-// close them
-QSEXPORT void CloseSpareRealTimeConnections ();
-// disconnect them
-QSEXPORT void DisconnectFromSpareRealTimeDatabases();
-// acces the database channels
-QSEXPORT QSDatabase *GetSpareConfigureDb (); 
-QSEXPORT QSDatabase *GetSpareResultDb ();
-QSEXPORT QSDatabase *GetSpareCurrentDb ();
-QSEXPORT RealTimeDbDict& GetSpareRealTimeDbDict();
-//
 #endif
 

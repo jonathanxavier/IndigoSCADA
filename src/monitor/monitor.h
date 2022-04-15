@@ -62,8 +62,6 @@ class Monitor : public QObject
 	int MaxRetryReconnectToDispatcher;
 	int MaxRetryReconnectToRealTimeDb;
 	int MaxRetryReconnectToHistoricDb;
-	int MaxRetryReconnectToSpareDispatcher;
-	int MaxRetryReconnectToSpareRealTimeDb;
 	//
 	public:
 	//
@@ -126,16 +124,10 @@ class Monitor : public QObject
 	void CurrentQueryResponse (QObject *,const QString &, int, QObject*); // current value responses
 	void ResultsQueryResponse (QObject *,const QString &, int, QObject*); // results responses
 
-	//Real time database on Host B (Spare)
-	//void SpareConfigQueryResponse (QObject *,const QString &, int, QObject*);  // handles configuration responses
-	//void SpareCurrentQueryResponse (QObject *,const QString &, int, QObject*); // current value responses
-	//void SpareResultsQueryResponse (QObject *,const QString &, int, QObject*); // results responses
-
 	//Historic database
 	void HistoricResultsQueryResponse (QObject *,const QString &, int, QObject*); // results responses
 
 	void ReceivedNotify(int, const char *);
-	//void SpareReceivedNotify(int, const char *);
 
 	void Start(); // start it all off
 	void Stop(); // stop everything

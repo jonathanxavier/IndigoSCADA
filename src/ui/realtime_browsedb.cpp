@@ -58,8 +58,6 @@ RealTimeBrowsedb::RealTimeBrowsedb(RealTimeDbDict dct) : QMainWindow(0,0,WDestru
 {
 	IT_IT("RealTimeBrowsedb::RealTimeBrowsedb");
 	//
-	//TODO: Stampare l'ip address dei database collegati
-	//cosi' da distinguere Spare server da primary server
 	db_dictionary = dct;
 
 	#ifdef USE_STD_MAP

@@ -94,16 +94,6 @@ int main(int argc, char **argv)
 		//DeskW = a.desktop()->width();
 		//DeskH = a.desktop()->height();
 
-		if(OpenSpareDispatcherConnection())
-		{
-			//do somethig
-		}
-
-		if(OpenSpareRealTimeConnections())
-		{
-		
-		}
-
 		OpenHistoricConnections();
 
 		stat = a.exec();
@@ -123,21 +113,6 @@ int main(int argc, char **argv)
 			CloseHistoricConnections();
 			#endif
 		}
-		//
-		if(GetSpareDispatcher() != NULL)
-		{
-			#ifdef STL_BUG_FIXED
-			CloseSpareDispatcherConnection();
-			#endif
-		}
-
-		if((GetSpareConfigureDb() != NULL) && (GetSpareCurrentDb() != NULL)&&(GetSpareResultDb() != NULL))
-		{
-			#ifdef STL_BUG_FIXED
-			CloseSpareRealTimeConnections();
-			#endif
-		}
-
 		//
 		UnloadAllDlls(); // unload Dlls
 

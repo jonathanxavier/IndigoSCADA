@@ -104,8 +104,6 @@ logrepgen(NULL),repgen(NULL),intro(NULL),
 MaxRetryReconnectToDispatcher(0),
 MaxRetryReconnectToRealTimeDb(0),
 MaxRetryReconnectToHistoricDb(0),
-MaxRetryReconnectToSpareDispatcher(0),
-MaxRetryReconnectToSpareRealTimeDb(0),
 statusBar_state(WHITE_STATE)
 {
 	IT_IT("UserFrameWork::UserFrameWork");
@@ -638,14 +636,6 @@ void UserFrameWork::Login()
 				if(GetConfigureDb()->Ok() && GetResultDb()->Ok() && GetCurrentDb()->Ok())
 				{
 					control->insertItem(QPixmap((const char **)server_xpm),tr("&Real time database management..."),this,SLOT(realtimeDbManagement()));
-				}
-
-				if((GetSpareConfigureDb() != NULL) && (GetSpareCurrentDb() != NULL)&&(GetSpareResultDb() != NULL))
-				{
-					if(GetSpareConfigureDb()->Ok() && GetSpareResultDb()->Ok() && GetSpareCurrentDb()->Ok())
-					{
-						control->insertItem(QPixmap((const char **)server_xpm),tr("&Spare real time database management..."),this,SLOT(spareRealtimeDbManagement()));
-					}
 				}
 
 				if(GetHistoricResultDb() != NULL)
@@ -1705,40 +1695,6 @@ void UserFrameWork::Tick()
 		fRequestFetch = false;
 	}
 
-	if(GetSpareDispatcher() != NULL)
-	{
-		//if((!GetSpareDispatcher()->Ok()) && (MaxRetryReconnectToSpareDispatcher <= 5))
-		if(!GetSpareDispatcher()->Ok())
-		{
-			statusBar_state = RED_STATE;
-			statusBar()->setBackgroundColor(Qt::red);
-			statusBar()->message(tr("Spare Dispatcher Client Failure"));
-
-			QSLogEvent("HMI", "Spare dispatcher client connection error");
-			QSLogEvent("HMI", "Attempt to restore connection with spare dispatcher server");
-			
-			if(GetSpareDispatcher()->IsConnected())
-			{
-				if(!GetSpareDispatcher()->Ok())
-				{
-					DisconnectFromSpareDispatcher();
-				}
-			}
-
-			if(!GetSpareDispatcher()->IsInRetry())
-			{
-				ConnectToSpareDispatcher();
-			}
-
-			++MaxRetryReconnectToSpareDispatcher;
-		}
-		else
-		{
-			MaxRetryReconnectToSpareDispatcher = 0;
-		}
-	}
-
-
 	//if((!GetDispatcher()->Ok()) && (MaxRetryReconnectToDispatcher <= 5))
 	if(!GetDispatcher()->Ok())
 	{
@@ -1821,55 +1777,7 @@ void UserFrameWork::Tick()
 	{
 		MaxRetryReconnectToRealTimeDb = 0;
 	}
-
-	if((GetSpareConfigureDb() != NULL) && (GetSpareCurrentDb() != NULL)&&(GetSpareResultDb() != NULL))
-	{
-		if(!GetSpareConfigureDb()->Ok() || !GetSpareResultDb()->Ok() || !GetSpareCurrentDb()->Ok())
-		{
-			//if(MaxRetryReconnectToSpareRealTimeDb <= 5)
-			{
-				if(!GetSpareConfigureDb()->Ok())
-				{
-					QString msg = QString("Spare real time client error: ") + GetSpareConfigureDb()->GetErrorMessage();
-					QSLogEvent("HMI", msg);
-					GetSpareConfigureDb()->AcnoledgeError();
-				}
-
-				if(!GetSpareResultDb()->Ok())
-				{
-					QString msg = QString("Spare real time client error: ") + GetSpareResultDb()->GetErrorMessage();
-					QSLogEvent("HMI", msg);	
-					GetSpareResultDb()->AcnoledgeError();
-				}
-				
-				if(!GetSpareCurrentDb()->Ok())
-				{
-					QString msg = QString("Spare real time client error: ") + GetSpareCurrentDb()->GetErrorMessage();
-					QSLogEvent("HMI", msg);	
-					GetSpareCurrentDb()->AcnoledgeError();
-				}
-
-				QSLogEvent("HMI", "Attempt to restore connection with spare realtime database server");
-
-				if(GetSpareConfigureDb()->IsConnected())
-				{
-					if(!GetSpareConfigureDb()->Ok())
-					{
-						DisconnectFromSpareRealTimeDatabases();
-					}
-				}
-
-				ConnectToSpareRealTimeDatabases();
-
-				++MaxRetryReconnectToSpareRealTimeDb;
-			}
-		}
-		else
-		{
-			MaxRetryReconnectToSpareRealTimeDb = 0;
-		}
-	}
-
+	
 	if(GetHistoricResultDb() != NULL)
 	{
 		//if((!GetHistoricResultDb()->Ok()) && (MaxRetryReconnectToHistoricDb <= 5))
@@ -1902,9 +1810,7 @@ void UserFrameWork::Tick()
 /*
 	if((MaxRetryReconnectToHistoricDb > 2) || 
 		(MaxRetryReconnectToRealTimeDb > 2) ||
-		(MaxRetryReconnectToDispatcher > 2) || 
-		(MaxRetryReconnectToSpareRealTimeDb > 2) ||
-		(MaxRetryReconnectToSpareDispatcher > 2) 
+		(MaxRetryReconnectToDispatcher > 2)
 		)
 	{
 		statusBar_state = RED_STATE;
@@ -2005,26 +1911,6 @@ void UserFrameWork::realtimeDbManagement()
 	p->raise();
 	//
 };
-
-/*
-*Function: spareRealtimeDbManagement
-*Open a database management window
-*Inputs:none
-*Outputs:none
-*Returns:none
-*/
-void UserFrameWork::spareRealtimeDbManagement()
-{
-	IT_IT("UserFrameWork::spareRealtimeDbManagement");
-	
-	RealTimeBrowsedb *p = new RealTimeBrowsedb(GetSpareRealTimeDbDict()); // create the top level window
-	//
-	p->show();
-	p->setGeometry(3, 20, QApplication::desktop()->width() - 3, QApplication::desktop()->height()-50);
-	p->raise();
-	//
-};
-
 
 /*
 *Function: historicDbManagement

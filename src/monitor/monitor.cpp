@@ -151,8 +151,7 @@ Monitor * Monitor::Instance = 0;
 Monitor::Monitor(QObject *parent,RealTimeDbDict *db_dct, Dispatcher *dsp) : QObject(parent),
 fStarted(false),SequenceNumber(0),fHalt(0),translation(0),dispatcher(dsp),db_dictionary(*db_dct),
 MaxRetryReconnectToDispatcher(0),MaxRetryReconnectToRealTimeDb(0),
-MaxRetryReconnectToHistoricDb(0),MaxRetryReconnectToSpareDispatcher(0),
-MaxRetryReconnectToSpareRealTimeDb(0)
+MaxRetryReconnectToHistoricDb(0)
 {
 	IT_IT("Monitor::Monitor");
 	
@@ -459,35 +458,7 @@ void Monitor::UpdateCurrentValue( const QString &name, SamplePoint &sp)
 void Monitor::Tick()
 {
 	IT_IT("Monitor::Tick");
-
-	if(GetSpareDispatcher() != NULL)
-	{
-		if(!GetSpareDispatcher()->Ok())
-		{
-			QSLogEvent("Monitor", "Spare dispatcher client connection error");
-			QSLogEvent("Monitor", "Attempt to restore connection with spare dispatcher server");
-
-			if(GetSpareDispatcher()->IsConnected())
-			{
-				if(!GetSpareDispatcher()->Ok())
-				{
-					DisconnectFromSpareDispatcher();
-				}
-			}
-
-			if(!GetSpareDispatcher()->IsInRetry())
-			{
-				ConnectToSpareDispatcher();
-			}
-
-			++MaxRetryReconnectToSpareDispatcher;
-		}
-		else
-		{
-			MaxRetryReconnectToSpareDispatcher = 0;
-		}
-	}
-
+	
 	if(!GetDispatcher()->Ok())
 	{
 		QSLogEvent("Monitor", "Dispatcher client connection error");
@@ -554,51 +525,7 @@ void Monitor::Tick()
 	{
 		MaxRetryReconnectToRealTimeDb = 0;
 	}
-
-	if((GetSpareConfigureDb() != NULL) && (GetSpareCurrentDb() != NULL)&&(GetSpareResultDb() != NULL))
-	{
-		if(!GetSpareConfigureDb()->Ok() || !GetSpareResultDb()->Ok() || !GetSpareCurrentDb()->Ok())
-		{
-			if(!GetSpareConfigureDb()->Ok())
-			{
-				QString msg = QString("Spare real time client error: ") + GetSpareConfigureDb()->GetErrorMessage();
-				QSLogEvent("Monitor", msg);
-				GetSpareConfigureDb()->AcnoledgeError();
-			}
-
-			if(!GetSpareResultDb()->Ok())
-			{
-				QString msg = QString("Spare real time client error: ") + GetSpareResultDb()->GetErrorMessage();
-				QSLogEvent("Monitor", msg);	
-				GetSpareResultDb()->AcnoledgeError();
-			}
-			
-			if(!GetSpareCurrentDb()->Ok())
-			{
-				QString msg = QString("Spare real time client error: ") + GetSpareCurrentDb()->GetErrorMessage();
-				QSLogEvent("Monitor", msg);	
-				GetSpareCurrentDb()->AcnoledgeError();
-			}
-
-			QSLogEvent("Monitor", "Attempt to restore connection with spare realtime database server");
-
-			if(GetSpareConfigureDb()->IsConnected())
-			{
-				if(!GetSpareConfigureDb()->Ok())
-				{
-					DisconnectFromSpareRealTimeDatabases();
-				}
-			}
-
-			ConnectToSpareRealTimeDatabases();
-			++MaxRetryReconnectToSpareRealTimeDb;
-		}
-		else
-		{
-			MaxRetryReconnectToSpareRealTimeDb = 0;
-		}
-	}
-
+	
 	if(GetHistoricResultDb() != NULL)
 	{
 		if(!GetHistoricResultDb()->Ok())
@@ -622,9 +549,7 @@ void Monitor::Tick()
 /*
 	if((MaxRetryReconnectToHistoricDb > 50) || 
 		(MaxRetryReconnectToRealTimeDb > 50) ||
-		(MaxRetryReconnectToDispatcher > 50) || 
-		(MaxRetryReconnectToSpareRealTimeDb > 50) ||
-		(MaxRetryReconnectToSpareDispatcher > 50) 
+		(MaxRetryReconnectToDispatcher > 50)
 		)
 	{
 		//We have no more connection with some server
@@ -1734,21 +1659,10 @@ int main(int argc, char **argv)
 			   OpenDispatcherConnection() )
 			{
 				RealTimeDbDict realtime_databases = GetRealTimeDbDict();
-				RealTimeDbDict spare_realtime_databases;
-				
+								
 				Monitor *pMonitor = NULL;
-				Monitor *pSpareMonitor = NULL;
-
+				
 				pMonitor = new Monitor(NULL, &realtime_databases, GetDispatcher());  // create the monitoring engine interface
-
-				if(OpenSpareDispatcherConnection() && OpenSpareRealTimeConnections())
-				{
-					//Se esiste un server Spare, allora si crea un nuovo oggetto monitor
-					//con lo spare dispatcher e con lo spare database realtime
-					
-					spare_realtime_databases = GetSpareRealTimeDbDict();
-					pSpareMonitor = new Monitor(NULL, &spare_realtime_databases, GetSpareDispatcher());  // create the monitoring engine interface
-				}
 
 				OpenHistoricConnections();
 
@@ -1760,9 +1674,6 @@ int main(int argc, char **argv)
 
 				if(pMonitor)
 					delete pMonitor;
-
-				if(pSpareMonitor)
-					delete pSpareMonitor;
 
 				//
 				//
@@ -1779,20 +1690,6 @@ int main(int argc, char **argv)
 				{
 					#ifdef STL_BUG_FIXED
 					CloseHistoricConnections();
-					#endif
-				}
-
-				if(GetSpareDispatcher() != NULL)
-				{
-					#ifdef STL_BUG_FIXED
-					CloseSpareDispatcherConnection();
-					#endif
-				}
-
-				if((GetSpareConfigureDb() != NULL) && (GetSpareCurrentDb() != NULL)&&(GetSpareResultDb() != NULL))
-				{
-					#ifdef STL_BUG_FIXED
-					CloseSpareRealTimeConnections();
 					#endif
 				}
 

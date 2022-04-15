@@ -85,8 +85,6 @@ class UserFrameWork : public QMainWindow
 	int MaxRetryReconnectToDispatcher;
 	int MaxRetryReconnectToRealTimeDb;
 	int MaxRetryReconnectToHistoricDb;
-	int MaxRetryReconnectToSpareDispatcher;
-	int MaxRetryReconnectToSpareRealTimeDb;
 	////////////////////////////////////////////////////////////
 
 	int statusBar_state;
@@ -143,7 +141,6 @@ class UserFrameWork : public QMainWindow
 	void AutoLogOut(); // automatic logout 
 	void penTrace(); // pen trace
 	void realtimeDbManagement(); //real time database management
-	void spareRealtimeDbManagement(); //spare real time database management
 	void historicDbManagement(); //historical database management
 	void UserEntry(); // user makes message entries
 	void About(); // about and version number

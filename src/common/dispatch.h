@@ -269,7 +269,6 @@ class QSEXPORT Dispatcher : public QObject
 };
 
 QSEXPORT Dispatcher * GetDispatcher(); //on primary host
-QSEXPORT Dispatcher * GetSpareDispatcher(); //on spare host
 //void SetDispatcher(Dispatcher *);
 
 #include "stdtp.h"
@@ -423,14 +422,5 @@ QSEXPORT bool ConnectToDispatcher();
 QSEXPORT void CloseDispatcherConnection();		
 //disconnect it
 QSEXPORT void DisconnectFromDispatcher();
-
-// open dispatcher on spare host
-QSEXPORT bool OpenSpareDispatcherConnection();
-QSEXPORT bool ConnectToSpareDispatcher();
-// close dispatcher 
-QSEXPORT void CloseSpareDispatcherConnection();		
-//disconnect it
-QSEXPORT void DisconnectFromSpareDispatcher();
-
 
 #endif
