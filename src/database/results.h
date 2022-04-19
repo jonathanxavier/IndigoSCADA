@@ -79,6 +79,7 @@ struct IECValue // a measured result
 		iec_type11 v11_q;
 		iec_type13 v13_q;
 		iec_type30 v30_q;
+		iec_type31 v31_q;
 		iec_type33 v33_q;
 		iec_type34 v34_q;
 		iec_type35 v35_q;
@@ -159,6 +160,9 @@ struct IECValue // a measured result
 			case M_SP_TB_1:
 			v30_q = *(iec_type30*)v;
 			break;
+			case M_DP_TB_1:
+			v31_q = *(iec_type31*)v;
+			break;
 			case M_BO_TB_1:
 			v33_q = *(iec_type33*)v;
 			break;
@@ -211,6 +215,9 @@ struct IECValue // a measured result
 			break;
 			case M_SP_TB_1:
 			v30_q = s.v30_q;
+			break;
+			case M_DP_TB_1:
+			v31_q = s.v31_q;
 			break;
 			case M_BO_TB_1:
 			v33_q = s.v33_q;

@@ -47,6 +47,8 @@ double get_value_iec_value(IECValue &v)
 		return (double)(v.v13_q.mv);
 		case M_SP_TB_1:
 		return (double)v.v30_q.sp;
+		case M_DP_TB_1:
+		return (double)v.v31_q.dp;
 		case M_BO_TB_1:
 		return (double)(*(char*)&(v.v33_q.stcd));
 		case M_ME_TD_1:
@@ -98,6 +100,8 @@ struct cp56time2a get_time_of_iec_value(IECValue &v)
 		return t;
 		case M_SP_TB_1:
 		return v.v30_q.time;
+		case M_DP_TB_1:
+		return v.v31_q.time;
 		case M_BO_TB_1:
 		return v.v33_q.time;
 		case M_ME_TD_1:
@@ -156,6 +160,9 @@ int get_quality_of_iec_value(IECValue &v)
 		break;
 		case M_SP_TB_1:
 		quality =v.v30_q.iv;
+		break;
+		case M_DP_TB_1:
+		quality =v.v31_q.iv;
 		break;
 		case M_BO_TB_1:
 		quality =v.v33_q.iv;
@@ -229,6 +236,9 @@ void set_value_iec_value(IECValue &v, double val)
 		break;
 		case M_SP_TB_1:
 		v.v30_q.sp = val;
+		break;
+		case M_DP_TB_1:
+		v.v31_q.dp = val;
 		break;
 		case M_BO_TB_1:
 		memcpy(&v.v33_q.stcd, &val, sizeof(struct iec_stcd));
