@@ -50,6 +50,16 @@ void Iec103DriverThread::run()
 	strcat(pCommandLine, polling_time);
 	strcat(pCommandLine, " -n ");
 	strcat(pCommandLine, ((Iec103driver_Instance*)Parent)->Cfg.COMPortName);
+
+	if(((Iec103driver_Instance*)Parent)->isProtocolLoggingEnabled)
+	{
+		strcat(pCommandLine, " -f "); 
+		strcat(pCommandLine, GetScadaHomeDirectory());
+		strcat(pCommandLine, "\\logs\\iec103");
+		strcat(pCommandLine, "_line_");
+		strcat(pCommandLine, line_number);
+		strcat(pCommandLine, "_");
+	}
 		
 	strcpy(pWorkingDir, GetScadaHomeDirectory());
 	strcat(pWorkingDir,"\\bin");

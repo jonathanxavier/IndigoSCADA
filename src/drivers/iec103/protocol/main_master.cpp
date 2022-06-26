@@ -171,6 +171,33 @@ int main( int argc, char **argv )
 				struct tm *ptm;
 				time_t t;
 				char log_time_stamp[100];
+
+				t = time(NULL);
+				ptm = localtime(&t);
+
+				sprintf(log_time_stamp, "_%d_%d_%d_%d_%d_%d",
+				ptm->tm_year + 1900,
+				ptm->tm_mon + 1,
+				ptm->tm_mday,
+				ptm->tm_hour,
+				ptm->tm_min,
+				ptm->tm_sec);
+				
+				strcpy(iec_optional_log_file_name, optarg);
+				strcpy(log_file_name, iec_optional_log_file_name);
+				strcat(log_file_name, log_time_stamp);
+				strcat(log_file_name, ".log");
+
+				//Reassign "stderr" to log file
+				iec_protocol_log_stream = freopen(log_file_name, "w", stderr);
+			}
+			break;
+			/*
+			case 'f' :
+			{
+				struct tm *ptm;
+				time_t t;
+				char log_time_stamp[100];
                 char program_path[_MAX_PATH];
 
                 #ifdef WIN32
@@ -216,6 +243,7 @@ int main( int argc, char **argv )
 	            fflush(stderr);
 			}
 			break;
+			*/
 			case '?' :
 				fprintf(stderr, RUNTIME_USAGE, argv[0]);
 				fflush(stderr);
