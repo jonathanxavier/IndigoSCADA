@@ -552,8 +552,8 @@ void PipeWorker(void* pParam)
 				{ 
 					gl_timeout_connection_with_parent = 0;
 					//fprintf(stderr, "Receive keep alive # %d from front end\n", p_item->msg_id);
-                    fprintf(stderr, "wdg %d\r", p_item->msg_id);
-				    fflush(stderr);
+                    fprintf(stdout, "wdg %d\r", p_item->msg_id);
+				    fflush(stdout);
 				}
 			}
 		}
