@@ -190,6 +190,9 @@ int main( int argc, char **argv )
 
 				//Reassign "stderr" to log file
 				iec_protocol_log_stream = freopen(log_file_name, "w", stderr);
+
+				fprintf(stderr, "%s\n", version);
+	            fflush(stderr);
 			}
 			break;
 			/*

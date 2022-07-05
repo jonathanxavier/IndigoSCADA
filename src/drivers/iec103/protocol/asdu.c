@@ -2398,8 +2398,10 @@ void process_data_received_hook(struct iecserial *s, struct iec_buf *b)
         
                 item_to_send.iec_type = TYPE_7;
                 item_to_send.cause = 9; //GI
-                item_to_send.iec_obj.fun_type = obj[i].fun_type;
-                item_to_send.iec_obj.inf_num = obj[i].inf_num;
+                //item_to_send.iec_obj.fun_type = obj[i].fun_type;
+                //item_to_send.iec_obj.inf_num = obj[i].inf_num;
+				item_to_send.iec_obj.fun_type = 255;
+                item_to_send.iec_obj.inf_num = 0;
                 item_to_send.iec_obj.o.type7.m_SCN = 123;
                 
 			    send_items(s, &item_to_send, 1);
