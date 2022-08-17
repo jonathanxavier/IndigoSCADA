@@ -21,6 +21,7 @@
 #include "..\ui\quit.xpm"
 #include "..\ui\computer.xpm"
 #include "inifile.h"
+#include "general_defines.h"
 
 static QString HomeDirectory = (const char*) 0;
 static QString ProjectDirectory = (const char*) 0; //apa 04-12-2020
@@ -447,14 +448,18 @@ ButtonsGroups::ButtonsGroups( QWidget *parent, const char *name )
     QGroupBox *bgrp4 = new QButtonGroup( 1, QGroupBox::Horizontal, "Control board", this );
     box1->addWidget( bgrp4 );
 
+	QString start_str = QString("&Start ") + QString(""SYSTEM_NAME"");
+
     // insert four pushbuttons...
-    QPushButton *tb1 = new QPushButton( "&Start IndigoSCADA", bgrp4, "push" );
+    QPushButton *tb1 = new QPushButton( start_str, bgrp4, "push" );
 	tb1->setOn(FALSE);
 
 	connect( tb1, SIGNAL( clicked() ), this, SLOT( slotStartProcesses() ) );
 
+	QString stop_str = QString("Stop &") + QString(""SYSTEM_NAME"");
+
     // now make the second one a toggle button
-    QPushButton *tb2 = new QPushButton( "Stop &IndigoSCADA", bgrp4, "toggle" );
+    QPushButton *tb2 = new QPushButton( stop_str, bgrp4, "toggle" );
     //tb2->setToggleButton( TRUE );
     tb2->setOn( FALSE );
 

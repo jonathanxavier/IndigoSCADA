@@ -16,6 +16,7 @@
 #include "utilities.h"
 #include "buttongroups.h"
 #include "IndentedTrace.h"
+#include "general_defines.h"
 
 extern void SetScadaHomeDirectory(void);
 extern void SetScadaProjectDirectory(void);
@@ -63,7 +64,8 @@ int main( int argc, char **argv )
 		{
 			ButtonsGroups buttonsgroups;
 			buttonsgroups.resize( 500, 250 );
-			buttonsgroups.setCaption( "IndigoSCADA task manager" );
+			QString caption = QString(""SYSTEM_NAME"") + QString(" task manager") ; 
+			buttonsgroups.setCaption(caption);
 			a.setMainWidget( &buttonsgroups );
 			buttonsgroups.show();
 			//
