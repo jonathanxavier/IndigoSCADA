@@ -70,6 +70,21 @@ extern "C" {
 
 //<71 .. 99> reserved for further compatible definitions
 
+#define	S_CH_NA_1 81 // authentication challenge
+#define	S_RP_NA_1 82 // authentication reply
+#define	S_AR_NA_1 83 // aggressive mode authentication request
+#define	S_KR_NA_1 84 // session key status request
+#define	S_KS_NA_1 85 // session key status
+#define	S_KC_NA_1 86 // session key change
+#define	S_ER_NA_1 87 // authentication error
+
+#define	S_US_NA_1 90 // user status change
+#define	S_UQ_NA_1 91 // update key change request
+#define	S_UR_NA_1 92 // update key change reply
+#define	S_UK_NA_1 93 // update key change symetric
+#define	S_UA_NA_1 94 // update key change asymetric
+#define	S_UC_NA_1 95 // update key change confirmation
+
 #define	C_IC_NA_1	100     // general interrogation
 #define	C_CS_NA_1	103		// clock sync
 #define	C_TS_NA_1	104		// test command
