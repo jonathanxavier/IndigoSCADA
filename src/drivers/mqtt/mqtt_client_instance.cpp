@@ -849,8 +849,8 @@ void MQTT_client_Instance::get_items_from_local_fifo(void)
 			
 		//fprintf(stderr,"Receiving %d th mqtt message \n", p_item->msg_id);
 		//fflush(stderr);
-		fprintf(stderr,"Receiving %d th mqtt message from line = %d\n", p_item->msg_id, instanceID + 1);
-		fflush(stderr);
+		//fprintf(stderr,"Receiving %d th mqtt message from line = %d\n", p_item->msg_id, instanceID + 1);
+		//fflush(stderr);
 
 		//for (int j = 0; j < len; j++) 
 		//{ 

@@ -327,7 +327,7 @@ void Modbus_driver_Instance::QueryResponse(QObject *p, const QString &c, int id,
                     PostValue(SamplePointName, "VALUE", v); //Post the value directly in memory database
 				}
 
-				printf("SamplePointName = %s, IOA = %s, value = %lf\n", (const char*)SamplePointName, (const char*)t.Data2, v);
+				//printf("SamplePointName = %s, IOA = %s, value = %lf\n", (const char*)SamplePointName, (const char*)t.Data2, v);
 			}
 		}
 		break;

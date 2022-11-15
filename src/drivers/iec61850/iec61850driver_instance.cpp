@@ -309,7 +309,7 @@ void Iec61850driver_Instance::QueryResponse(QObject *p, const QString &c, int id
                     PostValue(SamplePointName, "VALUE", v); //Post the value directly in memory database
 				}
 
-				printf("SamplePointName = %s, IOA = %s, value = %lf\n", (const char*)SamplePointName, (const char*)t.Data2, v);
+				//printf("SamplePointName = %s, IOA = %s, value = %lf\n", (const char*)SamplePointName, (const char*)t.Data2, v);
 			}
 		}
 		break;
@@ -576,7 +576,7 @@ void Iec61850driver_Instance::get_items_from_local_fifo(void)
 		}
 			
 		//printf("Receiving %d th message \n", p_item->msg_id);
-		printf("Receiving %d th iec61850 message from line = %d\n", p_item->msg_id, instanceID + 1);
+		//printf("Receiving %d th iec61850 message from line = %d\n", p_item->msg_id, instanceID + 1);
 
 		//for (int j = 0; j < len; j++) 
 		//{ 
