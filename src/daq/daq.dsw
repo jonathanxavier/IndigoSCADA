@@ -218,6 +218,9 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name rfc1006_server
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name m_bus
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -559,6 +562,18 @@ Package=<4>
 ###############################################################################
 
 Project: "lightopc_lib"="..\drivers\opc_server_da\lo-0.888\LightOPC\lightopc.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "m_bus"=..\drivers\mbus\protocol\m_bus.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
