@@ -109,6 +109,10 @@ SOURCE=..\..\..\common\iec_item_type.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\json\json.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\load_database_publisher.cpp
 # End Source File
 # Begin Source File
