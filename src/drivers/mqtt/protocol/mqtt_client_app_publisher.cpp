@@ -15,7 +15,7 @@
 #include "iec_item.h"
 #include "clear_crc_eight.h"
 #include "GeneralHashFunctions.h"
-
+#include ".\json\cJSON.h"
 
 #define MAX_KEYLEN 256
 
@@ -538,157 +538,316 @@ void MQTT_client_imp_publisher::monitoring_dir_consumer(struct iec_item *p_item)
 							
 		fprintf(stderr,"Receiving message for topic %s, ioa %d\n", topic_to_write, p_item->iec_obj.ioa);
 		fflush(stderr);
-		
-		// Create the DDATA payload
-		org_eclipse_tahu_protobuf_Payload ddata_payload;
-		get_next_payload(&ddata_payload);
-				
-		char command_string[100];
-		
-		switch(p_item->iec_type)
+
+		int payload_type = 1; //spurkplug
+		//int payload_type = 0; //json
+
+		if(payload_type)
 		{
-			case M_SP_NA_1:
+			// Create the DDATA payload
+			org_eclipse_tahu_protobuf_Payload ddata_payload;
+			get_next_payload(&ddata_payload);
+					
+			char command_string[100];
+			
+			switch(p_item->iec_type)
 			{
-				sprintf(command_string, "%d", p_item->iec_obj.o.type1.sp);
+				case M_SP_NA_1:
+				{
+					sprintf(command_string, "%d", p_item->iec_obj.o.type1.sp);
 
-				bool value = p_item->iec_obj.o.type1.sp;
+					bool value = p_item->iec_obj.o.type1.sp;
 
-				add_simple_metric(&ddata_payload, NULL, false, 0, METRIC_DATA_TYPE_BOOLEAN, false, false, false, &value, sizeof(value));
+					add_simple_metric(&ddata_payload, NULL, false, 0, METRIC_DATA_TYPE_BOOLEAN, false, false, false, &value, sizeof(value));
+				}
+				break;
+				case M_DP_NA_1:
+				{
+					sprintf(command_string,"%d", p_item->iec_obj.o.type3.dp);
+
+					uint8_t value = p_item->iec_obj.o.type3.dp;
+
+					add_simple_metric(&ddata_payload, NULL, false, 0, METRIC_DATA_TYPE_UINT8, false, false, false, &value, sizeof(value));
+				}
+				break;
+				//case M_BO_NA_1:
+				//{
+				//}
+				//break;
+				case M_ME_NA_1:
+				{
+					sprintf(command_string,"%d", p_item->iec_obj.o.type9.mv);
+
+					int16_t value = p_item->iec_obj.o.type9.mv;
+
+					add_simple_metric(&ddata_payload, NULL, false, 0, METRIC_DATA_TYPE_INT16, false, false, false, &value, sizeof(value));
+				}
+				break;
+				case M_ME_NB_1:
+				{
+					sprintf(command_string,"%d", p_item->iec_obj.o.type11.mv);
+
+					int16_t value = p_item->iec_obj.o.type11.mv;
+
+					add_simple_metric(&ddata_payload, NULL, false, 0, METRIC_DATA_TYPE_INT16, false, false, false, &value, sizeof(value));
+				}
+				break;
+				case M_ME_NC_1:
+				{
+					sprintf(command_string,"%f", p_item->iec_obj.o.type13.mv);
+
+					float value = p_item->iec_obj.o.type13.mv;
+
+					add_simple_metric(&ddata_payload, NULL, false, 0, METRIC_DATA_TYPE_FLOAT, false, false, false, &value, sizeof(value));
+				}
+				break;
+				case M_SP_TB_1:
+				{
+					sprintf(command_string,"%d", p_item->iec_obj.o.type30.sp);
+
+					bool value = p_item->iec_obj.o.type30.sp;
+
+					add_simple_metric(&ddata_payload, NULL, false, 0, METRIC_DATA_TYPE_BOOLEAN, false, false, false, &value, sizeof(value));
+				}
+				break;
+				case M_DP_TB_1:
+				{
+					sprintf(command_string,"%d", p_item->iec_obj.o.type31.dp);
+
+					uint8_t value = p_item->iec_obj.o.type31.dp;
+
+					add_simple_metric(&ddata_payload, NULL, false, 0, METRIC_DATA_TYPE_UINT8, false, false, false, &value, sizeof(value));
+				}
+				break;
+				case M_BO_TB_1:
+				{
+					//sprintf(command_string,"%d", p_item->iec_obj.o.type33.stcd);
+				}
+				break;
+				case M_ME_TD_1:
+				{
+					sprintf(command_string,"%d", p_item->iec_obj.o.type34.mv);
+
+					int16_t value = p_item->iec_obj.o.type34.mv;
+
+					add_simple_metric(&ddata_payload, NULL, false, 0, METRIC_DATA_TYPE_INT16, false, false, false, &value, sizeof(value));
+				}
+				break;
+				case M_ME_TE_1:
+				{
+					sprintf(command_string,"%d", p_item->iec_obj.o.type35.mv);
+
+					int16_t value = p_item->iec_obj.o.type35.mv;
+
+					add_simple_metric(&ddata_payload, NULL, false, 0, METRIC_DATA_TYPE_INT16, false, false, false, &value, sizeof(value));
+				}
+				break;
+				case M_ME_TF_1:
+				{
+					sprintf(command_string,"%f", p_item->iec_obj.o.type36.mv);
+
+					float value = p_item->iec_obj.o.type36.mv;
+
+					add_simple_metric(&ddata_payload, NULL, false, 0, METRIC_DATA_TYPE_FLOAT, false, false, false, &value, sizeof(value));
+				}
+				break;
+				case M_IT_TB_1:
+				{
+					sprintf(command_string,"%d", p_item->iec_obj.o.type37.counter);
+
+					int value = p_item->iec_obj.o.type37.counter;
+
+					add_simple_metric(&ddata_payload, NULL, false, 0, METRIC_DATA_TYPE_INT32, false, false, false, &value, sizeof(value));
+				}
+				break;
+				default:
+				{
+					return;
+				}
+				break;
 			}
-			break;
-			case M_DP_NA_1:
-			{
-				sprintf(command_string,"%d", p_item->iec_obj.o.type3.dp);
+			
+			printf("Publish topic %s, value: %s\n", Item[item].spname, command_string);
 
-				uint8_t value = p_item->iec_obj.o.type3.dp;
+			// Encode the payload into a binary format so it can be published in the MQTT message.
+			// The binary_buffer must be large enough to hold the contents of the binary payload
+			size_t message_length = encode_payload(&sending_binary_buffer, sending_buffer_length, &ddata_payload);
 
-				add_simple_metric(&ddata_payload, NULL, false, 0, METRIC_DATA_TYPE_UINT8, false, false, false, &value, sizeof(value));
-			}
-			break;
-			//case M_BO_NA_1:
-			//{
-			//}
-			//break;
-			case M_ME_NA_1:
-			{
-				sprintf(command_string,"%d", p_item->iec_obj.o.type9.mv);
+			//write MQTT message///////////////////////////////////////////////////
+			/* Publish Topic */
+			int rc;
 
-				int16_t value = p_item->iec_obj.o.type9.mv;
+			XMEMSET(&mqttCtx.publish, 0, sizeof(MqttPublish));
+			mqttCtx.publish.retain = 0;
+			mqttCtx.publish.qos = mqttCtx.qos;
+			mqttCtx.publish.duplicate = 0;
+			mqttCtx.publish.topic_name = topic_to_write;
+			mqttCtx.publish.packet_id = mqtt_get_packetid();
+			mqttCtx.publish.buffer = (byte*)sending_binary_buffer;
+			mqttCtx.publish.total_len = message_length;
+					
+			rc = MqttClient_Publish(&mqttCtx.client, &mqttCtx.publish);
+			
+			printf("MQTT Publish: Topic %s, %s (%d)\n",
+				mqttCtx.publish.topic_name, MqttClient_ReturnCodeToString(rc), rc);
+			////////////////////////////////////////////////////////////////////////
 
-				add_simple_metric(&ddata_payload, NULL, false, 0, METRIC_DATA_TYPE_INT16, false, false, false, &value, sizeof(value));
-			}
-			break;
-			case M_ME_NB_1:
-			{
-				sprintf(command_string,"%d", p_item->iec_obj.o.type11.mv);
-
-				int16_t value = p_item->iec_obj.o.type11.mv;
-
-				add_simple_metric(&ddata_payload, NULL, false, 0, METRIC_DATA_TYPE_INT16, false, false, false, &value, sizeof(value));
-			}
-			break;
-			case M_ME_NC_1:
-			{
-				sprintf(command_string,"%f", p_item->iec_obj.o.type13.mv);
-
-				float value = p_item->iec_obj.o.type13.mv;
-
-				add_simple_metric(&ddata_payload, NULL, false, 0, METRIC_DATA_TYPE_FLOAT, false, false, false, &value, sizeof(value));
-			}
-			break;
-			case M_SP_TB_1:
-			{
-				sprintf(command_string,"%d", p_item->iec_obj.o.type30.sp);
-
-				bool value = p_item->iec_obj.o.type30.sp;
-
-				add_simple_metric(&ddata_payload, NULL, false, 0, METRIC_DATA_TYPE_BOOLEAN, false, false, false, &value, sizeof(value));
-			}
-			break;
-			case M_DP_TB_1:
-			{
-				sprintf(command_string,"%d", p_item->iec_obj.o.type31.dp);
-
-				uint8_t value = p_item->iec_obj.o.type31.dp;
-
-				add_simple_metric(&ddata_payload, NULL, false, 0, METRIC_DATA_TYPE_UINT8, false, false, false, &value, sizeof(value));
-			}
-			break;
-			case M_BO_TB_1:
-			{
-				//sprintf(command_string,"%d", p_item->iec_obj.o.type33.stcd);
-			}
-			break;
-			case M_ME_TD_1:
-			{
-				sprintf(command_string,"%d", p_item->iec_obj.o.type34.mv);
-
-				int16_t value = p_item->iec_obj.o.type34.mv;
-
-				add_simple_metric(&ddata_payload, NULL, false, 0, METRIC_DATA_TYPE_INT16, false, false, false, &value, sizeof(value));
-			}
-			break;
-			case M_ME_TE_1:
-			{
-				sprintf(command_string,"%d", p_item->iec_obj.o.type35.mv);
-
-				int16_t value = p_item->iec_obj.o.type35.mv;
-
-				add_simple_metric(&ddata_payload, NULL, false, 0, METRIC_DATA_TYPE_INT16, false, false, false, &value, sizeof(value));
-			}
-			break;
-			case M_ME_TF_1:
-			{
-				sprintf(command_string,"%f", p_item->iec_obj.o.type36.mv);
-
-				float value = p_item->iec_obj.o.type36.mv;
-
-				add_simple_metric(&ddata_payload, NULL, false, 0, METRIC_DATA_TYPE_FLOAT, false, false, false, &value, sizeof(value));
-			}
-			break;
-			case M_IT_TB_1:
-			{
-				sprintf(command_string,"%d", p_item->iec_obj.o.type37.counter);
-
-				int value = p_item->iec_obj.o.type37.counter;
-
-				add_simple_metric(&ddata_payload, NULL, false, 0, METRIC_DATA_TYPE_INT32, false, false, false, &value, sizeof(value));
-			}
-			break;
-			default:
-			{
-				return;
-			}
-			break;
+			// Free the memory
+			free_payload(&ddata_payload);
 		}
-		
-		printf("Publish topic %s, value: %s\n", Item[item].spname, command_string);
+		else // json payload
+		{
+			cJSON* msg = cJSON_CreateObject();
+			cJSON_AddStringToObject(msg, "topic", topic_to_write);
 
-		// Encode the payload into a binary format so it can be published in the MQTT message.
-		// The binary_buffer must be large enough to hold the contents of the binary payload
-		size_t message_length = encode_payload(&sending_binary_buffer, sending_buffer_length, &ddata_payload);
+			char command_string[100];
+			
+			switch(p_item->iec_type)
+			{
+				case M_SP_NA_1:
+				{
+					sprintf(command_string, "%d", p_item->iec_obj.o.type1.sp);
 
-		//write MQTT message///////////////////////////////////////////////////
-		/* Publish Topic */
-		int rc;
+					bool value = p_item->iec_obj.o.type1.sp;
 
-		XMEMSET(&mqttCtx.publish, 0, sizeof(MqttPublish));
-		mqttCtx.publish.retain = 0;
-		mqttCtx.publish.qos = mqttCtx.qos;
-		mqttCtx.publish.duplicate = 0;
-		mqttCtx.publish.topic_name = topic_to_write;
-		mqttCtx.publish.packet_id = mqtt_get_packetid();
-		mqttCtx.publish.buffer = (byte*)sending_binary_buffer;
-		mqttCtx.publish.total_len = message_length;
-				
-		rc = MqttClient_Publish(&mqttCtx.client, &mqttCtx.publish);
-		
-		printf("MQTT Publish: Topic %s, %s (%d)\n",
+					cJSON_AddNumberToObject(msg, "value", value);
+				}
+				break;
+				case M_DP_NA_1:
+				{
+					sprintf(command_string,"%d", p_item->iec_obj.o.type3.dp);
+
+					uint8_t value = p_item->iec_obj.o.type3.dp;
+
+					cJSON_AddNumberToObject(msg, "value", value);
+				}
+				break;
+				//case M_BO_NA_1:
+				//{
+				//}
+				//break;
+				case M_ME_NA_1:
+				{
+					sprintf(command_string,"%d", p_item->iec_obj.o.type9.mv);
+
+					int16_t value = p_item->iec_obj.o.type9.mv;
+
+					cJSON_AddNumberToObject(msg, "value", value);
+				}
+				break;
+				case M_ME_NB_1:
+				{
+					sprintf(command_string,"%d", p_item->iec_obj.o.type11.mv);
+
+					int16_t value = p_item->iec_obj.o.type11.mv;
+
+					cJSON_AddNumberToObject(msg, "value", value);
+				}
+				break;
+				case M_ME_NC_1:
+				{
+					sprintf(command_string,"%f", p_item->iec_obj.o.type13.mv);
+
+					float value = p_item->iec_obj.o.type13.mv;
+
+					cJSON_AddNumberToObject(msg, "value", value);
+				}
+				break;
+				case M_SP_TB_1:
+				{
+					sprintf(command_string,"%d", p_item->iec_obj.o.type30.sp);
+
+					bool value = p_item->iec_obj.o.type30.sp;
+
+					cJSON_AddNumberToObject(msg, "value", value);
+				}
+				break;
+				case M_DP_TB_1:
+				{
+					sprintf(command_string,"%d", p_item->iec_obj.o.type31.dp);
+
+					uint8_t value = p_item->iec_obj.o.type31.dp;
+
+					cJSON_AddNumberToObject(msg, "value", value);
+				}
+				break;
+				case M_BO_TB_1:
+				{
+					//sprintf(command_string,"%d", p_item->iec_obj.o.type33.stcd);
+				}
+				break;
+				case M_ME_TD_1:
+				{
+					sprintf(command_string,"%d", p_item->iec_obj.o.type34.mv);
+
+					int16_t value = p_item->iec_obj.o.type34.mv;
+
+					cJSON_AddNumberToObject(msg, "value", value);
+				}
+				break;
+				case M_ME_TE_1:
+				{
+					sprintf(command_string,"%d", p_item->iec_obj.o.type35.mv);
+
+					int16_t value = p_item->iec_obj.o.type35.mv;
+
+					cJSON_AddNumberToObject(msg, "value", value);
+				}
+				break;
+				case M_ME_TF_1:
+				{
+					sprintf(command_string,"%f", p_item->iec_obj.o.type36.mv);
+
+					float value = p_item->iec_obj.o.type36.mv;
+
+					cJSON_AddNumberToObject(msg, "value", value);
+				}
+				break;
+				case M_IT_TB_1:
+				{
+					sprintf(command_string,"%d", p_item->iec_obj.o.type37.counter);
+
+					int value = p_item->iec_obj.o.type37.counter;
+
+					cJSON_AddNumberToObject(msg, "value", value);
+				}
+				break;
+				default:
+				{
+					return;
+				}
+				break;
+			}
+			
+			printf("Publish topic %s, value: %s\n", Item[item].spname, command_string);
+
+			// Encode the payload into json string so it can be published in the MQTT message.
+			char* msgstr = cJSON_PrintUnformatted(msg);
+
+			//write MQTT message///////////////////////////////////////////////////
+			/* Publish Topic */
+			int rc;
+
+			XMEMSET(&mqttCtx.publish, 0, sizeof(MqttPublish));
+			mqttCtx.publish.retain = 0;
+			mqttCtx.publish.qos = mqttCtx.qos;
+			mqttCtx.publish.duplicate = 0;
+			mqttCtx.publish.topic_name = topic_to_write;
+			mqttCtx.publish.packet_id = mqtt_get_packetid();
+			mqttCtx.publish.buffer = (byte*)msgstr;
+			mqttCtx.publish.total_len = strlen(msgstr);
+					
+			rc = MqttClient_Publish(&mqttCtx.client, &mqttCtx.publish);
+			
+			printf("MQTT Publish: Topic %s, %s (%d)\n",
 			mqttCtx.publish.topic_name, MqttClient_ReturnCodeToString(rc), rc);
-		////////////////////////////////////////////////////////////////////////
+			////////////////////////////////////////////////////////////////////////
 
-		// Free the memory
-		free_payload(&ddata_payload);
+			//printf("json str: %s\n", msgstr);
+
+			free(msgstr);
+			cJSON_Delete(msg);
+		}
 	}
 
 	return;

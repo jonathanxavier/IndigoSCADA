@@ -15,6 +15,7 @@
 #include "iec_item.h"
 #include "clear_crc_eight.h"
 #include "GeneralHashFunctions.h"
+#include ".\json\cJSON.h"
 
 #define MAX_KEYLEN 256
 #define MAX_COMMAND_SEND_TIME 60
@@ -1230,49 +1231,126 @@ static int mqtt_message_cb(MqttClient *client, MqttMessage *msg,
 				PRINTF("MQTT Message: Done\n");
 			}
 
-			// Decode the payload
-			org_eclipse_tahu_protobuf_Payload inbound_payload = org_eclipse_tahu_protobuf_Payload_init_zero;
+			int payload_type = 1; //spurkplug
+			//int payload_type = 0; //json
 
-			if(!decode_payload(&inbound_payload, msg->buffer, msg->buffer_len)) 
+			if(payload_type)
 			{
-				fprintf(stderr, "Failed to decode the payload\n");
+				// Decode the payload
+				org_eclipse_tahu_protobuf_Payload inbound_payload = org_eclipse_tahu_protobuf_Payload_init_zero;
+
+				if(!decode_payload(&inbound_payload, msg->buffer, msg->buffer_len)) 
+				{
+					fprintf(stderr, "Failed to decode the payload\n");
+				}
+
+				// Get the number of metrics in the payload and iterate over them handling them as needed
+				unsigned int i;
+				float value;
+
+				for(i=0; i<inbound_payload.metrics_count; i++) 
+				{
+					if(inbound_payload.metrics[i].datatype == METRIC_DATA_TYPE_BOOLEAN)
+					{
+						int val = inbound_payload.metrics[i].value.boolean_value;
+						value = (float) val;	
+					}
+					else if(inbound_payload.metrics[i].datatype == METRIC_DATA_TYPE_UINT8)
+					{
+						int val = inbound_payload.metrics[i].value.int_value;
+						value = (float)val;
+					}
+					else if(inbound_payload.metrics[i].datatype == METRIC_DATA_TYPE_INT16)
+					{
+						int val = inbound_payload.metrics[i].value.int_value;
+						value = (float) val;
+					}
+					else if(inbound_payload.metrics[i].datatype == METRIC_DATA_TYPE_FLOAT)
+					{
+						value = inbound_payload.metrics[i].value.float_value;
+					}
+					else if(inbound_payload.metrics[i].datatype == METRIC_DATA_TYPE_DOUBLE)
+					{
+						value = (float)inbound_payload.metrics[i].value.double_value;
+					}
+					else if(inbound_payload.metrics[i].datatype == METRIC_DATA_TYPE_INT32)
+					{
+						int val = inbound_payload.metrics[i].value.int_value;
+						value = (float)val;
+					}
+
+					//////////////////////////////////////////////////////////////////////////
+					//Prepare message in monitoring direction
+					item_to_send.iec_type = M_ME_TF_1;
+					//parent_class->epoch_to_cp56time2a(&time, epoch_in_millisec);
+					parent_class->get_local_host_time(&time);
+					item_to_send.iec_obj.o.type36.time = time;
+					item_to_send.iec_obj.o.type36.iv = 0;
+					item_to_send.iec_obj.o.type36.mv = value;
+					item_to_send.msg_id = n_msg_sent;
+					item_to_send.checksum = clearCrc((unsigned char *)&item_to_send, sizeof(struct iec_item));
+
+					//unsigned char buf[sizeof(struct iec_item)];
+					//int len = sizeof(struct iec_item);
+					//memcpy(buf, &item_to_send, len);
+					//	for(j = 0;j < len; j++)
+					//	{
+					//	  unsigned char c = *(buf + j);
+						//fprintf(stderr,"tx ---> 0x%02x\n", c);
+						//fflush(stderr);
+						//IT_COMMENT1("tx ---> 0x%02x\n", c);
+					//	}
+
+					//Send in monitor direction
+					fprintf(stderr,"Sending message %u th\n", n_msg_sent);
+					fflush(stderr);
+					
+					#ifdef USE_RIPC_MIDDLEWARE
+					////////Middleware/////////////
+					//publishing data
+					parent_class->queue_monitor_dir->put(&item_to_send, sizeof(struct iec_item));
+					////////Middleware/////////////
+					#endif
+
+					//Send in monitor direction
+					//prepare published data
+					memset(&(parent_class->instanceSend),0x00, sizeof(iec_item_type));
+
+					parent_class->instanceSend.iec_type = item_to_send.iec_type;
+					memcpy(&(parent_class->instanceSend.iec_obj), &(item_to_send.iec_obj), sizeof(struct iec_object));
+					parent_class->instanceSend.cause = item_to_send.cause;
+					parent_class->instanceSend.msg_id = item_to_send.msg_id;
+					parent_class->instanceSend.ioa_control_center = item_to_send.ioa_control_center;
+					parent_class->instanceSend.casdu = item_to_send.casdu;
+					parent_class->instanceSend.is_neg = item_to_send.is_neg;
+					parent_class->instanceSend.checksum = item_to_send.checksum;
+
+					ORTEPublicationSend(parent_class->publisher);
+
+					n_msg_sent++;
+				}
 			}
-
-			// Get the number of metrics in the payload and iterate over them handling them as needed
-			unsigned int i;
-			float value;
-
-			for(i=0; i<inbound_payload.metrics_count; i++) 
+			else //json payload
 			{
-				if(inbound_payload.metrics[i].datatype == METRIC_DATA_TYPE_BOOLEAN)
+				float value = 0.0;
+				
+			    cJSON *json_payload = cJSON_Parse((const char *)buf);
+				
+				if (json_payload == NULL)
 				{
-					int val = inbound_payload.metrics[i].value.boolean_value;
-					value = (float) val;	
-				}
-				else if(inbound_payload.metrics[i].datatype == METRIC_DATA_TYPE_UINT8)
-				{
-					int val = inbound_payload.metrics[i].value.int_value;
-					value = (float)val;
-				}
-				else if(inbound_payload.metrics[i].datatype == METRIC_DATA_TYPE_INT16)
-				{
-					int val = inbound_payload.metrics[i].value.int_value;
-					value = (float) val;
-				}
-				else if(inbound_payload.metrics[i].datatype == METRIC_DATA_TYPE_FLOAT)
-				{
-					value = inbound_payload.metrics[i].value.float_value;
-				}
-				else if(inbound_payload.metrics[i].datatype == METRIC_DATA_TYPE_DOUBLE)
-				{
-					value = (float)inbound_payload.metrics[i].value.double_value;
-				}
-				else if(inbound_payload.metrics[i].datatype == METRIC_DATA_TYPE_INT32)
-				{
-					int val = inbound_payload.metrics[i].value.int_value;
-					value = (float)val;
+					const char *error_ptr = cJSON_GetErrorPtr();
+					if (error_ptr != NULL)
+					{
+						fprintf(stderr, "Error before: %s\n", error_ptr);
+					}
 				}
 
+				cJSON *val = cJSON_GetObjectItemCaseSensitive(json_payload, "value");
+				
+				value = val->valuedouble;
+				
+				cJSON_Delete(json_payload);
+								
 				//////////////////////////////////////////////////////////////////////////
 				//Prepare message in monitoring direction
 				item_to_send.iec_type = M_ME_TF_1;
