@@ -1250,6 +1250,9 @@ static int mqtt_message_cb(MqttClient *client, MqttMessage *msg,
 
 				for(i=0; i<inbound_payload.metrics_count; i++) 
 				{
+					fprintf(stderr, "Metric name: %s\n", inbound_payload.metrics[i].name);
+					fflush(stderr);
+					
 					if(inbound_payload.metrics[i].datatype == METRIC_DATA_TYPE_BOOLEAN)
 					{
 						int val = inbound_payload.metrics[i].value.boolean_value;
@@ -1328,6 +1331,8 @@ static int mqtt_message_cb(MqttClient *client, MqttMessage *msg,
 					ORTEPublicationSend(parent_class->publisher);
 
 					n_msg_sent++;
+
+					break; //1-2-2023 Remove ASAP and fix me. Only one metric in a payload is supported with this break
 				}
 			}
 			else //json payload
