@@ -768,6 +768,7 @@ OpcUa_StatusCode Client_Browse(Session* a_pSession, OpcUa_Int a_iNodeID)
 	OpcUa_ViewDescription view;
 	OpcUa_BrowseDescription nodesToBrowse;
 	int i;
+	char node_id_name[30];
 
 	OpcUa_InitializeStatus(OpcUa_Module_Client, "Client_Browse");
 
@@ -786,23 +787,25 @@ OpcUa_StatusCode Client_Browse(Session* a_pSession, OpcUa_Int a_iNodeID)
 
 	OpcUa_BrowseDescription_Initialize(&nodesToBrowse);
 	
-	nodesToBrowse.NodeId.Identifier.Numeric = a_iNodeID;
-	nodesToBrowse.NodeId.IdentifierType = OpcUa_IdentifierType_Numeric;
-	
-	//sprintf(nodesToBrowse.NodeId.Identifier.String.strContent, "BuildingAutomation");
-	//nodesToBrowse.NodeId.IdentifierType = OpcUa_IdentifierType_String;
-	
-	nodesToBrowse.NodeId.NamespaceIndex = 0;
+	//nodesToBrowse.NodeId.Identifier.Numeric = a_iNodeID;
+	//nodesToBrowse.NodeId.IdentifierType = OpcUa_IdentifierType_Numeric;
+	//nodesToBrowse.NodeId.NamespaceIndex = 0;
+
+	strcpy(node_id_name,"Demo.Dynamic.Scalar");
+	nodesToBrowse.NodeId.Identifier.String.strContent = node_id_name;
+	nodesToBrowse.NodeId.IdentifierType = OpcUa_IdentifierType_String;
+	nodesToBrowse.NodeId.NamespaceIndex = 2;
+
 	nodesToBrowse.BrowseDirection = OpcUa_BrowseDirection_Forward;
 	nodesToBrowse.IncludeSubtypes = OpcUa_True;
 	nodesToBrowse.NodeClassMask = 0xFF;
 	nodesToBrowse.ResultMask = OpcUa_BrowseResultMask_All;
-	
+			
 	uStatus = OpcUa_ClientApi_Browse(
 		a_pSession->Channel,
 		&requestHeader,
 		&view,
-		10,
+		100,
 		1,
 		&nodesToBrowse,
 		&responseHeader,
@@ -826,12 +829,33 @@ OpcUa_StatusCode Client_Browse(Session* a_pSession, OpcUa_Int a_iNodeID)
 
 	OpcUa_Trace(OPCUA_TRACE_LEVEL_SYSTEM, "Client_Browse: SUCCESS\n");
 
+	printf("Client_Browse: SUCCESS\n");
+
+	if(nodesToBrowse.NodeId.IdentifierType == OpcUa_IdentifierType_Numeric)
+	{
+		printf("Node browsed = %d, ns= %d\n", nodesToBrowse.NodeId.Identifier.Numeric, nodesToBrowse.NodeId.NamespaceIndex);
+	}
+	else if(nodesToBrowse.NodeId.IdentifierType == OpcUa_IdentifierType_String)
+	{
+		printf("Node browsed = %s, ns= %d\n", nodesToBrowse.NodeId.Identifier.String.strContent, nodesToBrowse.NodeId.NamespaceIndex);
+	}
+
+	printf("NoOfReferences = %d\n", pBrowseResults->NoOfReferences);
+
 	for(i = 0; i < pBrowseResults->NoOfReferences; i++)
 	{
-		if(pBrowseResults->References[i].NodeId.NodeId.IdentifierType == 0)
-			printf("%s %d n=%d\n", pBrowseResults->References[i].BrowseName.Name.strContent, pBrowseResults->References[i].NodeId.NodeId.Identifier.Numeric, nResultCount);
+		if(pBrowseResults->References[i].NodeId.NodeId.IdentifierType == OpcUa_IdentifierType_Numeric)
+		{
+			printf("%s %d ns= %d\n", pBrowseResults->References[i].BrowseName.Name.strContent, pBrowseResults->References[i].NodeId.NodeId.Identifier.Numeric, pBrowseResults->References[i].NodeId.NodeId.NamespaceIndex);
+		}
+		else if(pBrowseResults->References[i].NodeId.NodeId.IdentifierType == OpcUa_IdentifierType_String)
+		{
+			printf("%s %s ns= %d\n", pBrowseResults->References[i].BrowseName.Name.strContent, pBrowseResults->References[i].NodeId.NodeId.Identifier.String.strContent, pBrowseResults->References[i].NodeId.NodeId.NamespaceIndex);
+		}
 		else
-			printf("%s %s n=%d\n", pBrowseResults->References[i].BrowseName.Name.strContent, pBrowseResults->References[i].NodeId.NodeId.Identifier.String.strContent, nResultCount);
+		{
+			printf("Not supported type\n");
+		}
 	}
 	
 	OpcUa_RequestHeader_Clear(&requestHeader);
@@ -862,6 +886,7 @@ OpcUa_StatusCode Client_ReadNode(Session* a_pSession, OpcUa_Int a_iNodeID, OpcUa
 	OpcUa_DataValue* pResults = OpcUa_Null;
 	OpcUa_Int32 nDiagnosticInfoCount = 0;
 	OpcUa_DiagnosticInfo* pDiagnosticInfos = NULL;
+	char node_id_name[50];
 
 	OpcUa_InitializeStatus(OpcUa_Module_Client, "Client_ReadNode");
 
@@ -878,9 +903,15 @@ OpcUa_StatusCode Client_ReadNode(Session* a_pSession, OpcUa_Int a_iNodeID, OpcUa
 	requestHeader.Timestamp = OpcUa_DateTime_UtcNow();
 
 	OpcUa_ReadValueId_Initialize(&nodesToRead);
-	nodesToRead.NodeId.Identifier.Numeric = a_iNodeID;
-	nodesToRead.NodeId.IdentifierType = OpcUa_IdentifierType_Numeric;
-	nodesToRead.NodeId.NamespaceIndex = 0;
+
+	strcpy(node_id_name,"Demo.Dynamic.Scalar.Int16");
+	nodesToRead.NodeId.Identifier.String.strContent = node_id_name;
+	nodesToRead.NodeId.IdentifierType = OpcUa_IdentifierType_String;
+	nodesToRead.NodeId.NamespaceIndex = 2;
+
+	//nodesToRead.NodeId.Identifier.Numeric = a_iNodeID;
+	//nodesToRead.NodeId.IdentifierType = OpcUa_IdentifierType_Numeric;
+	//nodesToRead.NodeId.NamespaceIndex = 0;
 	nodesToRead.AttributeId = OpcUa_Attributes_Value;
 		
 	uStatus = OpcUa_ClientApi_Read(
@@ -1051,12 +1082,12 @@ int Main_Client()
 
 	printf("9\n");
 
-	uStatus = Client_Browse(&session, 85); //apa+++
-	OpcUa_GotoErrorIfBad(uStatus);//apa+++
+	uStatus = Client_Browse(&session, 85);
+	OpcUa_GotoErrorIfBad(uStatus);
 
 	printf("10\n");
 
-	OpcUa_Trace(OPCUA_TRACE_LEVEL_SYSTEM, "**** Client Session active, pless 'x' to shutdown! ****\n");
+	OpcUa_Trace(OPCUA_TRACE_LEVEL_SYSTEM, "**** Client Session active, press 'x' to shutdown! ****\n");
 
 	/* read the current server time and publish it every second until the 'x' key is pressed */
 	while (!Client_CheckForKeypress())
@@ -1070,21 +1101,24 @@ int Main_Client()
 
 		printf("11\n");
 
-		if ((value != OpcUa_Null) && (value->Value.Datatype == OpcUaType_DateTime))
+		if ((value != OpcUa_Null) && (value->Value.Datatype == OpcUaType_Int16))
 		{
-			char valueBuffer[50];
-			char sourceTimeStampBuffer[50];
-			char serverTimeStampBuffer[50];
-			char msgText[1024];
+			printf("12\n");
+			//char valueBuffer[50];
+			//char sourceTimeStampBuffer[50];
+			//char serverTimeStampBuffer[50];
+			//char msgText[1024];
 			
-			OpcUa_DateTime_GetStringFromDateTime(value->Value.Value.DateTime, valueBuffer, 50);
-			OpcUa_Trace(OPCUA_TRACE_LEVEL_SYSTEM, "Current server time: %s\n", valueBuffer);
-			printf("%s\n", valueBuffer);
+			//OpcUa_DateTime_GetStringFromDateTime(value->Value.Value.DateTime, valueBuffer, 50);
+			//OpcUa_Trace(OPCUA_TRACE_LEVEL_SYSTEM, "Current server time: %s\n", valueBuffer);
+			//printf("%s\n", valueBuffer);
 			
-			OpcUa_DateTime_GetStringFromDateTime(value->SourceTimestamp, sourceTimeStampBuffer, 50);
+			//OpcUa_DateTime_GetStringFromDateTime(value->SourceTimestamp, sourceTimeStampBuffer, 50);
 
 			
-			OpcUa_DateTime_GetStringFromDateTime(value->ServerTimestamp, serverTimeStampBuffer, 50);
+			//OpcUa_DateTime_GetStringFromDateTime(value->ServerTimestamp, serverTimeStampBuffer, 50);
+
+			printf("%d\n",value->Value.Value.Int16);
 		}
 		
 		
