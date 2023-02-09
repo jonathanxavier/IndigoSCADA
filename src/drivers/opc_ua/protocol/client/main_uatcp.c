@@ -767,6 +767,7 @@ OpcUa_StatusCode Client_Browse(Session* a_pSession, OpcUa_Int a_iNodeID)
 	OpcUa_DiagnosticInfo* pDiagnosticInfos = NULL;
 	OpcUa_ViewDescription view;
 	OpcUa_BrowseDescription nodesToBrowse;
+	int i;
 
 	OpcUa_InitializeStatus(OpcUa_Module_Client, "Client_Browse");
 
@@ -784,8 +785,13 @@ OpcUa_StatusCode Client_Browse(Session* a_pSession, OpcUa_Int a_iNodeID)
 	OpcUa_ViewDescription_Initialize(&view);
 
 	OpcUa_BrowseDescription_Initialize(&nodesToBrowse);
+	
 	nodesToBrowse.NodeId.Identifier.Numeric = a_iNodeID;
 	nodesToBrowse.NodeId.IdentifierType = OpcUa_IdentifierType_Numeric;
+	
+	//sprintf(nodesToBrowse.NodeId.Identifier.String.strContent, "BuildingAutomation");
+	//nodesToBrowse.NodeId.IdentifierType = OpcUa_IdentifierType_String;
+	
 	nodesToBrowse.NodeId.NamespaceIndex = 0;
 	nodesToBrowse.BrowseDirection = OpcUa_BrowseDirection_Forward;
 	nodesToBrowse.IncludeSubtypes = OpcUa_True;
@@ -820,6 +826,14 @@ OpcUa_StatusCode Client_Browse(Session* a_pSession, OpcUa_Int a_iNodeID)
 
 	OpcUa_Trace(OPCUA_TRACE_LEVEL_SYSTEM, "Client_Browse: SUCCESS\n");
 
+	for(i = 0; i < pBrowseResults->NoOfReferences; i++)
+	{
+		if(pBrowseResults->References[i].NodeId.NodeId.IdentifierType == 0)
+			printf("%s %d n=%d\n", pBrowseResults->References[i].BrowseName.Name.strContent, pBrowseResults->References[i].NodeId.NodeId.Identifier.Numeric, nResultCount);
+		else
+			printf("%s %s n=%d\n", pBrowseResults->References[i].BrowseName.Name.strContent, pBrowseResults->References[i].NodeId.NodeId.Identifier.String.strContent, nResultCount);
+	}
+	
 	OpcUa_RequestHeader_Clear(&requestHeader);
 	OpcUa_ResponseHeader_Clear(&responseHeader);
 	OpcUa_ClearArray(pBrowseResults, nResultCount, BrowseResult);
@@ -992,46 +1006,69 @@ int Main_Client()
 	uStatus = Client_Initialize();
 	OpcUa_GotoErrorIfBad(uStatus);
 
+	printf("1\n");
+
 	/* need to fetch the metadata from the server using an insecure channel */
 	uStatus = OpcUa_Channel_Create(&session.Channel, OpcUa_Channel_SerializerType_Binary);
 	OpcUa_GotoErrorIfBad(uStatus);
 
+	printf("2\n");
+
 	uStatus = Client_Connect(&session, OpcUa_False);
 	OpcUa_GotoErrorIfBad(uStatus);
+
+	printf("3\n");
 
 	uStatus = Client_GetEndpoints(&session);
 	OpcUa_GotoErrorIfBad(uStatus);
 
+	printf("4\n");
+
 	OpcUa_Channel_Disconnect(session.Channel);
 	OpcUa_Channel_Delete(&session.Channel);
+
+	printf("5\n");
 
 	/* now need to connect to server using a secure channel with any access token */
 	uStatus = OpcUa_Channel_Create(&session.Channel, OpcUa_Channel_SerializerType_Binary);
 	OpcUa_GotoErrorIfBad(uStatus);
 
+	printf("6\n");
+
 	uStatus = Client_Connect(&session, OpcUa_True);
 	OpcUa_GotoErrorIfBad(uStatus);
+
+	printf("7\n");
 
 	/* create a normal UA session and activate it */
 	uStatus = Client_CreateSession(&session);
 	OpcUa_GotoErrorIfBad(uStatus);
+
+	printf("8\n");
 	
 	uStatus = Client_ActivateSession(&session);
 	OpcUa_GotoErrorIfBad(uStatus);
 
-	uStatus = Client_Browse(&session, 0); //apa+++
+	printf("9\n");
+
+	uStatus = Client_Browse(&session, 85); //apa+++
 	OpcUa_GotoErrorIfBad(uStatus);//apa+++
+
+	printf("10\n");
 
 	OpcUa_Trace(OPCUA_TRACE_LEVEL_SYSTEM, "**** Client Session active, pless 'x' to shutdown! ****\n");
 
 	/* read the current server time and publish it every second until the 'x' key is pressed */
 	while (!Client_CheckForKeypress())
 	{
+		
 		OpcUa_DataValue* value = OpcUa_Null;
 		const OpcUa_Int serverTimeNodeID = 2258;
 		
 		uStatus = Client_ReadNode(&session, serverTimeNodeID, &value);
 		OpcUa_GotoErrorIfBad(uStatus);
+
+		printf("11\n");
 
 		if ((value != OpcUa_Null) && (value->Value.Datatype == OpcUaType_DateTime))
 		{
@@ -1050,6 +1087,7 @@ int Main_Client()
 			OpcUa_DateTime_GetStringFromDateTime(value->ServerTimestamp, serverTimeStampBuffer, 50);
 		}
 		
+		
 		Sleep(1000);
 	}
 
@@ -1057,12 +1095,16 @@ int Main_Client()
 	uStatus = Client_CloseSession(&session);
 	OpcUa_GotoErrorIfBad(uStatus);
 
+	printf("12\n");
+
 	/* disconnect and delete the channel */
 	OpcUa_Channel_Disconnect(session.Channel);
 	OpcUa_Channel_Delete(&session.Channel);
 	
 	Session_Clear(&session);
 	Client_Cleanup();
+
+	printf("13\n");
 
 	return 0;
 
@@ -1073,10 +1115,14 @@ Error:
 	if (session.Channel != OpcUa_Null)
 	{
 		OpcUa_Channel_Delete(&session.Channel);
+
+		printf("14\n");
 	}
 
 	Session_Clear(&session);
 	Client_Cleanup();
+
+	printf("15\n");
 
 	return uStatus;
 }

@@ -157,21 +157,21 @@ typedef struct _OpcUa_Guid
 } OpcUa_Guid, *OpcUa_pGuid, OpcUa_Guid_Wire, *pOpcUa_Guid_Wire;
 
 #define OPCUA_STRING_STATICINITIALIZER {0, 0, OpcUa_Null}
-#ifdef _DEBUG
+//#ifdef _DEBUG
 typedef struct _OpcUa_String
 {
     OpcUa_UInt16 flags;
     OpcUa_UInt32 uLength;
     OpcUa_CharA* strContent;
 } OpcUa_String, *OpcUa_pString;
-#else
-typedef struct _OpcUa_String
-{
-    OpcUa_UInt16        uReserved1;     /* Content is private to String Implementation */
-    OpcUa_UInt32        uReserved2;     /* Content is private to String Implementation */
-    OpcUa_Void*         uReserved4;     /* Content is private to String Implementation */
-} OpcUa_String, *OpcUa_pString;
-#endif
+//#else
+//typedef struct _OpcUa_String
+//{
+//    OpcUa_UInt16        uReserved1;     /* Content is private to String Implementation */
+//    OpcUa_UInt32        uReserved2;     /* Content is private to String Implementation */
+//    OpcUa_Void*         uReserved4;     /* Content is private to String Implementation */
+//} OpcUa_String, *OpcUa_pString;
+//#endif
 
 #define OPCUA_BYTESTRING_STATICINITIALIZER {-1, OpcUa_Null}
 typedef struct _OpcUa_ByteString

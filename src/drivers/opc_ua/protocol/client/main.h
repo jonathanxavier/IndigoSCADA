@@ -42,8 +42,9 @@
 /* standard timeout for connect process */
 #define UACLIENT_TIMEOUT                                OPCUA_INFINITE
 /* URL of the server */
-#define UACLIENT_SERVER_URL                             "opc.tcp://localhost:4840"
-//#define UACLIENT_SERVER_URL                             "opc.tcp://localhost:16664"
+//#define UACLIENT_SERVER_URL                             "opc.tcp://localhost:4840"
+#define UACLIENT_SERVER_URL                             "opc.tcp://opcuaserver.com:48010"
+
 /* Transport profile used by the client */
 #define UACLIENT_TRANSPORT_PROFILE_URI                  OpcUa_TransportProfile_UaTcp
 /* the used trace level */
