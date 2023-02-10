@@ -34,7 +34,7 @@
 #ifdef _WIN32
 #include <windows.h>
 #endif
-#include "main.h"
+#include "client_api.h"
 
 #define OpcUa_String_CopyTo(xSource, xDestination) OpcUa_String_StrnCpy((xDestination), (xSource), OPCUA_STRING_LENDONTCARE)
 #define OpcUa_NodeId_CopyTo(xSource, xDestination) memcpy((xDestination), (xSource), sizeof(OpcUa_NodeId));
@@ -292,6 +292,7 @@ OpcUa_BeginErrorHandling;
 OpcUa_FinishErrorHandling;
 }
 
+/*
 typedef struct _Session
 {
 	OpcUa_Channel Channel;
@@ -312,6 +313,7 @@ typedef struct _Session
 	OpcUa_DataValue* MonitoredValues;
 }
 Session;
+*/
 
 void Session_Initialize(Session* pSession)
 {
@@ -339,7 +341,7 @@ void Session_Clear(Session* pSession)
 /*===========================================================================================*/
 /** @brief Connect to the server.                                                            */
 /*===========================================================================================*/
-OpcUa_StatusCode Client_Connect(Session* a_pSession, OpcUa_Boolean a_bUseSecurity)
+OpcUa_StatusCode Client_Connect(Session* a_pSession, OpcUa_Boolean a_bUseSecurity, char* server_url)
 {
 	OpcUa_String szSecurityPolicy;
 	OpcUa_InitializeStatus(OpcUa_Module_Client, "Client_Connect");
@@ -353,7 +355,7 @@ OpcUa_StatusCode Client_Connect(Session* a_pSession, OpcUa_Boolean a_bUseSecurit
 	
 		uStatus = OpcUa_Channel_Connect(
 			a_pSession->Channel,
-			UACLIENT_SERVER_URL,
+			server_url,
 			Client_ChannelCallback,
 			OpcUa_Null,
 			&Client_g_ClientCertificate,
@@ -372,7 +374,7 @@ OpcUa_StatusCode Client_Connect(Session* a_pSession, OpcUa_Boolean a_bUseSecurit
 
 		uStatus = OpcUa_Channel_Connect(
 			a_pSession->Channel,
-			UACLIENT_SERVER_URL,
+			server_url,
 			Client_ChannelCallback,
 			OpcUa_Null,
 			&Client_g_ClientCertificate,
@@ -492,7 +494,7 @@ OpcUa_StatusCode Client_SelectAnonymousUserTokenPolicy(Session* a_pSession, OpcU
 /*===========================================================================================*/
 /** @brief Get the endpoints.                                                                */
 /*===========================================================================================*/
-OpcUa_StatusCode Client_GetEndpoints(Session* a_pSession)
+OpcUa_StatusCode Client_GetEndpoints(Session* a_pSession, char* server_url)
 {
 	int ii;
 	OpcUa_RequestHeader requestHeader;
@@ -510,7 +512,7 @@ OpcUa_StatusCode Client_GetEndpoints(Session* a_pSession)
 	requestHeader.TimeoutHint = 60000;
 	requestHeader.Timestamp = OpcUa_DateTime_UtcNow();
 
-	uStatus = OpcUa_String_AttachToString(UACLIENT_SERVER_URL, OPCUA_STRINGLENZEROTERMINATED, 0, OpcUa_True, OpcUa_True, &endpointUrl);
+	uStatus = OpcUa_String_AttachToString(server_url, OPCUA_STRINGLENZEROTERMINATED, 0, OpcUa_True, OpcUa_True, &endpointUrl);
 	OpcUa_GotoErrorIfBad(uStatus);
 
 	uStatus = OpcUa_ClientApi_GetEndpoints(
@@ -877,7 +879,7 @@ OpcUa_FinishErrorHandling;
 /*===========================================================================================*/
 /** @brief Read node.                                                                    */
 /*===========================================================================================*/
-OpcUa_StatusCode Client_ReadNode(Session* a_pSession, OpcUa_Int a_iNodeID, OpcUa_DataValue** pValueRead)
+OpcUa_StatusCode Client_ReadNode(Session* a_pSession, char* node_id, int ns_idx, OpcUa_DataValue** pValueRead)
 {
 	OpcUa_RequestHeader requestHeader;
 	OpcUa_ResponseHeader responseHeader;
@@ -886,7 +888,6 @@ OpcUa_StatusCode Client_ReadNode(Session* a_pSession, OpcUa_Int a_iNodeID, OpcUa
 	OpcUa_DataValue* pResults = OpcUa_Null;
 	OpcUa_Int32 nDiagnosticInfoCount = 0;
 	OpcUa_DiagnosticInfo* pDiagnosticInfos = NULL;
-	char node_id_name[50];
 
 	OpcUa_InitializeStatus(OpcUa_Module_Client, "Client_ReadNode");
 
@@ -903,13 +904,12 @@ OpcUa_StatusCode Client_ReadNode(Session* a_pSession, OpcUa_Int a_iNodeID, OpcUa
 	requestHeader.Timestamp = OpcUa_DateTime_UtcNow();
 
 	OpcUa_ReadValueId_Initialize(&nodesToRead);
-
-	strcpy(node_id_name,"Demo.Dynamic.Scalar.Int16");
-	nodesToRead.NodeId.Identifier.String.strContent = node_id_name;
+	
+	nodesToRead.NodeId.Identifier.String.strContent = node_id;
 	nodesToRead.NodeId.IdentifierType = OpcUa_IdentifierType_String;
-	nodesToRead.NodeId.NamespaceIndex = 2;
+	nodesToRead.NodeId.NamespaceIndex = ns_idx;
 
-	//nodesToRead.NodeId.Identifier.Numeric = a_iNodeID;
+	//nodesToRead.NodeId.Identifier.Numeric = atoi(node_id);
 	//nodesToRead.NodeId.IdentifierType = OpcUa_IdentifierType_Numeric;
 	//nodesToRead.NodeId.NamespaceIndex = 0;
 	nodesToRead.AttributeId = OpcUa_Attributes_Value;
@@ -1021,7 +1021,7 @@ typedef struct EVENT_INSTANCE_TAG
 
 static int messageCounter = 0;
 
-
+#ifdef TEST_MAIN
 /*===========================================================================================*/
 /** @brief Main entry function.                                                              */
 /*===========================================================================================*/
@@ -1029,6 +1029,9 @@ int Main_Client()
 {
 	OpcUa_StatusCode uStatus = OpcUa_Good;
 	Session session;
+	char node_id[50];
+	int namespace_index;
+	OpcUa_DataValue* value = OpcUa_Null;
 
 	messageCounter = 0;
 
@@ -1089,38 +1092,21 @@ int Main_Client()
 
 	OpcUa_Trace(OPCUA_TRACE_LEVEL_SYSTEM, "**** Client Session active, press 'x' to shutdown! ****\n");
 
-	/* read the current server time and publish it every second until the 'x' key is pressed */
+	strcpy(node_id,"Demo.Dynamic.Scalar.Int16");
+	namespace_index = 2;
+
 	while (!Client_CheckForKeypress())
 	{
-		
-		OpcUa_DataValue* value = OpcUa_Null;
-		const OpcUa_Int serverTimeNodeID = 2258;
-		
-		uStatus = Client_ReadNode(&session, serverTimeNodeID, &value);
-		OpcUa_GotoErrorIfBad(uStatus);
+		value = OpcUa_Null;
 
-		printf("11\n");
+		uStatus = Client_ReadNode(&session, node_id, namespace_index, &value);
+		OpcUa_GotoErrorIfBad(uStatus);
 
 		if ((value != OpcUa_Null) && (value->Value.Datatype == OpcUaType_Int16))
 		{
-			printf("12\n");
-			//char valueBuffer[50];
-			//char sourceTimeStampBuffer[50];
-			//char serverTimeStampBuffer[50];
-			//char msgText[1024];
-			
-			//OpcUa_DateTime_GetStringFromDateTime(value->Value.Value.DateTime, valueBuffer, 50);
-			//OpcUa_Trace(OPCUA_TRACE_LEVEL_SYSTEM, "Current server time: %s\n", valueBuffer);
-			//printf("%s\n", valueBuffer);
-			
-			//OpcUa_DateTime_GetStringFromDateTime(value->SourceTimestamp, sourceTimeStampBuffer, 50);
-
-			
-			//OpcUa_DateTime_GetStringFromDateTime(value->ServerTimestamp, serverTimeStampBuffer, 50);
-
-			printf("%d\n",value->Value.Value.Int16);
+			fprintf(stderr, "%d\n", value->Value.Value.Int16);
+			fflush(stderr);
 		}
-		
 		
 		Sleep(1000);
 	}
@@ -1160,6 +1146,8 @@ Error:
 
 	return uStatus;
 }
+
+#endif //TEST_MAIN
 
 /*********************************************************************************************/
 /***********************                End Of File                   ************************/

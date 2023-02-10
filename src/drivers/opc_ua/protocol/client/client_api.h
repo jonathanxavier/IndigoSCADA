@@ -43,7 +43,7 @@
 #define UACLIENT_TIMEOUT                                OPCUA_INFINITE
 /* URL of the server */
 //#define UACLIENT_SERVER_URL                             "opc.tcp://localhost:4840"
-#define UACLIENT_SERVER_URL                             "opc.tcp://opcuaserver.com:48010"
+//#define UACLIENT_SERVER_URL                             "opc.tcp://opcuaserver.com:48010"
 
 /* Transport profile used by the client */
 #define UACLIENT_TRANSPORT_PROFILE_URI                  OpcUa_TransportProfile_UaTcp
@@ -121,4 +121,49 @@
 #if OPCUA_HAVE_HTTPS
 #include <openssl/ssl.h>
 #include <openssl/err.h>
+#endif
+
+typedef struct _Session
+{
+	OpcUa_Channel Channel;
+	OpcUa_String EndpointUrl;
+	OpcUa_String ApplicationUri;
+	OpcUa_NodeId SessionId;
+	OpcUa_NodeId AuthenticationToken;
+	OpcUa_Double RevisedSessionTimeout;
+	OpcUa_ByteString ServerNonce;
+	OpcUa_ByteString ServerCertificate;
+	OpcUa_UserTokenPolicy IdentityTokenPolicy;
+	OpcUa_ExtensionObject IdentityToken;
+	OpcUa_UInt32 SubscriptionId;
+	OpcUa_Int32 SequenceNumbersCount;
+	OpcUa_UInt32* SequenceNumbers;
+	OpcUa_Int32 MonitoredItemsCount;
+	OpcUa_UInt32* MonitoredItems;
+	OpcUa_DataValue* MonitoredValues;
+}
+Session;
+
+
+#ifdef  __cplusplus
+extern "C" {
+#endif
+
+OpcUa_StatusCode Client_Initialize(OpcUa_Void);
+OpcUa_Void Client_SecurityClear(OpcUa_Void);
+OpcUa_Void Client_Cleanup(OpcUa_Void);
+void Session_Initialize(Session* pSession);
+void Session_Clear(Session* pSession);
+OpcUa_StatusCode Client_Connect(Session* a_pSession, OpcUa_Boolean a_bUseSecurity, char* server_url);
+void* OpcUa_ExtensionObject_CreateFromType(OpcUa_ExtensionObject* a_pExtension, OpcUa_EncodeableType* a_pType);
+OpcUa_StatusCode Client_SelectAnonymousUserTokenPolicy(Session* a_pSession, OpcUa_EndpointDescription* a_pEndpoint);
+OpcUa_StatusCode Client_GetEndpoints(Session* a_pSession, char* server_url);
+OpcUa_StatusCode Client_CreateSession(Session* a_pSession);
+OpcUa_StatusCode Client_ActivateSession(Session* a_pSession);
+OpcUa_StatusCode Client_Browse(Session* a_pSession, OpcUa_Int a_iNodeID);
+OpcUa_StatusCode Client_ReadNode(Session* a_pSession, char* node_id, int ns_idx, OpcUa_DataValue** pValueRead);
+OpcUa_StatusCode Client_CloseSession(Session* a_pSession);
+
+#ifdef  __cplusplus
+}
 #endif
