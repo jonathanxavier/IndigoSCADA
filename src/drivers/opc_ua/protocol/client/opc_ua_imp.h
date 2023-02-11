@@ -73,7 +73,6 @@ class opcua_imp
 	int Stop(void);
 	int64_t epoch_from_cp56time2a(const struct cp56time2a* time);
 	int PollItems(void);
-	int ReadItem(int row);
 	short rescale_value(double V, double Vmin, double Vmax, int* error);
 	double rescale_value_inv(double A, double Vmin, double Vmax, int* error);
 	
