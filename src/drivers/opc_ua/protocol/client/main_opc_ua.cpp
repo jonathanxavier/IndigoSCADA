@@ -165,7 +165,7 @@ int main( int argc, char **argv )
 
 	if(strlen(serverURL) > 0)
 	{
-		strcpy(NewConsoleTitle, "MODBUS TCP address ");
+		strcpy(NewConsoleTitle, "OPC UA URL ");
 		strcat(NewConsoleTitle, serverURL);
 	}
 
@@ -200,7 +200,7 @@ int main( int argc, char **argv )
 	}
 	/////////////////end keep alive////////////////////////////////////////////////
 
-	modbus_imp* po = new modbus_imp(serverURL, line_number, atoi(polling_time));
+	opcua_imp* po = new opcua_imp(serverURL, line_number, atoi(polling_time));
 
 	if(po == NULL)
 	{
@@ -249,7 +249,7 @@ void PipeWorker(void* pParam)
 
     struct args* arg = (struct args*)pParam;
 
-	strcpy(pipe_name, "\\\\.\\pipe\\modbus_master_namedpipe");
+	strcpy(pipe_name, "\\\\.\\pipe\\opcua_client_namedpipe");
     strcat(pipe_name, arg->line_number);
 
 	for(i = 0; i < N_PIPES; i++)

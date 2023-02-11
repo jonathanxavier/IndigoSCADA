@@ -76,7 +76,7 @@ void rebuild_iec_item_message(struct iec_item *item2, iec_item_type *item1)
 
 void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackParam) 
 {
-	modbus_imp * cl = (modbus_imp*)recvCallBackParam;
+	opcua_imp * cl = (opcua_imp*)recvCallBackParam;
 	iec_item_type *item1 = (iec_item_type*)vinstance;
 
 	switch (info->status) 
@@ -108,7 +108,7 @@ void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackPa
 //   
 //  Class constructor.   
 //   
-modbus_imp::modbus_imp(char* server_url, char* line_number, int polling_time):
+opcua_imp::opcua_imp(char* server_url, char* line_number, int polling_time):
 fExit(false),pollingTime(polling_time), general_interrogation(true), is_connected(false)
 {   
 	lineNumber = atoi(line_number);
@@ -145,7 +145,7 @@ fExit(false),pollingTime(polling_time), general_interrogation(true), is_connecte
 	char fifo_monitor_name[150];
 	strcpy(fifo_monitor_name,"fifo_monitor_direction");
 	strcat(fifo_monitor_name, line_number);
-	strcat(fifo_monitor_name, "modbus");
+	strcat(fifo_monitor_name, "opcua");
 
 	publisher = ORTEPublicationCreate(
 	domain,
@@ -163,7 +163,7 @@ fExit(false),pollingTime(polling_time), general_interrogation(true), is_connecte
 	char fifo_control_name[150];
 	strcpy(fifo_control_name,"fifo_control_direction");
 	strcat(fifo_control_name, line_number);
-	strcat(fifo_control_name, "modbus");
+	strcat(fifo_control_name, "opcua");
 
 	//Create subscriber
 	NTPTIME_BUILD(deadline,3);
@@ -187,7 +187,7 @@ fExit(false),pollingTime(polling_time), general_interrogation(true), is_connecte
 //   
 //  Class destructor.   
 //   
-modbus_imp::~modbus_imp()  
+opcua_imp::~opcua_imp()  
 {   
     // free resources   
 	fExit = 1;
@@ -200,9 +200,9 @@ modbus_imp::~modbus_imp()
 
 static u_int n_msg_sent = 0;
 
-int modbus_imp::PollServer(void)
+int opcua_imp::PollServer(void)
 {
-	IT_IT("modbus_imp::PollServer");
+	IT_IT("opcua_imp::PollServer");
 	
 	int rc = 0;
 
@@ -229,7 +229,7 @@ int modbus_imp::PollServer(void)
 				fprintf(stderr,"opc ua client on line %d exiting...., due to lack of connection with server\n", lineNumber);
 				fflush(stderr);
 
-				IT_COMMENT("modbus_imp exiting...., due to lack of connection with server");
+				IT_COMMENT("opcua_imp exiting...., due to lack of connection with server");
 				
 				//Send LOST message to parent (monitor.exe)
 				struct iec_item item_to_send;
@@ -277,7 +277,7 @@ int modbus_imp::PollServer(void)
 
 		if(fExit)
 		{
-			IT_COMMENT("Terminate modbus loop!");
+			IT_COMMENT("Terminate opc ua loop!");
 			break;
 		}
 
@@ -299,9 +299,9 @@ int modbus_imp::PollServer(void)
 	return 0;
 }
 
-int modbus_imp::Start(void)
+int opcua_imp::Start(void)
 {
-	IT_IT("modbus_imp::Start");
+	IT_IT("opcua_imp::Start");
 	
 	char show_msg[200];
 	sprintf(show_msg, " IndigoSCADA OPC UA client Start\n");
@@ -391,9 +391,9 @@ Error:
 	return uStatus;
 }
 
-int modbus_imp::Stop()
+int opcua_imp::Stop()
 {
-	IT_IT("modbus_imp::Stop");
+	IT_IT("opcua_imp::Stop");
 
 	fprintf(stderr,"Entering Stop()\n");
 	fflush(stderr);
@@ -401,7 +401,7 @@ int modbus_imp::Stop()
 	// terminate server and it will clean up itself
 
 	char show_msg[200];
-	sprintf(show_msg, " IndigoSCADA MODBUS master End\n");
+	sprintf(show_msg, " IndigoSCADA OPC UA client End\n");
 	LogMessage(NULL, show_msg);
 
 	IT_EXIT;
@@ -414,7 +414,7 @@ struct log_message{
 	char message[150];
 };
 
-void modbus_imp::LogMessage(int* error, const char* name)
+void opcua_imp::LogMessage(int* error, const char* name)
 {
 	//TODO: send message to monitor.exe as a single point
 
@@ -449,7 +449,7 @@ uint64_t getTimeInMs()
 	return (now / 10000i64) - DIFF_TO_UNIXTIME;
 }
 
-void modbus_imp::get_local_host_time(struct cp56time2a* time)
+void opcua_imp::get_local_host_time(struct cp56time2a* time)
 {
 
 	struct tm	*ptm;
@@ -475,7 +475,7 @@ void modbus_imp::get_local_host_time(struct cp56time2a* time)
     return;
 }
 
-void modbus_imp::get_utc_host_time(struct cp56time2a* time)
+void opcua_imp::get_utc_host_time(struct cp56time2a* time)
 {
 	struct tm	*ptm;
 	int64_t epoch_in_ms;
@@ -503,7 +503,7 @@ void modbus_imp::get_utc_host_time(struct cp56time2a* time)
     return;
 }
 
-int64_t modbus_imp::epoch_from_cp56time2a(const struct cp56time2a* time)
+int64_t opcua_imp::epoch_from_cp56time2a(const struct cp56time2a* time)
 {
 	struct tm	t;
 	int64_t epoch = 0;
@@ -533,15 +533,15 @@ int64_t modbus_imp::epoch_from_cp56time2a(const struct cp56time2a* time)
 #define ABS(x) ((x) >= 0 ? (x) : -(x))
 
 //Retun 1 on error
-int modbus_imp::PollItems(void)
+int opcua_imp::PollItems(void)
 {
-	IT_IT("modbus_imp::PollItems");
+	IT_IT("opcua_imp::PollItems");
 
 	struct iec_item item_to_send;
 	struct cp56time2a actual_time;
 	////////////////////////////////Start protocol implementation///////////////////////////////////
 	int rc;
-    bool send_item;
+    bool send_item = true;
 	int bit_size;
     	
     comm_error_counter = 0;
@@ -553,8 +553,11 @@ int modbus_imp::PollItems(void)
 	char node_id[50];
 	int namespace_index;
 
-	strcpy(node_id,"Demo.Dynamic.Scalar.Int16");
+	//strcpy(node_id,"Demo.Dynamic.Scalar.Int16");
 	namespace_index = 2;
+
+	strcpy(node_id, Config_db[0].nodeid);
+	//namespace_index = Config_db[0].namespace_index;
 
 	uStatus = Client_ReadNode(&session, node_id, namespace_index, &value);
 	OpcUa_GotoErrorIfBad(uStatus);
@@ -566,608 +569,26 @@ int modbus_imp::PollItems(void)
 		fprintf(stderr, "%d\n", value->Value.Value.Int16);
 		fflush(stderr);
 	}
-	
-	/*
 
+/*	
 	for(int rowNumber = 0; rowNumber < db_n_rows; rowNumber++)
 	{
 		memset(&item_to_send,0x00, sizeof(struct iec_item));
-
-		memset(tab_rp_bits, 0x00, nb_points * sizeof(uint8_t));
-
-		memset(tab_rp_registers, 0x00, nb_points * sizeof(uint16_t));
-	
-		if(Config_db[rowNumber].modbus_function_read == FC_READ_COILS)
-		{
-			//0x01
-				
-			if(Config_db[rowNumber].modbus_type == VT_BOOL)
-			{
-				bit_size = 1;
-
-				int address = Config_db[rowNumber].modbus_address;
-
-				modbus_set_slave(ctx, Config_db[rowNumber].slave_id);
-
-				rc = modbus_read_bits(ctx, address, bit_size, tab_rp_bits);
-
-				if (rc != 1) 
-				{
-                    comm_error_counter++;
-					
-                    continue;
-				}
-
-				uint8_t value = tab_rp_bits[0];
-
-				fprintf(stderr, "modbus_read_bits: value = %d\n", (int)value);
-
-				if(Config_db[rowNumber].last_value.a != value)
-				{
-					Config_db[rowNumber].last_value.a = value;
-
-					send_item = true;
-				}
-				else
-				{
-					send_item = false;
-				}
-
-				item_to_send.iec_obj.ioa = Config_db[rowNumber].ioa_control_center;
-
-				item_to_send.cause = 0x03;
 			
-				item_to_send.iec_type = M_SP_TB_1;
-				
-				get_local_host_time(&actual_time);
+		strcpy(node_id, Config_db[rowNumber].nodeid);
+		namespace_index = Config_db[rowNumber].namespace_index;
 
-				item_to_send.iec_obj.o.type30.sp = value;
-				item_to_send.iec_obj.o.type30.time = actual_time;
-				item_to_send.iec_obj.o.type30.iv = 0;
-				
-				IT_COMMENT1("Value = %d", value);
-			}
-			else
-			{
-				printf("Modbus type %d not supported with FC_READ_COILS", Config_db[rowNumber].modbus_type);
-			}
-		}
-		else if(Config_db[rowNumber].modbus_function_read == FC_READ_DISCRETE_INPUTS)
+		uStatus = Client_ReadNode(&session, node_id, 2, &value);
+		OpcUa_GotoErrorIfBad(uStatus);
+
+		printf("11\n");
+
+		if ((value != OpcUa_Null) && (value->Value.Datatype == OpcUaType_Int16))
 		{
-			//0x02
-
-			if(Config_db[rowNumber].modbus_type == VT_BOOL)
-			{
-				bit_size = 1;
-
-				int address = Config_db[rowNumber].modbus_address;
-
-				modbus_set_slave(ctx, Config_db[rowNumber].slave_id);
-
-				rc = modbus_read_input_bits(ctx, address, bit_size, tab_rp_bits);
-
-				if (rc != 1) 
-				{
-                    comm_error_counter++;
-					
-                    continue;
-				}
-
-				uint8_t value = tab_rp_bits[0];
-
-				fprintf(stderr, "modbus_read_input_bits: value = %d\n", (int)value);
-
-				if(Config_db[rowNumber].last_value.a != value)
-				{
-					Config_db[rowNumber].last_value.a = value;
-
-					send_item = true;
-				}
-				else
-				{
-					send_item = false;
-				}
-
-				item_to_send.iec_obj.ioa = Config_db[rowNumber].ioa_control_center;
-
-				item_to_send.cause = 0x03;
-			
-				item_to_send.iec_type = M_SP_TB_1;
-				
-				get_local_host_time(&actual_time);
-
-				item_to_send.iec_obj.o.type30.sp = value;
-				item_to_send.iec_obj.o.type30.time = actual_time;
-				item_to_send.iec_obj.o.type30.iv = 0;
-				
-				IT_COMMENT1("Value = %d", value);
-			}
-			else
-			{
-				printf("Modbus type %d not supported with FC_READ_COILS", Config_db[rowNumber].modbus_type);
-			}
+			fprintf(stderr, "%d\n", value->Value.Value.Int16);
+			fflush(stderr);
 		}
-		else if(Config_db[rowNumber].modbus_function_read == FC_READ_HOLDING_REGISTERS)
-		{
-			//0x03
-			if((Config_db[rowNumber].modbus_type == VT_I4) || 
-			   (Config_db[rowNumber].modbus_type == VT_UI4)|| 
-			   (Config_db[rowNumber].modbus_type == VT_R4) ||
-			   (Config_db[rowNumber].modbus_type == VT_R4SWAP)
-			   )
-			{
-				int registers = 2; //read 32 bits
 
-				int address = Config_db[rowNumber].modbus_address;
-
-				modbus_set_slave(ctx, Config_db[rowNumber].slave_id);
-
-				rc = modbus_read_registers(ctx, address, registers, tab_rp_registers);
-
-				fprintf(stderr, "modbus_read_registers: ");
-
-				if (rc != registers) 
-				{
-                    comm_error_counter++;
-					
-                    continue;
-				}
-
-				if((Config_db[rowNumber].modbus_type == VT_R4) ||
-				   (Config_db[rowNumber].modbus_type == VT_R4SWAP)
-				  )
-				{
-					float real;
-
-					if(Config_db[rowNumber].modbus_type == VT_R4)
-					{
-						real = modbus_get_float(tab_rp_registers);
-					}
-					else if(Config_db[rowNumber].modbus_type == VT_R4SWAP)
-					{
-					    // swap LSB and MSB
-						uint16_t tmp1 = tab_rp_registers[0];
-						uint16_t tmp2 = tab_rp_registers[1];
-						tab_rp_registers[0] = tmp2;
-						tab_rp_registers[1] = tmp1;
-
-						real = modbus_get_float(&tab_rp_registers[0]);
-					}
-
-					fprintf(stderr, "Get float: %f\n", real);
-
-					if(ABS(Config_db[rowNumber].last_value.f - real) > Config_db[rowNumber].deadband)
-					{
-						Config_db[rowNumber].last_value.f = real;
-
-						send_item = true;
-					}
-					else
-					{
-						send_item = false;
-					}
-
-					item_to_send.iec_obj.ioa = Config_db[rowNumber].ioa_control_center;
-
-					item_to_send.cause = 0x03;
-
-					item_to_send.iec_type = M_ME_TF_1;
-					
-					get_local_host_time(&actual_time);
-
-					item_to_send.iec_obj.o.type36.mv = real;
-					item_to_send.iec_obj.o.type36.time = actual_time;
-					item_to_send.iec_obj.o.type36.iv = 0;
-				}
-				else if(Config_db[rowNumber].modbus_type == VT_I4)
-				{
-					int integer32;
-					integer32 = modbus_get_int(tab_rp_registers);
-
-					fprintf(stderr, "Get integer: %d\n", integer32);
-
-					if(ABS(Config_db[rowNumber].last_value.a - integer32) > (int)Config_db[rowNumber].deadband)
-					{
-						Config_db[rowNumber].last_value.a = integer32;
-
-						send_item = true;
-					}
-					else
-					{
-						send_item = false;
-					}
-
-					item_to_send.iec_obj.ioa = Config_db[rowNumber].ioa_control_center;
-
-					item_to_send.cause = 0x03;
-
-					item_to_send.iec_type = M_IT_TB_1;
-					
-					get_local_host_time(&actual_time);
-
-					item_to_send.iec_obj.o.type37.counter = integer32;
-					item_to_send.iec_obj.o.type37.time = actual_time;
-					item_to_send.iec_obj.o.type37.iv = 0;
-				}
-				else if(Config_db[rowNumber].modbus_type == VT_UI4)
-				{
-					unsigned int uinteger32;
-					uinteger32 = modbus_get_uint(tab_rp_registers);
-
-					fprintf(stderr, "Get unsigned integer: %d\n", uinteger32);
-
-					if(ABS(Config_db[rowNumber].last_value.ua - uinteger32) > (int)Config_db[rowNumber].deadband)
-					{
-						Config_db[rowNumber].last_value.ua = uinteger32;
-
-						send_item = true;
-					}
-					else
-					{
-						send_item = false;
-					}
-
-					item_to_send.iec_obj.ioa = Config_db[rowNumber].ioa_control_center;
-
-					item_to_send.cause = 0x03;
-
-					item_to_send.iec_type = M_ME_TO_1;
-					
-					get_local_host_time(&actual_time);
-
-					item_to_send.iec_obj.o.type151.mv = uinteger32;
-					item_to_send.iec_obj.o.type151.time = actual_time;
-					item_to_send.iec_obj.o.type151.iv = 0;
-				}
-			}
-			else if(Config_db[rowNumber].modbus_type == VT_I2)
-			{
-				int registers = 1; //read 16 bits
-
-				int address = Config_db[rowNumber].modbus_address;
-
-				modbus_set_slave(ctx, Config_db[rowNumber].slave_id);
-								
-				rc = modbus_read_registers(ctx, address, registers, tab_rp_registers);
-				fprintf(stderr, "modbus_read_registers: ");
-
-				if (rc != registers) 
-				{
-					comm_error_counter++;
-					
-					continue;
-				}
-				
-				short integer16;
-				integer16 = tab_rp_registers[0];
-
-				fprintf(stderr, "Get integer: %d\n", integer16);
-
-				if(ABS(Config_db[rowNumber].last_value.a - integer16) > (short)Config_db[rowNumber].deadband)
-				{
-					Config_db[rowNumber].last_value.a = integer16;
-
-					send_item = true;
-				}
-				else
-				{
-					send_item = false;
-				}
-
-				item_to_send.iec_obj.ioa = Config_db[rowNumber].ioa_control_center;
-
-				item_to_send.cause = 0x03;
-
-				item_to_send.iec_type = M_ME_TE_1;
-				
-				get_local_host_time(&actual_time);
-
-				item_to_send.iec_obj.o.type35.mv = integer16;
-				item_to_send.iec_obj.o.type35.time = actual_time;
-				item_to_send.iec_obj.o.type35.iv = 0;
-			}
-			else if(Config_db[rowNumber].modbus_type == VT_UI2)
-			{
-				int registers = 1; //read 16 bits
-
-				int address = Config_db[rowNumber].modbus_address;
-
-				modbus_set_slave(ctx, Config_db[rowNumber].slave_id);
-								
-				rc = modbus_read_registers(ctx, address, registers, tab_rp_registers);
-				fprintf(stderr, "modbus_read_registers: ");
-
-				if (rc != registers) 
-				{
-					comm_error_counter++;
-					
-					continue;
-				}
-				
-				unsigned short uinteger16;
-				uinteger16 = tab_rp_registers[0];
-
-				fprintf(stderr, "Get unsigned integer: %d\n", uinteger16);
-
-				if(ABS(Config_db[rowNumber].last_value.ua - uinteger16) > (short)Config_db[rowNumber].deadband)
-				{
-					Config_db[rowNumber].last_value.ua = uinteger16;
-
-					send_item = true;
-				}
-				else
-				{
-					send_item = false;
-				}
-
-				item_to_send.iec_obj.ioa = Config_db[rowNumber].ioa_control_center;
-
-				item_to_send.cause = 0x03;
-
-				item_to_send.iec_type = M_ME_TQ_1;
-				
-				get_local_host_time(&actual_time);
-
-				item_to_send.iec_obj.o.type153.mv = uinteger16;
-				item_to_send.iec_obj.o.type153.time = actual_time;
-				item_to_send.iec_obj.o.type153.iv = 0;
-			}
-			else
-			{
-				printf("Modbus type %d not supported with FC_READ_HOLDING_REGISTERS", Config_db[rowNumber].modbus_type);
-			}
-		}
-		else if(Config_db[rowNumber].modbus_function_read == FC_READ_INPUT_REGISTERS)
-		{
-			//0x04
-			if((Config_db[rowNumber].modbus_type == VT_I4) || 
-			   (Config_db[rowNumber].modbus_type == VT_UI4)|| 
-			   (Config_db[rowNumber].modbus_type == VT_R4) ||
-			   (Config_db[rowNumber].modbus_type == VT_R4SWAP)
-			   )
-			{
-				int registers = 2; //read 32 bits
-
-				int address = Config_db[rowNumber].modbus_address;
-
-				modbus_set_slave(ctx, Config_db[rowNumber].slave_id);
-
-				rc = modbus_read_input_registers(ctx, address, registers, tab_rp_registers);
-
-				fprintf(stderr, "modbus_read_input_registers: ");
-
-				if (rc != registers) 
-				{
-                    comm_error_counter++;
-					
-                    continue;
-				}
-
-				if((Config_db[rowNumber].modbus_type == VT_R4) ||
-				   (Config_db[rowNumber].modbus_type == VT_R4SWAP)
-				  )
-				{
-					float real;
-
-					if(Config_db[rowNumber].modbus_type == VT_R4)
-					{
-						real = modbus_get_float(tab_rp_registers);
-					}
-					else if(Config_db[rowNumber].modbus_type == VT_R4SWAP)
-					{
-					    // swap LSB and MSB
-						uint16_t tmp1 = tab_rp_registers[0];
-						uint16_t tmp2 = tab_rp_registers[1];
-						tab_rp_registers[0] = tmp2;
-						tab_rp_registers[1] = tmp1;
-
-						real = modbus_get_float(&tab_rp_registers[0]);
-					}
-
-					fprintf(stderr, "Get float: %f\n", real);
-
-					if(ABS(Config_db[rowNumber].last_value.f - real) > Config_db[rowNumber].deadband)
-					{
-						Config_db[rowNumber].last_value.f = real;
-
-						send_item = true;
-					}
-					else
-					{
-						send_item = false;
-					}
-
-					item_to_send.iec_obj.ioa = Config_db[rowNumber].ioa_control_center;
-
-					item_to_send.cause = 0x03;
-
-					item_to_send.iec_type = M_ME_TF_1;
-					
-					get_local_host_time(&actual_time);
-
-					item_to_send.iec_obj.o.type36.mv = real;
-					item_to_send.iec_obj.o.type36.time = actual_time;
-					item_to_send.iec_obj.o.type36.iv = 0;
-				}
-				else if(Config_db[rowNumber].modbus_type == VT_I4)
-				{
-					int integer32;
-					integer32 = modbus_get_int(tab_rp_registers);
-
-					fprintf(stderr, "Get integer: %d\n", integer32);
-
-					if(ABS(Config_db[rowNumber].last_value.a - integer32) > (int)Config_db[rowNumber].deadband)
-					{
-						Config_db[rowNumber].last_value.a = integer32;
-
-						send_item = true;
-					}
-					else
-					{
-						send_item = false;
-					}
-
-					item_to_send.iec_obj.ioa = Config_db[rowNumber].ioa_control_center;
-
-					item_to_send.cause = 0x03;
-
-					item_to_send.iec_type = M_IT_TB_1;
-					
-					get_local_host_time(&actual_time);
-
-					item_to_send.iec_obj.o.type37.counter = integer32;
-					item_to_send.iec_obj.o.type37.time = actual_time;
-					item_to_send.iec_obj.o.type37.iv = 0;
-				}
-				else if(Config_db[rowNumber].modbus_type == VT_UI4)
-				{
-					unsigned int uinteger32;
-					uinteger32 = modbus_get_uint(tab_rp_registers);
-
-					fprintf(stderr, "Get unsigned integer: %d\n", uinteger32);
-
-					if(ABS(Config_db[rowNumber].last_value.ua - uinteger32) > (int)Config_db[rowNumber].deadband)
-					{
-						Config_db[rowNumber].last_value.ua = uinteger32;
-
-						send_item = true;
-					}
-					else
-					{
-						send_item = false;
-					}
-
-					item_to_send.iec_obj.ioa = Config_db[rowNumber].ioa_control_center;
-
-					item_to_send.cause = 0x03;
-
-					item_to_send.iec_type = M_ME_TO_1;
-					
-					get_local_host_time(&actual_time);
-
-					item_to_send.iec_obj.o.type151.mv = uinteger32;
-					item_to_send.iec_obj.o.type151.time = actual_time;
-					item_to_send.iec_obj.o.type151.iv = 0;
-				}
-			}
-			else if(Config_db[rowNumber].modbus_type == VT_I2)
-			{
-				int registers = 1; //read 16 bits
-
-				int address = Config_db[rowNumber].modbus_address;
-				
-				modbus_set_slave(ctx, Config_db[rowNumber].slave_id);
-				
-				rc = modbus_read_input_registers(ctx, address, registers, tab_rp_registers);
-				fprintf(stderr, "modbus_read_input_registers: ");
-
-				if (rc != registers) 
-				{
-					comm_error_counter++;
-					
-					continue;
-				}
-				
-				short integer16;
-				integer16 = tab_rp_registers[0];
-
-				fprintf(stderr, "Get integer: %d\n", integer16);
-
-				if(ABS(Config_db[rowNumber].last_value.a - integer16) > (short)Config_db[rowNumber].deadband)
-				{
-					Config_db[rowNumber].last_value.a = integer16;
-
-					send_item = true;
-				}
-				else
-				{
-					send_item = false;
-				}
-
-				item_to_send.iec_obj.ioa = Config_db[rowNumber].ioa_control_center;
-
-				item_to_send.cause = 0x03;
-
-				item_to_send.iec_type = M_ME_TE_1;
-				
-				get_local_host_time(&actual_time);
-
-				item_to_send.iec_obj.o.type35.mv = integer16;
-				item_to_send.iec_obj.o.type35.time = actual_time;
-				item_to_send.iec_obj.o.type35.iv = 0;
-			}
-			else if(Config_db[rowNumber].modbus_type == VT_UI2)
-			{
-				int registers = 1; //read 16 bits
-
-				int address = Config_db[rowNumber].modbus_address;
-				
-				modbus_set_slave(ctx, Config_db[rowNumber].slave_id);
-				
-				rc = modbus_read_input_registers(ctx, address, registers, tab_rp_registers);
-				fprintf(stderr, "modbus_read_input_registers: ");
-
-				if (rc != registers) 
-				{
-					comm_error_counter++;
-					
-					continue;
-				}
-				
-				unsigned short uinteger16;
-				uinteger16 = tab_rp_registers[0];
-
-				fprintf(stderr, "Get unsigned integer: %d\n", uinteger16);
-
-				if(ABS(Config_db[rowNumber].last_value.ua - uinteger16) > (short)Config_db[rowNumber].deadband)
-				{
-					Config_db[rowNumber].last_value.ua = uinteger16;
-
-					send_item = true;
-				}
-				else
-				{
-					send_item = false;
-				}
-
-				item_to_send.iec_obj.ioa = Config_db[rowNumber].ioa_control_center;
-
-				item_to_send.cause = 0x03;
-
-				item_to_send.iec_type = M_ME_TQ_1;
-				
-				get_local_host_time(&actual_time);
-
-				item_to_send.iec_obj.o.type153.mv = uinteger16;
-				item_to_send.iec_obj.o.type153.time = actual_time;
-				item_to_send.iec_obj.o.type153.iv = 0;
-			}
-			else
-			{
-				printf("Modbus type %d not supported with FC_READ_INPUT_REGISTERS", Config_db[rowNumber].modbus_type);
-			}
-		}
-		else if(Config_db[rowNumber].modbus_function_read == FC_READ_EXCEPTION_STATUS)
-		{
-			//0x07
-			printf("Function %x not supported\n", 0x07);
-		
-		}
-		else if(Config_db[rowNumber].modbus_function_read == FC_REPORT_SLAVE_ID)
-		{
-			//0x11
-			printf("Function %x not supported\n", 0x11);
-		}
-		else if(Config_db[rowNumber].modbus_function_read == FC_WRITE_AND_READ_REGISTERS)
-		{
-			//0x17
-			printf("Function %x not supported\n", 0x17);
-		}
-		else
-		{
-			printf("Function not supported\n");
-		}
-		
 		if(send_item || general_interrogation)
 		{
 			item_to_send.msg_id = n_msg_sent;
@@ -1210,14 +631,8 @@ int modbus_imp::PollItems(void)
 			n_msg_sent++;
 		}
 	}
+*/
 
-    if(comm_error_counter >= db_n_rows)
-    {
-        IT_EXIT; //Lost connection with server...
-	    return 1;
-    }
-
-	*/
 Error:
 
 	IT_EXIT;
@@ -1229,7 +644,7 @@ Error:
 
 #define DO_NOT_RESCALE
 
-short modbus_imp::rescale_value(double V, double Vmin, double Vmax, int* error)
+short opcua_imp::rescale_value(double V, double Vmin, double Vmax, int* error)
 {
 	#ifdef DO_SCALE
 	double Amin;
@@ -1292,7 +707,7 @@ short modbus_imp::rescale_value(double V, double Vmin, double Vmax, int* error)
 	#endif //DO_NOT_RESCALE
 }
 
-double modbus_imp::rescale_value_inv(double A, double Vmin, double Vmax, int* error)
+double opcua_imp::rescale_value_inv(double A, double Vmin, double Vmax, int* error)
 {
 	#ifdef DO_SCALE
 	double Amin;
@@ -1337,7 +752,7 @@ double modbus_imp::rescale_value_inv(double A, double Vmin, double Vmax, int* er
 }
 
 
-void modbus_imp::check_for_commands(struct iec_item *queued_item)
+void opcua_imp::check_for_commands(struct iec_item *queued_item)
 {
 	if(!fExit)
 	{ 
@@ -1519,7 +934,7 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 
 					char show_msg[200];
 					sprintf(show_msg, "Error %d, %s\n",__LINE__, __FILE__);
-					modbus_imp::LogMessage(0, show_msg);
+					opcua_imp::LogMessage(0, show_msg);
 				
 					return;
 				}
@@ -1649,7 +1064,7 @@ void modbus_imp::check_for_commands(struct iec_item *queued_item)
 
 						char show_msg[200];
 						sprintf(show_msg, "Error %d, %s\n",__LINE__, __FILE__);
-						modbus_imp::LogMessage(0, show_msg);
+						opcua_imp::LogMessage(0, show_msg);
 						
 						return;
 					}

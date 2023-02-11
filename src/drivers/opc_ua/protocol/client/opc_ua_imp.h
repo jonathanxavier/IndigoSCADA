@@ -10,8 +10,8 @@
  *
  */
 
-#ifndef MODBUS_IMP_H
-#define MODBUS_IMP_H
+#ifndef OPC_UA_IMP_H
+#define OPC_UA_IMP_H
 
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -30,7 +30,7 @@ extern void onRegFail(void *param);
 extern void recvCallBack(const ORTERecvInfo *info,void *vinstance, void *recvCallBackParam); 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-class modbus_imp
+class opcua_imp
 {
 	public:
 	///////////////////configuration database//////////////////////
@@ -39,7 +39,7 @@ class modbus_imp
 	int db_m_columns;
 	/////////////////////////////////////////////////
 	int g_dwNumItems;
-	struct modbusDbRecord* Config_db;
+	struct opcuaDbRecord* Config_db;
 	/////////////////////Middleware/////////////////////////
 	ORTEDomain              *domain;
 	ORTEPublication			*publisher;
@@ -64,8 +64,8 @@ class modbus_imp
 	////////////////////////////////////////////////
 	int lineNumber;
 	
-	modbus_imp(char* server_url, char* line_number, int polling_time);
-	~modbus_imp();
+	opcua_imp(char* server_url, char* line_number, int polling_time);
+	~opcua_imp();
 	int AddItems(void);
 	int PollServer(void);
 	int Start(void);
@@ -83,4 +83,4 @@ class modbus_imp
 	////////////////////////////////////////////////
 };
 
-#endif //MODBUS_IMP_H
+#endif //OPC_UA_IMP_H

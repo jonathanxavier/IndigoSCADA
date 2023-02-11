@@ -27,7 +27,7 @@
 
 static gl_row_counter = 0;
 static gl_column_counter = 0;
-static struct modbusDbRecord* gl_Config_db = 0;
+static struct opcuaDbRecord* gl_Config_db = 0;
 
 static int db_callback(void *NotUsed, int argc, char **argv, char **azColName)
 {
@@ -44,115 +44,26 @@ static int db_callback(void *NotUsed, int argc, char **argv, char **azColName)
 		{
 			case 0:
 			{
-				//column 1 in table modbus_table
-				//slave ID
+				//column 1 in table opcua_table
+				//node ID
 				if(argv[i] != NULL)
-					gl_Config_db[gl_row_counter].slave_id = atoi(argv[i]);
+					strcpy(gl_Config_db[gl_row_counter].nodeid, argv[i]);
 			}
 			break;
 			case 1:
 			{
-				//column 2 in table modbus_table
-				//modbus_function_read
+				//column 2 in table opcua_table
+				//namespace_index
 				if(argv[i] != NULL)
-					gl_Config_db[gl_row_counter].modbus_function_read = atoi(argv[i]);
+					gl_Config_db[gl_row_counter].namespace_index = atoi(argv[i]);
 			}
 			break;
 			case 2:
 			{
-				//column 3 in table modbus_table
-				//modbus_function_write
-				if(argv[i] != NULL)
-					gl_Config_db[gl_row_counter].modbus_function_write = atoi(argv[i]);
-			}
-			break;
-			case 3:
-			{
-				//column 4 in table modbus_table
-				//modbus_address
-				if(argv[i] != NULL)
-					gl_Config_db[gl_row_counter].modbus_address = atoi(argv[i]);
-			}
-			break;
-			case 4:
-			{
-				//column 5 in table modbus_table
-				//modbus_type expressed like an OPC type
-				if(argv[i] != NULL)
-				{
-					if(strcmp(argv[i], "VT_BOOL") == 0)
-					{
-						gl_Config_db[gl_row_counter].modbus_type = VT_BOOL;
-					}
-					else if(strcmp(argv[i], "VT_I2") == 0)
-					{
-						gl_Config_db[gl_row_counter].modbus_type = VT_I2;
-					}
-					else if(strcmp(argv[i], "VT_UI2") == 0)
-					{
-						gl_Config_db[gl_row_counter].modbus_type = VT_UI2;
-					}
-					else if(strcmp(argv[i], "VT_I4") == 0)
-					{
-						gl_Config_db[gl_row_counter].modbus_type = VT_I4;
-					}
-					else if(strcmp(argv[i], "VT_UI4") == 0)
-					{
-						gl_Config_db[gl_row_counter].modbus_type = VT_UI4;
-					}
-					else if(strcmp(argv[i], "VT_R4") == 0)
-					{
-						gl_Config_db[gl_row_counter].modbus_type = VT_R4;
-					}
-					else if(strcmp(argv[i], "VT_R4SWAP") == 0)
-					{
-						gl_Config_db[gl_row_counter].modbus_type = VT_R4SWAP;
-					}
-					else if(strcmp(argv[i], "VT_R8") == 0)
-					{
-						gl_Config_db[gl_row_counter].modbus_type = VT_R8;
-					}
-					else if(strcmp(argv[i], "VT_I1") == 0)
-					{
-						gl_Config_db[gl_row_counter].modbus_type = VT_I1;
-					}
-					else if(strcmp(argv[i], "VT_UI1") == 0)
-					{
-						gl_Config_db[gl_row_counter].modbus_type = VT_UI1;
-					}
-					else if(strcmp(argv[i], "VT_I8") == 0)
-					{
-						gl_Config_db[gl_row_counter].modbus_type = VT_I8;
-					}
-					else if(strcmp(argv[i], "VT_UI8") == 0)
-					{
-						gl_Config_db[gl_row_counter].modbus_type = VT_UI8;
-					}
-					else
-					{
-						gl_Config_db[gl_row_counter].modbus_type = VT_ERROR;
-					}
-				}
-				else
-				{
-					gl_Config_db[gl_row_counter].modbus_type = VT_ERROR;
-				}
-			}
-			break;
-			case 5:
-			{
-				//column 6 in table modbus_table
+				//column 3 in table opcua_table
 				//ioa_control_center Unstructured
 				if(argv[i] != NULL)
 					gl_Config_db[gl_row_counter].ioa_control_center = atoi(argv[i]);
-			}
-			break;
-			case 6:
-			{
-				//column 7 in table modbus_table
-				//deadband
-				if(argv[i] != NULL)
-					gl_Config_db[gl_row_counter].deadband = (float)atof(argv[i]);
 			}
 			break;
 			default:
@@ -168,11 +79,11 @@ static int db_callback(void *NotUsed, int argc, char **argv, char **azColName)
 	return 0;
 }
 
-#define MAX_CONFIGURABLE_MODBUS_ITEMIDS 30000
+#define MAX_CONFIGURABLE_OPCUA_ITEMIDS 30000
 
-int modbus_imp::AddItems(void)
+int opcua_imp::AddItems(void)
 {
-	IT_IT("modbus_imp::AddItems");
+	IT_IT("opcua_imp::AddItems");
 
 	sqlite3 *db;
 	char *zErrMsg = 0;
@@ -202,7 +113,7 @@ int modbus_imp::AddItems(void)
 
 	strcpy(database_name, project_dir);
 	strcat(database_name, "\\");
-	strcat(database_name, "modbus_database");
+	strcat(database_name, "opcua_database");
 	strcat(database_name, line_number);
 	strcat(database_name, ".db");
 
@@ -217,15 +128,15 @@ int modbus_imp::AddItems(void)
 	  return 1;
 	}
 
-	g_dwNumItems = MAX_CONFIGURABLE_MODBUS_ITEMIDS;
+	g_dwNumItems = MAX_CONFIGURABLE_OPCUA_ITEMIDS;
 	
-	Config_db = (struct modbusDbRecord*)calloc(1, g_dwNumItems*sizeof(struct modbusDbRecord));
+	Config_db = (struct opcuaDbRecord*)calloc(1, g_dwNumItems*sizeof(struct opcuaDbRecord));
 
 	gl_Config_db = Config_db;
 
 	gl_row_counter = 0;
 
-	rc = sqlite3_exec(db, "select * from modbus_table;", db_callback, 0, &zErrMsg);
+	rc = sqlite3_exec(db, "select * from opcua_table;", db_callback, 0, &zErrMsg);
 
 	if(rc != SQLITE_OK)
 	{
