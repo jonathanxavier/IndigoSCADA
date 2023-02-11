@@ -26,7 +26,10 @@
 * The complete license agreement can be found here:
 * http://opcfoundation.org/License/MIT/1.00/
 * ======================================================================*/
-#pragma once
+//#pragma once
+
+#ifndef OPCUA_CLIENT_API
+#define OPCUA_CLIENT_API
 
 /*********************************************************************************************/
 /***********************                     Config                   ************************/
@@ -167,3 +170,5 @@ OpcUa_StatusCode Client_CloseSession(Session* a_pSession);
 #ifdef  __cplusplus
 }
 #endif
+
+#endif //OPCUA_CLIENT_API

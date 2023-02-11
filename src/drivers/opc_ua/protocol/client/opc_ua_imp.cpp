@@ -371,6 +371,8 @@ int opcua_imp::Start(void)
 
 	is_connected = true;
 
+	printf("Server is connected\n");
+
 Error:
 /*
 	OpcUa_Trace(OPCUA_TRACE_LEVEL_ERROR, "**** Error ****\n");
@@ -539,56 +541,124 @@ int opcua_imp::PollItems(void)
 
 	struct iec_item item_to_send;
 	struct cp56time2a actual_time;
-	////////////////////////////////Start protocol implementation///////////////////////////////////
+	
 	int rc;
     bool send_item = true;
-	int bit_size;
-    	
-    comm_error_counter = 0;
-
-	int stored_address = 0;
 
 	OpcUa_StatusCode uStatus = OpcUa_Good;
 	OpcUa_DataValue* value = OpcUa_Null;
 	char node_id[50];
 	int namespace_index;
+/*
 
-	//strcpy(node_id,"Demo.Dynamic.Scalar.Int16");
-	namespace_index = 2;
+	strcpy(node_id, Config_db[4].nodeid);
+	namespace_index = Config_db[4].namespace_index;
 
-	strcpy(node_id, Config_db[0].nodeid);
-	//namespace_index = Config_db[0].namespace_index;
-
-	uStatus = Client_ReadNode(&session, node_id, namespace_index, &value);
+	uStatus = Client_ReadNode(&session, node_id, 2, &value);
 	OpcUa_GotoErrorIfBad(uStatus);
 
 	printf("11\n");
 
-	if ((value != OpcUa_Null) && (value->Value.Datatype == OpcUaType_Int16))
+	if(value != OpcUa_Null)
 	{
-		fprintf(stderr, "%d\n", value->Value.Value.Int16);
-		fflush(stderr);
+		switch(value->Value.Datatype)
+		{
+			case OpcUaType_Int16:
+			{
+				fprintf(stderr, "%d\n", value->Value.Value.Int16);
+				fflush(stderr);
+			}
+			break;
+			case OpcUaType_Int32:
+			{
+				fprintf(stderr, "%d\n", value->Value.Value.Int32);
+				fflush(stderr);
+			}
+			break;
+			case OpcUaType_Float:
+			{
+				fprintf(stderr, "%f\n", value->Value.Value.Float);
+				fflush(stderr);
+			}
+			break;
+			case OpcUaType_Double:
+			{
+				fprintf(stderr, "%lf\n", value->Value.Value.Double);
+				fflush(stderr);
+			}
+			break;
+			case OpcUaType_Boolean:
+			{
+				fprintf(stderr, "%x\n", value->Value.Value.Boolean);
+				fflush(stderr);
+			}
+			break;
+			default:
+			break;
+		}
 	}
+*/
 
-/*	
-	for(int rowNumber = 0; rowNumber < db_n_rows; rowNumber++)
+	//for(int rowNumber = 0; rowNumber < db_n_rows; rowNumber++)
 	{
+		value = OpcUa_Null;
+		
 		memset(&item_to_send,0x00, sizeof(struct iec_item));
 			
+		int rowNumber = 2;
 		strcpy(node_id, Config_db[rowNumber].nodeid);
 		namespace_index = Config_db[rowNumber].namespace_index;
-
+				
 		uStatus = Client_ReadNode(&session, node_id, 2, &value);
+				
 		OpcUa_GotoErrorIfBad(uStatus);
 
 		printf("11\n");
 
-		if ((value != OpcUa_Null) && (value->Value.Datatype == OpcUaType_Int16))
+		if(value != OpcUa_Null)
 		{
-			fprintf(stderr, "%d\n", value->Value.Value.Int16);
-			fflush(stderr);
+			switch(value->Value.Datatype)
+			{
+				case OpcUaType_Int16:
+				{
+					fprintf(stderr, "%d\n", value->Value.Value.Int16);
+					fflush(stderr);
+				}
+				break;
+				case OpcUaType_Int32:
+				{
+					fprintf(stderr, "%d\n", value->Value.Value.Int32);
+					fflush(stderr);
+				}
+				break;
+				case OpcUaType_Float:
+				{
+					fprintf(stderr, "%f\n", value->Value.Value.Float);
+					fflush(stderr);
+				}
+				break;
+				case OpcUaType_Double:
+				{
+					fprintf(stderr, "%lf\n", value->Value.Value.Double);
+					fflush(stderr);
+				}
+				break;
+				case OpcUaType_Boolean:
+				{
+					fprintf(stderr, "%x\n", value->Value.Value.Boolean);
+					fflush(stderr);
+				}
+				break;
+				default:
+				{
+					fprintf(stderr, "Node id type %s is not supported\n", node_id);
+					fflush(stderr);
+				}
+				break;
+			}
 		}
 
+/*
 		if(send_item || general_interrogation)
 		{
 			item_to_send.msg_id = n_msg_sent;
@@ -630,14 +700,82 @@ int opcua_imp::PollItems(void)
 
 			n_msg_sent++;
 		}
-	}
 */
+
+	}
+
+
 
 Error:
 
 	IT_EXIT;
 	return 0;
 
+}
+
+int opcua_imp::ReadItem(int row)
+{
+	struct iec_item item_to_send;
+	struct cp56time2a actual_time;
+
+	OpcUa_StatusCode uStatus = OpcUa_Good;
+	OpcUa_DataValue* value = OpcUa_Null;
+	char node_id[50];
+	int namespace_index;
+
+	memset(&item_to_send,0x00, sizeof(struct iec_item));
+		
+	strcpy(node_id, Config_db[row].nodeid);
+	namespace_index = Config_db[row].namespace_index;
+	
+	uStatus = Client_ReadNode(&session, node_id, 2, &value);
+			
+	//OpcUa_GotoErrorIfBad(uStatus);
+
+	printf("11\n");
+
+	if(value != OpcUa_Null)
+	{
+		switch(value->Value.Datatype)
+		{
+			case OpcUaType_Int16:
+			{
+				fprintf(stderr, "%d\n", value->Value.Value.Int16);
+				fflush(stderr);
+			}
+			break;
+			case OpcUaType_Int32:
+			{
+				fprintf(stderr, "%d\n", value->Value.Value.Int32);
+				fflush(stderr);
+			}
+			break;
+			case OpcUaType_Float:
+			{
+				fprintf(stderr, "%f\n", value->Value.Value.Float);
+				fflush(stderr);
+			}
+			break;
+			case OpcUaType_Double:
+			{
+				fprintf(stderr, "%lf\n", value->Value.Value.Double);
+				fflush(stderr);
+			}
+			break;
+			case OpcUaType_Boolean:
+			{
+				fprintf(stderr, "%x\n", value->Value.Value.Boolean);
+				fflush(stderr);
+			}
+			break;
+			default:
+			{
+				fprintf(stderr, "Node id type %s is not supported\n", node_id);
+				fflush(stderr);
+			}
+			break;
+		}
+	}
 }
 
 #define _EPSILON_ ((double)(2.220446E-16))
