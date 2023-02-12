@@ -221,6 +221,9 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name m_bus
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name opcua_driver
+    End Project Dependency
 }}}
 
 ###############################################################################
