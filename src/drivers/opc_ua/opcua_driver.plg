@@ -1,0 +1,151 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: opcua_driver - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\Users\Admin\AppData\Local\Temp\RSP714B.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe .\opcua_driverInputData.h -o .\moc_opcua_driverInputData.cpp
+]
+Creating command line "C:\Users\Admin\AppData\Local\Temp\RSP714B.bat"
+Creating temporary file "C:\Users\Admin\AppData\Local\Temp\RSP714C.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe .\opcua_driverInput.h -o .\moc_opcua_driverInput.cpp
+]
+Creating command line "C:\Users\Admin\AppData\Local\Temp\RSP714C.bat"
+Creating temporary file "C:\Users\Admin\AppData\Local\Temp\RSP714D.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe .\opcua_driverConfigurationData.h -o .\moc_opcua_driverConfigurationData.cpp
+]
+Creating command line "C:\Users\Admin\AppData\Local\Temp\RSP714D.bat"
+Creating temporary file "C:\Users\Admin\AppData\Local\Temp\RSP714E.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe .\opcua_driverConfiguration.h -o .\moc_opcua_driverConfiguration.cpp
+]
+Creating command line "C:\Users\Admin\AppData\Local\Temp\RSP714E.bat"
+Creating temporary file "C:\Users\Admin\AppData\Local\Temp\RSP714F.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe .\opcua_driverCommandData.h -o .\moc_opcua_driverCommandData.cpp
+]
+Creating command line "C:\Users\Admin\AppData\Local\Temp\RSP714F.bat"
+Creating temporary file "C:\Users\Admin\AppData\Local\Temp\RSP715F.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe .\opcua_driverCommand.h -o .\moc_opcua_driverCommand.cpp
+]
+Creating command line "C:\Users\Admin\AppData\Local\Temp\RSP715F.bat"
+Creating temporary file "C:\Users\Admin\AppData\Local\Temp\RSP7160.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe .\opcua_driver_instance.h -o .\moc_opcua_driver_instance.cpp
+]
+Creating command line "C:\Users\Admin\AppData\Local\Temp\RSP7160.bat"
+Creating temporary file "C:\Users\Admin\AppData\Local\Temp\RSP7161.bat" with contents
+[
+@echo off
+%qtdir%\bin\moc.exe .\opcua_driver.h -o .\moc_opcua_driver.cpp
+]
+Creating command line "C:\Users\Admin\AppData\Local\Temp\RSP7161.bat"
+Creating temporary file "C:\Users\Admin\AppData\Local\Temp\RSP7162.tmp" with contents
+[
+/nologo /MD /W3 /GX /O2 /I "." /I "C:\Qt\3.3.8\include" /I "C:\Qt\3.3.8\mkspecs\win32-msvc" /I "..\..\gigabase" /I "..\..\common" /I ".." /I "..\..\database" /I "..\..\ui\widgets" /I "..\..\trace" /I "..\..\utilities" /I "..\..\fifo" /I "..\..\middleware\ripc\inc" /I "..\..\middleware\rtps\include" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_USRDLL" /D "OPCUA_DRIVER_EXPORTS" /D "USING_GARRET" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_H_CPP" /D "RIPC_DLL" /Fo"Release/" /Fd"Release/" /FD /Zm200 /c 
+"C:\code\trunk\src\utilities\clear_crc_eight.c"
+"C:\code\trunk\src\common\iec_item_type.c"
+"C:\code\trunk\src\drivers\opc_ua\moc_opcua_driver.cpp"
+"C:\code\trunk\src\drivers\opc_ua\moc_opcua_driver_instance.cpp"
+"C:\code\trunk\src\drivers\opc_ua\moc_opcua_driverCommand.cpp"
+"C:\code\trunk\src\drivers\opc_ua\moc_opcua_driverCommandData.cpp"
+"C:\code\trunk\src\drivers\opc_ua\moc_opcua_driverConfiguration.cpp"
+"C:\code\trunk\src\drivers\opc_ua\moc_opcua_driverConfigurationData.cpp"
+"C:\code\trunk\src\drivers\opc_ua\moc_opcua_driverInput.cpp"
+"C:\code\trunk\src\drivers\opc_ua\moc_opcua_driverInputData.cpp"
+"C:\code\trunk\src\drivers\opc_ua\opcua_driver.cpp"
+"C:\code\trunk\src\drivers\opc_ua\opcua_driver_instance.cpp"
+"C:\code\trunk\src\drivers\opc_ua\opcua_driverCommand.cpp"
+"C:\code\trunk\src\drivers\opc_ua\opcua_driverCommandData.cpp"
+"C:\code\trunk\src\drivers\opc_ua\opcua_driverConfiguration.cpp"
+"C:\code\trunk\src\drivers\opc_ua\opcua_driverConfigurationData.cpp"
+"C:\code\trunk\src\drivers\opc_ua\opcua_driverInput.cpp"
+"C:\code\trunk\src\drivers\opc_ua\opcua_driverInputData.cpp"
+"C:\code\trunk\src\drivers\opc_ua\opcua_driverthread.cpp"
+"C:\code\trunk\src\common\time64.c"
+]
+Creating command line "cl.exe @C:\Users\Admin\AppData\Local\Temp\RSP7162.tmp" 
+MOCing opcua_driverInputData.h...
+MOCing opcua_driverInput.h...
+MOCing opcua_driverConfigurationData.h...
+MOCing opcua_driverConfiguration.h...
+MOCing opcua_driverCommandData.h...
+MOCing opcua_driverCommand.h...
+MOCing opcua_driver_instance.h...
+MOCing opcua_driver.h...
+Creating temporary file "C:\Users\Admin\AppData\Local\Temp\RSP720F.tmp" with contents
+[
+scada.lib utilities.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib shell32.lib uuid.lib WSOCK32.LIB snmpapi.lib qt-mt3.lib fifo.lib rtps.lib /nologo /dll /incremental:no /pdb:"Release/opcua_driver.pdb" /machine:I386 /out:"c:\scada\Drivers/opcua_driver.dll" /implib:"c:\scada\Drivers/opcua_driver.lib" /pdbtype:sept /libpath:"C:\Qt\3.3.8\lib" /libpath:"c:\scada\lib" 
+.\Release\clear_crc_eight.obj
+.\Release\iec_item_type.obj
+.\Release\moc_opcua_driver.obj
+.\Release\moc_opcua_driver_instance.obj
+.\Release\moc_opcua_driverCommand.obj
+.\Release\moc_opcua_driverCommandData.obj
+.\Release\moc_opcua_driverConfiguration.obj
+.\Release\moc_opcua_driverConfigurationData.obj
+.\Release\moc_opcua_driverInput.obj
+.\Release\moc_opcua_driverInputData.obj
+.\Release\opcua_driver.obj
+.\Release\opcua_driver_instance.obj
+.\Release\opcua_driverCommand.obj
+.\Release\opcua_driverCommandData.obj
+.\Release\opcua_driverConfiguration.obj
+.\Release\opcua_driverConfigurationData.obj
+.\Release\opcua_driverInput.obj
+.\Release\opcua_driverInputData.obj
+.\Release\opcua_driverthread.obj
+.\Release\time64.obj
+]
+Creating command line "link.exe @C:\Users\Admin\AppData\Local\Temp\RSP720F.tmp"
+<h3>Output Window</h3>
+Compiling...
+clear_crc_eight.c
+iec_item_type.c
+Generating Code...
+Compiling...
+moc_opcua_driver.cpp
+moc_opcua_driver_instance.cpp
+moc_opcua_driverCommand.cpp
+moc_opcua_driverCommandData.cpp
+moc_opcua_driverConfiguration.cpp
+moc_opcua_driverConfigurationData.cpp
+moc_opcua_driverInput.cpp
+moc_opcua_driverInputData.cpp
+opcua_driver.cpp
+opcua_driver_instance.cpp
+opcua_driverCommand.cpp
+opcua_driverCommandData.cpp
+opcua_driverConfiguration.cpp
+opcua_driverConfigurationData.cpp
+opcua_driverInput.cpp
+opcua_driverInputData.cpp
+opcua_driverthread.cpp
+Generating Code...
+Compiling...
+time64.c
+Generating Code...
+Linking...
+   Creating library c:\scada\Drivers/opcua_driver.lib and object c:\scada\Drivers/opcua_driver.exp
+
+
+
+<h3>Results</h3>
+opcua_driver.dll - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>

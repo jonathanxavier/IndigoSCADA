@@ -816,6 +816,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "opcua_driver"=..\drivers\opc_ua\opcua_driver.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "protocol_configurator"=..\configurator\browser\protocol_configurator.dsp - Package Owner=<4>
 
 Package=<5>
