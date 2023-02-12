@@ -542,7 +542,6 @@ int opcua_imp::PollItems(void)
 	struct iec_item item_to_send;
 	struct cp56time2a actual_time;
 	
-	int rc;
     bool send_item = true;
 
 	OpcUa_StatusCode uStatus = OpcUa_Good;
@@ -570,34 +569,118 @@ int opcua_imp::PollItems(void)
 
 		if(value != OpcUa_Null)
 		{
+			printf("12\n");
+
 			switch(value->Value.Datatype)
 			{
 				case OpcUaType_Int16:
 				{
+					item_to_send.iec_obj.ioa = Config_db[rowNumber].ioa_control_center;
+					item_to_send.cause = 0x03;
+					item_to_send.iec_type = M_ME_TE_1;
+					
+					get_local_host_time(&actual_time);
+
+					item_to_send.iec_obj.o.type35.mv = value->Value.Value.Int16;
+					item_to_send.iec_obj.o.type35.time = actual_time;
+					item_to_send.iec_obj.o.type35.iv = 0;
+
 					fprintf(stderr, "%d\n", value->Value.Value.Int16);
 					fflush(stderr);
 				}
 				break;
 				case OpcUaType_Int32:
 				{
+					item_to_send.iec_obj.ioa = Config_db[rowNumber].ioa_control_center;
+					item_to_send.cause = 0x03;
+					item_to_send.iec_type = M_IT_TB_1;
+					
+					get_local_host_time(&actual_time);
+
+					item_to_send.iec_obj.o.type37.counter = value->Value.Value.Int32;
+					item_to_send.iec_obj.o.type37.time = actual_time;
+					item_to_send.iec_obj.o.type37.iv = 0;
+
 					fprintf(stderr, "%d\n", value->Value.Value.Int32);
+					fflush(stderr);
+				}
+				break;
+				case OpcUaType_UInt16:
+				{
+					item_to_send.iec_obj.ioa = Config_db[rowNumber].ioa_control_center;
+					item_to_send.cause = 0x03;
+					item_to_send.iec_type = M_ME_TQ_1;
+					
+					get_local_host_time(&actual_time);
+
+					item_to_send.iec_obj.o.type153.mv = value->Value.Value.UInt16;
+					item_to_send.iec_obj.o.type153.time = actual_time;
+					item_to_send.iec_obj.o.type153.iv = 0;
+
+					fprintf(stderr, "%d\n", value->Value.Value.UInt16);
+					fflush(stderr);
+				}
+				break;
+				case OpcUaType_UInt32:
+				{
+					item_to_send.iec_obj.ioa = Config_db[rowNumber].ioa_control_center;
+					item_to_send.cause = 0x03;
+					item_to_send.iec_type = M_ME_TO_1;
+					
+					get_local_host_time(&actual_time);
+
+					item_to_send.iec_obj.o.type151.mv = value->Value.Value.UInt32;
+					item_to_send.iec_obj.o.type151.time = actual_time;
+					item_to_send.iec_obj.o.type151.iv = 0;
+
+					fprintf(stderr, "%d\n", value->Value.Value.UInt32);
 					fflush(stderr);
 				}
 				break;
 				case OpcUaType_Float:
 				{
+					item_to_send.iec_obj.ioa = Config_db[rowNumber].ioa_control_center;
+					item_to_send.cause = 0x03;
+					item_to_send.iec_type = M_ME_TF_1;
+					
+					get_local_host_time(&actual_time);
+
+					item_to_send.iec_obj.o.type36.mv = value->Value.Value.Float;
+					item_to_send.iec_obj.o.type36.time = actual_time;
+					item_to_send.iec_obj.o.type36.iv = 0;
+
 					fprintf(stderr, "%f\n", value->Value.Value.Float);
 					fflush(stderr);
 				}
 				break;
 				case OpcUaType_Double:
 				{
+					item_to_send.iec_obj.ioa = Config_db[rowNumber].ioa_control_center;
+					item_to_send.cause = 0x03;
+					item_to_send.iec_type = M_ME_TN_1;
+					
+					get_local_host_time(&actual_time);
+
+					item_to_send.iec_obj.o.type150.mv = value->Value.Value.Float;
+					item_to_send.iec_obj.o.type150.time = actual_time;
+					item_to_send.iec_obj.o.type150.iv = 0;
+
 					fprintf(stderr, "%lf\n", value->Value.Value.Double);
 					fflush(stderr);
 				}
 				break;
 				case OpcUaType_Boolean:
 				{
+					item_to_send.iec_obj.ioa = Config_db[rowNumber].ioa_control_center;
+					item_to_send.cause = 0x03;
+					item_to_send.iec_type = M_SP_TB_1;
+					
+					get_local_host_time(&actual_time);
+
+					item_to_send.iec_obj.o.type30.sp = value->Value.Value.Boolean;
+					item_to_send.iec_obj.o.type30.time = actual_time;
+					item_to_send.iec_obj.o.type30.iv = 0;
+					
 					fprintf(stderr, "%x\n", value->Value.Value.Boolean);
 					fflush(stderr);
 				}
