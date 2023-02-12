@@ -49,11 +49,7 @@ Inherited( parent, name ),Receipe(receipe)
 	{
 		NItems->setEnabled(false);
 		OPCUAServerIPAddressText->setEnabled(false);
-		OPCUAServerIPPortText->setEnabled(false);
 	};
-
-    static const char* items[] = { "N", "E", "O", 0 };
-    Parity->insertStrList( items );
 }
 Opcua_driverConfiguration::~Opcua_driverConfiguration()
 {
@@ -71,20 +67,8 @@ void Opcua_driverConfiguration::OkClicked()
 	QString cmd = QString("delete from PROPS where SKEY='")+QString(Name->text()) + QString("' and IKEY='") + Receipe + "';";
 	GetConfigureDb()->DoExec(0,cmd,0); // delete the old value
 	//
-	if(context == RTU)
-	{
-		OPCUAServerIPAddressText->setText("xxx.xxx.xxx.xxx");
-		OPCUAServerIPPortText->setText("502");
-
-		cmd = "insert into PROPS values('"+Name->text() +"','" + Receipe + "','" + 
-		NItems->text() + " " + PollInterval->text() + " " + OPCUAServerIPAddressText->text() + " " + OPCUAServerIPPortText->text() +
-		" " + SerialDevice->text() + " " + Baud->text() + " " + DataBits->text() +" "+ StopBit->text() +" "+ Parity->currentText() +" "+ RTSOnTime->text() +" "+ RTSOffTime->text() + "');";
-	}
-	else if(context == TCP)
-	{
-		cmd = "insert into PROPS values('"+Name->text() +"','" + Receipe + "','" + 
-		NItems->text() + " " + PollInterval->text() + " " + OPCUAServerIPAddressText->text() + " " + OPCUAServerIPPortText->text() +"');";
-	}
+	cmd = "insert into PROPS values('"+Name->text() +"','" + Receipe + "','" + 
+	NItems->text() + " " + PollInterval->text() + " " + OPCUAServerIPAddressText->text() +"');";
 
 	GetConfigureDb()->DoExec(0,cmd,0);
 	QSAuditTrail(this,caption(), tr("Edited"));
@@ -110,48 +94,15 @@ void Opcua_driverConfiguration::QueryResponse (QObject *p, const QString &c, int
 				QString s = UndoEscapeSQLText(GetConfigureDb()->GetString("DVAL")); // the top one is either the receipe or (default)
 				QTextIStream is(&s); // extract the values
 				//
-				QString t;
 				QString OPCUAServerIPAddress;
-				QString OPCUAServerIPPort;
 				int n;
 				is >> n;
 				NItems->setValue(n);
 				is >> n;
 				PollInterval->setValue(n);
 				is >> OPCUAServerIPAddress;
-				is >> OPCUAServerIPPort;
-				is >> t;
-				SerialDevice->setText(t);
-				is >> n;
-				Baud->setValue(n);
-				is >> n;
-				DataBits->setValue(n);
-				is >> n;
-				StopBit->setValue(n);
-				is >> t;
-				Parity->setCurrentText(t);
-				is >> n;
-				RTSOnTime->setValue(n);
-				is >> n;
-				RTSOffTime->setValue(n);
 
-				if(strlen((const char*)(SerialDevice->text())) == 0)
-				{
-					TCPButton->toggle();
-	                context = TCP;
-
-					OPCUAServerIPAddressText->setText(OPCUAServerIPAddress);
-					OPCUAServerIPPortText->setText(OPCUAServerIPPort);
-
-				}
-				else
-				{
-					RTUButton->toggle();
-	                context = RTU;
-
-					OPCUAServerIPAddressText->setText("");
-					OPCUAServerIPPortText->setText("");
-				}
+				OPCUAServerIPAddressText->setText(OPCUAServerIPAddress);
 			}
 			else
 			{
@@ -163,15 +114,6 @@ void Opcua_driverConfiguration::QueryResponse (QObject *p, const QString &c, int
 				NItems->setValue(8);
 				PollInterval->setValue(1000);
 				OPCUAServerIPAddressText->setText("");
-				OPCUAServerIPPortText->setText("");
-				SerialDevice->setText("COM1");
-				Baud->setValue(9600);
-				DataBits->setValue(8);
-				StopBit->setValue(1);
-				Parity->setCurrentText("N");
-				RTSOnTime->setValue(0);
-				RTSOffTime->setValue(0);
-				RTUButton->toggle();
 			}
 		} 
 		break;
@@ -179,14 +121,4 @@ void Opcua_driverConfiguration::QueryResponse (QObject *p, const QString &c, int
 		break;
 	};
 };
-
-void Opcua_driverConfiguration::RTUContextActive(bool)
-{
-	context = RTU;
-}
-
-void Opcua_driverConfiguration::TCPContextActive(bool)
-{
-    context = TCP;
-}
 

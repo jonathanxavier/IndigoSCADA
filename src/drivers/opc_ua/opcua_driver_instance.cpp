@@ -261,27 +261,9 @@ void Opcua_driver_Instance::QueryResponse(QObject *p, const QString &c, int id, 
 				//
 				is >> IecItems;	  // how many opcua items there are in the RTU or PLC
 				is >> Cfg.SampleTime; // how long we sample for in milliseconds
-				//OPCUA TCP
-				is >> Cfg.OPCUAServerIPAddress;  // OPCUA server IP address (slave)
-				is >> Cfg.OPCUAServerTCPPort;  // OPCUA server TCP port
-				//OPCUA RTU //If this fields are filled in, then we have a serial line
-				is >> Cfg.SerialDevice;
-				is >> Cfg.Baud;
-				is >> Cfg.DataBits;
-				is >> Cfg.StopBit;
-				is >> Cfg.Parity;
-				is >> Cfg.RTSOnTime;
-				is >> Cfg.RTSOffTime;
+				//
+				is >> Cfg.OPCUAServerIPAddress;  // OPCUA server URL
 				
-				if(strlen((const char*)Cfg.SerialDevice) == 0)
-				{
-					Cfg.context = InstanceCfg::TCP;
-				}
-				else
-				{
-					Cfg.context = InstanceCfg::RTU;
-				}
-
 				Countdown = 1;
 
 				if(Values)

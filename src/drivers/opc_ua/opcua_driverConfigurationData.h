@@ -34,42 +34,20 @@ public:
     ~Opcua_driverConfigurationData();
 
     QLabel* textLabel1;
-    QLabel* textLabel4;
-    QLabel* textLabel7;
-    QLabel* textLabel8;
-    QLabel* textLabel9;
-    QLabel* textLabel10;
-    QLabel* textLabel11;
-    QLineEdit* SerialDevice;
-    QLineEdit* OPCUAServerIPPortText;
     QLineEdit* OPCUAServerIPAddressText;
     QLineEdit* Name;
-    QLabel* textLabel2;
-    QSpinBox* Baud;
-    QSpinBox* DataBits;
-    QButtonGroup* buttonGroup1;
-    QRadioButton* TCPButton;
-    QRadioButton* RTUButton;
     QLabel* textLabel3;
     QPushButton* HelpButton;
     QPushButton* CancelButton;
     QPushButton* OkButton;
-    QSpinBox* StopBit;
     QSpinBox* PollInterval;
     QSpinBox* NItems;
     QLabel* textLabel5;
     QLabel* textLabel6;
-    QComboBox* Parity;
-	QSpinBox* RTSOnTime;
-	QSpinBox* RTSOffTime;
-	QLabel* textLabel12;
-	QLabel* textLabel13;
 
 public slots:
     virtual void Help();
     virtual void OkClicked();
-    virtual void RTUContextActive(bool);
-    virtual void TCPContextActive(bool);
 
 protected:
 

@@ -12,8 +12,6 @@ class Opcua_driverConfiguration : public Opcua_driverConfigurationData
 	Q_OBJECT
 	QString Receipe; // receipe name
 	enum {tItem = 1, tSerial}; // transaction codes
-	enum {TCP = 0, RTU = 1}; // context codes
-	int context;
 	public:
 	Opcua_driverConfiguration(
 	QWidget *parent = NULL,
@@ -23,8 +21,6 @@ class Opcua_driverConfiguration : public Opcua_driverConfigurationData
 	protected slots:
 	virtual void Help();
 	virtual void OkClicked();
-	virtual void RTUContextActive(bool);
-    virtual void TCPContextActive(bool);
 	void QueryResponse (QObject *, const QString &, int, QObject*); // handles database responses
 };
 #endif // Opcua_driverConfiguration_included

@@ -37,39 +37,19 @@ class Opcua_driver_Instance;
 
 struct InstanceCfg // friend to anyone
 {
-	int context; //TCP or RTU
-	//OPCUA TCP
 	QString OPCUAServerIPAddress;  // OPCUA server IP address (slave)
-	QString OPCUAServerTCPPort;  // OPCUA server TCP port
-	//OPCUA RTU
-	QString SerialDevice;
-	QString Baud;
-	QString DataBits;
-	QString StopBit;
-	QString Parity;
-	QString RTSOnTime;
-	QString RTSOffTime;
 
 	unsigned SampleTime; // sampleing time 
 
-	enum {
-		TCP = 0,
-		RTU = 1
-	};
-
 	InstanceCfg() : 
-	SampleTime(1000),OPCUAServerIPAddress(""),OPCUAServerTCPPort(""),
-	context(TCP),SerialDevice(""), Baud(""), DataBits(""), StopBit(""), Parity("")
+	SampleTime(1000),OPCUAServerIPAddress("")
 	{
 	};
 
 	InstanceCfg(const InstanceCfg &m) :
-		SampleTime(m.SampleTime),OPCUAServerIPAddress(m.OPCUAServerIPAddress),
-		OPCUAServerTCPPort(m.OPCUAServerTCPPort),
-		context(m.context),SerialDevice(m.SerialDevice), 
-		Baud(m.Baud), DataBits(m.DataBits), StopBit(m.StopBit), Parity(m.Parity)
-		{
-		};
+	SampleTime(m.SampleTime),OPCUAServerIPAddress(m.OPCUAServerIPAddress)
+	{
+	};
 };
 
 

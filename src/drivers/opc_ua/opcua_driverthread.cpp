@@ -37,18 +37,14 @@ void Opcua_DriverThread::run()
     strcat(pipe_name, line_number);
 
 	itoa(((Opcua_driver_Instance*)Parent)->Cfg.SampleTime, polling_time, 10);
-
-	if(((Opcua_driver_Instance*)Parent)->Cfg.context == InstanceCfg::TCP)
-	{
-		//OPCUA TCP
-		strcpy(pCommandLine, GetScadaHomeDirectory());
-		strcat(pCommandLine, "\\bin\\opc_ua_client.exe -a ");
-		strcat(pCommandLine, ((Opcua_driver_Instance*)Parent)->Cfg.OPCUAServerIPAddress);
-		strcat(pCommandLine, " -l ");
-		strcat(pCommandLine, line_number);
-		strcat(pCommandLine, " -t ");
-		strcat(pCommandLine, polling_time);
-	}
+	
+	strcpy(pCommandLine, GetScadaHomeDirectory());
+	strcat(pCommandLine, "\\bin\\opc_ua_client.exe -a ");
+	strcat(pCommandLine, ((Opcua_driver_Instance*)Parent)->Cfg.OPCUAServerIPAddress);
+	strcat(pCommandLine, " -l ");
+	strcat(pCommandLine, line_number);
+	strcat(pCommandLine, " -t ");
+	strcat(pCommandLine, polling_time);
 
 	if(((Opcua_driver_Instance*)Parent)->isProtocolLoggingEnabled)
 	{
