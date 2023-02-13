@@ -116,6 +116,7 @@ MQTT_client_imp_publisher::MQTT_client_imp_publisher(char* broker_host_name, cha
 	g_dwNumItems = 0;
 	g_dwUpdateRate = 60000; //in milliseconds
 	nThreads = 1;
+	payload_encoding = SPARKPLUG;
 
 	sending_buffer_length = 128;
 	sending_binary_buffer = (uint8_t *)malloc(sending_buffer_length * sizeof(uint8_t));
@@ -539,10 +540,7 @@ void MQTT_client_imp_publisher::monitoring_dir_consumer(struct iec_item *p_item)
 		fprintf(stderr,"Receiving message for topic %s, ioa %d\n", topic_to_write, p_item->iec_obj.ioa);
 		fflush(stderr);
 
-		int payload_type = 1; //spurkplug
-		//int payload_type = 0; //json
-
-		if(payload_type)
+		if(payload_encoding == SPARKPLUG)
 		{
 			// Create the DDATA payload
 			org_eclipse_tahu_protobuf_Payload ddata_payload;
@@ -695,7 +693,7 @@ void MQTT_client_imp_publisher::monitoring_dir_consumer(struct iec_item *p_item)
 			// Free the memory
 			free_payload(&ddata_payload);
 		}
-		else // json payload
+		else if(payload_encoding == JSON)// json payload
 		{
 			cJSON* msg = cJSON_CreateObject();
 			cJSON_AddStringToObject(msg, "topic", topic_to_write);

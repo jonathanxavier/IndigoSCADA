@@ -145,6 +145,7 @@ MQTT_client_imp::MQTT_client_imp(char* broker_host_name, char* line_number)
 	g_dwNumItems = 0;
 	g_dwUpdateRate = 60000; //in milliseconds
 	nThreads = 1;
+	payload_encoding = SPARKPLUG;
 
 	dump = NULL;
 
@@ -1231,10 +1232,7 @@ static int mqtt_message_cb(MqttClient *client, MqttMessage *msg,
 				PRINTF("MQTT Message: Done\n");
 			}
 
-			int payload_type = 1; //spurkplug
-			//int payload_type = 0; //json
-
-			if(payload_type)
+			if(parent_class->payload_encoding == parent_class->SPARKPLUG)
 			{
 				// Decode the payload
 				org_eclipse_tahu_protobuf_Payload inbound_payload = org_eclipse_tahu_protobuf_Payload_init_zero;
@@ -1335,7 +1333,7 @@ static int mqtt_message_cb(MqttClient *client, MqttMessage *msg,
 					break; //1-2-2023 Remove ASAP and fix me. Only one metric in a payload is supported with this break
 				}
 			}
-			else //json payload
+			else if(parent_class->payload_encoding == parent_class->JSON)// json payload
 			{
 				float value = 0.0;
 				

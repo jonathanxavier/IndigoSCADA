@@ -112,6 +112,12 @@ class MQTT_client_imp_publisher
 	 //////////////////////////////////////////////////////
 	 #endif
 
+	 int payload_encoding;
+	 enum {
+		SPARKPLUG = 0,
+		JSON = 1
+	 };
+
 	 /////////////////////Middleware/////////////////////////
 	 ORTEDomain             *domain;
 	 ORTEPublication		*publisher;
