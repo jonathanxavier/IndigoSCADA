@@ -906,6 +906,7 @@ OpcUa_StatusCode Client_ReadNode(Session* a_pSession, char* node_id, int ns_idx,
 	OpcUa_ReadValueId_Initialize(&nodesToRead);
 	
 	nodesToRead.NodeId.Identifier.String.strContent = node_id;
+	nodesToRead.NodeId.Identifier.String.uLength = strlen(node_id);
 	nodesToRead.NodeId.IdentifierType = OpcUa_IdentifierType_String;
 	nodesToRead.NodeId.NamespaceIndex = ns_idx;
 

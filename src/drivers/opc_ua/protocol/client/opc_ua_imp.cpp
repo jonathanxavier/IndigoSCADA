@@ -564,13 +564,9 @@ int opcua_imp::PollItems(void)
 		{
 			return 1;
 		}
-				
-		printf("11\n");
 
 		if(value != OpcUa_Null)
 		{
-			printf("12\n");
-
 			switch(value->Value.Datatype)
 			{
 				case OpcUaType_Int16:
