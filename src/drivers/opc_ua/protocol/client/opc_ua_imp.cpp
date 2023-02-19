@@ -268,8 +268,10 @@ int opcua_imp::PollServer(void)
 				ORTEPublicationSend(publisher);
 				
 				n_msg_sent++;
+
+				Sleep(100);
 			
-				//break; //this terminate the loop and the program
+				break; //this terminate the loop and the program
 
 				is_connected = false;
 			}
@@ -281,7 +283,7 @@ int opcua_imp::PollServer(void)
 			break;
 		}
 
-		//#define USE_KEEP_ALIVE_WATCH_DOG
+		#define USE_KEEP_ALIVE_WATCH_DOG
 
 		#ifdef USE_KEEP_ALIVE_WATCH_DOG
 		gl_timeout_connection_with_parent++;
