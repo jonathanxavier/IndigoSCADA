@@ -17,6 +17,7 @@ struct opcuaDbRecord
 {
 	char nodeid[50];		//OPC UA node ID string
 	int namespace_index;	// namespace index
+	int dataType;			//data type of the node
 	//////////////control center part/////////////////////////////////////////
 	unsigned int ioa_control_center; //unique inside CASDU
 };

@@ -974,7 +974,7 @@ OpcUa_StatusCode Client_WriteNode(Session* a_pSession, char* node_id, int ns_idx
 	OpcUa_Int32 nDiagnosticInfoCount = 0;
 	OpcUa_DiagnosticInfo* pDiagnosticInfos = NULL;
 
-	OpcUa_WriteValue nodesToWrite;
+	OpcUa_WriteValue nodeToWrite;
 	OpcUa_InitializeStatus(OpcUa_Module_Client, "Client_WriteNode");
 
 	OpcUa_ReturnErrorIfArgumentNull(a_pSession);
@@ -989,20 +989,20 @@ OpcUa_StatusCode Client_WriteNode(Session* a_pSession, char* node_id, int ns_idx
 	requestHeader.TimeoutHint = 60000;
 	requestHeader.Timestamp = OpcUa_DateTime_UtcNow();
 
-	OpcUa_WriteValue_Initialize(&nodesToWrite);
+	OpcUa_WriteValue_Initialize(&nodeToWrite);
 
-    nodesToWrite.NodeId.Identifier.String.strContent = node_id;
-	nodesToWrite.NodeId.Identifier.String.uLength = strlen(node_id);
-	nodesToWrite.NodeId.IdentifierType = OpcUa_IdentifierType_String;
-	nodesToWrite.NodeId.NamespaceIndex = ns_idx;
-	nodesToWrite.AttributeId = OpcUa_Attributes_Value;
-	nodesToWrite.Value = *pValueWrite;
+    nodeToWrite.NodeId.Identifier.String.strContent = node_id;
+	nodeToWrite.NodeId.Identifier.String.uLength = strlen(node_id);
+	nodeToWrite.NodeId.IdentifierType = OpcUa_IdentifierType_String;
+	nodeToWrite.NodeId.NamespaceIndex = ns_idx;
+	nodeToWrite.AttributeId = OpcUa_Attributes_Value;
+	nodeToWrite.Value = *pValueWrite;
 
 	uStatus = OpcUa_ClientApi_Write(
 		a_pSession->Channel,
 		&requestHeader,
 		1, 
-		&nodesToWrite,
+		&nodeToWrite,
 		&responseHeader,
 		&nNoOfResults,
 		&pResults,
@@ -1018,14 +1018,17 @@ OpcUa_StatusCode Client_WriteNode(Session* a_pSession, char* node_id, int ns_idx
 	if (OpcUa_IsBad(responseHeader.ServiceResult))
 	{
 		uStatus = responseHeader.ServiceResult;
-		OpcUa_Trace(OPCUA_TRACE_LEVEL_ERROR, "Client_ReadNode: ERROR 0x%8X.\n", responseHeader.ServiceResult);
+		OpcUa_Trace(OPCUA_TRACE_LEVEL_ERROR, "Client_WriteNode: ERROR 0x%8X.\n", responseHeader.ServiceResult);
 		OpcUa_GotoErrorIfBad(uStatus);
 	}
 
 	OpcUa_Trace(OPCUA_TRACE_LEVEL_SYSTEM, "Client_WriteNode: SUCCESS\n");
 	printf("Client_WriteNode: SUCCESS\n");
 
-	OpcUa_WriteValue_Clear(&nodesToWrite);
+	OpcUa_RequestHeader_Clear(&requestHeader);
+	OpcUa_ResponseHeader_Clear(&responseHeader);
+
+	OpcUa_WriteValue_Clear(&nodeToWrite);
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;

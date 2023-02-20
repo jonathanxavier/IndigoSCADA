@@ -610,6 +610,11 @@ int opcua_imp::PollItems(void)
 
 		if(value != OpcUa_Null)
 		{
+			if(Config_db[rowNumber].dataType == 0)
+			{ 
+				Config_db[rowNumber].dataType = value->Value.Datatype;
+			}
+
 			switch(value->Value.Datatype)
 			{
 				case OpcUaType_Int16:
@@ -1113,17 +1118,11 @@ void opcua_imp::check_for_commands(struct iec_item *queued_item)
 					case C_SC_TA_1:
 					{
 						cmd_val.v = queued_item->iec_obj.o.type58.scs;
-
-						ValueWrite.Value.Datatype = OpcUaType_Int32;
-						ValueWrite.Value.Value.Int32 = cmd_val.v;
 					}
 					break;
 					case C_DC_TA_1:
 					{
 						cmd_val.f = (float)queued_item->iec_obj.o.type59.dcs;
-
-						ValueWrite.Value.Datatype = OpcUaType_Float;
-						ValueWrite.Value.Value.Float = cmd_val.f;
 					}
 					break;
 					case C_SE_TA_1:
@@ -1152,32 +1151,79 @@ void opcua_imp::check_for_commands(struct iec_item *queued_item)
 					{
 						cmd_val.f = queued_item->iec_obj.o.type63.sv;
 
-						ValueWrite.Value.Datatype = OpcUaType_Float;
-						ValueWrite.Value.Value.Float = cmd_val.f;
+						switch(Config_db[rowNumber].dataType)
+						{
+							case OpcUaType_Int16:
+							{
+								ValueWrite.Value.Datatype = OpcUaType_Int16;
+								ValueWrite.Value.Value.Int16 = (int)cmd_val.f;
+								printf("value to write Int16 = %d\n", ValueWrite.Value.Value.Int16);
+							}
+							break;
+							case OpcUaType_Int32:
+							{
+								ValueWrite.Value.Datatype = OpcUaType_Int32;
+								ValueWrite.Value.Value.Int32 = (int)cmd_val.f;
+								printf("value to write Int32 = %d\n", ValueWrite.Value.Value.Int32);
+							}
+							break;
+							case OpcUaType_UInt16:
+							{
+								ValueWrite.Value.Datatype = OpcUaType_UInt16;
+								ValueWrite.Value.Value.UInt16 = (int)cmd_val.f;
+								printf("value to write UInt16 = %d\n", ValueWrite.Value.Value.UInt16);
+							}
+							break;
+							case OpcUaType_UInt32:
+							{
+								ValueWrite.Value.Datatype = OpcUaType_UInt32;
+								ValueWrite.Value.Value.UInt32 = (int)cmd_val.f;
+								printf("value to write UInt32 = %d\n", ValueWrite.Value.Value.UInt32);
+							}
+							break;
+							case OpcUaType_Float:
+							{
+								ValueWrite.Value.Datatype = OpcUaType_Float;
+								ValueWrite.Value.Value.Float = cmd_val.f;
+								printf("value to write Float = %f\n", ValueWrite.Value.Value.Float);
+							}
+							break;
+							case OpcUaType_Double:
+							{
+								ValueWrite.Value.Datatype = OpcUaType_Double;
+								ValueWrite.Value.Value.Double = (double)cmd_val.f;
+								printf("value to write Double = %lf\n", ValueWrite.Value.Value.Double);
+							}
+							break;
+							case OpcUaType_Boolean:
+							{
+								ValueWrite.Value.Datatype = OpcUaType_Boolean;
+								ValueWrite.Value.Value.Boolean = (int)cmd_val.f;
+								printf("value to write Boolean = %x\n", ValueWrite.Value.Value.Boolean);
+							}
+							break;
+							default:
+							{
+								fprintf(stderr, "Node ID type of command is not supported\n");
+								fflush(stderr);
+							}
+							break;
+						}
 					}
 					break;
 					case C_BO_TA_1:
 					{
 						memcpy(&(cmd_val.v), &(queued_item->iec_obj.o.type64.stcd), sizeof(struct iec_stcd));
-
-						ValueWrite.Value.Datatype = OpcUaType_Int32;
-						ValueWrite.Value.Value.Int32 = cmd_val.v;
 					}
 					break;
 					case C_SC_NA_1:
 					{
 						cmd_val.f = (float)queued_item->iec_obj.o.type45.scs;
-
-						ValueWrite.Value.Datatype = OpcUaType_Float;
-						ValueWrite.Value.Value.Float = cmd_val.f;
 					}
 					break;
 					case C_DC_NA_1:
 					{
 						cmd_val.f = (float)queued_item->iec_obj.o.type46.dcs;
-
-						ValueWrite.Value.Datatype = OpcUaType_Float;
-						ValueWrite.Value.Value.Float = cmd_val.f;
 					}
 					break;
 					case C_SE_NA_1:
@@ -1205,17 +1251,11 @@ void opcua_imp::check_for_commands(struct iec_item *queued_item)
 					case C_SE_NC_1:
 					{
 						cmd_val.f = queued_item->iec_obj.o.type50.sv;
-
-						ValueWrite.Value.Datatype = OpcUaType_Float;
-						ValueWrite.Value.Value.Float = cmd_val.f;
 					}
 					break;
 					case C_BO_NA_1:
 					{
 						memcpy(&(cmd_val.v), &(queued_item->iec_obj.o.type51.stcd), sizeof(struct iec_stcd));
-
-						ValueWrite.Value.Datatype = OpcUaType_Int32;
-						ValueWrite.Value.Value.Int32 = cmd_val.v;
 					}
 					break;
 					default:
@@ -1238,6 +1278,7 @@ void opcua_imp::check_for_commands(struct iec_item *queued_item)
 
 				strcpy(node_id, Config_db[rowNumber].nodeid);
 				namespace_index = Config_db[rowNumber].namespace_index;
+				printf("node_id to write = %s\n", node_id);
 
 				Client_WriteNode(&session, node_id, namespace_index, &ValueWrite);
 			}
