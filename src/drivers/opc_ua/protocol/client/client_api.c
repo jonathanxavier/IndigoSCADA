@@ -962,6 +962,81 @@ OpcUa_FinishErrorHandling;
 }
 
 /*===========================================================================================*/
+/** @brief Write node.                                                                    */
+/*===========================================================================================*/
+
+OpcUa_StatusCode Client_WriteNode(Session* a_pSession, char* node_id, int ns_idx, OpcUa_DataValue* pValueWrite)
+{
+	OpcUa_RequestHeader requestHeader;
+	OpcUa_ResponseHeader responseHeader;
+	OpcUa_Int32 nNoOfResults;
+	OpcUa_DataValue* pResults = OpcUa_Null;
+	OpcUa_Int32 nDiagnosticInfoCount = 0;
+	OpcUa_DiagnosticInfo* pDiagnosticInfos = NULL;
+
+	OpcUa_WriteValue nodesToWrite;
+	OpcUa_InitializeStatus(OpcUa_Module_Client, "Client_WriteNode");
+
+	OpcUa_ReturnErrorIfArgumentNull(a_pSession);
+	OpcUa_ReturnErrorIfArgumentNull(pValueWrite);
+		
+	OpcUa_RequestHeader_Initialize(&requestHeader);
+	OpcUa_ResponseHeader_Initialize(&responseHeader);
+
+	uStatus = OpcUa_NodeId_CopyTo(&a_pSession->AuthenticationToken, &requestHeader.AuthenticationToken);
+	//OpcUa_GotoErrorIfBad(uStatus);
+
+	requestHeader.TimeoutHint = 60000;
+	requestHeader.Timestamp = OpcUa_DateTime_UtcNow();
+
+	OpcUa_WriteValue_Initialize(&nodesToWrite);
+
+    nodesToWrite.NodeId.Identifier.String.strContent = node_id;
+	nodesToWrite.NodeId.Identifier.String.uLength = strlen(node_id);
+	nodesToWrite.NodeId.IdentifierType = OpcUa_IdentifierType_String;
+	nodesToWrite.NodeId.NamespaceIndex = ns_idx;
+	nodesToWrite.AttributeId = OpcUa_Attributes_Value;
+	nodesToWrite.Value = *pValueWrite;
+
+	uStatus = OpcUa_ClientApi_Write(
+		a_pSession->Channel,
+		&requestHeader,
+		1, 
+		&nodesToWrite,
+		&responseHeader,
+		&nNoOfResults,
+		&pResults,
+		&nDiagnosticInfoCount,
+		&pDiagnosticInfos);
+
+	if (OpcUa_IsBad(uStatus))
+	{
+		OpcUa_Trace(OPCUA_TRACE_LEVEL_ERROR, "Client_WriteNode: ERROR 0x%8X.\n", uStatus);
+		OpcUa_GotoErrorIfBad(uStatus);
+	}
+
+	if (OpcUa_IsBad(responseHeader.ServiceResult))
+	{
+		uStatus = responseHeader.ServiceResult;
+		OpcUa_Trace(OPCUA_TRACE_LEVEL_ERROR, "Client_ReadNode: ERROR 0x%8X.\n", responseHeader.ServiceResult);
+		OpcUa_GotoErrorIfBad(uStatus);
+	}
+
+	OpcUa_Trace(OPCUA_TRACE_LEVEL_SYSTEM, "Client_WriteNode: SUCCESS\n");
+	printf("Client_WriteNode: SUCCESS\n");
+
+	OpcUa_WriteValue_Clear(&nodesToWrite);
+
+OpcUa_ReturnStatusCode;
+OpcUa_BeginErrorHandling;
+
+	OpcUa_RequestHeader_Clear(&requestHeader);
+	OpcUa_ResponseHeader_Clear(&responseHeader);
+
+OpcUa_FinishErrorHandling;
+}
+
+/*===========================================================================================*/
 /** @brief Close session.                                                                    */
 /*===========================================================================================*/
 OpcUa_StatusCode Client_CloseSession(Session* a_pSession)

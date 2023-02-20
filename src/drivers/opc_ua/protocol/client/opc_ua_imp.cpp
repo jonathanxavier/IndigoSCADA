@@ -1099,6 +1099,8 @@ void opcua_imp::check_for_commands(struct iec_item *queued_item)
 			fprintf(stderr,"Aged delta time= %d\n", delta);
 			fflush(stderr);
 
+			OpcUa_DataValue ValueWrite;
+
 			if(delta < MAX_COMMAND_SEND_TIME && delta >= 0)
 			{
 				union {
@@ -1111,11 +1113,17 @@ void opcua_imp::check_for_commands(struct iec_item *queued_item)
 					case C_SC_TA_1:
 					{
 						cmd_val.v = queued_item->iec_obj.o.type58.scs;
+
+						ValueWrite.Value.Datatype = OpcUaType_Int32;
+						ValueWrite.Value.Value.Int32 = cmd_val.v;
 					}
 					break;
 					case C_DC_TA_1:
 					{
 						cmd_val.f = (float)queued_item->iec_obj.o.type59.dcs;
+
+						ValueWrite.Value.Datatype = OpcUaType_Float;
+						ValueWrite.Value.Value.Float = cmd_val.f;
 					}
 					break;
 					case C_SE_TA_1:
@@ -1143,21 +1151,33 @@ void opcua_imp::check_for_commands(struct iec_item *queued_item)
 					case C_SE_TC_1:
 					{
 						cmd_val.f = queued_item->iec_obj.o.type63.sv;
+
+						ValueWrite.Value.Datatype = OpcUaType_Float;
+						ValueWrite.Value.Value.Float = cmd_val.f;
 					}
 					break;
 					case C_BO_TA_1:
 					{
 						memcpy(&(cmd_val.v), &(queued_item->iec_obj.o.type64.stcd), sizeof(struct iec_stcd));
+
+						ValueWrite.Value.Datatype = OpcUaType_Int32;
+						ValueWrite.Value.Value.Int32 = cmd_val.v;
 					}
 					break;
 					case C_SC_NA_1:
 					{
 						cmd_val.f = (float)queued_item->iec_obj.o.type45.scs;
+
+						ValueWrite.Value.Datatype = OpcUaType_Float;
+						ValueWrite.Value.Value.Float = cmd_val.f;
 					}
 					break;
 					case C_DC_NA_1:
 					{
 						cmd_val.f = (float)queued_item->iec_obj.o.type46.dcs;
+
+						ValueWrite.Value.Datatype = OpcUaType_Float;
+						ValueWrite.Value.Value.Float = cmd_val.f;
 					}
 					break;
 					case C_SE_NA_1:
@@ -1185,11 +1205,17 @@ void opcua_imp::check_for_commands(struct iec_item *queued_item)
 					case C_SE_NC_1:
 					{
 						cmd_val.f = queued_item->iec_obj.o.type50.sv;
+
+						ValueWrite.Value.Datatype = OpcUaType_Float;
+						ValueWrite.Value.Value.Float = cmd_val.f;
 					}
 					break;
 					case C_BO_NA_1:
 					{
 						memcpy(&(cmd_val.v), &(queued_item->iec_obj.o.type51.stcd), sizeof(struct iec_stcd));
+
+						ValueWrite.Value.Datatype = OpcUaType_Int32;
+						ValueWrite.Value.Value.Int32 = cmd_val.v;
 					}
 					break;
 					default:
@@ -1206,8 +1232,14 @@ void opcua_imp::check_for_commands(struct iec_item *queued_item)
 					}
 					break;
 				}
-				
-				//TODO: implement write tag
+								
+				char node_id[50];
+				int namespace_index;
+
+				strcpy(node_id, Config_db[rowNumber].nodeid);
+				namespace_index = Config_db[rowNumber].namespace_index;
+
+				Client_WriteNode(&session, node_id, namespace_index, &ValueWrite);
 			}
 		}
 		else if(queued_item->iec_type == C_EX_IT_1)

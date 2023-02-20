@@ -165,6 +165,7 @@ OpcUa_StatusCode Client_CreateSession(Session* a_pSession);
 OpcUa_StatusCode Client_ActivateSession(Session* a_pSession);
 OpcUa_StatusCode Client_Browse(Session* a_pSession, OpcUa_Int a_iNodeID);
 OpcUa_StatusCode Client_ReadNode(Session* a_pSession, char* node_id, int ns_idx, OpcUa_DataValue** pValueRead);
+OpcUa_StatusCode Client_WriteNode(Session* a_pSession, char* node_id, int ns_idx, OpcUa_DataValue* pValueWrite);
 OpcUa_StatusCode Client_CloseSession(Session* a_pSession);
 
 #ifdef  __cplusplus
