@@ -770,7 +770,7 @@ OpcUa_StatusCode Client_Browse(Session* a_pSession, OpcUa_Int a_iNodeID)
 	OpcUa_ViewDescription view;
 	OpcUa_BrowseDescription nodesToBrowse;
 	int i;
-	char node_id_name[30];
+	char node_id_name[50];
 
 	OpcUa_InitializeStatus(OpcUa_Module_Client, "Client_Browse");
 
@@ -795,6 +795,7 @@ OpcUa_StatusCode Client_Browse(Session* a_pSession, OpcUa_Int a_iNodeID)
 
 	strcpy(node_id_name,"Demo.Dynamic.Scalar");
 	nodesToBrowse.NodeId.Identifier.String.strContent = node_id_name;
+	nodesToBrowse.NodeId.Identifier.String.uLength = strlen(node_id_name);
 	nodesToBrowse.NodeId.IdentifierType = OpcUa_IdentifierType_String;
 	nodesToBrowse.NodeId.NamespaceIndex = 2;
 

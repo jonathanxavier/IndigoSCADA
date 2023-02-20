@@ -81,7 +81,7 @@ class opcua_imp
 	void get_utc_host_time(struct cp56time2a* time);
 	void get_local_host_time(struct cp56time2a* time);
 	////////////////////////////////////////////////
-	void get_opc_ua_message_time(struct cp56time2a* time, FILETIME ft);
+	void get_opc_ua_message_time(struct cp56time2a* time, OpcUa_DateTime* timestamp);
 };
 
 #endif //OPC_UA_IMP_H

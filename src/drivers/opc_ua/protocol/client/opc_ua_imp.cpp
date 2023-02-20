@@ -439,9 +439,13 @@ void opcua_imp::LogMessage(int* error, const char* name)
 	*/
 }
 
-uint64_t getTimeInMs_from_filetime(FILETIME ft)
+uint64_t getTimeInMs_from_filetime(OpcUa_DateTime* timestamp)
 {
 	uint64_t now;
+	FILETIME ft;
+
+	ft.dwHighDateTime = timestamp->dwHighDateTime;
+	ft.dwLowDateTime = timestamp->dwLowDateTime;
 
 	static const uint64_t DIFF_TO_UNIXTIME = 11644473600000i64;
 
@@ -450,14 +454,14 @@ uint64_t getTimeInMs_from_filetime(FILETIME ft)
 	return (now / 10000i64) - DIFF_TO_UNIXTIME;
 }
 
-void opcua_imp::get_opc_ua_message_time(struct cp56time2a* time, FILETIME ft)
+void opcua_imp::get_opc_ua_message_time(struct cp56time2a* time, OpcUa_DateTime* timestamp)
 {
 
 	struct tm	*ptm;
 	int64_t epoch_in_ms;
 	int64_t seconds;
 
-	epoch_in_ms = getTimeInMs_from_filetime(ft);
+	epoch_in_ms = getTimeInMs_from_filetime(timestamp);
 
 	seconds = epoch_in_ms/1000;
 
@@ -580,8 +584,7 @@ int opcua_imp::PollItems(void)
 
 	struct iec_item item_to_send;
 	struct cp56time2a message_time;
-	FILETIME ft;
-	
+		
     bool send_item = true;
 
 	OpcUa_StatusCode uStatus = OpcUa_Good;
@@ -615,9 +618,7 @@ int opcua_imp::PollItems(void)
 					item_to_send.cause = 0x03;
 					item_to_send.iec_type = M_ME_TE_1;
 										
-					ft.dwLowDateTime = value->SourceTimestamp.dwLowDateTime;
-					ft.dwHighDateTime = value->SourceTimestamp.dwHighDateTime;
-					get_opc_ua_message_time(&message_time, ft);
+					get_opc_ua_message_time(&message_time, &(value->SourceTimestamp));
 
 					item_to_send.iec_obj.o.type35.mv = value->Value.Value.Int16;
 					item_to_send.iec_obj.o.type35.time = message_time;
@@ -632,10 +633,8 @@ int opcua_imp::PollItems(void)
 					item_to_send.iec_obj.ioa = Config_db[rowNumber].ioa_control_center;
 					item_to_send.cause = 0x03;
 					item_to_send.iec_type = M_IT_TB_1;
-					
-					ft.dwLowDateTime = value->SourceTimestamp.dwLowDateTime;
-					ft.dwHighDateTime = value->SourceTimestamp.dwHighDateTime;
-					get_opc_ua_message_time(&message_time, ft);
+										
+					get_opc_ua_message_time(&message_time, &(value->SourceTimestamp));
 
 					item_to_send.iec_obj.o.type37.counter = value->Value.Value.Int32;
 					item_to_send.iec_obj.o.type37.time = message_time;
@@ -650,10 +649,8 @@ int opcua_imp::PollItems(void)
 					item_to_send.iec_obj.ioa = Config_db[rowNumber].ioa_control_center;
 					item_to_send.cause = 0x03;
 					item_to_send.iec_type = M_ME_TQ_1;
-					
-					ft.dwLowDateTime = value->SourceTimestamp.dwLowDateTime;
-					ft.dwHighDateTime = value->SourceTimestamp.dwHighDateTime;
-					get_opc_ua_message_time(&message_time, ft);
+										
+					get_opc_ua_message_time(&message_time, &(value->SourceTimestamp));
 
 					item_to_send.iec_obj.o.type153.mv = value->Value.Value.UInt16;
 					item_to_send.iec_obj.o.type153.time = message_time;
@@ -668,10 +665,8 @@ int opcua_imp::PollItems(void)
 					item_to_send.iec_obj.ioa = Config_db[rowNumber].ioa_control_center;
 					item_to_send.cause = 0x03;
 					item_to_send.iec_type = M_ME_TO_1;
-					
-					ft.dwLowDateTime = value->SourceTimestamp.dwLowDateTime;
-					ft.dwHighDateTime = value->SourceTimestamp.dwHighDateTime;
-					get_opc_ua_message_time(&message_time, ft);
+										
+					get_opc_ua_message_time(&message_time, &(value->SourceTimestamp));
 
 					item_to_send.iec_obj.o.type151.mv = value->Value.Value.UInt32;
 					item_to_send.iec_obj.o.type151.time = message_time;
@@ -686,10 +681,8 @@ int opcua_imp::PollItems(void)
 					item_to_send.iec_obj.ioa = Config_db[rowNumber].ioa_control_center;
 					item_to_send.cause = 0x03;
 					item_to_send.iec_type = M_ME_TF_1;
-					
-					ft.dwLowDateTime = value->SourceTimestamp.dwLowDateTime;
-					ft.dwHighDateTime = value->SourceTimestamp.dwHighDateTime;
-					get_opc_ua_message_time(&message_time, ft);
+										
+					get_opc_ua_message_time(&message_time, &(value->SourceTimestamp));
 
 					item_to_send.iec_obj.o.type36.mv = value->Value.Value.Float;
 					item_to_send.iec_obj.o.type36.time = message_time;
@@ -704,10 +697,8 @@ int opcua_imp::PollItems(void)
 					item_to_send.iec_obj.ioa = Config_db[rowNumber].ioa_control_center;
 					item_to_send.cause = 0x03;
 					item_to_send.iec_type = M_ME_TN_1;
-					
-					ft.dwLowDateTime = value->SourceTimestamp.dwLowDateTime;
-					ft.dwHighDateTime = value->SourceTimestamp.dwHighDateTime;
-					get_opc_ua_message_time(&message_time, ft);
+										
+					get_opc_ua_message_time(&message_time, &(value->SourceTimestamp));
 
 					item_to_send.iec_obj.o.type150.mv = value->Value.Value.Float;
 					item_to_send.iec_obj.o.type150.time = message_time;
@@ -722,10 +713,8 @@ int opcua_imp::PollItems(void)
 					item_to_send.iec_obj.ioa = Config_db[rowNumber].ioa_control_center;
 					item_to_send.cause = 0x03;
 					item_to_send.iec_type = M_SP_TB_1;
-					
-					ft.dwLowDateTime = value->SourceTimestamp.dwLowDateTime;
-					ft.dwHighDateTime = value->SourceTimestamp.dwHighDateTime;
-					get_opc_ua_message_time(&message_time, ft);
+										
+					get_opc_ua_message_time(&message_time, &(value->SourceTimestamp));
 
 					item_to_send.iec_obj.o.type30.sp = value->Value.Value.Boolean;
 					item_to_send.iec_obj.o.type30.time = message_time;
