@@ -63,7 +63,7 @@
 #define UACLIENT_CERTIFICATE_LOCATION                           "../PKI/certs/Opc.Ua.Publisher [A482BEA2CEC01DCE670A6624A131943D3B1020AC].der"
 #define UACLIENT_PRIVATE_KEY_LOCATION                           "../PKI/private/Opc.Ua.Publisher [A482BEA2CEC01DCE670A6624A131943D3B1020AC].pfx"
 
-#define UACLIENTNAME              "Opc.Ua.Client"
+#define UACLIENTNAME              "IndigoSCADA Opc.Ua.Client"
 #define UACLIENTURI               "urn:localhost:OPCFoundation:AMQPPublisher"
 #define UACLIENT_PRODUCTURI		  "http://opcfoundation.org/UA/Publisher/"
 
