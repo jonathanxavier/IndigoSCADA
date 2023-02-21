@@ -1105,6 +1105,7 @@ void opcua_imp::check_for_commands(struct iec_item *queued_item)
 			fflush(stderr);
 
 			OpcUa_DataValue ValueWrite;
+			memset(&ValueWrite,0x00, sizeof(OpcUa_DataValue));
 
 			if(delta < MAX_COMMAND_SEND_TIME && delta >= 0)
 			{
