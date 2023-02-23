@@ -599,7 +599,7 @@ void Opcua_driver_Instance::get_items_from_local_fifo(void)
 			if(p_item->iec_type != C_LO_ST_1)
 			{
 				QString msg;
-				msg.sprintf("OPCUA master on line %d is now connected to OPCUA server.", instanceID + 1); 
+				msg.sprintf("OPCUA client on line %d is now connected to OPCUA server.", instanceID + 1); 
 				UnFailUnit(msg);
 				State = STATE_ASK_GENERAL_INTERROGATION;
 			}
@@ -1010,10 +1010,10 @@ void Opcua_driver_Instance::get_items_from_local_fifo(void)
 			{
 				if(State != STATE_FAIL)
 				{
-					printf("OPCUA master on line %d has lost connection with OPCUA server...\n", instanceID + 1);
+					printf("OPCUA client on line %d has lost connection with OPCUA server...\n", instanceID + 1);
 
 					QString msg;
-					msg.sprintf("OPCUA master on line %d has lost connection with OPCUA server...", instanceID + 1); 
+					msg.sprintf("OPCUA client on line %d has lost connection with OPCUA server...", instanceID + 1); 
 					FailUnit(msg);
 
 					State = STATE_FAIL;
