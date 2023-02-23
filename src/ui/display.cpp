@@ -15,11 +15,11 @@
 #include "IndentedTrace.h"
 #include "memmgr.h"
 
-//#define MALLOC memmgr_alloc
-//#define FREE memmgr_free
+#define MALLOC memmgr_alloc
+#define FREE memmgr_free
 
-#define MALLOC malloc
-#define FREE free
+//#define MALLOC malloc
+//#define FREE free
 
 void* StateListItem::operator new(size_t nbytes)
 {
