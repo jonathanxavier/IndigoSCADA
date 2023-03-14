@@ -218,3 +218,46 @@ void connect_hook(struct iecsock *s);
 #endif
 
 #endif
+
+/*
+CHANNEL SETTINGS
+Protocol Options
+
+t0 - Timeout of Connection establishment(s) - Maximum waiting time, in seconds, for a client TCP/IP
+connection establishment into the LISTENING port. After this time, this driver actively closes TCP/IP
+socket and restart it to LISTENING state. Allowed values lies between 1 and 255.
+t1 - Timeout of send or test APDUs(s) - Maximum acceptable time, in seconds, for the slave to send
+regular or test APDUs after receiving the START DT sending confirmation. Allowed values lie between 1
+and 255.
+t2 - Timeout for ack in case of no data(s)- Maximum waiting time, in seconds, for a pending
+acknowledgement before sending an acknowledgement for the last received message. A message with
+the sequence number of last received. Values from 1 to 255 are allowed. Besides, t2 must be inferior to
+t1.
+t3 - Timeout for send test frames(s) - Maximum waiting time, in seconds, for the arrival of any
+information (in case of a TCP-IP connection already established) before sending a TEST-FR. The Values
+are allowed are from 1 to 255.
+
+w - Send ack after received w I format APDUs - Number of information messages sent spontaneously to
+client until it sends an "acknowledgment" with the sequence number of last message it received.
+Allowed values lies between 1 and 32767.
+k - Messages received to send state variable - Maximum allowed number of pending
+acknowledgements before this slave stops sending new messages. The IEC standard recommends that
+w is, at most, two thirds of the k value. Values allowed are between 1 and 32767
+
+Comments:
+
+T0 must always be higher than T3, these two times supervise the communication status when there is no data, 
+if T3 is higher a disconnection is generated due to inactivity in the channel.
+
+T1 must always be higher than T2, these two times monitor the communication status when there is fluid traffic, 
+if T2 is lower it can generate disconnection due to lack of event confirmation.
+
+K must always be greater than W, these two parameters ensure the performance of the channel in conditions of 
+massive traffic. If K is lower than W, no disconnections will occur, however, for some moments the channel will 
+be inactive (around T2) despite having data to send.
+
+Generally when transmitting events on high latency channels, such as radio or satellite, disconnections may occur. 
+In this case, T1 can be increased to extend the time for receiving the confirmation of sent events; 
+and T2 can be reduced to confirm sequences faster.
+
+*/
