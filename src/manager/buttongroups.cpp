@@ -387,7 +387,9 @@ void ButtonsGroups::ProcessRestarter()
 ButtonsGroups::ButtonsGroups( QWidget *parent, const char *name )
     : QWidget( parent, name ),nBufferSize(500),nMaxProcCount(127),started(false)
 {
-    // Create Widgets which allow easy layouting
+    memset(&pProcInfo, 0, sizeof(pProcInfo));
+	
+	// Create Widgets which allow easy layouting
     QVBoxLayout *vbox = new QVBoxLayout( this, 11, 6 );
     QHBoxLayout *box1 = new QHBoxLayout( vbox );
     QHBoxLayout *box2 = new QHBoxLayout( vbox );
