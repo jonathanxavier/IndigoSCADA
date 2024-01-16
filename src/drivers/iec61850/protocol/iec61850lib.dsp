@@ -275,6 +275,10 @@ SOURCE=.\src\mms\iso_mms\asn1c\der_encoder.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\iec61850\server\model\dynamic_model.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\hal\filesystem\win32\file_provider_win32.c
 # End Source File
 # Begin Source File

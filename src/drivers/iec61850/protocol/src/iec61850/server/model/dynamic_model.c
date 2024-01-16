@@ -395,10 +395,11 @@ LogicalNode_addSettingGroupControlBlock(LogicalNode* self, SettingGroupControlBl
 SettingGroupControlBlock*
 SettingGroupControlBlock_create(LogicalNode* parent, uint8_t actSG, uint8_t numOfSGs)
 {
+	SettingGroupControlBlock* self;
     assert(actSG <= numOfSGs); /* actSG starting with 1 */
     assert(strcmp(parent->name, "LLN0") == 0);
 
-    SettingGroupControlBlock* self = (SettingGroupControlBlock*) GLOBAL_MALLOC(sizeof(SettingGroupControlBlock));
+    self = (SettingGroupControlBlock*) GLOBAL_MALLOC(sizeof(SettingGroupControlBlock));
 
     self->parent = parent;
     self->actSG = actSG;
@@ -669,12 +670,12 @@ DataSetEntry*
 DataSetEntry_create(DataSet* dataSet, const char* variable, int index, const char* component)
 {
     DataSetEntry* self = (DataSetEntry*) GLOBAL_MALLOC(sizeof(DataSetEntry));
-
     char variableName[130];
+	char* separator;
 
     strncpy(variableName, variable, 129);
 
-    char* separator = strchr(variableName, '/');
+    separator = strchr(variableName, '/');
 
     if (separator != NULL) {
         *separator = 0;
@@ -708,9 +709,10 @@ DataSetEntry_create(DataSet* dataSet, const char* variable, int index, const cha
 static void
 ModelNode_destroy(ModelNode* modelNode)
 {
+	ModelNode* currentChild;
     GLOBAL_FREEMEM(modelNode->name);
 
-    ModelNode* currentChild = modelNode->firstChild;
+    currentChild = modelNode->firstChild;
 
     while (currentChild != NULL) {
         ModelNode* nextChild = currentChild->sibling;
@@ -740,18 +742,28 @@ IedModel_destroy(IedModel* model)
     /* delete all logical devices */
 
     LogicalDevice* ld = model->firstChild;
+	LogicalNode* ln;
+	DataObject* currentDataObject;
+	LogicalNode* currentLn;
+	LogicalDevice* currentLd;
+	DataSet* dataSet;
+	ReportControlBlock* rcb;
+	GSEControlBlock* gcb;
+	SettingGroupControlBlock* sgcb;
+	LogControlBlock* lcb;
+	Log* log;
 
     while (ld != NULL) {
         GLOBAL_FREEMEM (ld->name);
 
-        LogicalNode* ln = (LogicalNode*) ld->firstChild;
+        ln = (LogicalNode*) ld->firstChild;
 
         while (ln != NULL) {
             GLOBAL_FREEMEM(ln->name);
 
             /* delete all data objects */
 
-            DataObject* currentDataObject = (DataObject*) ln->firstChild;
+            currentDataObject = (DataObject*) ln->firstChild;
 
             while (currentDataObject != NULL) {
                 DataObject* nextDataObject = (DataObject*) currentDataObject->sibling;
@@ -761,14 +773,14 @@ IedModel_destroy(IedModel* model)
                 currentDataObject = nextDataObject;
             }
 
-            LogicalNode* currentLn = ln;
+            currentLn = ln;
             ln = (LogicalNode*) ln->sibling;
 
             GLOBAL_FREEMEM(currentLn);
         }
 
 
-        LogicalDevice* currentLd = ld;
+        currentLd = ld;
         ld = (LogicalDevice*) ld->sibling;
 
         GLOBAL_FREEMEM(currentLd);
@@ -776,14 +788,15 @@ IedModel_destroy(IedModel* model)
 
     /*  delete all data sets */
 
-    DataSet* dataSet = model->dataSets;
+    dataSet = model->dataSets;
 
     while (dataSet != NULL) {
         DataSet* nextDataSet = dataSet->sibling;
+		DataSetEntry* dse;
 
         GLOBAL_FREEMEM(dataSet->name);
 
-        DataSetEntry* dse = dataSet->fcdas;
+        dse = dataSet->fcdas;
 
         while (dse != NULL) {
             DataSetEntry* nextDse = dse->sibling;
@@ -808,7 +821,7 @@ IedModel_destroy(IedModel* model)
 
     /* delete all RCBs */
 
-    ReportControlBlock* rcb = model->rcbs;
+    rcb = model->rcbs;
 
     while (rcb != NULL) {
         ReportControlBlock* nextRcb = rcb->sibling;
@@ -828,7 +841,7 @@ IedModel_destroy(IedModel* model)
 
     /* delete all GoCBs */
 
-    GSEControlBlock* gcb = model->gseCBs;
+    gcb = model->gseCBs;
 
     while (gcb != NULL) {
         GSEControlBlock* nextGcb = gcb->sibling;
@@ -847,7 +860,7 @@ IedModel_destroy(IedModel* model)
 
     /* delete setting controls */
 
-    SettingGroupControlBlock* sgcb = model->sgcbs;
+    sgcb = model->sgcbs;
 
     while (sgcb != NULL) {
         SettingGroupControlBlock* nextSgcb = sgcb->sibling;
@@ -858,7 +871,7 @@ IedModel_destroy(IedModel* model)
     }
 
     /* delete all LCBs */
-    LogControlBlock* lcb = model->lcbs;
+    lcb = model->lcbs;
 
     while (lcb != NULL) {
         LogControlBlock* nextLcb = lcb->sibling;
@@ -878,7 +891,7 @@ IedModel_destroy(IedModel* model)
     }
 
     /* delete all LOGs */
-    Log* log = model->logs;
+    log = model->logs;
 
     while (log != NULL) {
         Log* nextLog = log->sibling;

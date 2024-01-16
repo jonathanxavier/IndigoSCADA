@@ -144,7 +144,7 @@
 #define CONFIG_CONTROL_DEFAULT_SBO_TIMEOUT 15000
 
 /* include support for IEC 61850 reporting services */
-#define CONFIG_IEC61850_REPORT_SERVICE 0
+#define CONFIG_IEC61850_REPORT_SERVICE 1
 
 /* support buffered report control blocks with ResvTms field */
 #define CONFIG_IEC61850_BRCB_WITH_RESVTMS 1
